@@ -64,6 +64,38 @@ test('profileForProgram matches email.js', () => {
   assert.equal(profileForProgram({ usePlusTags: true }, programs, id).plus, false);
 });
 
+test('profileForProgram prefers a valid saved plusTagMap tag', () => {
+  const id = programs[0].id;
+  const base = { email: 'jane@gmail.com', usePlusTags: true };
+  const saved = profileForProgram({ ...base, plusTagMap: { [id]: 'my-tag' } }, programs, id);
+  assert.equal(saved.profile.email, email.plusAddress('jane@gmail.com', 'my-tag'));
+  const computed = email.plusAddress('jane@gmail.com', email.tagMap(programs)[id]);
+  assert.equal(profileForProgram({ ...base, plusTagMap: { [id]: 'Bad Tag!' } }, programs, id).profile.email, computed);
+  assert.equal(profileForProgram({ ...base, plusTagMap: { [id]: 'x'.repeat(25) } }, programs, id).profile.email, computed);
+  assert.equal(profileForProgram({ ...base, plusTagMap: {} }, programs, id).profile.email, computed);
+});
+
+test('parseBackup accepts signedUpAt and plusTagMap', () => {
+  const b = parseBackup(text(mk({
+    tracker: { a: { status: 'signed-up', note: '', updatedAt: NOW, signedUpAt: NOW } },
+    profile: { email: 'j@gmail.com', plusTagMap: { a: 'good', b: 'BAD TAG' } },
+  })));
+  assert.equal(b.tracker.a.signedUpAt, NOW);
+  assert.deepEqual(b.profile.plusTagMap, { a: 'good' });
+  assert.throws(() => parseBackup(text(mk({ tracker: { a: { status: 'todo', signedUpAt: 5 } } }))), /sign-up date/);
+  assert.throws(() => parseBackup(text(mk({ profile: { plusTagMap: [] } }))), /plus-tag/);
+  const big = {}; for (let i = 0; i < 5001; i++) big['k' + i] = 'a';
+  assert.throws(() => parseBackup(text(mk({ profile: { plusTagMap: big } }))), /too long/);
+});
+
+test('applyAnswers sets signedUpAt on done unless already present', () => {
+  const raw = mk({ tracker: { b: { status: 'todo', note: '', updatedAt: '' }, c: { status: 'todo', note: '', updatedAt: '', signedUpAt: '2026-01-01T00:00:00.000Z' } } });
+  const out = applyAnswers(raw, { b: { result: 'done' }, c: { result: 'done' } }, NOW);
+  assert.equal(out.tracker.b.signedUpAt, NOW);
+  assert.equal(out.tracker.c.signedUpAt, '2026-01-01T00:00:00.000Z');
+  assert.equal(applyAnswers(raw, { b: { result: 'skip' } }, NOW).tracker.b.signedUpAt, undefined);
+});
+
 test('parseAnswer', () => {
   assert.equal(parseAnswer(''), 'leave');
   assert.equal(parseAnswer(' D '), 'done');
@@ -87,7 +119,7 @@ test('applyAnswers updates only answered entries and keeps the rest', () => {
   }, NOW);
   assert.equal(JSON.stringify(raw), before, 'input is not mutated');
   assert.deepEqual(out.tracker.a, raw.tracker.a);
-  assert.deepEqual(out.tracker.b, { status: 'signed-up', note: 'keep', updatedAt: NOW });
+  assert.deepEqual(out.tracker.b, { status: 'signed-up', note: 'keep', updatedAt: NOW, signedUpAt: NOW });
   assert.equal(out.tracker.c.status, 'skipped');
   assert.deepEqual(out.tracker.d, { status: 'todo', note: 'Problem: CAPTCHA loop', updatedAt: NOW });
   assert.equal(out.tracker.f.status, 'signed-up');
