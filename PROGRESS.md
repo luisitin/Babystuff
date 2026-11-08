@@ -13,7 +13,24 @@ Seven `sonnet` researchers wrote `research/<lane>.json` and `research/<lane>-not
 - Fact-check (fresh `sonnet`): 23 entries re-checked (all below high, plus a seeded random 30% of high). 6 confirmed, 10 fixed, 8 unverifiable because the sites block automated reading (kept at medium with a caveat in notes), 0 dropped. See `research/factcheck.md`.
 - Link check (`haiku`): 27 OK, 10 blocked (403, bot challenge or connection error), 0 not found, 0 off-domain. See `research/link-check.md`.
 
-## Phase C, build: review in progress
-The contract is in `ARCHITECTURE.md`. Builder 1 (shell, directory, build, logic), builder 2 (My info, tracker, guided run) and builder 3 (autofill helper) are done. A `sonnet` code review is running, and its findings go to `docs/code-review.md`.
+## Phase C, build (done)
+- Contract: `ARCHITECTURE.md`. Builder 1 did the shell, directory, build and logic; builder 2 did My info, the tracker and the guided run; builder 3 did the autofill helper.
+- Review (`sonnet`): 28 findings (3 high, 10 medium, 15 low) in `docs/code-review.md`. All were fixed by the builders. Highlights:
+  - the skip link;
+  - focus hidden under the bottom nav;
+  - stale reads after a storage failure;
+  - import size caps;
+  - inline confirms instead of `window.confirm`, which is blocked in sandboxed iframes;
+  - autofill skipping spouse, doctor, LMP and honeypot fields;
+  - a final-domain check for autofill.
+- Mobile layout: compact header and filters, so the first card shows at 375x812. The guided run puts "Open sign-up page" first, with a sticky Done/Skip/Problem bar. "Recommended" is the default sort.
 
-## Phase D, checks and docs: not started
+## Phase D, checks and docs: in progress
+- Tests (`haiku`): `tests/data.test.mjs` (schema, enums, https, official domain, dates) and `tests/build.test.mjs` (fresh build matches, no external resources, CSP, no network APIs). The suite also includes the logic, store/tracker and autofill-matcher tests.
+- Docs (`haiku`): `README.md` and `PRIVACY.md`.
+- Final checks (`haiku`): running, results go to `docs/final-checks.md`.
+
+## Known gaps / next steps
+- Eight entries rest on official-domain search results because their sites block automated reading: Gerber, Babylist, buybuy BABY, Huggies, Edgepark, Early Head Start, Cribs for Kids, Healthy Start and PSI. Recheck them in a normal browser.
+- Diapers, feeding and baby care have few real freebies. Most brands offer only discounts or paid trials (see `research/excluded.md`).
+- Offers change. Re-run research and fact-checking every few months and update `verifiedOn`.
