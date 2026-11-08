@@ -1,0 +1,11 @@
+{
+  "name": "baby-freebies-finder",
+  "private": true,
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "test": "node --test"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
