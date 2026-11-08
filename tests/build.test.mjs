@@ -90,8 +90,14 @@ test('inline JS uses no network APIs', () => {
   }
 });
 
-test('every http(s) URL outside the data block is the SVG namespace or a program link', () => {
-  const allowed = new Set(['http://www.w3.org/2000/svg']);
+test('every http(s) URL outside the data block is a namespace, the Gmail search base, or a program link', () => {
+  // Namespaces are identifiers that are never fetched; the Gmail base opens the person's own Gmail search.
+  const allowed = new Set([
+    'http://www.w3.org/2000/svg',
+    'http://www.w3.org/2005/Atom',
+    'http://schemas.google.com/apps/2006',
+    'https://mail.google.com/mail/u/0/#search/',
+  ]);
   for (const p of programs) {
     allowed.add(p.signupUrl);
     for (const s of p.sourceUrls) allowed.add(s);

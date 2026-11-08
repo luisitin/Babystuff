@@ -57,6 +57,7 @@
       PROFILE_KEYS.forEach(function (k) {
         if (typeof data.profile[k] === 'string') profile[k] = data.profile[k].slice(0, MAX_FIELD);
       });
+      if (typeof data.profile.usePlusTags === 'boolean') profile.usePlusTags = data.profile.usePlusTags;
       if (profile.dueDate) profile.dueDate = BFF.util.normalizeDate(profile.dueDate);
     }
     return { tracker: clean, profile: profile };
@@ -134,6 +135,7 @@
     },
     exportJSON: function (opts) {
       var profile = opts && opts.includeProfile ? store.get('profile.v1', {}) : null;
+      if (profile && typeof profile === 'object') profile = Object.assign({}, profile, { usePlusTags: !!profile.usePlusTags });
       return buildExport(state(), profile, new Date().toISOString());
     },
     // Dry run: what would importJSON do? Throws on bad input.
@@ -244,11 +246,15 @@
     var hint = h('span', { class: 'fx-saved', role: 'status', 'aria-live': 'polite' });
     var link = h('a', { class: 'fx-link-btn', href: p.signupUrl, target: '_blank', rel: 'noopener noreferrer', text: 'Sign up ↗' });
     link.setAttribute('aria-label', 'Sign up for ' + p.name + ' (opens in a new tab)');
+    var addr = h('p', { class: 'fx-muted fx-trk-addr', hidden: '' });
+    var gm = h('a', { class: 'fx-link-btn fx-link-btn--ghost', target: '_blank', rel: 'noopener noreferrer', hidden: '', text: 'Search my Gmail ↗' });
+    gm.setAttribute('aria-label', 'Search my Gmail for ' + p.name + ' (opens your own Gmail in a new tab)');
     var el = h('li', { class: 'fx-trk-row' }, [
       h('div', { class: 'fx-trk-head' }, [
         h('div', { class: 'fx-trk-name' }, [h('strong', { text: p.name }), h('span', { class: 'fx-muted', text: p.brand || '' })]),
-        link
+        h('div', { class: 'fx-trk-links' }, [link, gm])
       ]),
+      addr,
       h('div', { class: 'fx-field' }, [h('label', { 'for': sid, text: 'Status for ' + p.name }), select]),
       h('div', { class: 'fx-field' }, [h('label', { 'for': nid, text: 'Notes for ' + p.name }), note, hint])
     ]);
@@ -276,12 +282,12 @@
     select.addEventListener('change', function () {
       if (!tracker.setStatus(id, select.value)) view.msg.textContent = SAVE_FAIL;
     });
-    view.rows[id] = { el: el, select: select, note: note };
+    view.rows[id] = { el: el, select: select, note: note, addr: addr, gm: gm };
     return el;
   }
 
-  function download(name, text) {
-    var blob = new Blob([text], { type: 'application/json' });
+  function download(name, text, type) {
+    var blob = new Blob([text], { type: type || 'application/json' });
     var url = URL.createObjectURL(blob);
     var a = document.createElement('a');
     a.href = url;
@@ -290,6 +296,147 @@
     document.body.appendChild(a);
     a.click();
     setTimeout(function () { URL.revokeObjectURL(url); a.remove(); }, 1000);
+  }
+
+  // ---- email and calendar helpers ----
+  function profileOf() {
+    var p = store.get('profile.v1', {});
+    return p && typeof p === 'object' && !Array.isArray(p) ? p : {};
+  }
+  function plusOn(pr) {
+    return !!pr.usePlusTags && BFF.email.supportsPlus(pr.email) !== false && !!BFF.email.plusAddress(pr.email, 'x');
+  }
+  function activePrograms() {
+    return (BFF.programs || []).filter(function (p) { return tracker.getStatus(p.id) !== 'skipped'; });
+  }
+  function localDate(iso) {
+    var t = Date.parse(iso);
+    if (isNaN(t)) return '';
+    var d = new Date(t);
+    return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate());
+  }
+  function copyText(text) {
+    function fallback() {
+      var ta = h('textarea', { 'aria-hidden': 'true', tabindex: '-1', readonly: '' });
+      ta.style.cssText = 'position:fixed;top:0;left:0;width:1px;height:1px;opacity:0';
+      ta.value = text;
+      document.body.appendChild(ta);
+      ta.select();
+      var ok = false;
+      try { ok = document.execCommand('copy'); } catch (e) {}
+      ta.remove();
+      return ok;
+    }
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      return navigator.clipboard.writeText(text).then(function () { return true; }, function () { return fallback(); });
+    }
+    return Promise.resolve(fallback());
+  }
+  function openLink(href) {
+    var a = document.createElement('a');
+    a.href = href;
+    a.style.display = 'none';
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(function () { a.remove(); }, 0);
+  }
+  // Show or hide the per-row address and Gmail search link from the current profile.
+  function syncEmailBits() {
+    var pr = profileOf(), E = BFF.email, all = BFF.programs || [];
+    var plus = plusOn(pr), gmail = E.isGmail(pr.email);
+    var map = plus ? E.tagMap(all) : {};
+    all.forEach(function (p) {
+      var r = view.rows[p.id];
+      if (!r) return;
+      var tag = plus ? map[p.id] : '';
+      r.addr.hidden = !plus;
+      r.addr.textContent = plus ? 'Sign up with: ' + E.plusAddress(pr.email, tag) : '';
+      r.gm.hidden = !gmail;
+      if (gmail) r.gm.setAttribute('href', E.gmailSearchUrl({ email: pr.email, tag: tag, domain: E.domainOfUrl(p.signupUrl) }));
+      else r.gm.removeAttribute('href');
+    });
+    if (view.mailHint) view.mailHint.hidden = !!E.plusAddress(pr.email, 'x');
+    if (view.gmailNote) view.gmailNote.hidden = !gmail;
+  }
+
+  function buildEmailPanel() {
+    var E = BFF.email;
+    var msg = h('p', { class: 'fx-msg', role: 'status', 'aria-live': 'polite' });
+    view.mailHint = h('p', { class: 'fx-warn', hidden: '' }, [
+      document.createTextNode('Add your email in '), h('a', { href: '#info', text: 'My info' }), document.createTextNode(' to email yourself the checklist.')
+    ]);
+    // 1. checklist by email
+    var mailBtn = h('button', { type: 'button', class: 'fx-btn fx-btn--primary', text: 'Email me my checklist' });
+    mailBtn.addEventListener('click', function () {
+      var pr = profileOf();
+      if (!E.plusAddress(pr.email, 'x')) {
+        msg.textContent = 'Add your email in My info first.';
+        view.mailHint.hidden = false;
+        return;
+      }
+      var r = E.mailtoChecklist({
+        to: pr.email.trim(), programs: activePrograms(),
+        statusOf: function (p) { return LABELS[tracker.getStatus(p.id)]; }
+      });
+      if (r.truncated) {
+        copyText(r.fullText).then(function (ok) {
+          msg.textContent = ok ? 'The list was too long for an email link, so it is cut short there. The full list is copied to your clipboard: paste it into the message.'
+            : 'The list was too long for an email link, so it is cut short there, and copying the full list failed.';
+        });
+      } else msg.textContent = 'Opening your email app with the checklist.';
+      openLink(r.url);
+    });
+    // 2. Gmail filters
+    var arch = h('input', { type: 'checkbox', id: 'trk-archive' });
+    var fBtn = h('button', { type: 'button', class: 'fx-btn', text: 'Download Gmail filters' });
+    fBtn.addEventListener('click', function () {
+      var pr = profileOf();
+      var xml = E.gmailFiltersXml(activePrograms(), { email: pr.email, usePlus: plusOn(pr), archive: arch.checked, allPrograms: BFF.programs || [] });
+      try {
+        download('baby-freebies-gmail-filters.xml', xml, 'application/xml');
+        msg.textContent = 'Downloaded baby-freebies-gmail-filters.xml. Import it in Gmail with the steps below.';
+      } catch (e) { msg.textContent = 'Could not create the file: ' + e.message; }
+    });
+    var steps = h('details', { class: 'fx-about' }, [
+      h('summary', { text: 'How to import the filters' }),
+      h('ol', {}, [
+        h('li', { text: 'On a computer, open Gmail and go to Settings (gear) > See all settings > Filters and Blocked Addresses.' }),
+        h('li', { text: 'Choose Import filters, then Choose file, and pick the downloaded file.' }),
+        h('li', { text: 'Select Open file, tick the filters you want, and choose Create filters.' })
+      ]),
+      h('p', { class: 'fx-small', text: 'Each filter adds a label like Baby Freebies/Program name to that program\u2019s mail. With plus addresses on, it matches the tagged address; otherwise it matches the program\u2019s sign-up domain.' })
+    ]);
+    // 3. reminders
+    var iBtn = h('button', { type: 'button', class: 'fx-btn', text: 'Download reminders (.ics)' });
+    iBtn.addEventListener('click', function () {
+      var entries = [];
+      (BFF.programs || []).forEach(function (p) {
+        if (tracker.getStatus(p.id) !== 'signed-up') return;
+        var d = localDate(entryOf(state(), p.id).updatedAt);
+        if (d) entries.push({ id: p.id, name: p.name, date: d });
+      });
+      if (!entries.length) {
+        msg.textContent = 'No programs are marked Signed up yet. Mark a program as Signed up, then come back: each reminder lands 28 days after the date you marked it.';
+        return;
+      }
+      try {
+        download('baby-freebies-reminders.ics', E.icsReminders(entries, { days: 28 }), 'text/calendar');
+        msg.textContent = 'Downloaded ' + plural(entries.length, 'reminder') + '. Open the file to add them to your calendar.';
+      } catch (e) { msg.textContent = 'Could not create the file: ' + e.message; }
+    });
+    view.gmailNote = h('p', { class: 'fx-small', hidden: '', text: 'The Search my Gmail links on each row open your own Gmail in a new tab. This app never sees your mail.' });
+    return h('section', { class: 'fx-card', 'aria-labelledby': 'trk-mail-h' }, [
+      h('h3', { id: 'trk-mail-h', text: 'Email and calendar' }),
+      h('p', { class: 'fx-muted', text: 'These hand off to your own mail app, Gmail or calendar. Nothing is sent from this app.' }),
+      view.mailHint,
+      h('div', { class: 'fx-actions' }, [mailBtn]),
+      h('div', { class: 'fx-check' }, [arch, h('label', { 'for': 'trk-archive', text: 'Skip the inbox (archive)' })]),
+      h('div', { class: 'fx-actions' }, [fBtn]),
+      steps,
+      h('div', { class: 'fx-actions' }, [iBtn]),
+      view.gmailNote,
+      msg
+    ]);
   }
 
   view.init = function (el) {
@@ -314,6 +461,7 @@
     el.appendChild(view.storeWarn);
     el.appendChild(view.msg);
     el.appendChild(view.live);
+    el.appendChild(buildEmailPanel());
 
     var bar = h('div', { class: 'fx-tabs', role: 'group', 'aria-label': 'Filter by status' });
     [['all', 'All']].concat(STATUSES.map(function (s) { return [s, LABELS[s]]; })).forEach(function (f) {
@@ -404,10 +552,13 @@
     function flushAll() { view.flushers.forEach(function (f) { f(); }); }
     window.addEventListener('pagehide', flushAll);
     document.addEventListener('visibilitychange', function () { if (document.visibilityState === 'hidden') flushAll(); });
+    syncEmailBits();
+    document.addEventListener('bff:profile-changed', syncEmailBits);
     updateSummary();
     applyFilter();
   };
   view.show = function () {
+    syncEmailBits();
     (BFF.programs || []).forEach(function (p) { syncRow(p.id); });
     view.msg.textContent = '';
     updateSummary();

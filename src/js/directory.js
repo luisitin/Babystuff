@@ -16,6 +16,7 @@
 
   var state = Object.assign({}, DEFAULTS);
   var els = {};
+  var shownIds = [];
   var uid = 0;
 
   function h(tag, attrs, kids) {
@@ -105,8 +106,16 @@
     emptyClear.addEventListener('click', clearFilters);
     els.empty.appendChild(emptyClear);
 
+    els.start = h('button', { type: 'button', class: 'btn btn-primary start-run' });
+    els.start.addEventListener('click', function () {
+      if (!shownIds.length || !BFF.guided) return;
+      BFF.guided.preselect(shownIds.slice());
+      location.hash = '#guided';
+    });
+
     root.appendChild(filters);
     root.appendChild(resultRow);
+    root.appendChild(h('div', { class: 'start-row' }, [els.start]));
     root.appendChild(els.list);
     root.appendChild(els.empty);
   }
@@ -213,6 +222,9 @@
     els.list.appendChild(frag);
     els.count.textContent = 'Showing ' + shown.length + ' of ' + all.length + ' programs';
     els.empty.hidden = shown.length !== 0;
+    shownIds = shown.map(function (p) { return p.id; });
+    els.start.textContent = 'Start a guided run with these ' + shown.length;
+    els.start.disabled = shown.length === 0;
   }
 
   function onTrackerChanged() {

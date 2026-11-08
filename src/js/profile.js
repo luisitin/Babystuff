@@ -38,6 +38,7 @@
   }
 
   var inputs = {}, hints = {}, statusEl = null, timer = null, keptDue = '', dueHint = null;
+  var plusBox = null, plusPreview = null, plusNote = null;
 
   function read() {
     var p = store.get(KEY, {});
@@ -63,12 +64,32 @@
       inputs[f.key].value = v;
       if (f.check) validate(f);
     });
+    if (plusBox) { plusBox.checked = !!p.usePlusTags; updatePlus(); }
+  }
+  // Live preview of the tagged address plus a note about the person's email provider.
+  function updatePlus() {
+    if (!plusPreview) return;
+    var E = BFF.email, email = inputs.email.value.trim();
+    var progs = BFF.programs || [];
+    var ex = progs[0], tag = ex && E ? E.tagFor(ex, progs) : 'similac';
+    var addr = E ? E.plusAddress(email, tag) : '';
+    var sup = E ? E.supportsPlus(email) : null;
+    if (!addr) {
+      plusPreview.textContent = 'Add your email above to see a preview.';
+      plusNote.textContent = '';
+      return;
+    }
+    plusPreview.textContent = 'Preview: ' + addr + (ex ? ' (for ' + ex.name + ')' : '');
+    if (sup === true) plusNote.textContent = 'Your email provider supports plus addresses. Mail to the tagged address still arrives in your normal inbox.';
+    else if (sup === false) plusNote.textContent = 'Yahoo uses a hyphen instead of a plus sign (a different kind of address), so this app will not tag Yahoo addresses. Your plain email is used.';
+    else plusNote.textContent = 'Check your provider: not every email service delivers plus addresses. Send yourself a test message before relying on this.';
   }
   function saveNow() {
     timer = null;
     var p = {};
     FIELDS.forEach(function (f) { p[f.key] = inputs[f.key].value.trim(); });
     if (!p.dueDate && keptDue) p.dueDate = keptDue;
+    p.usePlusTags = !!(plusBox && plusBox.checked);
     var ok = store.set(KEY, p);
     statusEl.className = 'fx-saved fx-saved--block' + (ok ? '' : ' fx-hint');
     statusEl.textContent = ok ? 'Saved on this device' : 'Could not save on this device (storage is full or blocked). Your info is kept only until you close this page.';
@@ -102,6 +123,7 @@
         hints[f.key] = hint;
         var evt = f.select || f.type === 'date' ? 'change' : 'input';
         input.addEventListener(evt, function () {
+          if (f.key === 'email') updatePlus();
           if (f.check) validate(f);
           if (f.key === 'dueDate' && input.value) { keptDue = ''; hint.textContent = ''; }
           statusEl.className = 'fx-saved fx-saved--block';
@@ -113,6 +135,23 @@
         form.appendChild(h('div', { class: 'fx-field' }, [h('label', { 'for': id, text: f.label }), input, hint]));
       });
       el.appendChild(form);
+
+      plusBox = h('input', { type: 'checkbox', id: 'info-plus' });
+      plusPreview = h('p', { class: 'fx-plus-preview', role: 'status', 'aria-live': 'polite' });
+      plusNote = h('p', { class: 'fx-muted' });
+      plusBox.addEventListener('change', function () {
+        statusEl.className = 'fx-saved fx-saved--block';
+        statusEl.textContent = 'Saving…';
+        if (timer) clearTimeout(timer);
+        timer = setTimeout(saveNow, 400);
+      });
+      el.appendChild(h('section', { class: 'fx-card', 'aria-labelledby': 'info-plus-h' }, [
+        h('h3', { id: 'info-plus-h', text: 'Plus addresses' }),
+        h('div', { class: 'fx-check' }, [plusBox, h('label', { 'for': 'info-plus', text: 'Give each program its own plus address' })]),
+        h('p', { class: 'fx-muted', text: 'Adds a short tag to your email, like yourname+similac@gmail.com. The guided run copies the tagged address, and you can filter or search your inbox by program.' }),
+        plusPreview,
+        plusNote
+      ]));
 
       statusEl = h('p', { class: 'fx-saved fx-saved--block', role: 'status', 'aria-live': 'polite' });
       var clear = h('button', { type: 'button', class: 'fx-btn fx-btn--danger', text: 'Clear my info' });

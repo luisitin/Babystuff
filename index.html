@@ -300,6 +300,12 @@ main:focus { outline: none; }
 @media (prefers-reduced-motion: no-preference) {
   .btn, .theme-toggle { transition: background-color .15s, border-color .15s; }
 }
+
+/* Directory: start a guided run */
+.start-row { margin: 0 0 var(--space-3); }
+.start-row .btn { width: 100%; }
+.btn:disabled { opacity: .5; cursor: not-allowed; }
+@media (min-width: 640px) { .start-row .btn { width: auto; } }
 /* Styles for My info, Tracker and Do it for me. Uses base.css tokens, with fallbacks. */
 .fx-view { --fx-bg: var(--bg, #fff); --fx-surface: var(--surface, #f6f7f9); --fx-text: var(--text, #1c2430); --fx-muted: var(--muted, #5b6676);
   --fx-primary: var(--primary, #2457c5); --fx-pc: var(--primary-contrast, #fff); --fx-border: var(--border, #cfd6e0);
@@ -399,6 +405,16 @@ main:focus { outline: none; }
   .fx-form .fx-field:nth-child(5), .fx-form .fx-field:nth-child(6) { grid-column: 1 / -1; }
   .fx-btn--big { width: auto; min-width: 20rem; }
 }
+/* Phase E: plus tags, shortcuts, email and calendar */
+.fx-plus-preview { font-weight: 600; word-break: break-all; }
+.fx-trk-links { display: flex; flex-wrap: wrap; gap: var(--fx-s2); align-items: center; }
+.fx-link-btn--ghost { color: var(--fx-primary); background: var(--fx-bg); }
+.fx-link-btn--ghost[hidden], .fx-trk-addr[hidden] { display: none; }
+.fx-trk-addr { margin: var(--fx-s1) 0 0; word-break: break-all; }
+.fx-keys { list-style: none; padding: 0; margin: 0 0 var(--fx-s3); display: grid; grid-template-columns: 1fr 1fr; gap: var(--fx-s2); }
+.fx-keys kbd { display: inline-block; min-width: 1.6em; padding: 0 var(--fx-s2); text-align: center; font: inherit; font-weight: 700; color: var(--fx-text); background: var(--fx-bg); border: 1px solid var(--fx-border); border-radius: 6px; }
+.fx-card ol { margin: var(--fx-s2) 0; padding-left: var(--fx-s5); }
+.fx-card ol li { margin: var(--fx-s1) 0; }
 @media (prefers-reduced-motion: reduce) { .fx-view * { transition: none !important; } }
 </style>
 </head>
@@ -785,6 +801,227 @@ main:focus { outline: none; }
     closeConfirm: closePanel
   };
 })();
+// Pure helpers for plus addresses, Gmail filters, a mailto checklist and calendar reminders.
+// Nothing here touches the network or the DOM. Loadable from Node tests as well as the browser.
+(function (root) {
+  'use strict';
+
+  var PLUS_OK = ['gmail.com', 'googlemail.com', 'outlook.com', 'hotmail.com', 'live.com', 'icloud.com', 'me.com',
+    'fastmail.com', 'proton.me', 'protonmail.com'];
+  var GMAIL = ['gmail.com', 'googlemail.com'];
+  var MAX_TAG = 24;
+  var MAX_URL = 1900;
+  var SEARCH_BASE = 'https://mail.google.com/mail/u/0/#search/';
+  var NS_ATOM = 'http://www.w3.org/2005/Atom';
+  var NS_APPS = 'http://schemas.google.com/apps/2006';
+
+  function str(v) { return typeof v === 'string' ? v : v == null ? '' : String(v); }
+
+  // ---- addresses ----
+  function splitEmail(email) {
+    var e = str(email).trim();
+    var at = e.lastIndexOf('@');
+    if (at < 1 || at === e.length - 1) return null;
+    var local = e.slice(0, at), domain = e.slice(at + 1).toLowerCase();
+    if (/[\s@,;<>()"]/.test(local) || !/^[^\s@,;<>()"]+\.[^\s@,;<>()"]+$/.test(domain) || /^\.|\.$|\.\./.test(domain)) return null;
+    var plus = local.indexOf('+');
+    var base = plus >= 0 ? local.slice(0, plus) : local;
+    if (!base) return null;
+    return { base: base, domain: domain };
+  }
+
+  function plusAddress(email, tag) {
+    var parts = splitEmail(email);
+    var t = str(tag).toLowerCase().replace(/[^a-z0-9-]/g, '');
+    if (!parts || !t) return '';
+    return parts.base + '+' + t + '@' + parts.domain;
+  }
+
+  function supportsPlus(email) {
+    var parts = splitEmail(email);
+    if (!parts) return null;
+    if (parts.domain === 'yahoo.com') return false; // Yahoo uses "-" instead of "+"
+    return PLUS_OK.indexOf(parts.domain) >= 0 ? true : null;
+  }
+
+  function isGmail(email) {
+    var parts = splitEmail(email);
+    return !!parts && GMAIL.indexOf(parts.domain) >= 0;
+  }
+
+  // ---- tags ----
+  function firstSegment(id) { return str(id).toLowerCase().split('-')[0].replace(/[^a-z0-9]/g, ''); }
+  function baseOf(p) {
+    var b = str(p.brand).replace(/\([^)]*\)/g, ' ').trim().split(/\s+/)[0] || '';
+    b = b.toLowerCase().replace(/[^a-z0-9]/g, '');
+    if (!b) b = firstSegment(p.id);
+    if (!b) b = 'program';
+    return b.slice(0, MAX_TAG);
+  }
+  function clip(s) { return s.slice(0, MAX_TAG).replace(/-+$/, ''); }
+
+  function tagMap(all) {
+    var list = Array.isArray(all) ? all.slice() : [];
+    list.sort(function (a, b) { return str(a.id) < str(b.id) ? -1 : str(a.id) > str(b.id) ? 1 : 0; });
+    var groups = {}, order = [], used = {}, out = {};
+    list.forEach(function (p) {
+      var b = baseOf(p);
+      if (!groups[b]) { groups[b] = []; order.push(b); }
+      groups[b].push(p);
+    });
+    // Every group's first program keeps the plain base (bases are distinct by construction).
+    order.forEach(function (b) { out[groups[b][0].id] = b; used[b] = true; });
+    order.forEach(function (b) {
+      groups[b].slice(1).forEach(function (p) {
+        var segs = str(p.id).toLowerCase().split('-').map(function (s) { return s.replace(/[^a-z0-9]/g, ''); }).filter(Boolean);
+        var seg = '';
+        for (var i = 0; i < segs.length; i++) if (segs[i] !== b) { seg = segs[i]; break; }
+        var cand = seg ? clip(b + '-' + seg) : '';
+        var n = 2;
+        while (!cand || used[cand]) { cand = clip((seg ? b + '-' + seg : b).slice(0, MAX_TAG - String(n).length - 1)) + '-' + n; n++; }
+        used[cand] = true;
+        out[p.id] = cand;
+      });
+    });
+    return out;
+  }
+
+  function tagFor(program, all) {
+    var list = Array.isArray(all) ? all : [];
+    var has = list.some(function (p) { return p.id === program.id; });
+    return tagMap(has ? list : list.concat([program]))[program.id];
+  }
+
+  // ---- Gmail ----
+  function domainOfUrl(url) {
+    var m = /^https?:\/\/([^\/?#:]+)/i.exec(str(url));
+    return m ? m[1].toLowerCase().replace(/^www\./, '') : '';
+  }
+
+  function gmailSearchUrl(o) {
+    o = o || {};
+    var domain = str(o.domain).trim();
+    var plus = o.tag ? plusAddress(o.email, o.tag) : '';
+    var q;
+    if (plus) q = 'to:(' + plus + ')' + (domain ? ' OR from:(' + domain + ')' : '');
+    else if (domain) q = 'from:(' + domain + ')';
+    else return '';
+    return SEARCH_BASE + encodeURIComponent(q);
+  }
+
+  function xmlEscape(s) {
+    return str(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&apos;');
+  }
+
+  function gmailFiltersXml(programs, opts) {
+    opts = opts || {};
+    var list = Array.isArray(programs) ? programs : [];
+    var map = tagMap(Array.isArray(opts.allPrograms) ? opts.allPrograms : list);
+    var out = ['<?xml version="1.0" encoding="UTF-8"?>',
+      '<feed xmlns="' + NS_ATOM + '" xmlns:apps="' + NS_APPS + '">',
+      '<title>Mail Filters</title>'];
+    list.forEach(function (p) {
+      var plus = opts.usePlus ? plusAddress(opts.email, map[p.id]) : '';
+      var domain = domainOfUrl(p.signupUrl);
+      var key = plus ? 'to' : 'from';
+      var val = plus || domain;
+      if (!val) return;
+      var label = 'Baby Freebies/' + str(p.name).replace(/\//g, '-').trim();
+      out.push('<entry>', '<category term="filter"></category>', '<title>Mail Filter</title>', '<content></content>',
+        '<apps:property name="' + key + '" value="' + xmlEscape(val) + '"/>',
+        '<apps:property name="label" value="' + xmlEscape(label) + '"/>');
+      if (opts.archive) out.push('<apps:property name="shouldArchive" value="true"/>');
+      out.push('</entry>');
+    });
+    out.push('</feed>');
+    return out.join('\n') + '\n';
+  }
+
+  // ---- mailto checklist ----
+  function mailtoChecklist(o) {
+    o = o || {};
+    var list = Array.isArray(o.programs) ? o.programs : [];
+    var statusOf = typeof o.statusOf === 'function' ? o.statusOf : function () { return ''; };
+    var subject = 'Baby freebies checklist';
+    var lines = list.map(function (p) {
+      var st = str(statusOf(p));
+      return '- ' + str(p.name) + (st ? ' [' + st + ']' : '') + '\n  ' + str(p.signupUrl);
+    });
+    var to = encodeURIComponent(str(o.to).trim()).replace(/%40/g, '@');
+    function build(text) {
+      return 'mailto:' + to + '?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(text);
+    }
+    var fullText = lines.length ? lines.join('\n') : '(No programs in the list yet.)';
+    var url = build(fullText);
+    if (url.length < MAX_URL) return { url: url, truncated: false, fullText: fullText };
+    for (var k = lines.length - 1; k >= 0; k--) {
+      var text = lines.slice(0, k).concat(['…and ' + (lines.length - k) + ' more (see the app)']).join('\n');
+      url = build(text);
+      if (url.length < MAX_URL) return { url: url, truncated: true, fullText: fullText };
+    }
+    return { url: build('…and ' + lines.length + ' more (see the app)'), truncated: true, fullText: fullText };
+  }
+
+  // ---- iCalendar ----
+  function pad(n) { return (n < 10 ? '0' : '') + n; }
+  function ymd(d) { return d.getUTCFullYear() + pad(d.getUTCMonth() + 1) + pad(d.getUTCDate()); }
+  // YYYY-MM-DD plus whole days, using UTC arithmetic only (no local timezone involved).
+  function addDays(date, days) {
+    var m = /^(\d{4})-(\d{2})-(\d{2})/.exec(str(date));
+    if (!m) return null;
+    var t = Date.UTC(+m[1], +m[2] - 1, +m[3]);
+    var d = new Date(t);
+    if (d.getUTCFullYear() !== +m[1] || d.getUTCMonth() !== +m[2] - 1 || d.getUTCDate() !== +m[3]) return null;
+    return new Date(t + days * 86400000);
+  }
+  function icsText(s) {
+    return str(s).replace(/\\/g, '\\\\').replace(/;/g, '\\;').replace(/,/g, '\\,').replace(/\r?\n/g, '\\n');
+  }
+  function utf8Len(ch) {
+    var c = ch.codePointAt(0);
+    return c < 0x80 ? 1 : c < 0x800 ? 2 : c < 0x10000 ? 3 : 4;
+  }
+  // Fold at 75 octets without splitting a character; continuation lines start with one space.
+  function fold(line) {
+    var out = [], cur = '', n = 0, limit = 75;
+    for (var ch of line) {
+      var l = utf8Len(ch);
+      if (n + l > limit) { out.push(cur); cur = ' '; n = 1; limit = 75; }
+      cur += ch;
+      n += l;
+    }
+    out.push(cur);
+    return out.join('\r\n');
+  }
+
+  function icsReminders(entries, opts) {
+    var days = opts && typeof opts.days === 'number' ? opts.days : 28;
+    var lines = ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//Baby Freebies Finder//EN', 'CALSCALE:GREGORIAN', 'METHOD:PUBLISH'];
+    (Array.isArray(entries) ? entries : []).forEach(function (e) {
+      var start = addDays(e.date, days);
+      if (!start) return;
+      var end = new Date(start.getTime() + 86400000);
+      lines.push('BEGIN:VEVENT',
+        'UID:' + icsText(e.id) + '@baby-freebies-finder',
+        'DTSTAMP:' + ymd(start) + 'T000000Z',
+        'DTSTART;VALUE=DATE:' + ymd(start),
+        'DTEND;VALUE=DATE:' + ymd(end),
+        'SUMMARY:' + icsText('Check for ' + str(e.name) + ' mail or box'),
+        'TRANSP:TRANSPARENT',
+        'END:VEVENT');
+    });
+    lines.push('END:VCALENDAR');
+    return lines.map(fold).join('\r\n') + '\r\n';
+  }
+
+  var api = {
+    tagFor: tagFor, tagMap: tagMap, plusAddress: plusAddress, supportsPlus: supportsPlus, isGmail: isGmail,
+    gmailSearchUrl: gmailSearchUrl, gmailFiltersXml: gmailFiltersXml, mailtoChecklist: mailtoChecklist,
+    icsReminders: icsReminders, domainOfUrl: domainOfUrl, MAX_TAG: MAX_TAG
+  };
+  if (typeof module === 'object' && module.exports) module.exports = api;
+  else { root.BFF = root.BFF || {}; root.BFF.email = api; }
+})(typeof window !== 'undefined' ? window : globalThis);
 (function () {
   'use strict';
   var BFF = (window.BFF = window.BFF || {});
@@ -844,6 +1081,7 @@ main:focus { outline: none; }
       PROFILE_KEYS.forEach(function (k) {
         if (typeof data.profile[k] === 'string') profile[k] = data.profile[k].slice(0, MAX_FIELD);
       });
+      if (typeof data.profile.usePlusTags === 'boolean') profile.usePlusTags = data.profile.usePlusTags;
       if (profile.dueDate) profile.dueDate = BFF.util.normalizeDate(profile.dueDate);
     }
     return { tracker: clean, profile: profile };
@@ -921,6 +1159,7 @@ main:focus { outline: none; }
     },
     exportJSON: function (opts) {
       var profile = opts && opts.includeProfile ? store.get('profile.v1', {}) : null;
+      if (profile && typeof profile === 'object') profile = Object.assign({}, profile, { usePlusTags: !!profile.usePlusTags });
       return buildExport(state(), profile, new Date().toISOString());
     },
     // Dry run: what would importJSON do? Throws on bad input.
@@ -1031,11 +1270,15 @@ main:focus { outline: none; }
     var hint = h('span', { class: 'fx-saved', role: 'status', 'aria-live': 'polite' });
     var link = h('a', { class: 'fx-link-btn', href: p.signupUrl, target: '_blank', rel: 'noopener noreferrer', text: 'Sign up ↗' });
     link.setAttribute('aria-label', 'Sign up for ' + p.name + ' (opens in a new tab)');
+    var addr = h('p', { class: 'fx-muted fx-trk-addr', hidden: '' });
+    var gm = h('a', { class: 'fx-link-btn fx-link-btn--ghost', target: '_blank', rel: 'noopener noreferrer', hidden: '', text: 'Search my Gmail ↗' });
+    gm.setAttribute('aria-label', 'Search my Gmail for ' + p.name + ' (opens your own Gmail in a new tab)');
     var el = h('li', { class: 'fx-trk-row' }, [
       h('div', { class: 'fx-trk-head' }, [
         h('div', { class: 'fx-trk-name' }, [h('strong', { text: p.name }), h('span', { class: 'fx-muted', text: p.brand || '' })]),
-        link
+        h('div', { class: 'fx-trk-links' }, [link, gm])
       ]),
+      addr,
       h('div', { class: 'fx-field' }, [h('label', { 'for': sid, text: 'Status for ' + p.name }), select]),
       h('div', { class: 'fx-field' }, [h('label', { 'for': nid, text: 'Notes for ' + p.name }), note, hint])
     ]);
@@ -1063,12 +1306,12 @@ main:focus { outline: none; }
     select.addEventListener('change', function () {
       if (!tracker.setStatus(id, select.value)) view.msg.textContent = SAVE_FAIL;
     });
-    view.rows[id] = { el: el, select: select, note: note };
+    view.rows[id] = { el: el, select: select, note: note, addr: addr, gm: gm };
     return el;
   }
 
-  function download(name, text) {
-    var blob = new Blob([text], { type: 'application/json' });
+  function download(name, text, type) {
+    var blob = new Blob([text], { type: type || 'application/json' });
     var url = URL.createObjectURL(blob);
     var a = document.createElement('a');
     a.href = url;
@@ -1077,6 +1320,147 @@ main:focus { outline: none; }
     document.body.appendChild(a);
     a.click();
     setTimeout(function () { URL.revokeObjectURL(url); a.remove(); }, 1000);
+  }
+
+  // ---- email and calendar helpers ----
+  function profileOf() {
+    var p = store.get('profile.v1', {});
+    return p && typeof p === 'object' && !Array.isArray(p) ? p : {};
+  }
+  function plusOn(pr) {
+    return !!pr.usePlusTags && BFF.email.supportsPlus(pr.email) !== false && !!BFF.email.plusAddress(pr.email, 'x');
+  }
+  function activePrograms() {
+    return (BFF.programs || []).filter(function (p) { return tracker.getStatus(p.id) !== 'skipped'; });
+  }
+  function localDate(iso) {
+    var t = Date.parse(iso);
+    if (isNaN(t)) return '';
+    var d = new Date(t);
+    return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate());
+  }
+  function copyText(text) {
+    function fallback() {
+      var ta = h('textarea', { 'aria-hidden': 'true', tabindex: '-1', readonly: '' });
+      ta.style.cssText = 'position:fixed;top:0;left:0;width:1px;height:1px;opacity:0';
+      ta.value = text;
+      document.body.appendChild(ta);
+      ta.select();
+      var ok = false;
+      try { ok = document.execCommand('copy'); } catch (e) {}
+      ta.remove();
+      return ok;
+    }
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      return navigator.clipboard.writeText(text).then(function () { return true; }, function () { return fallback(); });
+    }
+    return Promise.resolve(fallback());
+  }
+  function openLink(href) {
+    var a = document.createElement('a');
+    a.href = href;
+    a.style.display = 'none';
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(function () { a.remove(); }, 0);
+  }
+  // Show or hide the per-row address and Gmail search link from the current profile.
+  function syncEmailBits() {
+    var pr = profileOf(), E = BFF.email, all = BFF.programs || [];
+    var plus = plusOn(pr), gmail = E.isGmail(pr.email);
+    var map = plus ? E.tagMap(all) : {};
+    all.forEach(function (p) {
+      var r = view.rows[p.id];
+      if (!r) return;
+      var tag = plus ? map[p.id] : '';
+      r.addr.hidden = !plus;
+      r.addr.textContent = plus ? 'Sign up with: ' + E.plusAddress(pr.email, tag) : '';
+      r.gm.hidden = !gmail;
+      if (gmail) r.gm.setAttribute('href', E.gmailSearchUrl({ email: pr.email, tag: tag, domain: E.domainOfUrl(p.signupUrl) }));
+      else r.gm.removeAttribute('href');
+    });
+    if (view.mailHint) view.mailHint.hidden = !!E.plusAddress(pr.email, 'x');
+    if (view.gmailNote) view.gmailNote.hidden = !gmail;
+  }
+
+  function buildEmailPanel() {
+    var E = BFF.email;
+    var msg = h('p', { class: 'fx-msg', role: 'status', 'aria-live': 'polite' });
+    view.mailHint = h('p', { class: 'fx-warn', hidden: '' }, [
+      document.createTextNode('Add your email in '), h('a', { href: '#info', text: 'My info' }), document.createTextNode(' to email yourself the checklist.')
+    ]);
+    // 1. checklist by email
+    var mailBtn = h('button', { type: 'button', class: 'fx-btn fx-btn--primary', text: 'Email me my checklist' });
+    mailBtn.addEventListener('click', function () {
+      var pr = profileOf();
+      if (!E.plusAddress(pr.email, 'x')) {
+        msg.textContent = 'Add your email in My info first.';
+        view.mailHint.hidden = false;
+        return;
+      }
+      var r = E.mailtoChecklist({
+        to: pr.email.trim(), programs: activePrograms(),
+        statusOf: function (p) { return LABELS[tracker.getStatus(p.id)]; }
+      });
+      if (r.truncated) {
+        copyText(r.fullText).then(function (ok) {
+          msg.textContent = ok ? 'The list was too long for an email link, so it is cut short there. The full list is copied to your clipboard: paste it into the message.'
+            : 'The list was too long for an email link, so it is cut short there, and copying the full list failed.';
+        });
+      } else msg.textContent = 'Opening your email app with the checklist.';
+      openLink(r.url);
+    });
+    // 2. Gmail filters
+    var arch = h('input', { type: 'checkbox', id: 'trk-archive' });
+    var fBtn = h('button', { type: 'button', class: 'fx-btn', text: 'Download Gmail filters' });
+    fBtn.addEventListener('click', function () {
+      var pr = profileOf();
+      var xml = E.gmailFiltersXml(activePrograms(), { email: pr.email, usePlus: plusOn(pr), archive: arch.checked, allPrograms: BFF.programs || [] });
+      try {
+        download('baby-freebies-gmail-filters.xml', xml, 'application/xml');
+        msg.textContent = 'Downloaded baby-freebies-gmail-filters.xml. Import it in Gmail with the steps below.';
+      } catch (e) { msg.textContent = 'Could not create the file: ' + e.message; }
+    });
+    var steps = h('details', { class: 'fx-about' }, [
+      h('summary', { text: 'How to import the filters' }),
+      h('ol', {}, [
+        h('li', { text: 'On a computer, open Gmail and go to Settings (gear) > See all settings > Filters and Blocked Addresses.' }),
+        h('li', { text: 'Choose Import filters, then Choose file, and pick the downloaded file.' }),
+        h('li', { text: 'Select Open file, tick the filters you want, and choose Create filters.' })
+      ]),
+      h('p', { class: 'fx-small', text: 'Each filter adds a label like Baby Freebies/Program name to that program\u2019s mail. With plus addresses on, it matches the tagged address; otherwise it matches the program\u2019s sign-up domain.' })
+    ]);
+    // 3. reminders
+    var iBtn = h('button', { type: 'button', class: 'fx-btn', text: 'Download reminders (.ics)' });
+    iBtn.addEventListener('click', function () {
+      var entries = [];
+      (BFF.programs || []).forEach(function (p) {
+        if (tracker.getStatus(p.id) !== 'signed-up') return;
+        var d = localDate(entryOf(state(), p.id).updatedAt);
+        if (d) entries.push({ id: p.id, name: p.name, date: d });
+      });
+      if (!entries.length) {
+        msg.textContent = 'No programs are marked Signed up yet. Mark a program as Signed up, then come back: each reminder lands 28 days after the date you marked it.';
+        return;
+      }
+      try {
+        download('baby-freebies-reminders.ics', E.icsReminders(entries, { days: 28 }), 'text/calendar');
+        msg.textContent = 'Downloaded ' + plural(entries.length, 'reminder') + '. Open the file to add them to your calendar.';
+      } catch (e) { msg.textContent = 'Could not create the file: ' + e.message; }
+    });
+    view.gmailNote = h('p', { class: 'fx-small', hidden: '', text: 'The Search my Gmail links on each row open your own Gmail in a new tab. This app never sees your mail.' });
+    return h('section', { class: 'fx-card', 'aria-labelledby': 'trk-mail-h' }, [
+      h('h3', { id: 'trk-mail-h', text: 'Email and calendar' }),
+      h('p', { class: 'fx-muted', text: 'These hand off to your own mail app, Gmail or calendar. Nothing is sent from this app.' }),
+      view.mailHint,
+      h('div', { class: 'fx-actions' }, [mailBtn]),
+      h('div', { class: 'fx-check' }, [arch, h('label', { 'for': 'trk-archive', text: 'Skip the inbox (archive)' })]),
+      h('div', { class: 'fx-actions' }, [fBtn]),
+      steps,
+      h('div', { class: 'fx-actions' }, [iBtn]),
+      view.gmailNote,
+      msg
+    ]);
   }
 
   view.init = function (el) {
@@ -1101,6 +1485,7 @@ main:focus { outline: none; }
     el.appendChild(view.storeWarn);
     el.appendChild(view.msg);
     el.appendChild(view.live);
+    el.appendChild(buildEmailPanel());
 
     var bar = h('div', { class: 'fx-tabs', role: 'group', 'aria-label': 'Filter by status' });
     [['all', 'All']].concat(STATUSES.map(function (s) { return [s, LABELS[s]]; })).forEach(function (f) {
@@ -1191,10 +1576,13 @@ main:focus { outline: none; }
     function flushAll() { view.flushers.forEach(function (f) { f(); }); }
     window.addEventListener('pagehide', flushAll);
     document.addEventListener('visibilitychange', function () { if (document.visibilityState === 'hidden') flushAll(); });
+    syncEmailBits();
+    document.addEventListener('bff:profile-changed', syncEmailBits);
     updateSummary();
     applyFilter();
   };
   view.show = function () {
+    syncEmailBits();
     (BFF.programs || []).forEach(function (p) { syncRow(p.id); });
     view.msg.textContent = '';
     updateSummary();
@@ -1242,6 +1630,7 @@ main:focus { outline: none; }
   }
 
   var inputs = {}, hints = {}, statusEl = null, timer = null, keptDue = '', dueHint = null;
+  var plusBox = null, plusPreview = null, plusNote = null;
 
   function read() {
     var p = store.get(KEY, {});
@@ -1267,12 +1656,32 @@ main:focus { outline: none; }
       inputs[f.key].value = v;
       if (f.check) validate(f);
     });
+    if (plusBox) { plusBox.checked = !!p.usePlusTags; updatePlus(); }
+  }
+  // Live preview of the tagged address plus a note about the person's email provider.
+  function updatePlus() {
+    if (!plusPreview) return;
+    var E = BFF.email, email = inputs.email.value.trim();
+    var progs = BFF.programs || [];
+    var ex = progs[0], tag = ex && E ? E.tagFor(ex, progs) : 'similac';
+    var addr = E ? E.plusAddress(email, tag) : '';
+    var sup = E ? E.supportsPlus(email) : null;
+    if (!addr) {
+      plusPreview.textContent = 'Add your email above to see a preview.';
+      plusNote.textContent = '';
+      return;
+    }
+    plusPreview.textContent = 'Preview: ' + addr + (ex ? ' (for ' + ex.name + ')' : '');
+    if (sup === true) plusNote.textContent = 'Your email provider supports plus addresses. Mail to the tagged address still arrives in your normal inbox.';
+    else if (sup === false) plusNote.textContent = 'Yahoo uses a hyphen instead of a plus sign (a different kind of address), so this app will not tag Yahoo addresses. Your plain email is used.';
+    else plusNote.textContent = 'Check your provider: not every email service delivers plus addresses. Send yourself a test message before relying on this.';
   }
   function saveNow() {
     timer = null;
     var p = {};
     FIELDS.forEach(function (f) { p[f.key] = inputs[f.key].value.trim(); });
     if (!p.dueDate && keptDue) p.dueDate = keptDue;
+    p.usePlusTags = !!(plusBox && plusBox.checked);
     var ok = store.set(KEY, p);
     statusEl.className = 'fx-saved fx-saved--block' + (ok ? '' : ' fx-hint');
     statusEl.textContent = ok ? 'Saved on this device' : 'Could not save on this device (storage is full or blocked). Your info is kept only until you close this page.';
@@ -1306,6 +1715,7 @@ main:focus { outline: none; }
         hints[f.key] = hint;
         var evt = f.select || f.type === 'date' ? 'change' : 'input';
         input.addEventListener(evt, function () {
+          if (f.key === 'email') updatePlus();
           if (f.check) validate(f);
           if (f.key === 'dueDate' && input.value) { keptDue = ''; hint.textContent = ''; }
           statusEl.className = 'fx-saved fx-saved--block';
@@ -1317,6 +1727,23 @@ main:focus { outline: none; }
         form.appendChild(h('div', { class: 'fx-field' }, [h('label', { 'for': id, text: f.label }), input, hint]));
       });
       el.appendChild(form);
+
+      plusBox = h('input', { type: 'checkbox', id: 'info-plus' });
+      plusPreview = h('p', { class: 'fx-plus-preview', role: 'status', 'aria-live': 'polite' });
+      plusNote = h('p', { class: 'fx-muted' });
+      plusBox.addEventListener('change', function () {
+        statusEl.className = 'fx-saved fx-saved--block';
+        statusEl.textContent = 'Saving…';
+        if (timer) clearTimeout(timer);
+        timer = setTimeout(saveNow, 400);
+      });
+      el.appendChild(h('section', { class: 'fx-card', 'aria-labelledby': 'info-plus-h' }, [
+        h('h3', { id: 'info-plus-h', text: 'Plus addresses' }),
+        h('div', { class: 'fx-check' }, [plusBox, h('label', { 'for': 'info-plus', text: 'Give each program its own plus address' })]),
+        h('p', { class: 'fx-muted', text: 'Adds a short tag to your email, like yourname+similac@gmail.com. The guided run copies the tagged address, and you can filter or search your inbox by program.' }),
+        plusPreview,
+        plusNote
+      ]));
 
       statusEl = h('p', { class: 'fx-saved fx-saved--block', role: 'status', 'aria-live': 'polite' });
       var clear = h('button', { type: 'button', class: 'fx-btn fx-btn--danger', text: 'Clear my info' });
@@ -1366,6 +1793,7 @@ main:focus { outline: none; }
 
   var state = Object.assign({}, DEFAULTS);
   var els = {};
+  var shownIds = [];
   var uid = 0;
 
   function h(tag, attrs, kids) {
@@ -1455,8 +1883,16 @@ main:focus { outline: none; }
     emptyClear.addEventListener('click', clearFilters);
     els.empty.appendChild(emptyClear);
 
+    els.start = h('button', { type: 'button', class: 'btn btn-primary start-run' });
+    els.start.addEventListener('click', function () {
+      if (!shownIds.length || !BFF.guided) return;
+      BFF.guided.preselect(shownIds.slice());
+      location.hash = '#guided';
+    });
+
     root.appendChild(filters);
     root.appendChild(resultRow);
+    root.appendChild(h('div', { class: 'start-row' }, [els.start]));
     root.appendChild(els.list);
     root.appendChild(els.empty);
   }
@@ -1563,6 +1999,9 @@ main:focus { outline: none; }
     els.list.appendChild(frag);
     els.count.textContent = 'Showing ' + shown.length + ' of ' + all.length + ' programs';
     els.empty.hidden = shown.length !== 0;
+    shownIds = shown.map(function (p) { return p.id; });
+    els.start.textContent = 'Start a guided run with these ' + shown.length;
+    els.start.disabled = shown.length === 0;
   }
 
   function onTrackerChanged() {
@@ -1630,7 +2069,13 @@ main:focus { outline: none; }
     var m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(s || '');
     return m ? { iso: s, us: m[2] + '/' + m[3] + '/' + m[1] } : null;
   }
-  function detailList(p) {
+  // The tagged address for this program, or '' when plus tags are off or unsupported for this provider.
+  function taggedEmail(pr, prog) {
+    var E = BFF.email;
+    if (!E || !pr.usePlusTags || !prog || E.supportsPlus(pr.email) === false) return '';
+    return E.plusAddress(pr.email, E.tagFor(prog, progs()));
+  }
+  function detailList(p, prog) {
     var out = [];
     function add(label, value) { if (value) out.push({ label: label, value: value }); }
     var full = [p.firstName, p.lastName].filter(Boolean).join(' ');
@@ -1640,7 +2085,9 @@ main:focus { outline: none; }
     add('First name', p.firstName);
     add('Last name', p.lastName);
     add('Full name', full);
-    add('Email', p.email);
+    var tagged = taggedEmail(p, prog);
+    if (tagged) add('Email for this program', tagged);
+    else add('Email', p.email);
     add('Phone', p.phone);
     add('Address line 1', p.address1);
     add('Address line 2', p.address2);
@@ -1690,6 +2137,11 @@ main:focus { outline: none; }
 
   // ---- state ----
   var el, body, selected = null, run = null, focusHeading = false;
+  var actions = null; // buttons of the program on screen, for keyboard shortcuts
+  var autoOpen = (function () {
+    var r = store.get(KEY, null);
+    return !(r && r.autoOpenNext === false);
+  })();
 
   function loadRun() {
     var r = store.get(KEY, null);
@@ -1701,7 +2153,23 @@ main:focus { outline: none; }
     }
     return null;
   }
-  function saveRun() { if (run) store.set(KEY, run); else store.remove(KEY); }
+  // guided.v1 holds the current run plus the auto-open preference. Between runs it keeps only the preference.
+  function saveRun() {
+    if (run) { run.autoOpenNext = autoOpen; store.set(KEY, run); }
+    else if (autoOpen) store.remove(KEY);
+    else store.set(KEY, { autoOpenNext: false });
+  }
+  function autoToggle(idSuffix) {
+    var id = 'gd-auto-' + idSuffix;
+    var cb = h('input', { type: 'checkbox', id: id });
+    cb.checked = autoOpen;
+    cb.addEventListener('change', function () {
+      autoOpen = cb.checked;
+      saveRun();
+      announce(autoOpen ? 'Will open the next sign-up page when you tap Done.' : 'Will not open pages automatically.');
+    });
+    return h('div', { class: 'fx-check' }, [cb, h('label', { 'for': id, text: 'When I tap Done, open the next sign-up page' })]);
+  }
 
   function initSelection() {
     selected = {};
@@ -1739,6 +2207,7 @@ main:focus { outline: none; }
       bar.appendChild(btn);
     });
     body.appendChild(bar);
+    body.appendChild(autoToggle('setup'));
     body.appendChild(count);
     var list = h('ul', { class: 'fx-pick' });
     progs().forEach(function (p, i) {
@@ -1797,6 +2266,7 @@ main:focus { outline: none; }
   function renderRun() {
     var p = byId(run.ids[run.index]);
     body.textContent = '';
+    actions = {};
     var st = T().getStatus(p.id);
     var last = run.index === run.ids.length - 1;
 
@@ -1816,13 +2286,17 @@ main:focus { outline: none; }
 
     // (b) open button
     var open = h('button', { type: 'button', class: 'fx-btn fx-btn--primary fx-btn--big', text: 'Open sign-up page ↗' });
-    open.addEventListener('click', function () { window.open(p.signupUrl, '_blank', 'noopener,noreferrer'); });
+    open.addEventListener('click', function () {
+      window.open(p.signupUrl, '_blank', 'noopener,noreferrer');
+      announce('Opened the ' + p.name + ' sign-up page in a new tab.');
+    });
+    actions.open = open;
     body.appendChild(open);
     body.appendChild(h('p', { class: 'fx-small fx-tight' }, [document.createTextNode('Popup blocked? '),
       h('a', { href: p.signupUrl, target: '_blank', rel: 'noopener noreferrer', text: 'Use the plain link' })]));
 
     // (c) details
-    var details = detailList(profile());
+    var details = detailList(profile(), p);
     var dsec = h('section', { class: 'fx-card fx-card--tight', 'aria-labelledby': 'gd-details-h' }, [h('h4', { id: 'gd-details-h', text: 'Your details' })]);
     if (!details.length) {
       dsec.appendChild(h('p', { class: 'fx-muted' }, [document.createTextNode('Nothing saved yet. '), h('a', { href: '#info', text: 'Add My info' })]));
@@ -1831,6 +2305,7 @@ main:focus { outline: none; }
       all.addEventListener('click', function () {
         copy(details.map(function (d) { return d.label + ': ' + d.value; }).join('\n'), 'all details', all);
       });
+      actions.copyAll = all;
       dsec.appendChild(all);
       var dl = h('ul', { class: 'fx-details' });
       details.forEach(function (d) {
@@ -1854,6 +2329,15 @@ main:focus { outline: none; }
     if (p.catches) about.appendChild(h('p', { class: 'fx-warn' }, [h('strong', { text: 'Catches: ' }), document.createTextNode(p.catches)]));
     if (p.notes) about.appendChild(h('p', {}, [h('strong', { text: 'Notes: ' }), document.createTextNode(p.notes)]));
     body.appendChild(about);
+    body.appendChild(autoToggle('run'));
+    body.appendChild(h('details', { class: 'fx-about fx-shortcuts' }, [
+      h('summary', { text: 'Shortcuts' }),
+      h('p', { class: 'fx-small', text: 'Press a key when you are not typing in a field.' }),
+      h('ul', { class: 'fx-keys' }, [['O', 'Open the sign-up page'], ['C', 'Copy all details'], ['D', 'Done and go on'], ['S', 'Skip'],
+        ['P', 'Report a problem'], ['B', 'Back'], ['N', 'Next without changing']].map(function (k) {
+        return h('li', {}, [h('kbd', { text: k[0] }), document.createTextNode(' ' + k[1])]);
+      }))
+    ]));
     var so = h('button', { type: 'button', class: 'fx-btn fx-btn--link', text: 'Start over' });
     so.addEventListener('click', startOver);
     body.appendChild(so);
@@ -1875,28 +2359,43 @@ main:focus { outline: none; }
     done.addEventListener('click', function () {
       // Never downgrade: only todo or skipped programs become signed-up.
       if (st === 'todo' || st === 'skipped') saved(T().setStatus(p.id, 'signed-up'));
+      var nextP = last ? null : byId(run.ids[run.index + 1]);
+      var msg = p.name + ' marked as signed up.';
+      // Opened inside this click so the browser counts it as the person's own action.
+      if (autoOpen && nextP) {
+        window.open(nextP.signupUrl, '_blank', 'noopener,noreferrer');
+        msg += ' Opened the ' + nextP.name + ' sign-up page in a new tab.';
+      }
       go(1);
+      announce(msg);
     });
+    actions.done = done;
     var skip = h('button', { type: 'button', class: 'fx-btn', text: 'Skip' });
     skip.addEventListener('click', function () {
       if (st === 'todo') saved(T().setStatus(p.id, 'skipped'));
       go(1);
+      announce(p.name + ' skipped.');
     });
+    actions.skip = skip;
     var prob = h('button', { type: 'button', class: 'fx-btn', text: 'Problem', 'aria-expanded': 'false' });
     prob.addEventListener('click', function () {
       pbox.hidden = !pbox.hidden;
       prob.setAttribute('aria-expanded', pbox.hidden ? 'false' : 'true');
       if (!pbox.hidden) pta.focus();
     });
+    actions.prob = prob;
     var back = h('button', { type: 'button', class: 'fx-btn', text: 'Back' });
     back.disabled = run.index === 0;
     back.addEventListener('click', function () { go(-1); });
+    actions.back = back;
+    actions.next = next;
     body.appendChild(h('div', { class: 'fx-actionbar fx-sticky' }, [pbox, h('div', { class: 'fx-actionbar-row' }, [done, skip, prob, back])]));
     if (focusHeading) title.focus();
   }
 
   function renderFinish() {
     body.textContent = '';
+    actions = null;
     var doneL = [], skipL = [], probL = [];
     run.ids.forEach(function (id) {
       var p = byId(id), st = T().getStatus(id);
@@ -1927,9 +2426,39 @@ main:focus { outline: none; }
     if (!body) return;
     if (run && run.step === 'run') renderRun();
     else if (run && run.step === 'finish') renderFinish();
-    else { if (!selected) initSelection(); renderSetup(); }
+    else { actions = null; if (!selected) initSelection(); renderSetup(); }
     focusHeading = false;
   }
+
+  // ---- keyboard shortcuts ----
+  var KEYS = { o: 'open', c: 'copyAll', d: 'done', s: 'skip', p: 'prob', b: 'back', n: 'next' };
+  function onKey(e) {
+    if (e.defaultPrevented || e.repeat || e.ctrlKey || e.metaKey || e.altKey) return;
+    if (!el || el.hidden || !run || run.step !== 'run' || !actions) return;
+    var t = e.target, tag = t && t.tagName ? t.tagName.toLowerCase() : '';
+    var itype = tag === 'input' ? String(t.type || '').toLowerCase() : '';
+    var typing = tag === 'textarea' || tag === 'select' || (t && t.isContentEditable) ||
+      (tag === 'input' && ['checkbox', 'radio', 'button', 'submit', 'reset'].indexOf(itype) < 0);
+    if (typing) return; // text fields keep their own keys; checkboxes and buttons do not type letters
+    var name = e.key && e.key.length === 1 ? KEYS[e.key.toLowerCase()] : null;
+    if (!name) return;
+    var btn = actions[name];
+    if (!btn) { announce(name === 'copyAll' ? 'Nothing to copy. Add My info first.' : 'That is not available here.'); return; }
+    if (btn.disabled) { announce('That is not available here.'); return; }
+    e.preventDefault();
+    btn.click();
+  }
+
+  // Set the setup selection (for example from the directory's filtered list). Any run in progress is replaced.
+  BFF.guided = {
+    preselect: function (ids) {
+      var valid = {};
+      (Array.isArray(ids) ? ids : []).forEach(function (id) { if (byId(id)) valid[id] = true; });
+      selected = valid;
+      if (run) { run = null; saveRun(); }
+      if (body) render();
+    }
+  };
 
   BFF.views.guided = {
     init: function (root) {
@@ -1941,6 +2470,8 @@ main:focus { outline: none; }
       el.appendChild(body);
       el.appendChild(live);
       run = loadRun();
+      if (run && run.autoOpenNext === false) autoOpen = false;
+      document.addEventListener('keydown', onKey);
       render();
     },
     show: function () {

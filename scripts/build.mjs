@@ -5,7 +5,7 @@ import { fileURLToPath } from 'node:url';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const CSS = ['base.css', 'features.css'].map((f) => 'src/css/' + f);
-const JS = ['logic.js', 'store.js', 'tracker.js', 'profile.js', 'directory.js', 'guided.js', 'app.js'].map(
+const JS = ['logic.js', 'store.js', 'email.js', 'tracker.js', 'profile.js', 'directory.js', 'guided.js', 'app.js'].map(
   (f) => 'src/js/' + f
 );
 const inlined = [];
