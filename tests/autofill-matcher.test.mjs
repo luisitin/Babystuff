@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { classifyField, valueFor } from '../tools/autofill/field-matcher.mjs';
+import { classifyField, valueFor, cleanText, registrableDomain, sameSite, isGuidedDefault } from '../tools/autofill/field-matcher.mjs';
 
 const c = (o) => classifyField({ type: 'text', ...o });
 
@@ -104,4 +104,60 @@ test('valueFor state: code or full name', () => {
   assert.equal(valueFor('state', profile, { options: [{ value: '14', label: 'Illinois' }, { value: '15', label: 'Indiana' }] }), '14');
   assert.equal(valueFor('state', { state: 'Illinois' }, { options: [{ value: 'IL', label: 'IL' }] }), 'IL');
   assert.equal(valueFor('state', { state: 'Texas' }, { options: [{ value: 'IL', label: 'Illinois' }] }), null);
+});
+
+test('other people, other roles and other things are skipped', () => {
+  assert.equal(c({ label: 'Last menstrual period (LMP)' }), null);
+  assert.equal(c({ type: 'date', label: 'Last menstrual period' }), null);
+  assert.equal(c({ name: 'lmp_date' }), null);
+  assert.equal(c({ label: 'First time parent?' }), null);
+  assert.equal(c({ label: 'Phone type' }), null);
+  assert.equal(c({ label: 'Spouse email' }), null);
+  assert.equal(c({ label: "Partner's first name" }), null);
+  assert.equal(c({ label: "Doctor's phone" }), null);
+  assert.equal(c({ label: 'Hospital city' }), null);
+  assert.equal(c({ label: 'Gift recipient email' }), null);
+  assert.equal(c({ label: 'Friend email (referral)' }), null);
+  assert.equal(c({ label: 'Emergency contact phone' }), null);
+  assert.equal(c({ label: 'Grandmother name' }), null);
+  assert.equal(c({ label: 'Business address' }), null);
+  assert.equal(c({ autocomplete: 'email', label: 'Spouse email' }), null);
+  // Own details still work.
+  assert.equal(c({ label: 'First' }), 'firstName');
+  assert.equal(c({ label: 'Last name' }), 'lastName');
+});
+
+test('honeypot names are skipped', () => {
+  assert.equal(c({ name: 'honeypot' }), null);
+  assert.equal(c({ name: 'hp', label: 'Email' }), null);
+  assert.equal(c({ label: 'Leave blank', name: 'email2' }), null);
+});
+
+test('cleanText strips escapes and control characters', () => {
+  assert.equal(cleanText('Email\u001b[31m red\u001b[0m'), 'Email red');
+  assert.equal(cleanText('A\u001b]0;evil title\u0007B'), 'AB');
+  assert.equal(cleanText('x\ny\u0000z\u009b'), 'x y z');
+  assert.equal(cleanText('a'.repeat(200)).length, 80);
+});
+
+test('registrable domain check for redirects', () => {
+  assert.equal(registrableDomain('https://www.enfamil.com/x'), 'enfamil.com');
+  assert.equal(registrableDomain('https://register.gerber.com/'), 'gerber.com');
+  assert.equal(registrableDomain('https://shop.example.co.uk/'), 'example.co.uk');
+  assert.ok(sameSite('https://www.similac.com/a', 'https://similac.com/b'));
+  assert.ok(!sameSite('https://similac.com/', 'https://evil-similac.com/'));
+  assert.ok(!sameSite('https://similac.com.evil.net/', 'https://similac.com/'));
+});
+
+test('--all-free uses the guidedDefault rule', () => {
+  const base = { costToClaim: 'free', category: 'formula', requirements: ['email'] };
+  assert.ok(isGuidedDefault(base));
+  assert.ok(!isGuidedDefault({ ...base, costToClaim: 'shipping-fee' }));
+  assert.ok(!isGuidedDefault({ ...base, requirements: ['email', 'purchase'] }));
+  assert.ok(!isGuidedDefault({ ...base, requirements: ['membership'] }));
+  assert.ok(!isGuidedDefault({ ...base, requirements: ['insurance'] }));
+  assert.ok(!isGuidedDefault({ ...base, requirements: ['eligibility'] }));
+  assert.ok(!isGuidedDefault({ ...base, category: 'health-benefits' }));
+  assert.ok(!isGuidedDefault({ ...base, category: 'assistance' }));
+  assert.ok(!isGuidedDefault(null));
 });

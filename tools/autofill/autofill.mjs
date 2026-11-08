@@ -9,18 +9,19 @@ import { createRequire } from 'node:module';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import path from 'node:path';
 import readline from 'node:readline';
-import { classifyField, valueFor } from './field-matcher.mjs';
+import { classifyField, valueFor, cleanText, sameSite, isGuidedDefault } from './field-matcher.mjs';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const PROGRAMS = path.resolve(here, '../../data/programs.json');
 const PROFILE = path.join(here, 'profile.json');
-const SKIP_CATEGORIES = new Set(['health-benefits', 'assistance']);
 
 function usage() {
   console.log(`Usage:
   node autofill.mjs --list                 list program ids
   node autofill.mjs <id> [<id>...]         fill these programs, one at a time
-  node autofill.mjs --all-free             every free program (not health-benefits/assistance)
+  node autofill.mjs --all-free             programs the app's guided run picks by default:
+                                           free, no purchase/membership/insurance/eligibility,
+                                           not health-benefits or assistance
 
 Local testing only (not for real sites):
   node autofill.mjs --fixture <file.html|file:// URL> [--headless]
@@ -88,16 +89,37 @@ function scanFrame() {
     const cs = getComputedStyle(el);
     const r = el.getBoundingClientRect();
     if (cs.visibility === 'hidden' || cs.display === 'none' || r.width < 2 || r.height < 2) continue;
+    // Honeypots and fields a person cannot see: never filled, not even listed.
+    if (typeof el.checkVisibility === 'function' && !el.checkVisibility({ checkOpacity: true, checkVisibilityCSS: true })) continue;
+    let hidden = false;
+    for (let a = el; a && a.nodeType === 1; a = a.parentElement) {
+      const s = getComputedStyle(a);
+      if (a.getAttribute('aria-hidden') === 'true' || a.hidden || parseFloat(s.opacity) === 0) hidden = true;
+      if (s.clip === 'rect(0px, 0px, 0px, 0px)' || /inset\(\s*(50|100)%/.test(s.clipPath || '')) hidden = true;
+      if (s.overflow === 'hidden' && (a.offsetWidth < 2 || a.offsetHeight < 2) && a !== document.body) hidden = true;
+    }
+    const docW = Math.max(document.documentElement.scrollWidth, window.innerWidth);
+    const docH = Math.max(document.documentElement.scrollHeight, window.innerHeight);
+    const ax = r.left + window.scrollX, ay = r.top + window.scrollY;
+    if (ax + r.width <= 0 || ay + r.height <= 0 || ax >= docW || ay >= docH) hidden = true;
+    const hasLabel = !!labelOf(el) || !!el.getAttribute('aria-label');
+    if (el.getAttribute('tabindex') === '-1' && !hasLabel) hidden = true;
+    if (hidden) continue;
     const idx = String(n++);
     el.setAttribute('data-bff-idx', idx);
     const isSelect = tag === 'select';
+    // Page scripts that submit on change: skip when there is no submit button.
+    const form = el.form;
+    const hasSubmitBtn = !!(form && form.querySelector('button:not([type]), button[type=submit], input[type=submit], input[type=image]'));
+    const changeAttr = (el.getAttribute('onchange') || '') + ' ' + (form ? form.getAttribute('onchange') || '' : '');
+    const autoSubmit = el.hasAttribute('data-auto-submit') || (!hasSubmitBtn && /submit/i.test(changeAttr));
     let empty;
     if (isSelect) {
       const o = el.options[el.selectedIndex];
       empty = !o || o.value === '' || (el.selectedIndex === 0 && o.disabled);
     } else empty = el.value === '';
     out.push({
-      idx, tag, type, empty,
+      idx, tag, type, empty, autoSubmit,
       name: el.getAttribute('name') || '', id: el.id || '',
       autocomplete: el.getAttribute('autocomplete') || '',
       placeholder: el.getAttribute('placeholder') || '',
@@ -135,8 +157,9 @@ async function fillPage(page, profile) {
     let fields;
     try { fields = await frame.evaluate(scanFrame); } catch { continue; }
     for (const f of fields) {
-      const desc = f.label || f.ariaLabel || f.name || f.id || f.placeholder || f.type;
+      const desc = cleanText(f.label || f.ariaLabel || f.name || f.id || f.placeholder || f.type);
       const kind = classifyField(f);
+      if (f.autoSubmit) { skipped.push(`${desc} (page may auto-submit on change; do it by hand)`); continue; }
       if (!kind) { skipped.push(`${desc} (not recognised or intentionally skipped)`); continue; }
       if (!f.empty) { skipped.push(`${desc} (already has a value)`); continue; }
       const value = valueFor(kind, profile, { inputType: f.type, options: f.options });
@@ -156,12 +179,14 @@ async function fillPage(page, profile) {
 }
 
 function printSummary(title, { filled, skipped }) {
-  console.log(`\n=== ${title} ===`);
+  console.log(`\n=== ${cleanText(title)} ===`);
   console.log(`Filled (${filled.length}), outlined in green:`);
   for (const l of filled) console.log(`  + ${l}`);
   if (!filled.length) console.log('  (nothing)');
   console.log(`Left alone (${skipped.length}):`);
   for (const l of skipped) console.log(`  - ${l}`);
+  console.log('\nNote: some sites run their own scripts when a field changes. Review the page');
+  console.log('before anything else happens, and stop if it moved on by itself.');
   console.log('\nNow, by hand in the browser: check every field, fill anything missing,');
   console.log('tick or untick consent boxes yourself, solve any CAPTCHA, then press Submit.');
   console.log('This tool never submits for you.');
@@ -171,7 +196,7 @@ async function dumpFixture(page) {
   const state = await page.evaluate(() => ({
     submitted: !!window.__submitted,
     fields: Array.from(document.querySelectorAll('input, select, textarea')).map((e) => ({
-      name: e.name || e.id, type: e.type, value: e.type === 'checkbox' || e.type === 'radio' ? e.checked : e.value,
+      name: String(e.name || e.id).replace(/[\u0000-\u001f\u007f-\u009f]/g, ' ').slice(0, 80), type: e.type, value: e.type === 'checkbox' || e.type === 'radio' ? e.checked : e.value,
     })),
   }));
   console.log('\n[fixture] final state:');
@@ -202,7 +227,7 @@ async function main() {
   } else {
     if (headless) { console.error('--headless is only allowed together with --fixture (local testing). Real sign-ups open in a visible browser.'); process.exit(1); }
     const ids = args.includes('--all-free')
-      ? programs.filter((p) => p.costToClaim === 'free' && !SKIP_CATEGORIES.has(p.category)).map((p) => p.id)
+      ? programs.filter(isGuidedDefault).map((p) => p.id)
       : args.filter((a) => !a.startsWith('--'));
     if (!ids.length) { usage(); process.exit(1); }
     for (const id of ids) {
@@ -223,13 +248,21 @@ async function main() {
   try {
     for (let i = 0; i < targets.length; i++) {
       const t = targets[i];
-      console.log(`\n[${i + 1}/${targets.length}] Opening ${t.title}`);
+      console.log(`\n[${i + 1}/${targets.length}] Opening ${cleanText(t.title)}`);
       const page = await browser.newPage();
       try {
         await page.goto(t.url, { waitUntil: 'load', timeout: 45000 });
         await page.waitForTimeout(1500); // let late-rendering forms appear
       } catch (e) {
-        console.log(`Could not load the page fully: ${e.message.split('\n')[0]}`);
+        console.log(`Could not load the page fully: ${cleanText(e.message.split('\n')[0], 200)}`);
+      }
+      if (fixtureAt < 0 && !sameSite(page.url(), t.url)) {
+        console.log(`\nWARNING: this page ended up on ${cleanText(domain(page.url()))}, not ${domain(t.url)}.`);
+        console.log('Nothing was filled. Check the address bar; fill by hand only if you trust it.');
+        const a2 = (await ask(rl, 'Press Enter for the next site (q + Enter to quit): ')).trim().toLowerCase();
+        await page.close();
+        if (a2 === 'q') break;
+        continue;
       }
       const result = await fillPage(page, profile);
       printSummary(t.title, result);

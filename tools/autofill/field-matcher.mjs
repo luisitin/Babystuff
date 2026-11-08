@@ -27,6 +27,14 @@ const SKIP_WORDS = /\b(password|passwd|pwd|passcode|pin|card|credit|debit|cc|ccn
 // Names that belong to someone else or something else.
 const OTHER_NAME = /\b(baby|child|children|infant|newborn|spouse|partner|friend|referr\w*|recipient|company|business|organization|employer|username|user name|nickname|pet|hospital|doctor|physician|provider)\b/;
 
+// Fields about other people, other roles or other things: never filled, whatever
+// else the field looks like (applies to every kind, not just names).
+const OTHER_PERSON = /\b(spouse|partner|husband|wife|fianc\w*|doctor|dr|physician|ob|obgyn|midwife|doula|provider|hospital|clinic|pediatrician|gift|recipient|friend|referr\w*|referral|emergency|contact person|guardian|grandparent\w*|grandmother|grandfather|sibling|sister|brother|relative|caregiver|nanny|sponsor|witness|manager|supervisor|teacher|employer|company|business|organization|work|other parent|second parent|mother s|father s|mom s|dad s)\b/;
+// Not the value we have, even though a keyword matches.
+const OTHER_THING = /\b(last menstrual\w*|menstrual|lmp|first time|phone type|mobile type|cell type|phone carrier|carrier|contact preference|preferred contact|best time|email type|address type|how did you hear)\b/;
+// Honeypot / bot-trap names.
+const HONEYPOT = /\b(honeypot|honey pot|hp|hpot|leave blank|leave empty|do not fill|dont fill|bot trap|trap|url2|website2|fax)\b/;
+
 const AUTOCOMPLETE = {
   'given-name': 'firstName',
   'family-name': 'lastName',
@@ -72,10 +80,49 @@ function fromText(text, type) {
   if (has(/\b(address|addr|street)\b.*\b(2|two|line 2)\b|\baddress2\b|\baddr2\b|\b(apt|apartment|suite|unit)\b|\bline 2\b|\bline2\b/)) return 'address2';
   if (has(/\b(address|addr|street)\b/)) return 'address1';
   if (OTHER_NAME.test(t)) return null;
-  if (has(/\b(first name|firstname|fname|given name|forename|first)\b/)) return 'firstName';
-  if (has(/\b(last name|lastname|lname|surname|family name|last)\b/)) return 'lastName';
+  if (has(/\b(first name|firstname|fname|given name|forename)\b|^first$/)) return 'firstName';
+  if (has(/\b(last name|lastname|lname|surname|family name)\b|^last$/)) return 'lastName';
   if (has(/\b(full name|your name|name)\b/)) return 'fullName';
   return null;
+}
+
+// ---- Pure helpers used by the CLI (kept here so they can be tested) ----
+
+/** Remove ANSI/OSC escapes and control characters, trim, truncate. */
+export function cleanText(s, max = 80) {
+  let t = String(s ?? '')
+    .replace(/\u001b\][^\u0007\u001b]*(?:\u0007|\u001b\\)?/g, '')
+    .replace(/\u001b\[[0-9;?]*[ -\/]*[@-~]/g, '')
+    .replace(/[\u0000-\u001f\u007f-\u009f]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+  if (t.length > max) t = t.slice(0, max - 3) + '...';
+  return t;
+}
+
+const SECOND_LEVEL = new Set(['co', 'com', 'org', 'net', 'gov', 'edu', 'ac']);
+/** Registrable domain, approximated: last two labels (three for co.uk style). */
+export function registrableDomain(urlOrHost) {
+  let host = String(urlOrHost || '');
+  try { host = new URL(host).hostname; } catch { /* already a host */ }
+  const labels = host.toLowerCase().replace(/\.$/, '').split('.').filter(Boolean);
+  if (labels.length <= 2) return labels.join('.');
+  const tld = labels[labels.length - 1];
+  const take = tld.length === 2 && SECOND_LEVEL.has(labels[labels.length - 2]) ? 3 : 2;
+  return labels.slice(-take).join('.');
+}
+export function sameSite(a, b) {
+  const x = registrableDomain(a);
+  return x !== '' && x === registrableDomain(b);
+}
+
+/** Same rule as guidedDefault in src/js/logic.js (truly free, not eligibility based). */
+export function isGuidedDefault(p) {
+  if (!p || p.costToClaim !== 'free') return false;
+  const r = Array.isArray(p.requirements) ? p.requirements : [];
+  if (r.includes('purchase') || r.includes('membership')) return false;
+  if (p.category === 'health-benefits' || p.category === 'assistance') return false;
+  return !(r.includes('eligibility') || r.includes('insurance'));
 }
 
 export function classifyField(f = {}) {
@@ -89,7 +136,7 @@ export function classifyField(f = {}) {
   // Skip rules still win over a mislabelled autocomplete token.
   const parts = [f.label, f.ariaLabel, f.name, f.id, f.placeholder].map(norm).filter(Boolean);
   const all = parts.join(' ');
-  if (SKIP_WORDS.test(all)) return null;
+  if (SKIP_WORDS.test(all) || OTHER_PERSON.test(all) || OTHER_THING.test(all) || HONEYPOT.test(all)) return null;
 
   if (acKind) return acKind;
   if (acToken === 'bday' || acToken?.startsWith('bday-')) return null;

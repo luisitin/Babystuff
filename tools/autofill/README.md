@@ -10,6 +10,8 @@ A small Node + Playwright script you run on your own computer. It opens a sign-u
 - **Only official sign-up links.** It opens only `signupUrl` values from `data/programs.json`, and refuses anything that is not `https`.
 - **No sensitive fields.** It skips password, payment, card, CVV, SSN, insurance and member-ID fields, and never touches checkboxes (so marketing consent is always your choice).
 
+**Heads-up:** some sites run their own scripts when a field changes (for example, moving on when a dropdown changes). The tool only fills fields, but it cannot control what a page does in response. Review the page before anything else happens. It skips selects marked as auto-submitting where it can detect them, and does not fill hidden, off-screen or honeypot fields, or fields about other people (spouse, doctor, gift recipient, last menstrual period and so on). If a page ends up on a different website than the program's, it fills nothing and tells you.
+
 ## Setup
 
 ```
@@ -27,7 +29,7 @@ Edit `profile.json` with your own details. Keys: `firstName`, `lastName`, `email
 node autofill.mjs --list                  # ids, names, domains
 node autofill.mjs enfamil-family-beginnings
 node autofill.mjs id-one id-two id-three  # one after another, you press Enter between
-node autofill.mjs --all-free              # free programs, except health-benefits and assistance
+node autofill.mjs --all-free              # same rule as the app's guided run: free, no purchase/membership/insurance/eligibility, not health-benefits or assistance
 ```
 
 (`npm start -- <id>` and `npm run list` also work.) For each site it prints what it filled (and outlines those fields in green in the browser), what it left alone, and a reminder. Then review, handle any CAPTCHA, submit by hand, and press Enter in the terminal to move on. Type `q` and Enter to quit; the browser closes at the end.
