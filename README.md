@@ -2,6 +2,14 @@
 
 Baby Freebies Finder is a page you can use on a phone or computer to find legitimate US programs for someone expecting a baby. It lists places that offer free formula, diapers, samples, registry welcome boxes, rewards and benefits, and it includes a helper that gets you through the sign-up forms faster. Every link goes to an official program page. The page never submits anything for you, has no ads or trackers, and works offline. It is not affiliated with any brand. Offers change, so always read the official page before you sign up.
 
+## Screenshots
+
+<p align="center">
+  <img src="docs/screenshots/programs.png" alt="The Programs view on a phone, listing free baby programs with search and filters" width="240">
+  <img src="docs/screenshots/guided.png" alt="The Do it for me view on a phone, showing an open sign-up page button and a set of details to copy" width="240">
+  <img src="docs/screenshots/programs-dark.png" alt="The Programs view in dark mode on a phone" width="240">
+</p>
+
 ## What's inside
 
 - **Programs:** the full directory. Search it, filter by category, or tick "Truly free", "Email only" or "Needs a registry". You can sort the list too.

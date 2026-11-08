@@ -25,10 +25,11 @@ Seven `sonnet` researchers wrote `research/<lane>.json` and `research/<lane>-not
   - a final-domain check for autofill.
 - Mobile layout: compact header and filters, so the first card shows at 375x812. The guided run puts "Open sign-up page" first, with a sticky Done/Skip/Problem bar. "Recommended" is the default sort.
 
-## Phase D, checks and docs: in progress
+## Phase D, checks and docs (done)
 - Tests (`haiku`): `tests/data.test.mjs` (schema, enums, https, official domain, dates) and `tests/build.test.mjs` (fresh build matches, no external resources, CSP, no network APIs). The suite also includes the logic, store/tracker and autofill-matcher tests.
 - Docs (`haiku`): `README.md` and `PRIVACY.md`.
-- Final checks (`haiku`): running, results go to `docs/final-checks.md`.
+- Final checks (`haiku`), in `docs/final-checks.md`: rebuilding leaves no diff, and `node --test` passes 46 of 46. At 375x812 offline there are 0 blocked requests, no console errors and no horizontal scroll on any view. Focus is never hidden under the nav. Screenshots are in `docs/screenshots/`.
+- Model audit: 17 subagent transcripts, 13 `claude-sonnet-5-5` and 4 `claude-haiku-5-5`, none on any other model.
 
 ## Known gaps / next steps
 - Eight entries rest on official-domain search results because their sites block automated reading: Gerber, Babylist, buybuy BABY, Huggies, Edgepark, Early Head Start, Cribs for Kids, Healthy Start and PSI. Recheck them in a normal browser.
