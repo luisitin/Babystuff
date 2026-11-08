@@ -15,7 +15,6 @@ const SECOND_LEVEL = new Set([
 ]);
 
 const REDIRECT_ALLOWLIST = [
-  ['fns.usda.gov', 'fna.usda.gov'],
   ['byramhealthcare.com', 'byrambaby.com'],
   ['pgeveryday.com', 'pgbrandsaver.com'],
 ];
@@ -37,33 +36,28 @@ export function isExpectedRedirect(fromHost, toHost) {
   return REDIRECT_ALLOWLIST.some(([a, b]) => a === from && b === to);
 }
 
-const CHALLENGE_RE = new RegExp(
-  [
-    'just a moment', 'attention required', 'checking your browser',
-    'verify you are (a )?human', 'cf-browser-verification', 'cf-challenge',
-    'challenge-platform', '_cf_chl', 'captcha', 'access denied',
-    'request could not be satisfied', 'px-captcha', 'are you a robot',
-  ].join('|'),
-  'i',
-);
-const NOT_FOUND_RE = /page not found|404 not found|not found\s*[|\-–]|^\s*404\b|we can.?t find (that|this) page|page (does not|doesn.?t) exist/i;
+const DEAD_CODES = new Set([
+  'ENOTFOUND', 'EAI_AGAIN', 'ECONNREFUSED', 'CERT_HAS_EXPIRED', 'CERT_NOT_YET_VALID',
+  'DEPTH_ZERO_SELF_SIGNED_CERT', 'SELF_SIGNED_CERT_IN_CHAIN', 'UNABLE_TO_VERIFY_LEAF_SIGNATURE',
+  'UNABLE_TO_GET_ISSUER_CERT_LOCALLY', 'ERR_TLS_CERT_ALTNAME_INVALID',
+]);
+// Body markers only matter for an otherwise-OK 200 page.
+const CHALLENGE_TITLE_RE = /just a moment|attention required|access denied|checking your browser|verify you are (a )?human|are you a robot/i;
+const CHALLENGE_BODY_RE = /cf-browser-verification|challenge-platform|_cf_chl|px-captcha|request could not be satisfied/i;
+const NOT_FOUND_RE = /page not found|404 not found|not found\s*[|\-\u2013]|^\s*404\b|we can.?t find (that|this) page|page (does not|doesn.?t) exist/i;
 
 function hostOf(url) {
   try { return new URL(url).hostname; } catch { return ''; }
 }
 
-// Returns { cls, note }.
-export function classifyDetailed({ status, finalUrl, startUrl, error, bodySnippet } = {}) {
+// Returns { cls, note }. Classes: OK, NOT-FOUND, OFF-DOMAIN, DEAD, BLOCKED.
+export function classifyDetailed({ status, finalUrl, startUrl, error, errorCode, insecureHop, bodySnippet } = {}) {
   const body = bodySnippet || '';
-  if (error) return { cls: 'BLOCKED', note: `Network error: ${error}` };
-  if (status === 404 || status === 410) return { cls: 'NOT-FOUND', note: `HTTP ${status}` };
-  const challenge = CHALLENGE_RE.test(body);
-  if (status === 403 || status === 429 || status === 503) {
-    return { cls: 'BLOCKED', note: `HTTP ${status}${challenge ? ' (bot challenge)' : ''}` };
+  if (error) {
+    if (errorCode && DEAD_CODES.has(errorCode)) return { cls: 'DEAD', note: `${errorCode}: ${error}` };
+    return { cls: 'BLOCKED', note: `Network error: ${error}` };
   }
-  if (challenge) return { cls: 'BLOCKED', note: 'Bot challenge or access-denied page' };
-  const title = (body.match(/<title[^>]*>([\s\S]*?)<\/title>/i) || [, body])[1];
-  if (NOT_FOUND_RE.test(title)) return { cls: 'NOT-FOUND', note: 'Page title says not found' };
+  // 1. Domain
   if (finalUrl && startUrl) {
     const from = hostOf(startUrl);
     const to = hostOf(finalUrl);
@@ -71,7 +65,21 @@ export function classifyDetailed({ status, finalUrl, startUrl, error, bodySnippe
       return { cls: 'OFF-DOMAIN', note: `Redirected from ${registrableDomain(from)} to ${registrableDomain(to)}` };
     }
   }
+  // 2. Status
+  if (status === 404 || status === 410) return { cls: 'NOT-FOUND', note: `HTTP ${status}` };
+  // 3. Insecure hop or final URL (not a failure, but reported)
+  const insecure = insecureHop || (finalUrl && !/^https:/i.test(finalUrl));
+  if (insecure) return { cls: 'BLOCKED', note: 'insecure redirect (http: hop on the way or at the end); check by hand' };
+  if (status === 403 || status === 429 || status === 503) {
+    return { cls: 'BLOCKED', note: `HTTP ${status}${CHALLENGE_TITLE_RE.test(body) || CHALLENGE_BODY_RE.test(body) ? ' (bot challenge)' : ''}` };
+  }
+  const title = (body.match(/<title[^>]*>([\s\S]*?)<\/title>/i) || [, ''])[1];
+  if (NOT_FOUND_RE.test(title)) return { cls: 'NOT-FOUND', note: 'Page title says not found' };
   if (typeof status === 'number' && status >= 400) return { cls: 'BLOCKED', note: `HTTP ${status}` };
+  // 4. Body markers only turn an otherwise-OK page into BLOCKED
+  if (CHALLENGE_TITLE_RE.test(title) || CHALLENGE_BODY_RE.test(body)) {
+    return { cls: 'BLOCKED', note: 'Bot challenge page' };
+  }
   return { cls: 'OK', note: '' };
 }
 
@@ -101,28 +109,39 @@ async function readSnippet(res, limit = 64 * 1024) {
   return Buffer.concat(chunks.map((c) => Buffer.from(c))).subarray(0, limit).toString('utf8');
 }
 
+const codeOf = (e) => (e && e.cause && e.cause.code) || (e && e.code) || '';
+
 export async function checkUrl(startUrl, { maxRedirects = 8, timeoutMs = 20000 } = {}) {
   let url = startUrl;
+  let insecureHop = /^http:/i.test(startUrl);
+  const get = (u) => fetch(u, {
+    redirect: 'manual',
+    headers: { 'User-Agent': USER_AGENT },
+    signal: AbortSignal.timeout(timeoutMs),
+  });
   try {
     for (let hop = 0; hop <= maxRedirects; hop++) {
-      const res = await fetch(url, {
-        redirect: 'manual',
-        headers: { 'User-Agent': USER_AGENT },
-        signal: AbortSignal.timeout(timeoutMs),
-      });
+      let res;
+      try {
+        res = await get(url);
+      } catch (e) {
+        // DNS hiccups get one retry with the same request.
+        if (['ENOTFOUND', 'EAI_AGAIN'].includes(codeOf(e))) { await sleep(1500); res = await get(url); } else throw e;
+      }
       if (res.status >= 300 && res.status < 400 && res.headers.get('location')) {
         const next = new URL(res.headers.get('location'), url).href;
         try { await res.body?.cancel(); } catch { /* ignore */ }
+        if (/^http:/i.test(next)) insecureHop = true;
         url = next;
         continue;
       }
       const snippet = await readSnippet(res);
-      return { status: res.status, finalUrl: url, startUrl, bodySnippet: snippet };
+      return { status: res.status, finalUrl: url, startUrl, insecureHop, bodySnippet: snippet };
     }
     return { status: 0, finalUrl: url, startUrl, error: `Too many redirects (more than ${maxRedirects})` };
   } catch (e) {
-    const cause = e && e.cause && (e.cause.code || e.cause.message);
-    return { status: 0, finalUrl: url, startUrl, error: `${e.name === 'TimeoutError' ? 'Timeout' : (e.message || e)}${cause ? ` (${cause})` : ''}` };
+    const code = codeOf(e);
+    return { status: 0, finalUrl: url, startUrl, errorCode: code, error: `${e.name === 'TimeoutError' ? 'Timeout' : (e.message || e)}${code ? ` (${code})` : ''}` };
   }
 }
 
@@ -134,7 +153,7 @@ function titleOf(snippet) {
 const cell = (s) => String(s ?? '').replace(/\|/g, '\\|').replace(/\s+/g, ' ').trim();
 
 export function buildReport(rows, date) {
-  const classes = ['OK', 'NOT-FOUND', 'OFF-DOMAIN', 'BLOCKED'];
+  const classes = ['OK', 'NOT-FOUND', 'OFF-DOMAIN', 'DEAD', 'BLOCKED'];
   const counts = Object.fromEntries(classes.map((c) => [c, rows.filter((r) => r.cls === c).length]));
   const lines = [];
   lines.push('# Link check: signupUrl for every entry in data/programs.json', '');
@@ -145,8 +164,8 @@ export function buildReport(rows, date) {
     lines.push(`| ${cell(r.id)} | ${cell(r.url)} | ${r.status || '-'} | ${cell(r.status ? r.finalUrl : '-')} | ${r.cls} | ${cell(r.note)} |`);
   }
   lines.push('', '## Needs attention', '');
-  const bad = rows.filter((r) => r.cls === 'NOT-FOUND' || r.cls === 'OFF-DOMAIN');
-  if (!bad.length) lines.push('No NOT-FOUND or OFF-DOMAIN entries.');
+  const bad = rows.filter((r) => r.cls === 'NOT-FOUND' || r.cls === 'OFF-DOMAIN' || r.cls === 'DEAD');
+  if (!bad.length) lines.push('No NOT-FOUND, OFF-DOMAIN or DEAD entries.');
   for (const r of bad) lines.push(`- ${r.id} (${r.cls}): ${r.url} -> ${r.finalUrl} ${r.note ? `- ${r.note}` : ''}`.trim());
   const blocked = rows.filter((r) => r.cls === 'BLOCKED');
   if (blocked.length) {
@@ -193,8 +212,11 @@ async function main() {
   const report = buildReport(rows, date);
   if (opts.out) writeFileSync(opts.out, report); else process.stdout.write(report);
   if (opts.json) writeFileSync(opts.json, JSON.stringify({ checkedOn: date, results: rows }, null, 2) + '\n');
-  const fail = rows.some((r) => r.cls === 'NOT-FOUND' || r.cls === 'OFF-DOMAIN');
+  const fail = rows.some((r) => ['NOT-FOUND', 'OFF-DOMAIN', 'DEAD'].includes(r.cls));
   process.exit(fail ? 1 : 0);
 }
 
-if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) main();
+if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) {
+  // Exit codes: 0 all OK (BLOCKED allowed), 1 links need attention, 2 the checker itself failed.
+  main().catch((e) => { console.error(`Checker failed: ${e && e.stack || e}`); process.exit(2); });
+}
