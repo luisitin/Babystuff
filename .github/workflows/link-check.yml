@@ -1,0 +1,81 @@
+name: Link check
+
+on:
+  schedule:
+    - cron: '17 14 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  link-check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Check signup links
+        id: check
+        continue-on-error: true
+        run: node scripts/check-links.mjs --out link-report.md --json link-report.json
+      - name: Upload reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: link-report
+          path: |
+            link-report.md
+            link-report.json
+          if-no-files-found: warn
+      - name: Open, update or close the link-check issue
+        uses: actions/github-script@v7
+        env:
+          CHECK_OUTCOME: ${{ steps.check.outcome }}
+        with:
+          script: |
+            const fs = require('fs');
+            const { owner, repo } = context.repo;
+            const failed = process.env.CHECK_OUTCOME !== 'success';
+            const runUrl = `${process.env.GITHUB_SERVER_URL}/${owner}/${repo}/actions/runs/${process.env.GITHUB_RUN_ID}`;
+            let report = fs.existsSync('link-report.md')
+              ? fs.readFileSync('link-report.md', 'utf8')
+              : 'The link checker did not produce a report. See the workflow run for details.';
+            const limit = 60000;
+            const suffix = `\n\n(Report truncated. Full report is attached to the workflow run: ${runUrl})`;
+            if (report.length > limit) report = report.slice(0, limit - suffix.length) + suffix;
+            const body = `${report}\n\nWorkflow run: ${runUrl}`.slice(0, 65000);
+
+            const open = await github.rest.issues.listForRepo({
+              owner, repo, state: 'open', labels: 'link-check', per_page: 1,
+            });
+            const existing = open.data.find((i) => !i.pull_request);
+
+            if (failed) {
+              if (existing) {
+                await github.rest.issues.createComment({ owner, repo, issue_number: existing.number, body });
+              } else {
+                await github.rest.issues.create({
+                  owner, repo,
+                  title: 'Link check: programs need attention',
+                  body,
+                  labels: ['link-check'],
+                });
+              }
+            } else if (existing) {
+              const date = new Date().toISOString().slice(0, 10);
+              await github.rest.issues.createComment({
+                owner, repo, issue_number: existing.number, body: `All links OK on ${date}`,
+              });
+              await github.rest.issues.update({
+                owner, repo, issue_number: existing.number, state: 'closed', state_reason: 'completed',
+              });
+            }
+      - name: Fail the job if links need attention
+        if: steps.check.outcome != 'success'
+        run: |
+          echo "::error::Link check found NOT-FOUND or OFF-DOMAIN entries. See the link-check issue and the link-report artifact."
+          exit 1
