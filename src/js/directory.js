@@ -60,7 +60,7 @@
 
     var id = 'dir' + (++uid);
     els.search = h('input', { type: 'search', id: id + '-q', autocomplete: 'off', placeholder: 'Name, brand or what you get' });
-    els.category = h('select', { id: id + '-cat' }, [h('option', { value: '', text: 'All categories (' + all.length + ')' })]
+    els.category = h('select', { id: id + '-cat' }, [h('option', { value: '', text: 'All categories' })]
       .concat(L.CATEGORIES.map(function (c) { return h('option', { value: c.id, text: c.label + ' (' + (counts[c.id] || 0) + ')' }); })));
     els.sort = h('select', { id: id + '-sort' }, SORTS.map(function (s) { return h('option', { value: s[0], text: s[1] }); }));
 

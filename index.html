@@ -308,6 +308,7 @@ main:focus { outline: none; }
   max-width: 100%; overflow-wrap: anywhere; }
 .fx-view * { box-sizing: border-box; }
 .fx-view h3, .fx-view h4 { margin: var(--fx-s3) 0 var(--fx-s2); }
+.fx-view h4 { font-size: 1em; }
 .fx-view p { margin: var(--fx-s2) 0; }
 .fx-muted { color: var(--fx-muted); font-size: .9em; }
 .fx-small { font-size: .9em; color: var(--fx-muted); }
@@ -335,13 +336,12 @@ main:focus { outline: none; }
 .fx-btn, .fx-link-btn { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; min-width: 44px; padding: var(--fx-s2) var(--fx-s4); font: inherit; font-weight: 600; text-align: center; text-decoration: none; cursor: pointer; color: var(--fx-text); background: var(--fx-bg); border: 1px solid var(--fx-border); border-radius: var(--fx-r); }
 .fx-btn--primary, .fx-link-btn { color: var(--fx-pc); background: var(--fx-primary); border-color: var(--fx-primary); }
 .fx-btn--danger { color: var(--fx-wtext); background: var(--fx-wbg); border-color: var(--fx-wtext); }
-.fx-btn--big { width: 100%; min-height: 56px; font-size: 1.1em; margin: var(--fx-s3) 0; }
+.fx-btn--big { width: 100%; min-height: 56px; font-size: 1.1em; margin: var(--fx-s2) 0; }
 .fx-btn--small { min-height: 44px; padding: var(--fx-s1) var(--fx-s3); }
 .fx-btn--link { background: none; border: none; color: var(--fx-primary); text-decoration: underline; font-weight: 500; }
 .fx-btn:disabled { opacity: .5; cursor: not-allowed; }
 .fx-btn:focus-visible, .fx-link-btn:focus-visible, .fx-input:focus-visible, .fx-select:focus-visible, .fx-textarea:focus-visible, .fx-file:focus-visible, .fx-tab:focus-visible, .fx-view a:focus-visible, .fx-check input:focus-visible, .fx-pick-item input:focus-visible { outline: 3px solid var(--fx-primary); outline-offset: 2px; }
 .fx-actions { display: flex; flex-wrap: wrap; gap: var(--fx-s2); margin: var(--fx-s3) 0; }
-.fx-sticky { position: sticky; bottom: var(--nav-h, 56px); background: var(--fx-bg); padding: var(--fx-s3) 0; margin-bottom: 0; }
 .fx-sticky .fx-btn { flex: 1; }
 .fx-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 
@@ -366,11 +366,33 @@ main:focus { outline: none; }
 .fx-run-top { display: flex; flex-wrap: wrap; align-items: center; gap: var(--fx-s3); }
 .fx-run-top .fx-progress { flex: 1 1 8rem; }
 .fx-run-count { font-weight: 700; margin: 0; }
-.fx-run-title { font-size: 1.25em; }
-.fx-details li { display: grid; grid-template-columns: 1fr auto; column-gap: var(--fx-s3); align-items: center; padding: var(--fx-s2) 0; border-bottom: 1px solid var(--fx-border); }
-.fx-d-label { grid-column: 1; font-size: .8em; color: var(--fx-muted); }
-.fx-d-value { grid-column: 1; font-weight: 600; min-width: 0; }
-.fx-details .fx-btn { grid-column: 2; grid-row: 1 / span 2; }
+.fx-run-title { font-size: 1.25em; margin: var(--fx-s2) 0 0; }
+.fx-tight { margin: var(--fx-s1) 0; }
+.fx-card--tight { padding: var(--fx-s3); }
+.fx-card--tight h4 { margin-top: 0; }
+.fx-details { display: grid; grid-template-columns: 1fr 1fr; gap: var(--fx-s2); margin-top: var(--fx-s2); }
+.fx-details li { display: flex; flex-direction: column; min-width: 0; }
+.fx-d-label { font-size: .75em; color: var(--fx-muted); }
+.fx-details .fx-btn { width: 100%; justify-content: flex-start; font-weight: 500; text-align: left; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: block; padding: var(--fx-s2); line-height: 28px; }
+.fx-warn--line { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding: var(--fx-s2) var(--fx-s3); margin: var(--fx-s2) 0; }
+.fx-about { background: var(--fx-surface); border: 1px solid var(--fx-border); border-radius: var(--fx-r); padding: 0 var(--fx-s3); margin: var(--fx-s2) 0; }
+.fx-about summary { min-height: 44px; display: flex; align-items: center; cursor: pointer; font-weight: 600; }
+.fx-about summary:focus-visible { outline: 3px solid var(--fx-primary); outline-offset: 2px; }
+.fx-confirm { background: var(--fx-wbg); color: var(--fx-wtext); border: 1px solid var(--fx-wtext); border-radius: var(--fx-r); padding: var(--fx-s3) var(--fx-s4); margin: var(--fx-s3) 0; }
+.fx-confirm .fx-btn { color: var(--fx-text); }
+.fx-confirm .fx-btn--primary { color: var(--fx-pc); }
+.fx-confirm-msg { margin: 0 0 var(--fx-s2); font-weight: 600; }
+.fx-confirm-msg:focus { outline: none; }
+.fx-problem { margin-bottom: var(--fx-s2); }
+.fx-actionbar-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--fx-s2); }
+.fx-actionbar-row .fx-btn { padding-left: var(--fx-s1); padding-right: var(--fx-s1); min-width: 0; }
+
+/* Sticky bars only on phones, where the nav is fixed at the bottom */
+@media (max-width: 719px) {
+  .fx-sticky { position: sticky; bottom: var(--nav-h, 56px); background: var(--fx-bg); padding: var(--fx-s2) 0; margin: 0; z-index: 2; border-top: 1px solid var(--fx-border); }
+  .fx-sticky.fx-actions .fx-btn { flex: 1; }
+}
+@media (min-width: 720px) { .fx-details { grid-template-columns: repeat(3, 1fr); } }
 
 @media (min-width: 640px) {
   .fx-form { display: grid; grid-template-columns: 1fr 1fr; column-gap: var(--fx-s4); }
@@ -1219,7 +1241,7 @@ main:focus { outline: none; }
     return n;
   }
 
-  var inputs = {}, hints = {}, statusEl = null, timer = null;
+  var inputs = {}, hints = {}, statusEl = null, timer = null, keptDue = '', dueHint = null;
 
   function read() {
     var p = store.get(KEY, {});
@@ -1227,12 +1249,22 @@ main:focus { outline: none; }
   }
   function validate(f) {
     var c = CHECKS[f.check], v = inputs[f.key].value.trim();
-    hints[f.key].textContent = c && v && !c.re.test(v) ? c.msg : '';
+    var bad = !!(c && v && !c.re.test(v));
+    hints[f.key].textContent = bad ? 'Check this: ' + c.msg : '';
+    if (bad) inputs[f.key].setAttribute('aria-invalid', 'true'); else inputs[f.key].removeAttribute('aria-invalid');
   }
   function fill() {
     var p = read();
     FIELDS.forEach(function (f) {
-      inputs[f.key].value = typeof p[f.key] === 'string' ? p[f.key] : '';
+      var v = typeof p[f.key] === 'string' ? p[f.key] : '';
+      if (f.key === 'dueDate') {
+        // Date inputs only hold YYYY-MM-DD. Convert other formats; keep anything unreadable untouched.
+        var n = BFF.util.normalizeDate(v);
+        keptDue = v && !n ? v : '';
+        v = n;
+        hints.dueDate.textContent = keptDue ? 'The saved date \u201c' + keptDue + '\u201d could not be read. It is kept until you pick a new date.' : '';
+      }
+      inputs[f.key].value = v;
       if (f.check) validate(f);
     });
   }
@@ -1240,14 +1272,15 @@ main:focus { outline: none; }
     timer = null;
     var p = {};
     FIELDS.forEach(function (f) { p[f.key] = inputs[f.key].value.trim(); });
-    store.set(KEY, p);
-    statusEl.textContent = store.persistent ? 'Saved on this device' : 'Saved for this visit only (this browser blocks storage)';
+    if (!p.dueDate && keptDue) p.dueDate = keptDue;
+    var ok = store.set(KEY, p);
+    statusEl.className = 'fx-saved fx-saved--block' + (ok ? '' : ' fx-hint');
+    statusEl.textContent = ok ? 'Saved on this device' : 'Could not save on this device (storage is full or blocked). Your info is kept only until you close this page.';
     try { document.dispatchEvent(new CustomEvent('bff:profile-changed')); } catch (e) {}
   }
 
   BFF.views.info = {
     init: function (el) {
-      el.textContent = '';
       el.classList.add('fx-view');
       if (!el.querySelector('h2')) el.appendChild(h('h2', { tabindex: '-1', text: 'My info' }));
       el.appendChild(h('p', { class: 'fx-note', text: 'Stored only in this browser on this device. This app has no server and makes no network requests, so your details never leave your device. Clearing your browser data deletes them.' }));
@@ -1267,13 +1300,15 @@ main:focus { outline: none; }
           if (f.key === 'zip') input.setAttribute('maxlength', '10');
           if (f.type === 'email') input.setAttribute('autocapitalize', 'off');
         }
-        var hint = h('span', { id: hid, class: 'fx-hint', role: 'status' });
+        var hint = h('span', { id: hid, class: 'fx-hint' });
         input.setAttribute('aria-describedby', hid);
         inputs[f.key] = input;
         hints[f.key] = hint;
         var evt = f.select || f.type === 'date' ? 'change' : 'input';
         input.addEventListener(evt, function () {
           if (f.check) validate(f);
+          if (f.key === 'dueDate' && input.value) { keptDue = ''; hint.textContent = ''; }
+          statusEl.className = 'fx-saved fx-saved--block';
           statusEl.textContent = 'Saving…';
           if (timer) clearTimeout(timer);
           timer = setTimeout(saveNow, 400);
@@ -1285,17 +1320,28 @@ main:focus { outline: none; }
 
       statusEl = h('p', { class: 'fx-saved fx-saved--block', role: 'status', 'aria-live': 'polite' });
       var clear = h('button', { type: 'button', class: 'fx-btn fx-btn--danger', text: 'Clear my info' });
+      var clearRow = h('div', { class: 'fx-actions' }, [clear]);
       clear.addEventListener('click', function () {
-        if (!window.confirm('Clear all of My info from this device? This cannot be undone.')) return;
-        if (timer) { clearTimeout(timer); timer = null; }
-        store.remove(KEY);
-        fill();
-        statusEl.textContent = 'Your info was cleared from this device.';
-        try { document.dispatchEvent(new CustomEvent('bff:profile-changed')); } catch (e) {}
+        BFF.ui.confirm({
+          after: clearRow, confirmLabel: 'Clear my info', returnTo: clear,
+          message: 'Clear all of My info from this device? This cannot be undone.',
+          onConfirm: function () {
+            if (timer) { clearTimeout(timer); timer = null; }
+            var ok = store.remove(KEY);
+            fill();
+            statusEl.className = 'fx-saved fx-saved--block' + (ok ? '' : ' fx-hint');
+            statusEl.textContent = ok ? 'Your info was cleared from this device.' : 'Cleared for this visit, but the change could not be saved on this device.';
+            try { document.dispatchEvent(new CustomEvent('bff:profile-changed')); } catch (e) {}
+          },
+          onCancel: function () { statusEl.textContent = 'Clear cancelled. Nothing changed.'; }
+        });
       });
-      el.appendChild(h('div', { class: 'fx-actions' }, [clear]));
+      el.appendChild(clearRow);
       el.appendChild(statusEl);
       fill();
+      function flush() { if (timer) { clearTimeout(timer); saveNow(); } }
+      window.addEventListener('pagehide', flush);
+      document.addEventListener('visibilitychange', function () { if (document.visibilityState === 'hidden') flush(); });
     },
     show: function () {
       if (!timer) fill();
@@ -1364,7 +1410,7 @@ main:focus { outline: none; }
 
     var id = 'dir' + (++uid);
     els.search = h('input', { type: 'search', id: id + '-q', autocomplete: 'off', placeholder: 'Name, brand or what you get' });
-    els.category = h('select', { id: id + '-cat' }, [h('option', { value: '', text: 'All categories (' + all.length + ')' })]
+    els.category = h('select', { id: id + '-cat' }, [h('option', { value: '', text: 'All categories' })]
       .concat(L.CATEGORIES.map(function (c) { return h('option', { value: c.id, text: c.label + ' (' + (counts[c.id] || 0) + ')' }); })));
     els.sort = h('select', { id: id + '-sort' }, SORTS.map(function (s) { return h('option', { value: s[0], text: s[1] }); }));
 
@@ -1746,74 +1792,96 @@ main:focus { outline: none; }
     render();
   }
 
+  var SAVE_FAIL = 'Could not save on this device (storage is full or blocked). Your progress is kept only until you close this page.';
+
   function renderRun() {
     var p = byId(run.ids[run.index]);
     body.textContent = '';
-    var top = h('div', { class: 'fx-run-top' }, [
-      h('p', { class: 'fx-run-count', text: (run.index + 1) + ' of ' + run.ids.length }),
-      h('progress', { class: 'fx-progress', value: String(run.index + 1), max: String(run.ids.length), 'aria-label': 'Program ' + (run.index + 1) + ' of ' + run.ids.length })
-    ]);
-    var so = h('button', { type: 'button', class: 'fx-btn fx-btn--link', text: 'Start over' });
-    so.addEventListener('click', startOver);
-    top.appendChild(so);
-    body.appendChild(top);
+    var st = T().getStatus(p.id);
+    var last = run.index === run.ids.length - 1;
 
+    // (a) progress + name
+    var next = h('button', { type: 'button', class: 'fx-btn fx-btn--link', text: last ? 'Finish ›' : 'Next ›' });
+    next.setAttribute('aria-label', last ? 'Finish without changing this program' : 'Next program without changing this one');
+    next.addEventListener('click', function () { go(1); });
+    body.appendChild(h('div', { class: 'fx-run-top' }, [
+      h('p', { class: 'fx-run-count', text: (run.index + 1) + ' of ' + run.ids.length }),
+      h('progress', { class: 'fx-progress', value: String(run.index + 1), max: String(run.ids.length), 'aria-label': 'Program ' + (run.index + 1) + ' of ' + run.ids.length }),
+      next
+    ]));
+    if (!store.persistent) body.appendChild(h('p', { class: 'fx-warn', role: 'alert', text: SAVE_FAIL }));
     var title = h('h3', { class: 'fx-run-title', tabindex: '-1', text: p.name });
     body.appendChild(title);
-    var st = T().getStatus(p.id);
-    body.appendChild(h('p', { class: 'fx-muted', text: p.brand + ' · Current status: ' + T().LABELS[st] }));
-    body.appendChild(h('p', { text: p.whatYouGet }));
-    if (p.requirements && p.requirements.length) {
-      var rl = BFF.logic && BFF.logic.REQUIREMENT_LABELS ? BFF.logic.REQUIREMENT_LABELS : {};
-      body.appendChild(h('p', { class: 'fx-reqs' }, [h('strong', { text: 'You will need: ' }),
-        document.createTextNode(p.requirements.map(function (r) { return rl[r] || r; }).join(', '))]));
-    }
-    if (p.catches) body.appendChild(h('div', { class: 'fx-warn' }, [h('strong', { text: 'Catches: ' }), document.createTextNode(p.catches)]));
+    body.appendChild(h('p', { class: 'fx-muted fx-tight', text: p.brand + ' · Status: ' + T().LABELS[st] }));
 
+    // (b) open button
     var open = h('button', { type: 'button', class: 'fx-btn fx-btn--primary fx-btn--big', text: 'Open sign-up page ↗' });
     open.addEventListener('click', function () { window.open(p.signupUrl, '_blank', 'noopener,noreferrer'); });
     body.appendChild(open);
-    body.appendChild(h('p', { class: 'fx-small' }, [document.createTextNode('Or use the plain link: '),
-      h('a', { href: p.signupUrl, target: '_blank', rel: 'noopener noreferrer', text: 'open the sign-up page' })]));
+    body.appendChild(h('p', { class: 'fx-small fx-tight' }, [document.createTextNode('Popup blocked? '),
+      h('a', { href: p.signupUrl, target: '_blank', rel: 'noopener noreferrer', text: 'Use the plain link' })]));
 
+    // (c) details
     var details = detailList(profile());
-    var dsec = h('section', { class: 'fx-card', 'aria-labelledby': 'gd-details-h' }, [h('h4', { id: 'gd-details-h', text: 'Your details' })]);
+    var dsec = h('section', { class: 'fx-card fx-card--tight', 'aria-labelledby': 'gd-details-h' }, [h('h4', { id: 'gd-details-h', text: 'Your details' })]);
     if (!details.length) {
       dsec.appendChild(h('p', { class: 'fx-muted' }, [document.createTextNode('Nothing saved yet. '), h('a', { href: '#info', text: 'Add My info' })]));
     } else {
-      var all = h('button', { type: 'button', class: 'fx-btn', text: 'Copy all' });
+      var all = h('button', { type: 'button', class: 'fx-btn fx-btn--small', text: 'Copy all' });
       all.addEventListener('click', function () {
         copy(details.map(function (d) { return d.label + ': ' + d.value; }).join('\n'), 'all details', all);
       });
       dsec.appendChild(all);
       var dl = h('ul', { class: 'fx-details' });
       details.forEach(function (d) {
-        var b = h('button', { type: 'button', class: 'fx-btn fx-btn--small', text: 'Copy' });
-        b.setAttribute('aria-label', 'Copy ' + d.label.toLowerCase());
+        var b = h('button', { type: 'button', class: 'fx-btn fx-btn--small', text: d.value });
+        b.setAttribute('aria-label', 'Copy ' + d.label.toLowerCase() + ': ' + d.value);
+        b.title = d.label;
         b.addEventListener('click', function () { copy(d.value, d.label.toLowerCase(), b); });
-        dl.appendChild(h('li', {}, [h('span', { class: 'fx-d-label', text: d.label }), h('span', { class: 'fx-d-value', text: d.value }), b]));
+        dl.appendChild(h('li', {}, [h('span', { class: 'fx-d-label', text: d.label }), b]));
       });
       dsec.appendChild(dl);
     }
     body.appendChild(dsec);
 
-    // Problem box
-    var pbox = h('div', { class: 'fx-card', hidden: '' });
+    // (d) catches line + about
+    if (p.catches) body.appendChild(h('p', { class: 'fx-warn fx-warn--line', text: 'Catches: ' + p.catches }));
+    var about = h('details', { class: 'fx-about' }, [h('summary', { text: 'About this program' }), h('p', { text: p.whatYouGet })]);
+    if (p.requirements && p.requirements.length) {
+      var rl = BFF.logic && BFF.logic.REQUIREMENT_LABELS ? BFF.logic.REQUIREMENT_LABELS : {};
+      about.appendChild(h('p', {}, [h('strong', { text: 'You will need: ' }), document.createTextNode(p.requirements.map(function (r) { return rl[r] || r; }).join(', '))]));
+    }
+    if (p.catches) about.appendChild(h('p', { class: 'fx-warn' }, [h('strong', { text: 'Catches: ' }), document.createTextNode(p.catches)]));
+    if (p.notes) about.appendChild(h('p', {}, [h('strong', { text: 'Notes: ' }), document.createTextNode(p.notes)]));
+    body.appendChild(about);
+    var so = h('button', { type: 'button', class: 'fx-btn fx-btn--link', text: 'Start over' });
+    so.addEventListener('click', startOver);
+    body.appendChild(so);
+
+    // (e) sticky action bar
+    var pbox = h('div', { class: 'fx-problem', hidden: '' });
     var pta = h('textarea', { class: 'fx-textarea', id: 'gd-problem', rows: '2', maxlength: '500' });
     var psave = h('button', { type: 'button', class: 'fx-btn', text: 'Save problem and go on' });
     pbox.appendChild(h('div', { class: 'fx-field' }, [h('label', { 'for': 'gd-problem', text: 'What went wrong? (short note)' }), pta]));
     pbox.appendChild(psave);
+    function saved(ok) { if (!ok) announce(SAVE_FAIL); }
     psave.addEventListener('click', function () {
       var txt = pta.value.trim() || 'could not finish';
       var old = T().getNote(p.id);
-      T().setNote(p.id, 'Problem: ' + txt + (old ? '\n' + old : ''));
+      saved(T().setNote(p.id, 'Problem: ' + txt + (old ? '\n' + old : '')));
       go(1);
     });
-
     var done = h('button', { type: 'button', class: 'fx-btn fx-btn--primary', text: 'Done' });
-    done.addEventListener('click', function () { T().setStatus(p.id, 'signed-up'); go(1); });
+    done.addEventListener('click', function () {
+      // Never downgrade: only todo or skipped programs become signed-up.
+      if (st === 'todo' || st === 'skipped') saved(T().setStatus(p.id, 'signed-up'));
+      go(1);
+    });
     var skip = h('button', { type: 'button', class: 'fx-btn', text: 'Skip' });
-    skip.addEventListener('click', function () { T().setStatus(p.id, 'skipped'); go(1); });
+    skip.addEventListener('click', function () {
+      if (st === 'todo') saved(T().setStatus(p.id, 'skipped'));
+      go(1);
+    });
     var prob = h('button', { type: 'button', class: 'fx-btn', text: 'Problem', 'aria-expanded': 'false' });
     prob.addEventListener('click', function () {
       pbox.hidden = !pbox.hidden;
@@ -1823,12 +1891,7 @@ main:focus { outline: none; }
     var back = h('button', { type: 'button', class: 'fx-btn', text: 'Back' });
     back.disabled = run.index === 0;
     back.addEventListener('click', function () { go(-1); });
-    var next = h('button', { type: 'button', class: 'fx-btn', text: run.index === run.ids.length - 1 ? 'Finish' : 'Next' });
-    next.addEventListener('click', function () { go(1); });
-
-    body.appendChild(h('div', { class: 'fx-actions' }, [done, skip, prob]));
-    body.appendChild(pbox);
-    body.appendChild(h('div', { class: 'fx-actions' }, [back, next]));
+    body.appendChild(h('div', { class: 'fx-actionbar fx-sticky' }, [pbox, h('div', { class: 'fx-actionbar-row' }, [done, skip, prob, back])]));
     if (focusHeading) title.focus();
   }
 
@@ -1871,7 +1934,6 @@ main:focus { outline: none; }
   BFF.views.guided = {
     init: function (root) {
       el = root;
-      el.textContent = '';
       el.classList.add('fx-view');
       if (!el.querySelector('h2')) el.appendChild(h('h2', { tabindex: '-1', text: 'Do it for me' }));
       live = h('div', { class: 'fx-sr', role: 'status', 'aria-live': 'polite' });
@@ -1882,7 +1944,6 @@ main:focus { outline: none; }
       render();
     },
     show: function () {
-      if (!run) initSelection();
       render();
     }
   };
