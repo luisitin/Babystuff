@@ -176,7 +176,7 @@
 
   var view = { rows: {}, filter: 'all' };
 
-  function plural(n, w) { return n + ' ' + w + (n === 1 ? '' : 's'); }
+  function plural(n, w) { return n + ' ' + (n === 1 ? w : w.replace(/y$/, 'ie') + 's'); }
 
   function updateSummary() {
     if (!view.bar) return;

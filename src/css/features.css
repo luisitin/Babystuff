@@ -39,7 +39,7 @@
 .fx-btn:disabled { opacity: .5; cursor: not-allowed; }
 .fx-btn:focus-visible, .fx-link-btn:focus-visible, .fx-input:focus-visible, .fx-select:focus-visible, .fx-textarea:focus-visible, .fx-file:focus-visible, .fx-tab:focus-visible, .fx-view a:focus-visible, .fx-check input:focus-visible, .fx-pick-item input:focus-visible { outline: 3px solid var(--fx-primary); outline-offset: 2px; }
 .fx-actions { display: flex; flex-wrap: wrap; gap: var(--fx-s2); margin: var(--fx-s3) 0; }
-.fx-sticky { position: sticky; bottom: 0; background: var(--fx-bg); padding: var(--fx-s3) 0; margin-bottom: 0; }
+.fx-sticky { position: sticky; bottom: var(--nav-h, 56px); background: var(--fx-bg); padding: var(--fx-s3) 0; margin-bottom: 0; }
 .fx-sticky .fx-btn { flex: 1; }
 .fx-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 
