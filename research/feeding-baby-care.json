@@ -1,1 +1,92 @@
-[]
+[
+  {
+    "category": "feeding",
+    "region": "US",
+    "verifiedOn": "2026-11-08",
+    "id": "mam-club",
+    "name": "MAM Club",
+    "brand": "MAM",
+    "whatYouGet": "Coupon: 10% welcome voucher, plus 10% off online shop orders for logged-in members, free shipping from $35, a pregnancy newsletter, product-testing invitations and prize giveaways.",
+    "costToClaim": "free",
+    "costDetail": "Free to join; discounts apply to purchases in the MAM online shop",
+    "requirements": [
+      "email"
+    ],
+    "eligibility": "Not stated; open to anyone registering on the MAM US shop",
+    "signupUrl": "https://www.mambaby.com/en-us/mam-club/",
+    "sourceUrls": [
+      "https://www.mambaby.com/en-us/",
+      "https://www.mambaby.com/en-us/mam-club/"
+    ],
+    "confidence": "high",
+    "catches": "Discount is a coupon, not a free item; regular newsletter emails; giveaways and product tests are not guaranteed.",
+    "notes": "Registration form was not opened, so exact fields are unconfirmed. Welcome voucher terms were not shown on the club page."
+  },
+  {
+    "category": "feeding",
+    "region": "US",
+    "verifiedOn": "2026-11-08",
+    "id": "munchkin-email-signup-15-off",
+    "name": "Munchkin email sign-up (15% off first purchase)",
+    "brand": "Munchkin",
+    "whatYouGet": "Coupon: a code for 15% off your first purchase on munchkin.com when you subscribe to emails.",
+    "costToClaim": "free",
+    "costDetail": "Free to sign up; code applies to a purchase",
+    "requirements": [
+      "email"
+    ],
+    "eligibility": "Not stated",
+    "signupUrl": "https://www.munchkin.com/email-sign-up",
+    "sourceUrls": [
+      "https://www.munchkin.com/email-sign-up",
+      "https://www.munchkin.com/"
+    ],
+    "confidence": "high",
+    "catches": "Coupon only; marketing emails; code terms and exclusions not shown on the page.",
+    "notes": "Site says free shipping over $50 with exclusions."
+  },
+  {
+    "category": "feeding",
+    "region": "US",
+    "verifiedOn": "2026-11-08",
+    "id": "tommee-tippee-newsletter-15-off",
+    "name": "Tommee Tippee newsletter sign-up (15% off)",
+    "brand": "Tommee Tippee",
+    "whatYouGet": "Coupon: the footer says to sign up for 15% off, plus offers, stories and parenting advice.",
+    "costToClaim": "free",
+    "costDetail": "Free to sign up; discount applies to a purchase",
+    "requirements": [
+      "email"
+    ],
+    "eligibility": "Not stated",
+    "signupUrl": "https://www.tommeetippee.com/en-us",
+    "sourceUrls": [
+      "https://www.tommeetippee.com/en-us"
+    ],
+    "confidence": "medium",
+    "catches": "Coupon only; marketing emails; offer terms and exclusions were not found on the page.",
+    "notes": "Sign-up form is in the footer of the US homepage; footer links to Brand Club terms/privacy."
+  },
+  {
+    "category": "feeding",
+    "region": "US",
+    "verifiedOn": "2026-11-08",
+    "id": "philips-avent-store-newsletter-15-off",
+    "name": "Philips store sign-up (15% off first purchase)",
+    "brand": "Philips Avent",
+    "whatYouGet": "Coupon: the Avent product page says 'Sign-up & Save 15% off your next order' and '15% off your first purchase on the Philips store', plus early access to offers.",
+    "costToClaim": "free",
+    "costDetail": "Free to sign up; discount applies to a purchase on the Philips US store",
+    "requirements": [
+      "email"
+    ],
+    "eligibility": "Not stated",
+    "signupUrl": "https://www.usa.philips.com/c-p/SCD265_01/avent",
+    "sourceUrls": [
+      "https://www.usa.philips.com/c-p/SCD265_01/avent"
+    ],
+    "confidence": "medium",
+    "catches": "Coupon only; sign-up is for Philips-wide promotional emails, not Avent only; exclusions not shown.",
+    "notes": "Sign-up box sits at the bottom of Avent product pages."
+  }
+]
