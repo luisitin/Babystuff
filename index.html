@@ -1,0 +1,1411 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; connect-src 'none'; form-action 'none'; base-uri 'none'">
+<meta name="referrer" content="no-referrer">
+<meta name="description" content="Legit US sign-ups for free baby stuff: formula, diapers, samples, registry welcome boxes and rewards. Official links only, nothing leaves your device.">
+<meta name="color-scheme" content="light dark">
+<title>Baby Freebies Finder</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%231F6F6B'/%3E%3Cpath d='M32 49C17 39 13 30 18 24c4-5 11-3 14 2 3-5 10-7 14-2 5 6 1 15-14 25z' fill='%23FBF8F3'/%3E%3C/svg%3E">
+<style>
+/* Baby Freebies Finder: base styles. Tokens are shared with features.css. */
+:root {
+  --bg: #FBF8F3;
+  --surface: #FFFFFF;
+  --surface-2: #F4EFE6;
+  --text: #1F2A2E;
+  --muted: #5B6B70;
+  --primary: #1F6F6B;
+  --primary-contrast: #FFFFFF;
+  --primary-hover: #185a57;
+  --border: #E6DFD3;
+  --border-strong: #CFC6B6;
+  --success: #1E6B3A;
+  --success-bg: #E1F1E5;
+  --warning: #8A5A00;
+  --warning-bg: #FCEFD2;
+  --warning-text: #5E3B00;
+  --warning-border: #E8C66E;
+  --neutral-bg: #ECE9E2;
+  --neutral-text: #464E51;
+  --danger: #A12A2A;
+  --focus: #0B57D0;
+  --shadow: 0 1px 2px rgba(31, 42, 46, .06), 0 2px 8px rgba(31, 42, 46, .05);
+  --radius: 14px;
+  --radius-sm: 10px;
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --font: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --nav-h: 60px;
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #12181A;
+    --surface: #1B2326;
+    --surface-2: #232E32;
+    --text: #E8EEEE;
+    --muted: #9FB0B4;
+    --primary: #5CC2BA;
+    --primary-contrast: #0B1A19;
+    --primary-hover: #7AD3CC;
+    --border: #2E3A3E;
+    --border-strong: #425257;
+    --success: #7FD99A;
+    --success-bg: #1B3326;
+    --warning: #F0C060;
+    --warning-bg: #3A2D12;
+    --warning-text: #F6DBA0;
+    --warning-border: #6B5320;
+    --neutral-bg: #2A3438;
+    --neutral-text: #C5D0D3;
+    --danger: #FF9C9C;
+    --focus: #8AB4F8;
+    --shadow: 0 1px 2px rgba(0, 0, 0, .4);
+    color-scheme: dark;
+  }
+}
+
+:root[data-theme="dark"] {
+  --bg: #12181A;
+  --surface: #1B2326;
+  --surface-2: #232E32;
+  --text: #E8EEEE;
+  --muted: #9FB0B4;
+  --primary: #5CC2BA;
+  --primary-contrast: #0B1A19;
+  --primary-hover: #7AD3CC;
+  --border: #2E3A3E;
+  --border-strong: #425257;
+  --success: #7FD99A;
+  --success-bg: #1B3326;
+  --warning: #F0C060;
+  --warning-bg: #3A2D12;
+  --warning-text: #F6DBA0;
+  --warning-border: #6B5320;
+  --neutral-bg: #2A3438;
+  --neutral-text: #C5D0D3;
+  --danger: #FF9C9C;
+  --focus: #8AB4F8;
+  --shadow: 0 1px 2px rgba(0, 0, 0, .4);
+  color-scheme: dark;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font);
+  font-size: 16px;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+  padding-bottom: calc(var(--nav-h) + env(safe-area-inset-bottom, 0px) + var(--space-4));
+}
+h1, h2, h3, p, ul { margin: 0; }
+ul { padding: 0; list-style: none; }
+h2 { font-size: 1.375rem; line-height: 1.25; margin-bottom: var(--space-3); }
+h3 { font-size: 1.0625rem; line-height: 1.3; }
+h2:focus { outline: none; }
+a { color: var(--primary); }
+[hidden] { display: none !important; }
+
+:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+.skip-link {
+  position: absolute; left: var(--space-4); top: -100px; z-index: 100;
+  background: var(--primary); color: var(--primary-contrast);
+  padding: var(--space-3) var(--space-4); border-radius: var(--radius-sm);
+  font-weight: 600; text-decoration: none;
+}
+.skip-link:focus { top: var(--space-2); }
+
+.visually-hidden {
+  position: absolute !important; width: 1px; height: 1px; overflow: hidden;
+  clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap;
+}
+
+/* Header */
+.app-header { padding: calc(var(--space-4) + env(safe-area-inset-top, 0px)) var(--space-4) var(--space-2); }
+.header-inner { display: flex; gap: var(--space-3); align-items: flex-start; justify-content: space-between; max-width: 1080px; margin: 0 auto; }
+.app-name { font-size: 1.5rem; line-height: 1.2; color: var(--primary); }
+.promise { color: var(--muted); font-size: .9375rem; margin-top: var(--space-1); }
+.theme-toggle {
+  flex: none; min-height: 44px; min-width: 44px; padding: 0 var(--space-3);
+  background: var(--surface); color: var(--text); border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm); font: inherit; font-size: .875rem; cursor: pointer;
+}
+.theme-toggle:hover { border-color: var(--primary); }
+.notice {
+  max-width: 1080px; margin: var(--space-3) auto 0; padding: var(--space-2) var(--space-3);
+  background: var(--warning-bg); color: var(--warning-text); border: 1px solid var(--warning-border);
+  border-radius: var(--radius-sm); font-size: .875rem;
+}
+
+/* Nav: bottom tab bar on phones */
+.app-nav {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 50;
+  background: var(--surface); border-top: 1px solid var(--border);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  padding-left: env(safe-area-inset-left, 0px); padding-right: env(safe-area-inset-right, 0px);
+}
+.app-nav ul { display: flex; }
+.app-nav li { flex: 1 1 0; min-width: 0; }
+.app-nav a {
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;
+  min-height: var(--nav-h); padding: var(--space-1) 2px;
+  color: var(--muted); text-decoration: none; font-size: .6875rem; line-height: 1.15; text-align: center;
+}
+.nav-icon { font-size: 1.125rem; line-height: 1; }
+.app-nav a[aria-current="page"] { color: var(--primary); font-weight: 700; box-shadow: inset 0 3px 0 var(--primary); }
+.app-nav a:focus-visible { outline-offset: -3px; }
+
+/* Layout */
+main { display: block; max-width: 1080px; margin: 0 auto; padding: var(--space-3) var(--space-4) var(--space-5); }
+.lede { color: var(--muted); margin-bottom: var(--space-4); }
+
+/* Filters */
+.filters {
+  background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+  padding: var(--space-4); display: grid; gap: var(--space-3); box-shadow: var(--shadow);
+}
+.field { display: grid; gap: var(--space-1); min-width: 0; }
+.field label, .field-label { font-size: .875rem; font-weight: 600; }
+.field input[type="search"], .field select, .status-select select, select.status-select {
+  width: 100%; min-height: 44px; padding: 0 var(--space-3); font: inherit; color: var(--text);
+  background: var(--bg); border: 1px solid var(--border-strong); border-radius: var(--radius-sm);
+}
+.field-row { display: grid; gap: var(--space-3); grid-template-columns: 1fr; }
+.checks { display: flex; flex-wrap: wrap; gap: var(--space-2) var(--space-4); }
+.check { display: inline-flex; align-items: center; gap: var(--space-2); min-height: 44px; cursor: pointer; }
+.check input { width: 22px; height: 22px; accent-color: var(--primary); margin: 0; }
+.filter-actions { display: flex; align-items: center; justify-content: space-between; gap: var(--space-3); flex-wrap: wrap; }
+.result-count { color: var(--muted); font-size: .9375rem; margin: var(--space-4) 0 var(--space-3); }
+
+/* Buttons */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: var(--space-1);
+  min-height: 44px; padding: 0 var(--space-4); border-radius: var(--radius-sm);
+  font: inherit; font-weight: 600; text-decoration: none; cursor: pointer; text-align: center;
+  background: var(--surface); color: var(--text); border: 1px solid var(--border-strong);
+}
+.btn:hover { border-color: var(--primary); }
+.btn-primary { background: var(--primary); color: var(--primary-contrast); border-color: var(--primary); }
+.btn-primary:hover { background: var(--primary-hover); border-color: var(--primary-hover); }
+
+/* Cards */
+.card-grid { display: grid; gap: var(--space-4); grid-template-columns: minmax(0, 1fr); }
+.card {
+  background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+  padding: var(--space-4); box-shadow: var(--shadow); display: flex; flex-direction: column; gap: var(--space-3); min-width: 0;
+}
+.card-head h3 { font-size: 1.125rem; }
+.card-brand { color: var(--muted); font-size: .875rem; }
+.badges { display: flex; flex-wrap: wrap; gap: var(--space-2); }
+.badge {
+  display: inline-block; padding: 2px 10px; border-radius: 999px; font-size: .8125rem; font-weight: 600; line-height: 1.5;
+  background: var(--neutral-bg); color: var(--neutral-text);
+}
+.badge-category { background: var(--surface-2); color: var(--text); border: 1px solid var(--border); }
+.badge-cost-free { background: var(--success-bg); color: var(--success); }
+.badge-cost-shipping-fee { background: var(--warning-bg); color: var(--warning-text); }
+.badge-cost-purchase-required, .badge-cost-membership-required { background: var(--neutral-bg); color: var(--neutral-text); }
+.cost-detail { font-size: .9375rem; color: var(--muted); }
+.card-section-title { font-size: .8125rem; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); margin-bottom: var(--space-1); }
+.chips { display: flex; flex-wrap: wrap; gap: var(--space-2); }
+.chip { padding: 2px 10px; border: 1px solid var(--border-strong); border-radius: 999px; font-size: .8125rem; color: var(--text); }
+.meta { font-size: .9375rem; }
+.meta dt { font-weight: 600; display: inline; }
+.meta dd { display: inline; margin: 0; }
+.meta div { margin-bottom: var(--space-1); }
+.catches {
+  background: var(--warning-bg); color: var(--warning-text); border: 1px solid var(--warning-border);
+  border-left-width: 5px; border-radius: var(--radius-sm); padding: var(--space-3); font-size: .9375rem;
+}
+.catches strong { display: block; margin-bottom: 2px; }
+.card details { font-size: .9375rem; }
+.card summary { min-height: 44px; display: flex; align-items: center; cursor: pointer; font-weight: 600; color: var(--primary); }
+.card details p { margin-bottom: var(--space-2); }
+.source-list { list-style: disc; padding-left: var(--space-5); }
+.source-list li { margin-bottom: var(--space-1); }
+.card-foot { margin-top: auto; display: grid; gap: var(--space-3); }
+.verified { font-size: .8125rem; color: var(--muted); }
+.status-row { display: flex; align-items: center; gap: var(--space-3); }
+.status-row label { font-size: .875rem; font-weight: 600; flex: none; }
+.status-row select { flex: 1 1 auto; min-width: 0; min-height: 44px; padding: 0 var(--space-3); font: inherit; color: var(--text); background: var(--bg); border: 1px solid var(--border-strong); border-radius: var(--radius-sm); }
+.empty {
+  background: var(--surface); border: 1px dashed var(--border-strong); border-radius: var(--radius);
+  padding: var(--space-5) var(--space-4); text-align: center; display: grid; gap: var(--space-3); justify-items: center;
+}
+
+/* Safety */
+.safety-grid { display: grid; gap: var(--space-3); grid-template-columns: minmax(0, 1fr); }
+.safety-card { background: var(--surface); border: 1px solid var(--border); border-left: 5px solid var(--primary); border-radius: var(--radius); padding: var(--space-4); }
+.safety-card h3 { margin-bottom: var(--space-1); }
+
+/* Footer */
+.app-footer { max-width: 1080px; margin: 0 auto; padding: var(--space-4); color: var(--muted); font-size: .875rem; display: grid; gap: var(--space-1); }
+
+@media (min-width: 720px) {
+  body { padding-bottom: 0; }
+  .app-nav { position: static; border-top: 0; border-bottom: 1px solid var(--border); padding: 0 var(--space-4); }
+  .app-nav ul { max-width: 1080px; margin: 0 auto; gap: var(--space-2); }
+  .app-nav li { flex: none; }
+  .app-nav a { flex-direction: row; gap: var(--space-2); min-height: 48px; padding: 0 var(--space-4); font-size: .9375rem; box-shadow: none !important; border-bottom: 3px solid transparent; }
+  .app-nav a[aria-current="page"] { border-bottom-color: var(--primary); }
+  .nav-icon { font-size: 1rem; }
+  main { padding: var(--space-5) var(--space-4); }
+  .field-row { grid-template-columns: 1fr 1fr; }
+  .card-grid { grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); }
+  .safety-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (min-width: 1000px) {
+  .safety-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .btn, .theme-toggle { transition: background-color .15s, border-color .15s; }
+}
+</style>
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+<header class="app-header">
+  <div class="header-inner">
+    <div class="brand">
+      <h1 class="app-name">Baby Freebies Finder</h1>
+      <p class="promise">Legit US sign-ups for free baby stuff. Official links only. Your details never leave this device.</p>
+    </div>
+    <button type="button" id="theme-toggle" class="theme-toggle" aria-label="Theme: System. Tap to change.">Theme: System</button>
+  </div>
+  <p id="storage-notice" class="notice" role="status" hidden></p>
+</header>
+
+<nav class="app-nav" aria-label="Main">
+  <ul>
+    <li><a href="#directory" data-view="directory"><span class="nav-icon" aria-hidden="true">&#9776;</span><span>Programs</span></a></li>
+    <li><a href="#info" data-view="info"><span class="nav-icon" aria-hidden="true">&#9998;</span><span>My info</span></a></li>
+    <li><a href="#tracker" data-view="tracker"><span class="nav-icon" aria-hidden="true">&#10003;</span><span>Tracker</span></a></li>
+    <li><a href="#guided" data-view="guided"><span class="nav-icon" aria-hidden="true">&#9654;</span><span>Do it for me</span></a></li>
+    <li><a href="#safety" data-view="safety"><span class="nav-icon" aria-hidden="true">&#9888;</span><span>Spot a fake</span></a></li>
+  </ul>
+</nav>
+
+<main id="main">
+  <section id="view-directory" class="view" aria-labelledby="h-directory" hidden>
+    <h2 id="h-directory" tabindex="-1">Free baby programs</h2>
+  </section>
+
+  <section id="view-info" class="view" aria-labelledby="h-info" hidden>
+    <h2 id="h-info" tabindex="-1">My info</h2>
+  </section>
+
+  <section id="view-tracker" class="view" aria-labelledby="h-tracker" hidden>
+    <h2 id="h-tracker" tabindex="-1">Tracker</h2>
+  </section>
+
+  <section id="view-guided" class="view" aria-labelledby="h-guided" hidden>
+    <h2 id="h-guided" tabindex="-1">Do it for me</h2>
+  </section>
+
+  <section id="view-safety" class="view" aria-labelledby="h-safety" hidden>
+    <h2 id="h-safety" tabindex="-1">How to spot a fake freebie</h2>
+    <p class="lede">Real baby freebies are common, and so are copycats. These habits keep you safe.</p>
+    <div class="safety-grid">
+      <article class="safety-card">
+        <h3>Stay on the brand's own site</h3>
+        <p>Real programs live on the brand's own site. Check the address bar before typing anything.</p>
+      </article>
+      <article class="safety-card">
+        <h3>No card for a free sample</h3>
+        <p>A free sample never needs your card. A shipping fee should be labeled up front on a well-known retailer's site.</p>
+      </article>
+      <article class="safety-card">
+        <h3>Be wary of "free trials"</h3>
+        <p>"Free trials" that take a card usually become subscriptions. Read the renewal terms and set a cancel reminder.</p>
+      </article>
+      <article class="safety-card">
+        <h3>Skip survey "free baby box" offers</h3>
+        <p>Surveys promising a "free baby box" or gift card for your phone number are lead-gen sites that sell your details.</p>
+      </article>
+      <article class="safety-card">
+        <h3>Red flags in the page</h3>
+        <p>Watch for look-alike domains, countdown timers, "only 3 left!" and "share to unlock".</p>
+      </article>
+      <article class="safety-card">
+        <h3>Never share SSN or bank logins</h3>
+        <p>Never give a freebie site your SSN or bank login. For an insurance breast pump, use a supplier your insurer lists.</p>
+      </article>
+      <article class="safety-card">
+        <h3>Don't tap links in ads or texts</h3>
+        <p>Don't tap freebie links in ads or texts. Go to the brand's site yourself.</p>
+      </article>
+      <article class="safety-card">
+        <h3>Use a dedicated email</h3>
+        <p>Use a dedicated email or a plus address (name+baby@gmail.com) to see who shares your address.</p>
+      </article>
+      <article class="safety-card">
+        <h3>Report scams</h3>
+        <p>Report scams at ReportFraud.ftc.gov. Type it into your browser yourself.</p>
+      </article>
+    </div>
+  </section>
+</main>
+
+<footer class="app-footer">
+  <p>Program data last checked on <span id="last-checked">recently</span>. Offers change, so confirm details on the official page before you sign up.</p>
+  <p>No ads, no analytics, no trackers. Everything you enter stays in this browser.</p>
+</footer>
+
+<script id="programs-data" type="application/json">[{"id":"enfamil-family-beginnings","name":"Enfamil Family Beginnings","brand":"Enfamil (Mead Johnson / Reckitt)","category":"formula","whatYouGet":"Advertised as up to $400 in free gifts: you may be eligible for free formula samples, discount checks, cash-back rebates, Belly Badges, app access and weekly tips. Joining also enters you in a quarterly drawing for a year of free formula.","costToClaim":"free","costDetail":"Free to join; no purchase necessary for the sweepstakes","requirements":["email","due-date"],"eligibility":"Sweepstakes entry is for legal US residents 18+ who join in 2026; benefits vary by the details you give","region":"US","signupUrl":"https://www.enfamil.com/baby-formula-coupons-samples/","sourceUrls":["https://www.enfamil.com/baby-formula-coupons-samples/","https://www.enfamil.com/help-center/enfamil-family-beginnings/","https://www.enfamil.com/free-formula-sweepstakes/","https://www.enfamil.com/free-gift/"],"verifiedOn":"2026-11-08","confidence":"high","catches":"Samples are 'may be eligible', not guaranteed; benefits vary by family. Joining agrees to receive offers and communications from Enfamil and affiliated Reckitt brands. Sweepstakes promotion ends Dec 31, 2026.","notes":"Quick form asks first and last name, email and due or birth date. Enfamil Rewards points (100 for joining, 1,000 for first app login) are part of the same sign-up."},{"id":"gerber-mygerber-baby","name":"MyGerber Baby account (formula sample opt-in)","brand":"Gerber","category":"formula","whatYouGet":"Free MyGerber account with perks such as expert advice and order tracking; sign-up includes an optional checkbox to receive infant formula samples and offers if they become available.","costToClaim":"free","costDetail":"Creating an account is free","requirements":["email","due-date"],"eligibility":"Parents with a child's birthday or due date","region":"US","signupUrl":"https://register.gerber.com/","sourceUrls":["https://www.gerber.com/gerberr-good-startr-soothepro-powder-infant-formula","https://register.gerber.com/"],"verifiedOn":"2026-11-08","confidence":"medium","catches":"Samples are only 'if they become available'; an address is needed to receive them. Good Start formula has moved to Perrigo, so the current sample offer is unconfirmed.","notes":"Checked from the official site's search results; the site blocks automated reading, so details may be incomplete. gerber.com returned 403 to our fetcher and register.gerber.com failed through the proxy; details come from official-domain search results only."},{"id":"similac-mysimilac-rewards","name":"MySimilac Rewards","brand":"Similac (Abbott)","category":"formula","whatYouGet":"Formula coupons, points toward a bonus coupon, nutrition guidance and a free Shutterfly photo book (see registration form details). The welcome kit may include formula samples.","costToClaim":"free","costDetail":"Free to join","requirements":["email","address","due-date"],"eligibility":"Legal residents of the 50 states and DC, 18+; enrollment is per eligible child up to 9 months; one account per household per child","region":"US (50 states and DC)","signupUrl":"https://www.similac.com/rewards.html","sourceUrls":["https://www.similac.com/rewards.html","https://www.similac.com/rewards/admin/terms-conditions.html"],"verifiedOn":"2026-11-08","confidence":"high","catches":"Samples are not guaranteed ('may'). Optional SMS opt-in; email and postal mail marketing continue even if you decline texts. Points are earned only when a coupon is redeemed (5 points each); a special coupon comes at 35 points. Program can change or end at any time.","notes":"Registration asks for name, home address, email and baby's birth or due date, plus a password. Coupons may arrive by mail, in your account or by email."},{"id":"enfamil-nutramigen-support-program","name":"Nutramigen Support Program (within Enfamil Family Beginnings)","brand":"Enfamil (Mead Johnson / Reckitt)","category":"formula","whatYouGet":"Specialized track within Enfamil Family Beginnings for families managing cow's milk allergy: tailored tips and content, with the page saying samples to fit your needs and insurance support.","costToClaim":"free","costDetail":"Free to join","requirements":["email","address","due-date"],"eligibility":"Families managing cow's milk allergy; also joins you to Enfamil Family Beginnings","region":"US","signupUrl":"https://www.enfamil.com/nutramigen-savings-and-support-program/","sourceUrls":["https://www.enfamil.com/nutramigen-savings-and-support-program/"],"verifiedOn":"2026-11-08","confidence":"medium","catches":"Sample contents and availability are not specified on the page. Form includes an optional mobile number for text messages. Agrees to receive offers from Mead Johnson affiliated companies.","notes":"Form asks name, email, address, due or birth date and relationship to baby. Talk to your pediatrician before choosing a hypoallergenic formula."},{"id":"amazon-baby-registry-welcome-box","name":"Baby Registry Welcome Box","brand":"Amazon","category":"registry-box","whatYouGet":"Free gift box with sample and full-size items for parents and baby, for Prime members with a baby registry.","costToClaim":"membership-required","costDetail":"Requires an active Prime account, a registry with 10 unique items, and over $10 of purchases from the registry (by you or others).","requirements":["membership","registry","purchase"],"eligibility":"Primary registry owner with an active Prime account; Amazon Business accounts do not qualify.","region":"US","signupUrl":"https://www.amazon.com/baby-reg/welcomebox","sourceUrls":["https://www.amazon.com/baby-reg/welcomebox","https://www.amazon.com/gp/help/customer/display.html?nodeId=GBLXVKVYG5SBG8HF"],"verifiedOn":"2026-11-08","confidence":"high","catches":"Amazon's help page (read via domain search snippet; the page itself did not fetch cleanly) says tax, shipping, Prime and gift card purchases don't count toward the $10, the box shows $35 until a $35 promotional balance is applied, it ships to the contiguous US only, and a new box needs an 8-month wait. Limited-time and subject to change.","notes":"The same registry page also advertises a 15% completion discount, up to $300 in savings, and free 1-year returns. Older Q&A mentions a 60% checklist rule; the current page says 10 items."},{"id":"walmart-baby-registry-welcome-box","name":"Baby Registry Welcome Box","brand":"Walmart","category":"registry-box","whatYouGet":"Baby Box with at least six sample-size baby or parenting products plus discount coupons; contents vary.","costToClaim":"purchase-required","costDetail":"Free box. Registry created on or after 2/1/25, open 7+ days, 20+ unique items, and over $25 purchased through your registry link (items marked Purchased don't count).","requirements":["registry","purchase","address"],"eligibility":"Adults 18+ in the 50 US states and Puerto Rico; one box per person, Walmart account and household per 365 days.","region":"US (50 states and Puerto Rico)","signupUrl":"https://www.walmart.com/cp/baby-registry/1229485","sourceUrls":["https://www.walmart.com/cp/baby-registry/1229485","https://www.walmart.com/help/article/baby-registry-gift-box-offer/9cd45411397d425b8e88bc89583deb62","https://www.walmart.com/help/article/baby-registry-welcome-box-offer-terms-of-use/ab7999bd49bd4745abd355cfbf41d3e8"],"verifiedOn":"2026-11-08","confidence":"high","catches":"While supplies last, first come first served; not guaranteed even after meeting requirements and Walmart need not notify you if supplies run out; contents may be substituted; allow 10-12 weeks by US mail to the registry address (no P.O. boxes).","notes":"Claim via the banner on your registry page; you get a confirmation email. Support: support@walmartbabywelcomebox.com. The page shows no separate free postpartum or mom box."},{"id":"walmart-baby-registry-free-home-cleaning","name":"Free cleaning service with baby registry","brand":"Walmart","category":"registry-box","whatYouGet":"One free home cleaning (1 bedroom, 1 bathroom, kitchen and common areas in a single home, a $99 value) from a partner service provider.","costToClaim":"purchase-required","costDetail":"Registry open 7+ days with 20+ unique items and $300 spent on items from the registry (by you or invited gifters).","requirements":["registry","purchase","address"],"eligibility":"Adults 18+ in the 48 contiguous states; limit one per person. Registry must be created on or after the reward start date (Feb 9, 2026).","region":"US (48 contiguous states)","signupUrl":"https://www.walmart.com/cp/baby-registry/1229485","sourceUrls":["https://www.walmart.com/cp/baby-registry/1229485","https://www.walmart.com/help/article/baby-registry-welcome-box-offer-terms-of-use/ab7999bd49bd4745abd355cfbf41d3e8"],"verifiedOn":"2026-11-08","confidence":"high","catches":"Available while supplies last; fulfilled by an unaffiliated service provider with its own terms; must redeem no later than 90 days after your registry event date; merchandise total excludes taxes, shipping and fees, and items marked purchased don't count.","notes":"Walmart calls this a Tier 2 registry reward alongside the Baby Box."},{"id":"babylist-hello-baby-box","name":"Hello Baby Box","brand":"Babylist","category":"registry-box","whatYouGet":"Free welcome box of product samples and partner offers (diapers/wipes, bottles, skincare, coupons); contents vary.","costToClaim":"purchase-required","costDetail":"Add 3 items from other stores, complete 40% of the registry checklist, make a $30+ Babylist Shop purchase (a gifter may), and pay $8.95 plus tax shipping.","requirements":["registry","purchase","address","due-date"],"eligibility":"Arrival date under 9 months away or baby under 4 weeks old; one box per household and per registry; US addresses.","region":"US","signupUrl":"https://www.babylist.com/hello-baby-box","sourceUrls":["https://help.babylist.com/hc/en-us/articles/360054057353-How-do-I-get-a-Hello-Baby-Box","https://help.babylist.com/hc/en-us/articles/360053264354-What-is-a-Hello-Baby-Box","https://www.babylist.com/hello-baby/whats-inside-babylist-hello-baby-box"],"verifiedOn":"2026-11-08","confidence":"medium","catches":"Shipping fee is non-refundable and orders can't be changed; AK/HI total shipping $18.95; gift cards and return credit can't pay the fee; Babylist Health and other retailer orders don't count toward the $30.","notes":"Babylist's help center (the source of these terms) returned a bot challenge, so details come from official-domain search results. Babylist's marketing FAQ says one box per household per year; the help center says per household and per registry. babylist.com's own page did not describe the box."},{"id":"macrobaby-gift-box","name":"MacroBaby Gift Box","brand":"MacroBaby","category":"registry-box","whatYouGet":"Random, seasonal gift box valued at about $80 or more.","costToClaim":"purchase-required","costDetail":"Add at least 20 items to a registry and make a first qualifying purchase of $15 or more from it.","requirements":["registry","purchase"],"eligibility":"One box per qualifying registry.","region":"US","signupUrl":"https://www.macrobaby.com/pages/macrobaby-gift-box","sourceUrls":["https://www.macrobaby.com/pages/macrobaby-gift-box","https://www.macrobaby.com/pages/baby-registry"],"verifiedOn":"2026-11-08","confidence":"medium","catches":"Contents can't be requested; if the qualifying items are returned the box must be returned or an $80 fee applies; program can change or end without notice.","notes":"The Baby Registry page's description says 'free $80+ welcome box'; the gift box page body did not render in readable text, so the 20-item and $15 conditions come from official-domain search results. MacroBaby also advertises 5% cash back on registry purchases."},{"id":"buybuy-baby-registry-welcome-bag","name":"Registry welcome bag","brand":"buybuy BABY","category":"registry-box","whatYouGet":"Goody bag with free samples, coupons and a Registry Guide.","costToClaim":"free","costDetail":"Free with registry; available for pickup in stores only.","requirements":["registry"],"eligibility":"Baby registrants; details of eligibility not confirmed.","region":"US","signupUrl":"https://www.buybuybaby.com/store/page/BabyRegistry","sourceUrls":["https://www.buybuybaby.com/store/page/BabyRegistry"],"verifiedOn":"2026-11-08","confidence":"medium","catches":"Pickup in stores only; ask for the bag when registering in person per store pages. Eligibility and any purchase conditions were not stated in the results.","notes":"buybuy BABY pages refused or failed to fetch; store-page search snippets still describe a free goody bag with samples, coupons and a registry guide. Snippets also mention a 15% completion discount and free first-year shipping after $1,500 of registry gifts."},{"id":"target-registry-welcome-kit","name":"Registry Welcome Kit (Target Baby Box)","brand":"Target","category":"registry-box","whatYouGet":"Welcome kit valued at $100, a mix of samples and a Target Circle Bonus.","costToClaim":"shipping-fee","costDetail":"Free kit, but shipping and handling fees apply. Join Target Circle, create a baby registry, add 10 unique items, and purchase over $10 from the registry (by you or others).","requirements":["membership","registry","purchase"],"eligibility":"Active baby registries created after 08/15/2023 that haven't claimed a previous kit; one kit per year.","region":"US","signupUrl":"https://www.target.com/gift-registry/create-baby-registry","sourceUrls":["https://www.target.com/help/article/000062588"],"verifiedOn":"2026-11-08","confidence":"high","catches":"Online only, as a Target Circle Bonus that must be accepted; shipping and handling fees apply; limit one kit per year; registries that claimed a previous kit aren't eligible. Allow 24-48 hours for the bonus to be issued.","notes":"Active registries created after 08/15/2023 are eligible. The bonus shows on the registry dashboard. Target's registry sign-up page and product page did not mention the kit in readable text, so only the help article confirms it."},{"id":"mam-club","name":"MAM Club","brand":"MAM","category":"feeding","whatYouGet":"10% welcome voucher and 10% member discount on the MAM US online shop, plus a pregnancy newsletter, invitations to product tests and prize giveaways.","costToClaim":"free","costDetail":"Free to join; discounts apply to purchases in the MAM online shop","requirements":["email"],"eligibility":"Not stated; open to anyone registering on the MAM US shop","region":"US","signupUrl":"https://www.mambaby.com/en-us/mam-club/","sourceUrls":["https://www.mambaby.com/en-us/","https://www.mambaby.com/en-us/mam-club/"],"verifiedOn":"2026-11-08","confidence":"high","catches":"Main perks are discounts on MAM shop orders (a coupon, not a free item); product tests and giveaways are not guaranteed. Regular newsletter emails.","notes":"Registration form was not opened, so exact fields are unconfirmed. Welcome voucher terms were not shown on the club page."},{"id":"imagination-library-free-books","name":"Dolly Parton's Imagination Library","brand":"Dolly Parton's Imagination Library (The Dollywood Foundation)","category":"baby-care","whatYouGet":"A high-quality, age-appropriate book mailed each month to registered children at no cost to the family.","costToClaim":"free","costDetail":"Books are 100% free to enrolled children; local program partners cover book and shipping costs.","requirements":["address","due-date","eligibility"],"eligibility":"Children (the US page refers to ages 0-5) living in an area covered by a local program partner; the check-availability page lets you register online or by mail where offered.","region":"Varies by area","signupUrl":"https://imaginationlibrary.com/check-availability/","sourceUrls":["https://imaginationlibrary.com/check-availability/","https://imaginationlibrary.com/usa/"],"verifiedOn":"2026-11-08","confidence":"high","catches":"Only available where a local program partner serves your address. One local program reported 8-10 weeks for the first book.","notes":"Check availability by location first. The search-result snippet about 8-10 weeks came from a local program page."},{"id":"huggies-rewards","name":"Huggies Rewards","brand":"Huggies","category":"rewards","whatYouGet":"Free rewards program and app where purchases of Huggies products earn points that can be redeemed for rewards such as gift cards.","costToClaim":"purchase-required","costDetail":"Free to join; earning points requires buying Huggies products.","requirements":["email","app","purchase"],"eligibility":"","region":"US","signupUrl":"https://www.huggies.com/en-us/rewards","sourceUrls":["https://www.huggies.com/en-us/rewards/rewardsapp","https://www1.huggies.com/en-us/offers-and-rewards/rewards"],"verifiedOn":"2026-11-08","confidence":"medium","catches":"Points require buying Huggies products. Search snippets disagree on the sign-up bonus amount, so none is listed. Older Rewards+ (Fetch) earning ended per a Huggies page.","notes":"huggies.com blocks automated fetching (Cloudflare 403); details come from huggies.com search results only."},{"id":"pg-brandsaver-rewards","name":"P&G brandSAVER Points & Rewards","brand":"Procter & Gamble","category":"rewards","whatYouGet":"Free to join. Earn points by completing a profile, taking surveys or scanning receipts for P&G products, then redeem 750 points for a $5 off any P&G product digital reward or use points for sweepstakes entries. Also offers coupons and rebates on 60+ P&G brands.","costToClaim":"free","costDetail":"No cost to join, or any fees ever (per the site)","requirements":["email"],"eligibility":"","region":"US","signupUrl":"https://pgbrandsaver.com/rewards/","sourceUrls":["https://pgbrandsaver.com/","https://pgbrandsaver.com/rewards/","https://pgbrandsaver.com/fan-clubs/","https://privacypolicy.pg.com/en-US/"],"verifiedOn":"2026-11-08","confidence":"high","catches":"Privacy policy says P&G discloses personal data to third-party partners where it has a lawful basis, receives data from other companies, and may share hashed email identifiers with ad platforms (Google, Meta, Microsoft, Pinterest, Reddit, Snap, TikTok) for interest-based ads. Its FAQ says it does not sell personal data for monetary compensation, but the site footer says 'We may sell your sensitive personal data.' Marketing email/text with opt-out. Points come from surveys and receipt scans.","notes":"The former pgeveryday.com now leads to P&G brandSAVER. No baby-specific offer is listed on the rewards page. Eligibility rules are not on the pages read (see Offer Rules page)."},{"id":"pampers-rewards","name":"Pampers Rewards","brand":"Pampers","category":"rewards","whatYouGet":"Free loyalty app: scan the code inside Pampers diaper or wipe packs to earn Pampers Cash ($10 per 10 diaper scans), redeemable for discounts on Pampers at retailers.","costToClaim":"purchase-required","costDetail":"Free to download and join; page says no subscription or hidden fees. Earning rewards requires buying Pampers products, and rewards are discounts on Pampers purchases.","requirements":["email","app","purchase"],"eligibility":"","region":"US","signupUrl":"https://www.pampers.com/en-us/rewards","sourceUrls":["https://www.pampers.com/en-us/rewards","https://support.pampers.com/hc/en-us/articles/21676841189533-How-can-I-get-Pampers-samples-or-coupons"],"verifiedOn":"2026-11-08","confidence":"high","catches":"Earning needs Pampers purchases. Pampers Cash expires 6 months after being added or if the account is inactive 6 months. App works on one device at a time. Page also promotes a 7-day free trial of a separate Baby Sleep app.","notes":"Formerly called Pampers Club. Referral: invite up to 5 friends for $2 each for them and up to $10 for you."},{"id":"edgepark-breast-pump-insurance","name":"Breast pumps through insurance","brand":"Edgepark","category":"health-benefits","whatYouGet":"Supplier checks your insurance, handles paperwork and ships a covered breast pump if your plan covers one.","costToClaim":"free","costDetail":"No cost to you if your plan covers the pump; upgrades may cost extra","requirements":["insurance","eligibility"],"eligibility":"People whose health plan covers a breast pump; coverage, timing and prescription rules vary by plan.","region":"US","signupUrl":"https://edgepark.com/faqs_breastpumps","sourceUrls":["https://edgepark.com/faqs_breastpumps"],"verifiedOn":"2026-11-08","confidence":"medium","catches":"Edgepark says verification is never a guarantee of coverage; some plans have preferred pumps and timing limits.","notes":"Checked from the official site's search results; the site blocks automated reading, so details may be incomplete. Edgepark's site resets automated connections, so this entry rests on official-domain search results only. Exact coverage-check page not confirmed; FAQ page used. Coverage is generally one pump per pregnancy per Edgepark."},{"id":"healthcare-gov-insurance-covered-breast-pump","name":"Breastfeeding benefits (breast pump coverage)","brand":"HealthCare.gov","category":"health-benefits","whatYouGet":"Health plans must cover the cost of a breast pump (rental or one you keep) and provide breastfeeding support, counseling and equipment, before and after birth.","costToClaim":"free","costDetail":"Covered by your health plan; the page does not state costs beyond this","requirements":["insurance","eligibility"],"eligibility":"People with a Marketplace or other health plan, except grandfathered plans.","region":"US","signupUrl":"https://www.healthcare.gov/coverage/breast-feeding-benefits/","sourceUrls":["https://www.healthcare.gov/coverage/breast-feeding-benefits/"],"verifiedOn":"2026-11-08","confidence":"high","catches":"Plans may set guidelines on manual vs. electric, rental length and timing; some require doctor pre-authorization. Grandfathered plans are exempt.","notes":"How to claim (from HealthCare.gov and suppliers' own pages): 1) Contact your plan to ask about pump type (manual/electric), rental vs. purchase, timing and whether your doctor must pre-authorize. 2) Pick an in-network supplier and use its online coverage check (have your insurance card and due date ready). 3) The supplier verifies benefits and, where required, contacts your doctor for a prescription. 4) Choose a covered pump; the order ships per your plan's timing (Aeroflow notes many plans ship no sooner than 30 days before the due date). Contact your insurance plan with questions."},{"id":"byram-healthcare-breast-pumps-insurance","name":"ByramBaby: Breast Pumps Through Insurance","brand":"Byram Healthcare","category":"health-benefits","whatYouGet":"Supplier checks your insurance, handles paperwork and ships a covered breast pump if your plan covers one.","costToClaim":"free","costDetail":"No cost to you if your plan covers the pump; upgrades may cost extra","requirements":["email","insurance","eligibility"],"eligibility":"People whose health plan covers a breast pump; coverage, timing and prescription rules vary by plan.","region":"US","signupUrl":"https://www.byrambaby.com/how-it-works","sourceUrls":["https://www.byrambaby.com/how-it-works","https://www.byrambaby.com/"],"verifiedOn":"2026-11-08","confidence":"high","catches":"An account is required to see covered pumps. Most insurers require a prescription; Byram contacts your doctor. Some pumps are partially covered (upgrade cost).","notes":"Steps per Byram: 1) Select your insurance and create an account. 2) Choose a pump. 3) Place your order and Byram verifies with your insurer. 4) Pump ships (timing depends on insurance; page says within 4-5 days of order or of the due date window). Have your prescription and insurance card ready. byramhealthcare.com redirects to byrambaby.com."},{"id":"healthcare-gov-pregnancy-coverage","name":"Health coverage if you're pregnant","brand":"HealthCare.gov","category":"health-benefits","whatYouGet":"Explains that all Marketplace and Medicaid plans cover pregnancy and childbirth, and how to enroll or report a pregnancy.","costToClaim":"free","costDetail":"Free to apply; plan costs vary","requirements":["insurance","eligibility"],"eligibility":"People who are pregnant or recently gave birth; Medicaid/CHIP depends on state and income.","region":"US","signupUrl":"https://www.healthcare.gov/what-if-im-pregnant-or-plan-to-get-pregnant/","sourceUrls":["https://www.healthcare.gov/what-if-im-pregnant-or-plan-to-get-pregnant/"],"verifiedOn":"2026-11-08","confidence":"high","catches":"Pregnancy alone does not open a Special Enrollment Period; the birth of a child does (apply within 60 days of birth). Open Enrollment runs Nov 1 - Jan 15.","notes":"Medicaid or CHIP coverage can begin any time if you are eligible."},{"id":"1-natural-way-breast-pump-insurance","name":"Insurance-Covered Breast Pumps","brand":"1 Natural Way","category":"health-benefits","whatYouGet":"Supplier checks your insurance, handles paperwork and ships a covered breast pump if your plan covers one.","costToClaim":"free","costDetail":"No cost to you if your plan covers the pump; upgrades may cost extra","requirements":["insurance","eligibility"],"eligibility":"People whose health plan covers a breast pump; coverage, timing and prescription rules vary by plan.","region":"US","signupUrl":"https://www.1naturalway.com/resources/how-it-works","sourceUrls":["https://www.1naturalway.com/resources/how-it-works","https://www.1naturalway.com/products/insurance-breast-pump-options"],"verifiedOn":"2026-11-08","confidence":"high","catches":"Site says most moms are fully covered; shipping follows insurance guidelines, so start the check early. Other paid products (e.g. gender test) are separate.","notes":"Steps per 1NW: 1) Check coverage (about 2 minutes). 2) Choose a covered pump and accessories. 3) Pump ships free, timed to your insurance guidelines. Sign-up page is /register."},{"id":"lactation-network-insurance-covered-lactation-support","name":"Lactation support covered by insurance","brand":"The Lactation Network","category":"health-benefits","whatYouGet":"Insurance-covered lactation consultations with an IBCLC, in-home, in-office or online.","costToClaim":"free","costDetail":"Covered by insurance where your plan is eligible; page says it will confirm eligibility","requirements":["insurance","eligibility"],"eligibility":"People whose insurance covers lactation support and is in The Lactation Network's network.","region":"US (states in TLN's network)","signupUrl":"https://lactationnetwork.com/","sourceUrls":["https://lactationnetwork.com/","https://lactationnetwork.com/about-us/"],"verifiedOn":"2026-11-08","confidence":"medium","catches":"Coverage check is not a guarantee; network participation is verified after you submit.","notes":"How it works per the site: fill out the patient intake form with personal and insurance information; team confirms eligibility within 72 hours; you are matched with an IBCLC. Pump supply was not confirmed on the pages read. Medium because the exact form page was not read."},{"id":"medicaid-chip-pregnancy-coverage","name":"Medicaid & CHIP coverage (pregnancy)","brand":"Medicaid.gov / HealthCare.gov","category":"health-benefits","whatYouGet":"Free or low-cost coverage for eligible pregnant women; CHIP states can cover prenatal, delivery and postpartum care, and newborns of covered mothers are deemed eligible.","costToClaim":"free","costDetail":"Free or low-cost; varies by state","requirements":["eligibility"],"eligibility":"Income-based (MAGI) and non-financial criteria; rules vary by state. Postpartum care is covered at least 60 days, and many states extend to 12 months.","region":"Varies by state","signupUrl":"https://www.healthcare.gov/medicaid-chip/getting-medicaid-chip/","sourceUrls":["https://www.healthcare.gov/medicaid-chip/getting-medicaid-chip/","https://www.medicaid.gov/chip/chip-eligibility-enrollment","https://www.insurekidsnow.gov/initiatives/maternal-health"],"verifiedOn":"2026-11-08","confidence":"high","catches":"Details such as income limits differ by state.","notes":"You can apply any time of year. When a pregnant woman is enrolled in Medicaid or CHIP, her newborn is automatically enrolled (InsureKidsNow.gov)."},{"id":"aeroflow-breastpumps-insurance","name":"Qualify for a Free Breast Pump Through Insurance","brand":"Aeroflow Breastpumps","category":"health-benefits","whatYouGet":"Supplier checks your insurance, handles paperwork and ships a covered breast pump if your plan covers one.","costToClaim":"free","costDetail":"No cost to you if your plan covers the pump; upgrades may cost extra","requirements":["email","due-date","phone","insurance","eligibility"],"eligibility":"People whose health plan covers a breast pump; coverage, timing and prescription rules vary by plan.","region":"US","signupUrl":"https://aeroflowbreastpumps.com/qualify-through-insurance","sourceUrls":["https://aeroflowbreastpumps.com/qualify-through-insurance","https://aeroflowbreastpumps.com/our-process","https://aeroflowbreastpumps.com/insurance-eligibility"],"verifiedOn":"2026-11-08","confidence":"high","catches":"Form asks for email, due date, name, date of birth, phone, state and insurance details; includes optional marketing opt-in. Most insurers require a prescription (Aeroflow contacts your doctor). Shipping follows insurer rules.","notes":"Steps per Aeroflow: 1) Fill out the form with due date and insurance info (during pregnancy or up to one year postpartum). 2) Aeroflow verifies benefits and shows covered items. 3) Add your covered pump to the cart; Aeroflow handles the prescription and paperwork. Free shipping on covered items. Pumping Essentials (pumpingessentials.com) says it is part of the Aeroflow family and uses Aeroflow's form, terms and optional marketing opt-in, so it is covered by this entry."},{"id":"211-org-community-help","name":"2-1-1","brand":"United Way 211","category":"assistance","whatYouGet":"Confidential help finding local resources for bills, food and other needs; the 2-1-1 line connects to local experts.","costToClaim":"free","costDetail":"Page does not state a cost; NDBN's page also points to 2-1-1","requirements":[],"eligibility":"Anyone.","region":"US","signupUrl":"https://211.org/","sourceUrls":["https://211.org/"],"verifiedOn":"2026-11-08","confidence":"medium","catches":"Resources vary by local 211 service.","notes":"Home page says experts are available 24/7 and calls are confidential and can be anonymous."},{"id":"early-head-start-pregnant-women","name":"Early Head Start (services for pregnant women)","brand":"Head Start (HHS/ACF)","category":"assistance","whatYouGet":"Early Head Start programs may serve pregnant women and expectant families.","costToClaim":"free","costDetail":"Free","requirements":["eligibility"],"eligibility":"Generally income at or below the federal poverty level, or receiving TANF, SSI or SNAP; only programs that choose to serve pregnant women do so.","region":"US (local programs)","signupUrl":"https://www.headstart.gov/how-apply","sourceUrls":["https://www.headstart.gov/how-apply"],"verifiedOn":"2026-11-08","confidence":"medium","catches":"Not every program serves pregnant women; waiting lists possible.","notes":"Checked from the official site's search results; the site blocks automated reading, so details may be incomplete. headstart.gov returned 403 to automated fetching; details from official-domain search results."},{"id":"cribs-for-kids-find-a-crib","name":"Find a Crib","brand":"Cribs for Kids","category":"assistance","whatYouGet":"Free portable crib and safe sleep education through local partners.","costToClaim":"free","costDetail":"Free through partner organizations","requirements":["eligibility"],"eligibility":"Financial need, infant 12 months or younger, and receiving safe sleep education (per search result).","region":"US (via local partners)","signupUrl":"https://cribsforkids.org/find-a-crib/","sourceUrls":["https://cribsforkids.org/find-a-crib/"],"verifiedOn":"2026-11-08","confidence":"medium","catches":"Some partners provide education only; availability varies.","notes":"Checked from the official site's search results; the site blocks automated reading, so details may be incomplete. Site returned 403 to automated fetching, so this rests on official-domain search results."},{"id":"safe-kids-car-seat-check","name":"Get a Car Seat Checked","brand":"Safe Kids Worldwide","category":"assistance","whatYouGet":"Free car seat inspection events and a search for certified child passenger safety technicians who check installation and teach you to install it yourself.","costToClaim":"free","costDetail":"Safe Kids coalitions host 8,000+ free inspection events","requirements":[],"eligibility":"Anyone with a child car seat.","region":"US","signupUrl":"https://cert.safekids.org/get-car-seat-checked","sourceUrls":["https://cert.safekids.org/get-car-seat-checked"],"verifiedOn":"2026-11-08","confidence":"high","catches":"Inspection and education only; not a free car seat. Availability depends on local events and technicians, and fees for individual technicians or locations were not confirmed. Sessions take about 20-30 minutes and you do the installation yourself with guidance.","notes":"Bring the car seat and vehicle manuals; appointments take about 20-30 minutes. NHTSA site blocked automated fetching (403)."},{"id":"national-diaper-bank-network-get-help","name":"Get Help Now / Member Diaper Banks","brand":"National Diaper Bank Network","category":"assistance","whatYouGet":"Directs families to local diaper assistance via 2-1-1 and a directory of member diaper banks that distribute free diapers.","costToClaim":"free","costDetail":"Free diapers from local diaper banks","requirements":["eligibility"],"eligibility":"Families in need; each local program sets its own rules.","region":"US","signupUrl":"https://nationaldiaperbanknetwork.org/get-help-now/","sourceUrls":["https://nationaldiaperbanknetwork.org/get-help-now/","https://nationaldiaperbanknetwork.org/member-directory/"],"verifiedOn":"2026-11-08","confidence":"high","catches":"Availability varies by community; NDBN does not distribute diapers directly.","notes":"Per the site: call 2-1-1 or search 211.org for diapers or basic needs, check faith-based groups and food pantries, or use the member directory (240+ diaper banks). /find-a-diaper-bank/ returns 404; the directory is at /member-directory/."},{"id":"hrsa-healthy-start","name":"Healthy Start","brand":"HRSA","category":"assistance","whatYouGet":"Community projects offering care coordination, education and support before, during and after pregnancy.","costToClaim":"free","costDetail":"Free through local projects","requirements":["eligibility","address"],"eligibility":"Pregnant women, new parents, children to 18 months and partners in a funded service area.","region":"US (funded project areas)","signupUrl":"https://www.hrsa.gov/services/healthy-start","sourceUrls":["https://www.hrsa.gov/services/healthy-start","https://mchb.hrsa.gov/programs-impact/healthy-start"],"verifiedOn":"2026-11-08","confidence":"medium","catches":"Only in funded communities.","notes":"Checked from the official site's search results; the site blocks automated reading, so details may be incomplete. hrsa.gov and mchb.hrsa.gov returned 403; details from official-domain search results."},{"id":"postpartum-support-international-helpline","name":"PSI HelpLine","brand":"Postpartum Support International","category":"assistance","whatYouGet":"Free, confidential helpline for perinatal mental health support and resources; call or text 800-944-4773.","costToClaim":"free","costDetail":"Free and confidential","requirements":[],"eligibility":"Anyone; no diagnosis needed.","region":"US","signupUrl":"https://postpartum.net/contact-us/","sourceUrls":["https://postpartum.net/contact-us/"],"verifiedOn":"2026-11-08","confidence":"medium","catches":"Not for emergencies; volunteers return messages within about 48 hours.","notes":"Checked from the official site's search results; the site blocks automated reading, so details may be incomplete. postpartum.net returned 403 to automated fetching; details from official-domain search results. In crisis call 988 or 1-833-852-6262."},{"id":"usda-wic","name":"WIC (Special Supplemental Nutrition Program for Women, Infants, and Children)","brand":"USDA Food and Nutrition Administration","category":"assistance","whatYouGet":"Healthy foods, nutrition education, breastfeeding support and referrals for pregnant, postpartum and breastfeeding women, infants and children under 5.","costToClaim":"free","costDetail":"Foods provided at no cost; apply through a local WIC agency","requirements":["eligibility","address"],"eligibility":"Women who are pregnant, postpartum (up to 6 months after pregnancy ends) or breastfeeding (up to the infant's first birthday), infants, and children under 5; income at or below WIC limits (or on Medicaid, SNAP or TANF), live in the state, and complete a free health check.","region":"US (apply through your state or local WIC agency)","signupUrl":"https://www.fna.usda.gov/wic/apply","sourceUrls":["https://www.fna.usda.gov/wic/apply","https://www.fna.usda.gov/wic/eligibility","https://www.fna.usda.gov/wic"],"verifiedOn":"2026-11-08","confidence":"high","catches":"Requires an appointment with a local WIC agency; bring ID, proof of address and proof of income or program enrollment as the agency instructs.","notes":"Steps: 1) Use the Eligibility Tool. 2) Contact your local WIC agency by phone or online to start. 3) Attend an in-person or virtual appointment. fns.usda.gov now redirects to fna.usda.gov (Food and Nutrition Administration)."},{"id":"bzzagent-campaigns","name":"BzzAgent","brand":"BzzAgent (PowerReviews)","category":"product-testing","whatYouGet":"Community that invites members by email to apply for free product samples from brands, then share an honest review per posting instructions.","costToClaim":"free","costDetail":"Participation is free; members are not paid for reviews","requirements":["email","eligibility"],"eligibility":"Must be 18+ (or age of majority) and a resident of the US, UK or Canada (excl. Quebec)","region":"US","signupUrl":"https://bzzagent.com/how-it-works/","sourceUrls":["https://bzzagent.com/","https://bzzagent.com/how-it-works/","https://bzzagent.com/about-us/","https://bzzagent.com/privacy-policy/","https://bzzagent.com/terms-and-conditions/"],"verifiedOn":"2026-11-08","confidence":"medium","catches":"The join link on bzzagent.com goes to sampling.powerreviews.com, which is off the bzzagent.com domain (PowerReviews owns BzzAgent). Samples are limited and only chosen applicants get one. Required review and posting per campaign, shared with followers, with disclosure rules. Sponsoring brands may receive info about your participation and act as independent controllers. Privacy notice says it does not sell data for money but shares data with ad/analytics partners, which may count as a sale or share under state law. Campaign invite emails.","notes":"Not parenting-specific. Confidence capped at medium because the sign-up step is on another domain."},{"id":"home-tester-club-us-product-tests","name":"Home Tester Club","brand":"Home Tester Club","category":"product-testing","whatYouGet":"Free to join. Members can apply for free product tests with samples mailed to them, then rate and review them; points are earned for activity. Current campaigns have included children's oral care products.","costToClaim":"free","costDetail":"Completely free to join","requirements":["email","address","eligibility"],"eligibility":"Product tests are matched to member profile; not everyone is selected","region":"US","signupUrl":"https://www.hometesterclub.com/us/en/account/join","sourceUrls":["https://www.hometesterclub.com/us/en","https://www.hometesterclub.com/us/en/faq","https://www.hometesterclub.com/us/en/privacy","https://www.hometesterclub.com/us/en/terms"],"verifiedOn":"2026-11-08","confidence":"high","catches":"Not every applicant gets a test. Test partner companies can see your survey answers, written reviews with first name, and photo/video reviews, tied to profile demographics (name, email, phone and address are not shared with them per the policy). Feedback surveys and email after tests. Points have no monetary value.","notes":"Not parenting-specific; check the Test page for baby or kids' campaigns."},{"id":"influenster-voxbox","name":"Influenster VoxBox","brand":"Influenster","category":"product-testing","whatYouGet":"Selected members may receive free product boxes (VoxBoxes) to try and review; has a New Parent product category. Not guaranteed.","costToClaim":"free","costDetail":"Free to join; boxes go to selected members only","requirements":["app"],"eligibility":"Terms bar anyone under 16 from using the service","region":"US","signupUrl":"https://www.influenster.com/registration","sourceUrls":["https://www.influenster.com/privacy","https://www.influenster.com/terms","https://www.influenster.com/article/how-do-i-get-a-voxbox-from-influenster"],"verifiedOn":"2026-11-08","confidence":"medium","catches":"Not guaranteed a VoxBox; selection depends on activity and impact score. Recipients are expected to post reviews or social content and disclose the product was free. Privacy policy: shares name/last initial/location with third parties who may publish it, shares aggregate data with advertisers, and shares data with partners and service providers; reviews and profile are public. Marketing about specials and new features by email.","notes":"Home page and article pages returned a Cloudflare bot challenge (403), so offer details rest on official-domain search results. Privacy policy and terms pages were read. Not parenting-specific."},{"id":"pinchme-samples","name":"PINCHme","brand":"PINCHme","category":"product-testing","whatYouGet":"Apply for free product samples; once qualified for 4 products your box ships free. Feedback on samples unlocks more offers, and extra surveys can earn gift cards.","costToClaim":"free","costDetail":"Free to join, no credit card required, box ships free at 4 products","requirements":["email","address"],"eligibility":"","region":"US","signupUrl":"https://www.pinchme.com/","sourceUrls":["https://www.pinchme.com/","https://www.pinchme.com/policy","https://www.pinchme.com/tos"],"verifiedOn":"2026-11-08","confidence":"high","catches":"Terms say members are not guaranteed any samples. Privacy policy says information is shared with affiliates, business partners and brand partners for their own business purposes, including direct marketing. Marketing emails about campaigns and offers. Members are asked to share feedback and must follow FTC endorsement disclosure rules.","notes":"Not parenting-specific. Terms say membership may be limited by territory and eligibility; the specific rules were not found on the pages read."},{"id":"tryazon-tryabox-parties","name":"Tryazon","brand":"Tryazon","category":"product-testing","whatYouGet":"Members apply to host parties or receive TryaBoxes of brand products to try, with promised free products per the site.","costToClaim":"free","costDetail":"Described as free to try and keep products; sponsor selects participants","requirements":["email","eligibility"],"eligibility":"18+; sponsors select by demographics such as location, age or number of children","region":"US","signupUrl":"https://www.tryazon.com/host-sign-up-form/","sourceUrls":["https://www.tryazon.com/","https://www.tryazon.com/faq/","https://www.tryazon.com/privacy-policy/","https://www.tryazon.com/terms-use/"],"verifiedOn":"2026-11-08","confidence":"medium","catches":"Applications are shared with the sponsoring brand. FAQ says selection also looks at social accounts and who actively shares, and hosts follow FTC disclosure rules, so expect to post on social media. Privacy policy says it will not sell or rent your information and shares aggregated demographics with partners. Email communications with unsubscribe.","notes":"Terms of Use page shows an effective date of May 25, 2018. Specific what-you-get varies by party or TryaBox."}]</script>
+<script>
+(function (root) {
+  'use strict';
+
+  var CATEGORIES = [
+    { id: 'formula', label: 'Formula' },
+    { id: 'diapers-wipes', label: 'Diapers & wipes' },
+    { id: 'registry-box', label: 'Registry welcome boxes' },
+    { id: 'feeding', label: 'Feeding gear' },
+    { id: 'baby-care', label: 'Baby care' },
+    { id: 'rewards', label: 'Rewards' },
+    { id: 'health-benefits', label: 'Health benefits' },
+    { id: 'assistance', label: 'Assistance programs' },
+    { id: 'product-testing', label: 'Product testing' }
+  ];
+
+  var COST_LABELS = {
+    'free': 'Free',
+    'shipping-fee': 'Shipping fee',
+    'purchase-required': 'Purchase needed',
+    'membership-required': 'Membership needed'
+  };
+
+  var REQUIREMENT_LABELS = {
+    email: 'Email',
+    address: 'Mailing address',
+    phone: 'Phone number',
+    'due-date': 'Due date or birth date',
+    registry: 'Baby registry',
+    app: 'App',
+    purchase: 'Purchase',
+    membership: 'Membership',
+    insurance: 'Insurance',
+    eligibility: 'Meets eligibility rules'
+  };
+
+  var CONFIDENCE_RANK = { high: 0, medium: 1, low: 2 };
+
+  function reqs(p) {
+    return p && Array.isArray(p.requirements) ? p.requirements : [];
+  }
+  function has(p, r) {
+    return reqs(p).indexOf(r) !== -1;
+  }
+
+  function isTrulyFree(p) {
+    return !!p && p.costToClaim === 'free' && !has(p, 'purchase') && !has(p, 'membership');
+  }
+  function isEmailOnly(p) {
+    var r = reqs(p);
+    return has(p, 'email') && r.every(function (x) { return x === 'email' || x === 'due-date'; });
+  }
+  function needsRegistry(p) {
+    return has(p, 'registry');
+  }
+  function isEligibilityBased(p) {
+    return !!p && (p.category === 'health-benefits' || p.category === 'assistance' ||
+      has(p, 'eligibility') || has(p, 'insurance'));
+  }
+  function guidedDefault(p) {
+    return isTrulyFree(p) && !isEligibilityBased(p);
+  }
+
+  function filterPrograms(list, opts) {
+    opts = opts || {};
+    var q = String(opts.query || '').trim().toLowerCase();
+    return (list || []).filter(function (p) {
+      if (opts.category && p.category !== opts.category) return false;
+      if (opts.trulyFree && !isTrulyFree(p)) return false;
+      if (opts.emailOnly && !isEmailOnly(p)) return false;
+      if (opts.needsRegistry && !needsRegistry(p)) return false;
+      if (q) {
+        var hay = [p.name, p.brand, p.whatYouGet, p.notes, p.eligibility].join('\n').toLowerCase();
+        if (hay.indexOf(q) === -1) return false;
+      }
+      return true;
+    });
+  }
+
+  function byName(a, b) {
+    var x = String(a.name || ''), y = String(b.name || '');
+    return x.localeCompare(y, 'en', { sensitivity: 'base' }) || (x < y ? -1 : x > y ? 1 : 0);
+  }
+  function catIndex(p) {
+    for (var i = 0; i < CATEGORIES.length; i++) if (CATEGORIES[i].id === p.category) return i;
+    return CATEGORIES.length;
+  }
+  function confRank(p) {
+    var r = CONFIDENCE_RANK[p.confidence];
+    return r === undefined ? 3 : r;
+  }
+
+  function sortPrograms(list, key) {
+    var copy = (list || []).slice();
+    var cmp;
+    if (key === 'verified') {
+      cmp = function (a, b) {
+        var x = a.verifiedOn || '', y = b.verifiedOn || '';
+        return x === y ? byName(a, b) : x < y ? 1 : -1;
+      };
+    } else if (key === 'category') {
+      cmp = function (a, b) { return catIndex(a) - catIndex(b) || byName(a, b); };
+    } else if (key === 'confidence') {
+      cmp = function (a, b) { return confRank(a) - confRank(b) || byName(a, b); };
+    } else {
+      cmp = byName;
+    }
+    return copy.sort(cmp);
+  }
+
+  function domainOf(url) {
+    var s = String(url || '');
+    var m = /^[a-z][a-z0-9+.-]*:\/\/([^\/?#]*)/i.exec(s);
+    if (!m) return '';
+    var host = m[1].replace(/^[^@]*@/, '').replace(/:\d*$/, '').toLowerCase();
+    return host.replace(/^www\./, '');
+  }
+
+  function escapeHtml(s) {
+    return String(s === null || s === undefined ? '' : s)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+  }
+
+  var api = {
+    CATEGORIES: CATEGORIES,
+    COST_LABELS: COST_LABELS,
+    REQUIREMENT_LABELS: REQUIREMENT_LABELS,
+    isTrulyFree: isTrulyFree,
+    isEmailOnly: isEmailOnly,
+    needsRegistry: needsRegistry,
+    isEligibilityBased: isEligibilityBased,
+    guidedDefault: guidedDefault,
+    filterPrograms: filterPrograms,
+    sortPrograms: sortPrograms,
+    domainOf: domainOf,
+    escapeHtml: escapeHtml
+  };
+
+  if (typeof module === 'object' && module.exports) module.exports = api;
+  else { root.BFF = root.BFF || {}; root.BFF.logic = api; }
+})(typeof window !== 'undefined' ? window : globalThis);
+(function () {
+  'use strict';
+  var BFF = (window.BFF = window.BFF || {});
+  var PREFIX = 'bff.';
+  var mem = {};
+  var ls = null;
+
+  try {
+    ls = window.localStorage;
+    var probe = PREFIX + '__probe';
+    ls.setItem(probe, '1');
+    ls.removeItem(probe);
+  } catch (e) {
+    ls = null;
+  }
+
+  var store = {
+    persistent: !!ls,
+    get: function (key, fallback) {
+      var raw = null;
+      try {
+        raw = ls ? ls.getItem(PREFIX + key) : Object.prototype.hasOwnProperty.call(mem, key) ? mem[key] : null;
+      } catch (e) {
+        raw = Object.prototype.hasOwnProperty.call(mem, key) ? mem[key] : null;
+      }
+      if (raw === null || raw === undefined) return fallback;
+      try {
+        return JSON.parse(raw);
+      } catch (e) {
+        return fallback;
+      }
+    },
+    set: function (key, value) {
+      var raw = JSON.stringify(value);
+      mem[key] = raw;
+      if (ls) {
+        try {
+          ls.setItem(PREFIX + key, raw);
+          return true;
+        } catch (e) {
+          store.persistent = false;
+        }
+      }
+      return false;
+    },
+    remove: function (key) {
+      delete mem[key];
+      if (ls) {
+        try {
+          ls.removeItem(PREFIX + key);
+        } catch (e) {}
+      }
+    }
+  };
+  BFF.store = store;
+
+  var programs = [];
+  try {
+    var node = document.getElementById('programs-data');
+    if (node) {
+      var parsed = JSON.parse(node.textContent);
+      if (Array.isArray(parsed)) programs = parsed;
+    }
+  } catch (e) {
+    programs = [];
+  }
+  BFF.programs = programs;
+  BFF.views = BFF.views || {};
+})();
+(function () {
+  'use strict';
+  var BFF = (window.BFF = window.BFF || {});
+  BFF.views = BFF.views || {};
+  var store = BFF.store;
+
+  var STATUSES = ['todo', 'signed-up', 'received', 'skipped'];
+  var LABELS = { todo: 'To do', 'signed-up': 'Signed up', received: 'Received', skipped: 'Skipped' };
+  var APP = 'baby-freebies-finder';
+  var KEY = 'tracker.v1';
+  var has = function (o, k) { return Object.prototype.hasOwnProperty.call(o, k); };
+
+  function emit(id) {
+    try {
+      document.dispatchEvent(new CustomEvent('bff:tracker-changed', { detail: { id: id } }));
+    } catch (e) {}
+  }
+  function state() {
+    var s = store.get(KEY, {});
+    return s && typeof s === 'object' && !Array.isArray(s) ? s : {};
+  }
+  function ts(s) {
+    var t = Date.parse(s);
+    return isNaN(t) ? 0 : t;
+  }
+  function entryOf(s, id) {
+    return has(s, id) && s[id] ? s[id] : { status: 'todo', note: '', updatedAt: '' };
+  }
+
+  // ---- pure helpers (also used by tests) ----
+  function parseBackup(text) {
+    var data;
+    try { data = JSON.parse(text); } catch (e) { throw new Error('That file is not valid JSON, so it cannot be a backup.'); }
+    if (!data || typeof data !== 'object' || Array.isArray(data)) throw new Error('That file is not a Baby Freebies Finder backup.');
+    if (data.app !== APP) throw new Error('That file is not a Baby Freebies Finder backup (wrong app name).');
+    if (data.version !== 1) throw new Error('This backup has an unsupported version (' + String(data.version) + ').');
+    var t = data.tracker;
+    if (!t || typeof t !== 'object' || Array.isArray(t)) throw new Error('The backup has no tracker section.');
+    var clean = {};
+    Object.keys(t).forEach(function (id) {
+      var e = t[id];
+      if (!e || typeof e !== 'object') throw new Error('Entry "' + id + '" is malformed.');
+      if (STATUSES.indexOf(e.status) < 0) throw new Error('Entry "' + id + '" has an unknown status.');
+      if (e.note !== undefined && typeof e.note !== 'string') throw new Error('Entry "' + id + '" has a note that is not text.');
+      if (e.updatedAt !== undefined && typeof e.updatedAt !== 'string') throw new Error('Entry "' + id + '" has a bad date.');
+      clean[id] = { status: e.status, note: e.note || '', updatedAt: e.updatedAt || '' };
+    });
+    var profile = null;
+    if (data.profile !== undefined && data.profile !== null) {
+      if (typeof data.profile !== 'object' || Array.isArray(data.profile)) throw new Error('The profile section is malformed.');
+      profile = {};
+      Object.keys(data.profile).forEach(function (k) {
+        if (typeof data.profile[k] === 'string') profile[k] = data.profile[k];
+      });
+    }
+    return { tracker: clean, profile: profile };
+  }
+
+  // Merge parsed.tracker into a copy of current. Newer updatedAt wins; ties keep current.
+  function mergeImport(current, parsed) {
+    var next = {};
+    Object.keys(current).forEach(function (k) { next[k] = current[k]; });
+    var imported = 0, skipped = 0;
+    Object.keys(parsed.tracker).forEach(function (id) {
+      var inc = parsed.tracker[id];
+      if (!has(next, id) || !next[id] || ts(inc.updatedAt) > ts(next[id].updatedAt)) {
+        next[id] = inc;
+        imported++;
+      } else {
+        skipped++;
+      }
+    });
+    return { state: next, imported: imported, skipped: skipped };
+  }
+
+  function buildExport(s, profile, now) {
+    var out = { app: APP, version: 1, exportedAt: now, tracker: s };
+    if (profile) out.profile = profile;
+    return JSON.stringify(out, null, 2);
+  }
+
+  // ---- public API ----
+  var tracker = {
+    STATUSES: STATUSES,
+    LABELS: LABELS,
+    getStatus: function (id) {
+      var st = entryOf(state(), id).status;
+      return STATUSES.indexOf(st) >= 0 ? st : 'todo';
+    },
+    setStatus: function (id, status) {
+      if (STATUSES.indexOf(status) < 0) return;
+      var s = state();
+      var e = entryOf(s, id);
+      s[id] = { status: status, note: e.note || '', updatedAt: new Date().toISOString() };
+      store.set(KEY, s);
+      emit(id);
+    },
+    getNote: function (id) {
+      return entryOf(state(), id).note || '';
+    },
+    setNote: function (id, text) {
+      var s = state();
+      var e = entryOf(s, id);
+      s[id] = { status: e.status || 'todo', note: String(text), updatedAt: new Date().toISOString() };
+      store.set(KEY, s);
+      emit(id);
+    },
+    all: function () {
+      return state();
+    },
+    counts: function () {
+      var c = { todo: 0, 'signed-up': 0, received: 0, skipped: 0 };
+      var s = state();
+      var list = BFF.programs || [];
+      list.forEach(function (p) { c[tracker.getStatus(p.id)]++; });
+      c.total = list.length;
+      c.done = c['signed-up'] + c.received;
+      c.active = list.length - c.skipped;
+      return c;
+    },
+    reset: function () {
+      store.remove(KEY);
+      emit(null);
+    },
+    exportJSON: function (opts) {
+      var profile = opts && opts.includeProfile ? store.get('profile.v1', {}) : null;
+      return buildExport(state(), profile, new Date().toISOString());
+    },
+    // Dry run: what would importJSON do? Throws on bad input.
+    analyzeImport: function (text) {
+      var parsed = parseBackup(text);
+      var m = mergeImport(state(), parsed);
+      var known = {};
+      (BFF.programs || []).forEach(function (p) { known[p.id] = 1; });
+      var unknown = Object.keys(parsed.tracker).filter(function (id) { return !known[id]; }).length;
+      return { imported: m.imported, skipped: m.skipped, unknown: unknown, hasProfile: !!parsed.profile };
+    },
+    importJSON: function (text) {
+      var parsed = parseBackup(text);
+      var m = mergeImport(state(), parsed);
+      store.set(KEY, m.state);
+      if (parsed.profile) {
+        // Only fill blanks; never overwrite details already on this device.
+        var cur = store.get('profile.v1', {}) || {};
+        Object.keys(parsed.profile).forEach(function (k) {
+          if (!cur[k] && parsed.profile[k]) cur[k] = parsed.profile[k];
+        });
+        store.set('profile.v1', cur);
+        try { document.dispatchEvent(new CustomEvent('bff:profile-changed')); } catch (e) {}
+      }
+      emit(null);
+      return { imported: m.imported, skipped: m.skipped };
+    },
+    _parseBackup: parseBackup,
+    _mergeImport: mergeImport,
+    _buildExport: buildExport
+  };
+  BFF.tracker = tracker;
+
+  // ---- view ----
+  function h(tag, attrs, kids) {
+    var n = document.createElement(tag);
+    if (attrs) Object.keys(attrs).forEach(function (k) {
+      if (k === 'text') n.textContent = attrs[k];
+      else if (k === 'class') n.className = attrs[k];
+      else n.setAttribute(k, attrs[k]);
+    });
+    (kids || []).forEach(function (c) { if (c) n.appendChild(c); });
+    return n;
+  }
+  function pad(n) { return (n < 10 ? '0' : '') + n; }
+  function today() {
+    var d = new Date();
+    return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate());
+  }
+
+  var view = { rows: {}, filter: 'all' };
+
+  function plural(n, w) { return n + ' ' + w + (n === 1 ? '' : 's'); }
+
+  function updateSummary() {
+    if (!view.bar) return;
+    var c = tracker.counts();
+    view.bar.max = Math.max(c.active, 1);
+    view.bar.value = Math.min(c.done, view.bar.max);
+    view.barText.textContent = c.done + ' of ' + c.active + ' done' + (c.skipped ? ' (' + c.skipped + ' skipped)' : '');
+    view.bar.setAttribute('aria-label', c.done + ' of ' + c.active + ' programs done');
+    STATUSES.forEach(function (st) { view.countEls[st].textContent = c[st]; });
+    view.empty.hidden = !!(BFF.programs && BFF.programs.length);
+  }
+
+  function applyFilter() {
+    var shown = 0;
+    (BFF.programs || []).forEach(function (p) {
+      var r = view.rows[p.id];
+      if (!r) return;
+      var ok = view.filter === 'all' || tracker.getStatus(p.id) === view.filter;
+      r.el.hidden = !ok;
+      if (ok) shown++;
+    });
+    view.none.hidden = shown > 0 || !(BFF.programs || []).length;
+    Array.prototype.forEach.call(view.tabs, function (b) {
+      b.setAttribute('aria-pressed', b.getAttribute('data-filter') === view.filter ? 'true' : 'false');
+    });
+  }
+
+  function syncRow(id, force) {
+    var r = view.rows[id];
+    if (!r) return;
+    r.select.value = tracker.getStatus(id);
+    r.el.setAttribute('data-status', r.select.value);
+    if (force || document.activeElement !== r.note) r.note.value = tracker.getNote(id);
+  }
+
+  function buildRow(p) {
+    var id = p.id;
+    var sid = 'trk-s-' + id, nid = 'trk-n-' + id;
+    var select = h('select', { id: sid, class: 'fx-select' });
+    STATUSES.forEach(function (st) { select.appendChild(h('option', { value: st, text: LABELS[st] })); });
+    var note = h('textarea', { id: nid, class: 'fx-textarea', rows: '2', maxlength: '2000', placeholder: 'Notes (confirmation email, date, issues)' });
+    var hint = h('span', { class: 'fx-saved', role: 'status', 'aria-live': 'polite' });
+    var link = h('a', { class: 'fx-link-btn', href: p.signupUrl, target: '_blank', rel: 'noopener noreferrer', text: 'Sign up ↗' });
+    link.setAttribute('aria-label', 'Sign up for ' + p.name + ' (opens in a new tab)');
+    var el = h('li', { class: 'fx-trk-row' }, [
+      h('div', { class: 'fx-trk-head' }, [
+        h('div', { class: 'fx-trk-name' }, [h('strong', { text: p.name }), h('span', { class: 'fx-muted', text: p.brand || '' })]),
+        link
+      ]),
+      h('div', { class: 'fx-field' }, [h('label', { 'for': sid, text: 'Status' }), select]),
+      h('div', { class: 'fx-field' }, [h('label', { 'for': nid, text: 'Notes' }), note, hint])
+    ]);
+    var timer = null;
+    function flush() {
+      if (timer === null) return;
+      clearTimeout(timer);
+      timer = null;
+      tracker.setNote(id, note.value);
+      hint.textContent = 'Saved';
+      setTimeout(function () { if (hint.textContent === 'Saved') hint.textContent = ''; }, 1500);
+    }
+    note.addEventListener('input', function () {
+      hint.textContent = '';
+      if (timer !== null) clearTimeout(timer);
+      timer = setTimeout(flush, 500);
+    });
+    note.addEventListener('blur', flush);
+    select.addEventListener('change', function () { tracker.setStatus(id, select.value); });
+    view.rows[id] = { el: el, select: select, note: note };
+    return el;
+  }
+
+  function download(name, text) {
+    var blob = new Blob([text], { type: 'application/json' });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url;
+    a.download = name;
+    a.style.display = 'none';
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(function () { URL.revokeObjectURL(url); a.remove(); }, 1000);
+  }
+
+  view.init = function (el) {
+    view.el = el;
+    el.textContent = '';
+    if (!el.querySelector('h2')) el.appendChild(h('h2', { tabindex: '-1', text: 'Tracker' }));
+    el.classList.add('fx-view');
+
+    view.bar = h('progress', { class: 'fx-progress', value: '0', max: '1' });
+    view.barText = h('p', { class: 'fx-progress-text' });
+    view.countEls = {};
+    var counts = h('ul', { class: 'fx-counts' });
+    STATUSES.forEach(function (st) {
+      var n = h('strong');
+      view.countEls[st] = n;
+      counts.appendChild(h('li', {}, [n, h('span', { text: ' ' + LABELS[st] })]));
+    });
+    view.empty = h('p', { class: 'fx-muted', text: 'No programs loaded.', hidden: '' });
+    el.appendChild(h('div', { class: 'fx-card' }, [view.barText, view.bar, counts, view.empty]));
+
+    var bar = h('div', { class: 'fx-tabs', role: 'group', 'aria-label': 'Filter by status' });
+    [['all', 'All']].concat(STATUSES.map(function (s) { return [s, LABELS[s]]; })).forEach(function (f) {
+      var b = h('button', { type: 'button', class: 'fx-tab', 'data-filter': f[0], 'aria-pressed': f[0] === 'all' ? 'true' : 'false', text: f[1] });
+      b.addEventListener('click', function () { view.filter = f[0]; applyFilter(); });
+      bar.appendChild(b);
+    });
+    view.tabs = bar.children;
+    el.appendChild(bar);
+
+    var list = h('ul', { class: 'fx-trk-list' });
+    (BFF.programs || []).forEach(function (p) { list.appendChild(buildRow(p)); syncRow(p.id, true); });
+    view.none = h('p', { class: 'fx-muted', text: 'Nothing here yet.', hidden: '' });
+    el.appendChild(list);
+    el.appendChild(view.none);
+
+    // Backup panel
+    var inc = h('input', { type: 'checkbox', id: 'trk-inc-profile' });
+    var warn = h('p', { class: 'fx-warn', text: 'The file will contain your personal details (name, email, address). Keep it somewhere private.', hidden: '' });
+    inc.addEventListener('change', function () { warn.hidden = !inc.checked; });
+    var msg = h('p', { class: 'fx-msg', role: 'status', 'aria-live': 'polite' });
+    var dl = h('button', { type: 'button', class: 'fx-btn fx-btn--primary', text: 'Download backup (JSON)' });
+    dl.addEventListener('click', function () {
+      try {
+        download('baby-freebies-backup-' + today() + '.json', tracker.exportJSON({ includeProfile: inc.checked }));
+        msg.textContent = 'Backup downloaded.';
+      } catch (e) { msg.textContent = 'Could not create the backup: ' + e.message; }
+    });
+    var file = h('input', { type: 'file', id: 'trk-restore', accept: 'application/json,.json', class: 'fx-file' });
+    file.addEventListener('change', function () {
+      var f = file.files && file.files[0];
+      if (!f) return;
+      var fr = new FileReader();
+      fr.onerror = function () { msg.textContent = 'Could not read that file.'; };
+      fr.onload = function () {
+        try {
+          var text = String(fr.result);
+          var a = tracker.analyzeImport(text);
+          var q = 'Restore from "' + f.name + '"?\n\n' + plural(a.imported, 'program entry') + ' will be added or updated (newer changes win).\n' +
+            plural(a.skipped, 'entry') + ' will be left as they are because yours are newer.' +
+            (a.unknown ? '\n' + plural(a.unknown, 'entry') + ' for programs not in this version will be kept.' : '') +
+            (a.hasProfile ? '\nMy info in the file will fill in blank fields only.' : '');
+          if (!window.confirm(q)) { msg.textContent = 'Restore cancelled. Nothing changed.'; }
+          else {
+            var r = tracker.importJSON(text);
+            msg.textContent = 'Restored: ' + plural(r.imported, 'entry') + ' imported, ' + r.skipped + ' skipped.';
+          }
+        } catch (e) { msg.textContent = 'Restore failed: ' + e.message; }
+        file.value = '';
+      };
+      fr.readAsText(f);
+    });
+    var reset = h('button', { type: 'button', class: 'fx-btn fx-btn--danger', text: 'Reset tracker' });
+    reset.addEventListener('click', function () {
+      if (window.confirm('Reset the tracker? All statuses and notes on this device will be cleared. My info is not affected.')) {
+        tracker.reset();
+        msg.textContent = 'Tracker reset.';
+      }
+    });
+    el.appendChild(h('section', { class: 'fx-card', 'aria-labelledby': 'trk-backup-h' }, [
+      h('h3', { id: 'trk-backup-h', text: 'Backup' }),
+      h('p', { class: 'fx-muted', text: 'Your tracker lives only in this browser. Download a file to keep a copy or move to another device.' }),
+      h('div', { class: 'fx-check' }, [inc, h('label', { 'for': 'trk-inc-profile', text: 'Include My info in the backup' })]),
+      warn,
+      h('div', { class: 'fx-actions' }, [dl]),
+      h('div', { class: 'fx-field' }, [h('label', { 'for': 'trk-restore', text: 'Restore from backup' }), file]),
+      h('div', { class: 'fx-actions' }, [reset]),
+      msg
+    ]));
+
+    document.addEventListener('bff:tracker-changed', function (e) {
+      var id = e && e.detail ? e.detail.id : null;
+      if (id && view.rows[id]) syncRow(id);
+      else (BFF.programs || []).forEach(function (p) { syncRow(p.id, true); });
+      updateSummary();
+      applyFilter();
+    });
+    updateSummary();
+    applyFilter();
+  };
+  view.show = function () {
+    (BFF.programs || []).forEach(function (p) { syncRow(p.id); });
+    updateSummary();
+    applyFilter();
+  };
+  BFF.views.tracker = { init: view.init, show: view.show };
+})();
+(function () {
+  'use strict';
+  var BFF = (window.BFF = window.BFF || {});
+  BFF.views = BFF.views || {};
+  var store = BFF.store;
+  var KEY = 'profile.v1';
+
+  var STATES = [['AL','Alabama'],['AK','Alaska'],['AZ','Arizona'],['AR','Arkansas'],['CA','California'],['CO','Colorado'],['CT','Connecticut'],['DE','Delaware'],['DC','District of Columbia'],['FL','Florida'],['GA','Georgia'],['HI','Hawaii'],['ID','Idaho'],['IL','Illinois'],['IN','Indiana'],['IA','Iowa'],['KS','Kansas'],['KY','Kentucky'],['LA','Louisiana'],['ME','Maine'],['MD','Maryland'],['MA','Massachusetts'],['MI','Michigan'],['MN','Minnesota'],['MS','Mississippi'],['MO','Missouri'],['MT','Montana'],['NE','Nebraska'],['NV','Nevada'],['NH','New Hampshire'],['NJ','New Jersey'],['NM','New Mexico'],['NY','New York'],['NC','North Carolina'],['ND','North Dakota'],['OH','Ohio'],['OK','Oklahoma'],['OR','Oregon'],['PA','Pennsylvania'],['RI','Rhode Island'],['SC','South Carolina'],['SD','South Dakota'],['TN','Tennessee'],['TX','Texas'],['UT','Utah'],['VT','Vermont'],['VA','Virginia'],['WA','Washington'],['WV','West Virginia'],['WI','Wisconsin'],['WY','Wyoming'],['AS','American Samoa'],['GU','Guam'],['MP','Northern Mariana Islands'],['PR','Puerto Rico'],['VI','U.S. Virgin Islands']];
+
+  // key, label, autocomplete, input type, optional
+  var FIELDS = [
+    { key: 'firstName', label: 'First name', ac: 'given-name' },
+    { key: 'lastName', label: 'Last name', ac: 'family-name' },
+    { key: 'email', label: 'Email', ac: 'email', type: 'email', check: 'email' },
+    { key: 'phone', label: 'Phone (optional)', ac: 'tel', type: 'tel' },
+    { key: 'address1', label: 'Address line 1', ac: 'address-line1' },
+    { key: 'address2', label: 'Address line 2 (optional)', ac: 'address-line2' },
+    { key: 'city', label: 'City', ac: 'address-level2' },
+    { key: 'state', label: 'State', ac: 'address-level1', select: true },
+    { key: 'zip', label: 'ZIP code', ac: 'postal-code', inputmode: 'numeric', check: 'zip' },
+    { key: 'dueDate', label: 'Due date or baby’s birthday', ac: 'off', type: 'date' }
+  ];
+
+  var CHECKS = {
+    email: { re: /^[^\s@]+@[^\s@]+\.[^\s@]+$/, msg: 'This does not look like an email address. You can still save it.' },
+    zip: { re: /^\d{5}(-\d{4})?$/, msg: 'ZIP codes are usually 5 digits. You can still save it.' }
+  };
+
+  function h(tag, attrs, kids) {
+    var n = document.createElement(tag);
+    if (attrs) Object.keys(attrs).forEach(function (k) {
+      if (k === 'text') n.textContent = attrs[k];
+      else if (k === 'class') n.className = attrs[k];
+      else n.setAttribute(k, attrs[k]);
+    });
+    (kids || []).forEach(function (c) { if (c) n.appendChild(c); });
+    return n;
+  }
+
+  var inputs = {}, hints = {}, statusEl = null, timer = null;
+
+  function read() {
+    var p = store.get(KEY, {});
+    return p && typeof p === 'object' && !Array.isArray(p) ? p : {};
+  }
+  function validate(f) {
+    var c = CHECKS[f.check], v = inputs[f.key].value.trim();
+    hints[f.key].textContent = c && v && !c.re.test(v) ? c.msg : '';
+  }
+  function fill() {
+    var p = read();
+    FIELDS.forEach(function (f) {
+      inputs[f.key].value = typeof p[f.key] === 'string' ? p[f.key] : '';
+      if (f.check) validate(f);
+    });
+  }
+  function saveNow() {
+    timer = null;
+    var p = {};
+    FIELDS.forEach(function (f) { p[f.key] = inputs[f.key].value.trim(); });
+    store.set(KEY, p);
+    statusEl.textContent = store.persistent ? 'Saved on this device' : 'Saved for this visit only (this browser blocks storage)';
+    try { document.dispatchEvent(new CustomEvent('bff:profile-changed')); } catch (e) {}
+  }
+
+  BFF.views.info = {
+    init: function (el) {
+      el.textContent = '';
+      el.classList.add('fx-view');
+      if (!el.querySelector('h2')) el.appendChild(h('h2', { tabindex: '-1', text: 'My info' }));
+      el.appendChild(h('p', { class: 'fx-note', text: 'Stored only in this browser on this device. This app has no server and makes no network requests, so your details never leave your device. Clearing your browser data deletes them.' }));
+      el.appendChild(h('p', { class: 'fx-tip', text: 'Tip: Use a dedicated inbox or a plus address like yourname+baby@gmail.com. Sign-up mail is easy to filter, and you can see who shares your address.' }));
+
+      var form = h('form', { class: 'fx-card fx-form', novalidate: '', autocomplete: 'on', 'aria-label': 'My info' });
+      form.addEventListener('submit', function (e) { e.preventDefault(); });
+      FIELDS.forEach(function (f) {
+        var id = 'info-' + f.key, hid = id + '-hint', input;
+        if (f.select) {
+          input = h('select', { id: id, name: f.key, autocomplete: f.ac, class: 'fx-select' });
+          input.appendChild(h('option', { value: '', text: 'Select a state' }));
+          STATES.forEach(function (s) { input.appendChild(h('option', { value: s[0], text: s[1] + ' (' + s[0] + ')' })); });
+        } else {
+          input = h('input', { id: id, name: f.key, type: f.type || 'text', autocomplete: f.ac, class: 'fx-input' });
+          if (f.inputmode) input.setAttribute('inputmode', f.inputmode);
+          if (f.key === 'zip') input.setAttribute('maxlength', '10');
+          if (f.type === 'email') input.setAttribute('autocapitalize', 'off');
+        }
+        var hint = h('span', { id: hid, class: 'fx-hint', role: 'status' });
+        input.setAttribute('aria-describedby', hid);
+        inputs[f.key] = input;
+        hints[f.key] = hint;
+        var evt = f.select || f.type === 'date' ? 'change' : 'input';
+        input.addEventListener(evt, function () {
+          if (f.check) validate(f);
+          statusEl.textContent = 'Saving…';
+          if (timer) clearTimeout(timer);
+          timer = setTimeout(saveNow, 400);
+        });
+        if (f.check) input.addEventListener('blur', function () { validate(f); });
+        form.appendChild(h('div', { class: 'fx-field' }, [h('label', { 'for': id, text: f.label }), input, hint]));
+      });
+      el.appendChild(form);
+
+      statusEl = h('p', { class: 'fx-saved fx-saved--block', role: 'status', 'aria-live': 'polite' });
+      var clear = h('button', { type: 'button', class: 'fx-btn fx-btn--danger', text: 'Clear my info' });
+      clear.addEventListener('click', function () {
+        if (!window.confirm('Clear all of My info from this device? This cannot be undone.')) return;
+        if (timer) { clearTimeout(timer); timer = null; }
+        store.remove(KEY);
+        fill();
+        statusEl.textContent = 'Your info was cleared from this device.';
+        try { document.dispatchEvent(new CustomEvent('bff:profile-changed')); } catch (e) {}
+      });
+      el.appendChild(h('div', { class: 'fx-actions' }, [clear]));
+      el.appendChild(statusEl);
+      fill();
+    },
+    show: function () {
+      if (!timer) fill();
+    }
+  };
+})();
+(function () {
+  'use strict';
+  window.BFF = window.BFF || {};
+  BFF.views = BFF.views || {};
+
+  var L = BFF.logic;
+  var DEFAULTS = { query: '', category: '', trulyFree: false, emailOnly: false, needsRegistry: false, sort: 'name' };
+  var SORTS = [
+    ['name', 'Name A-Z'],
+    ['verified', 'Recently verified'],
+    ['category', 'Category'],
+    ['confidence', 'Confidence']
+  ];
+  var STATUSES = [['todo', 'To do'], ['signed-up', 'Signed up'], ['received', 'Received'], ['skipped', 'Skipped']];
+
+  var state = Object.assign({}, DEFAULTS);
+  var els = {};
+  var uid = 0;
+
+  function h(tag, attrs, kids) {
+    var n = document.createElement(tag);
+    if (attrs) Object.keys(attrs).forEach(function (k) {
+      var v = attrs[k];
+      if (v === false || v === null || v === undefined) return;
+      if (k === 'text') n.textContent = v;
+      else if (k === 'class') n.className = v;
+      else n.setAttribute(k, v === true ? '' : v);
+    });
+    (kids || []).forEach(function (c) { if (c) n.appendChild(typeof c === 'string' ? document.createTextNode(c) : c); });
+    return n;
+  }
+
+  function loadPrefs() {
+    var prefs = BFF.store ? BFF.store.get('prefs.v1', {}) : {};
+    var f = prefs && prefs.filters;
+    if (f && typeof f === 'object') {
+      state.query = typeof f.query === 'string' ? f.query : '';
+      state.category = L.CATEGORIES.some(function (c) { return c.id === f.category; }) ? f.category : '';
+      state.trulyFree = !!f.trulyFree;
+      state.emailOnly = !!f.emailOnly;
+      state.needsRegistry = !!f.needsRegistry;
+      state.sort = SORTS.some(function (s) { return s[0] === f.sort; }) ? f.sort : 'name';
+    }
+  }
+  function savePrefs() {
+    if (!BFF.store) return;
+    var prefs = BFF.store.get('prefs.v1', {});
+    if (!prefs || typeof prefs !== 'object') prefs = {};
+    prefs.filters = Object.assign({}, state);
+    BFF.store.set('prefs.v1', prefs);
+  }
+
+  function programs() { return Array.isArray(BFF.programs) ? BFF.programs : []; }
+
+  function buildControls(root) {
+    var all = programs();
+    var counts = {};
+    all.forEach(function (p) { counts[p.category] = (counts[p.category] || 0) + 1; });
+
+    var id = 'dir' + (++uid);
+    els.search = h('input', { type: 'search', id: id + '-q', autocomplete: 'off', placeholder: 'Name, brand or what you get' });
+    els.category = h('select', { id: id + '-cat' }, [h('option', { value: '', text: 'All categories (' + all.length + ')' })]
+      .concat(L.CATEGORIES.map(function (c) { return h('option', { value: c.id, text: c.label + ' (' + (counts[c.id] || 0) + ')' }); })));
+    els.sort = h('select', { id: id + '-sort' }, SORTS.map(function (s) { return h('option', { value: s[0], text: s[1] }); }));
+
+    function check(key, label) {
+      var input = h('input', { type: 'checkbox' });
+      input.addEventListener('change', function () { state[key] = input.checked; savePrefs(); render(); });
+      els[key] = input;
+      return h('label', { class: 'check' }, [input, h('span', { text: label })]);
+    }
+
+    els.clear = h('button', { type: 'button', class: 'btn', text: 'Clear filters' });
+    els.clear.addEventListener('click', clearFilters);
+
+    var timer = null;
+    els.search.addEventListener('input', function () {
+      clearTimeout(timer);
+      timer = setTimeout(function () { state.query = els.search.value; savePrefs(); render(); }, 150);
+    });
+    els.category.addEventListener('change', function () { state.category = els.category.value; savePrefs(); render(); });
+    els.sort.addEventListener('change', function () { state.sort = els.sort.value; savePrefs(); render(); });
+
+    var filters = h('div', { class: 'filters', role: 'search', 'aria-label': 'Filter programs' }, [
+      h('div', { class: 'field' }, [h('label', { for: id + '-q', text: 'Search' }), els.search]),
+      h('div', { class: 'field-row' }, [
+        h('div', { class: 'field' }, [h('label', { for: id + '-cat', text: 'Category' }), els.category]),
+        h('div', { class: 'field' }, [h('label', { for: id + '-sort', text: 'Sort by' }), els.sort])
+      ]),
+      h('div', { class: 'checks' }, [
+        check('trulyFree', 'Truly free'),
+        check('emailOnly', 'Email only'),
+        check('needsRegistry', 'Needs a registry')
+      ]),
+      h('div', { class: 'filter-actions' }, [els.clear])
+    ]);
+
+    els.count = h('p', { class: 'result-count', 'aria-live': 'polite', 'aria-atomic': 'true' });
+    els.list = h('div', { class: 'card-grid' });
+    els.empty = h('div', { class: 'empty', hidden: true }, [
+      h('p', { text: 'No programs match those filters.' })
+    ]);
+    var emptyClear = h('button', { type: 'button', class: 'btn btn-primary', text: 'Clear filters' });
+    emptyClear.addEventListener('click', clearFilters);
+    els.empty.appendChild(emptyClear);
+
+    root.appendChild(filters);
+    root.appendChild(els.count);
+    root.appendChild(els.list);
+    root.appendChild(els.empty);
+  }
+
+  function syncControls() {
+    els.search.value = state.query;
+    els.category.value = state.category;
+    els.sort.value = state.sort;
+    els.trulyFree.checked = state.trulyFree;
+    els.emailOnly.checked = state.emailOnly;
+    els.needsRegistry.checked = state.needsRegistry;
+  }
+
+  function clearFilters() {
+    var sort = state.sort;
+    state = Object.assign({}, DEFAULTS, { sort: sort });
+    syncControls();
+    savePrefs();
+    render();
+    els.search.focus();
+  }
+
+  function categoryLabel(id) {
+    for (var i = 0; i < L.CATEGORIES.length; i++) if (L.CATEGORIES[i].id === id) return L.CATEGORIES[i].label;
+    return id || 'Other';
+  }
+
+  function card(p) {
+    var cost = p.costToClaim;
+    var badges = h('div', { class: 'badges' }, [
+      h('span', { class: 'badge badge-category', text: categoryLabel(p.category) }),
+      h('span', { class: 'badge badge-cost-' + String(cost).replace(/[^a-z-]/g, ''), text: L.COST_LABELS[cost] || String(cost || 'Unknown') })
+    ]);
+
+    var kids = [
+      h('div', { class: 'card-head' }, [h('h3', { text: p.name }), h('p', { class: 'card-brand', text: p.brand })]),
+      badges
+    ];
+    if (p.costDetail) kids.push(h('p', { class: 'cost-detail', text: p.costDetail }));
+    if (p.whatYouGet) kids.push(h('p', { text: p.whatYouGet }));
+
+    var reqs = Array.isArray(p.requirements) ? p.requirements : [];
+    if (reqs.length) {
+      kids.push(h('div', null, [
+        h('p', { class: 'card-section-title', text: 'What you need' }),
+        h('ul', { class: 'chips' }, reqs.map(function (r) { return h('li', { class: 'chip', text: L.REQUIREMENT_LABELS[r] || r }); }))
+      ]));
+    }
+
+    var meta = [];
+    if (p.eligibility) meta.push(h('div', null, [h('dt', { text: 'Who: ' }), h('dd', { text: p.eligibility })]));
+    if (p.region) meta.push(h('div', null, [h('dt', { text: 'Where: ' }), h('dd', { text: p.region })]));
+    if (meta.length) kids.push(h('dl', { class: 'meta' }, meta));
+
+    if (p.catches && String(p.catches).trim()) {
+      kids.push(h('div', { class: 'catches', role: 'note' }, [
+        h('strong', { text: 'Catches' }),
+        h('span', { text: p.catches })
+      ]));
+    }
+
+    var sources = Array.isArray(p.sourceUrls) ? p.sourceUrls : [];
+    if (p.notes || sources.length) {
+      var d = [h('summary', { text: 'Notes and sources' })];
+      if (p.notes) d.push(h('p', { text: p.notes }));
+      if (sources.length) {
+        d.push(h('ul', { class: 'source-list' }, sources.map(function (u) {
+          return h('li', null, [h('a', { href: u, target: '_blank', rel: 'noopener noreferrer', text: L.domainOf(u) + ' page' + ' ↗' })]);
+        })));
+      }
+      kids.push(h('details', null, d));
+    }
+
+    var foot = [
+      h('a', { class: 'btn btn-primary', href: p.signupUrl, target: '_blank', rel: 'noopener noreferrer',
+        text: 'Sign up on ' + L.domainOf(p.signupUrl) + ' ↗' }),
+      h('p', { class: 'verified', text: 'Verified ' + (p.verifiedOn || 'date unknown') + ' · ' + (p.confidence || 'unknown') + ' confidence' })
+    ];
+    if (BFF.tracker) {
+      var sid = 'st-' + p.id;
+      var sel = h('select', { id: sid, 'data-program-id': p.id }, STATUSES.map(function (s) { return h('option', { value: s[0], text: s[1] }); }));
+      sel.value = BFF.tracker.getStatus(p.id) || 'todo';
+      sel.addEventListener('change', function () { BFF.tracker.setStatus(p.id, sel.value); });
+      foot.push(h('div', { class: 'status-row' }, [h('label', { for: sid, text: 'My status' }), sel]));
+    }
+    kids.push(h('div', { class: 'card-foot' }, foot));
+
+    return h('article', { class: 'card', 'data-program-id': p.id }, kids);
+  }
+
+  function render() {
+    var all = programs();
+    var shown = L.sortPrograms(L.filterPrograms(all, state), state.sort);
+    els.list.textContent = '';
+    var frag = document.createDocumentFragment();
+    shown.forEach(function (p) { frag.appendChild(card(p)); });
+    els.list.appendChild(frag);
+    els.count.textContent = 'Showing ' + shown.length + ' of ' + all.length + ' programs';
+    els.empty.hidden = shown.length !== 0;
+  }
+
+  function onTrackerChanged() {
+    if (!BFF.tracker || !els.list) return;
+    var sels = els.list.querySelectorAll('select[data-program-id]');
+    for (var i = 0; i < sels.length; i++) {
+      var s = BFF.tracker.getStatus(sels[i].getAttribute('data-program-id')) || 'todo';
+      if (sels[i].value !== s) sels[i].value = s;
+    }
+  }
+
+  BFF.views.directory = {
+    init: function (el) {
+      loadPrefs();
+      buildControls(el);
+      syncControls();
+      render();
+      document.addEventListener('bff:tracker-changed', onTrackerChanged);
+    },
+    show: function () { onTrackerChanged(); }
+  };
+})();
+(function () {
+  'use strict';
+  window.BFF = window.BFF || {};
+  BFF.views = BFF.views || {};
+
+  var VIEWS = ['directory', 'info', 'tracker', 'guided', 'safety'];
+  var THEMES = ['system', 'light', 'dark'];
+  var THEME_LABELS = { system: 'System', light: 'Light', dark: 'Dark' };
+  var inited = {};
+
+  function getPrefs() {
+    var p = BFF.store ? BFF.store.get('prefs.v1', {}) : {};
+    return p && typeof p === 'object' ? p : {};
+  }
+  var memTheme = 'system';
+  function getTheme() {
+    var t = BFF.store ? getPrefs().theme : memTheme;
+    return THEMES.indexOf(t) === -1 ? 'system' : t;
+  }
+  function setTheme(t) {
+    memTheme = t;
+    if (BFF.store) { var p = getPrefs(); p.theme = t; BFF.store.set('prefs.v1', p); }
+  }
+  function applyTheme(t) {
+    var root = document.documentElement;
+    if (t === 'system') root.removeAttribute('data-theme'); else root.setAttribute('data-theme', t);
+    var btn = document.getElementById('theme-toggle');
+    if (btn) {
+      btn.textContent = 'Theme: ' + THEME_LABELS[t];
+      var next = THEMES[(THEMES.indexOf(t) + 1) % THEMES.length];
+      btn.setAttribute('aria-label', 'Theme: ' + THEME_LABELS[t] + '. Tap to switch to ' + THEME_LABELS[next] + '.');
+    }
+  }
+
+  function currentView() {
+    var name = (location.hash || '').replace(/^#/, '');
+    return VIEWS.indexOf(name) === -1 ? 'directory' : name;
+  }
+
+  function guarded(fn, name) {
+    try { fn(); } catch (e) { if (window.console) console.error('Bad view "' + name + '":', e); }
+  }
+
+  function route(moveFocus) {
+    var name = currentView();
+    VIEWS.forEach(function (v) {
+      var el = document.getElementById('view-' + v);
+      if (el) el.hidden = v !== name;
+    });
+    var links = document.querySelectorAll('.app-nav a');
+    for (var i = 0; i < links.length; i++) {
+      if (links[i].getAttribute('data-view') === name) links[i].setAttribute('aria-current', 'page');
+      else links[i].removeAttribute('aria-current');
+    }
+    var el = document.getElementById('view-' + name);
+    var view = BFF.views[name];
+    if (el && view && typeof view.show === 'function') guarded(function () { view.show(el); }, name);
+    if (el) {
+      var h2 = el.querySelector('h2');
+      document.title = (h2 ? h2.textContent + ' · ' : '') + 'Baby Freebies Finder';
+      if (moveFocus && h2) h2.focus({ preventScroll: true });
+      window.scrollTo(0, 0);
+    }
+  }
+
+  function lastChecked() {
+    var newest = '';
+    (BFF.programs || []).forEach(function (p) { if (p.verifiedOn && p.verifiedOn > newest) newest = p.verifiedOn; });
+    var span = document.getElementById('last-checked');
+    if (span && newest) span.textContent = newest;
+  }
+
+  function boot() {
+    applyTheme(getTheme());
+    var btn = document.getElementById('theme-toggle');
+    btn.addEventListener('click', function () {
+      var next = THEMES[(THEMES.indexOf(getTheme()) + 1) % THEMES.length];
+      setTheme(next);
+      applyTheme(next);
+    });
+
+    if (BFF.store && BFF.store.persistent === false) {
+      var n = document.getElementById('storage-notice');
+      n.textContent = "This browser isn't saving data, so your info and tracker will be gone after a reload.";
+      n.hidden = false;
+    }
+
+    lastChecked();
+
+    VIEWS.forEach(function (v) {
+      var el = document.getElementById('view-' + v);
+      var view = BFF.views[v];
+      if (el && view && typeof view.init === 'function' && !inited[v]) {
+        inited[v] = true;
+        guarded(function () { view.init(el); }, v);
+      }
+    });
+
+    window.addEventListener('hashchange', function () { route(true); });
+    route(false);
+  }
+
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
+  else boot();
+})();
+</script>
+</body>
+</html>
