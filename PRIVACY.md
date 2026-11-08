@@ -28,7 +28,15 @@ Nothing is sent anywhere.
 
 - The tracker backup is a JSON file created on your device when you press **Download backup**. It is never uploaded.
 - It includes My info only if you tick **Include My info in the backup**.
+- With My info included, the backup also holds your plus-tag map (the plus address tag for each program).
 - Keep the file private. Anyone who has it can read your details if you included them.
+
+## Email and calendar buttons
+
+- Plus addresses and Gmail filters are generated on your device. Nothing is sent to make them.
+- **Search my Gmail** opens your own Gmail in a new tab with a search for that program. Google sees that search, because it is your Gmail.
+- **Email me my checklist** opens your mail app with a draft you can edit. The app sends nothing.
+- The reminder (.ics) and Gmail filter files are downloaded to your device. They are never uploaded.
 
 ## Links to other sites
 
@@ -40,6 +48,7 @@ Nothing is sent anywhere.
 
 - Opening `index.html` from your computer sends nothing.
 - If you use the GitHub Pages copy, GitHub serves the page, and GitHub may log standard request data under its own privacy statement. The app itself still sends nothing.
+- The GitHub link check runs on GitHub's servers. It fetches only the public sign-up pages listed in the program data, and holds none of your personal data. See [docs/automation.md](docs/automation.md).
 
 ## Autofill helper (optional)
 

@@ -36,8 +36,17 @@ Seven `sonnet` researchers wrote `research/<lane>.json` and `research/<lane>-not
 - Diapers, feeding and baby care have few real freebies. Most brands offer only discounts or paid trials (see `research/excluded.md`).
 - Offers change. Re-run research and fact-checking every few months and update `verifiedOn`.
 
-## Phase E, button and email automation (in progress)
+## Phase E, button and email automation (done)
 The user asked to "automate through buttons and email connections" and keep going without check-ins. The contract is in ARCHITECTURE.md ("Phase E"). Nothing submits sign-up forms or clicks through bot checks, which is the user's original rule.
 - Builder A (`sonnet`): `BFF.email` (per-program plus addresses, Gmail filter XML, Gmail search links, mailto checklist, .ics reminders); the guided run's Done opens the next page, plus keyboard shortcuts; the directory's "Start a guided run with these N".
 - Builder B (`sonnet`): GitHub Actions CI (build, diff, tests) and a weekly or button-triggered link check that opens or closes a `link-check` issue (GitHub emails the owner); `scripts/check-links.mjs`.
-- Next: autofill reads the app's backup and writes statuses back (`sonnet`), then review (`sonnet`), docs and final checks (`haiku`).
+- Builder 3 (`sonnet`): autofill runs from the app's backup (`--from-backup`), uses the same persisted plus tags, and writes a new `-updated.json` with statuses and `signedUpAt` for re-import. It still never submits.
+- Review (`sonnet`): 20 findings (2 high), all fixed (`docs/code-review-phase-e.md`):
+  - Gmail filters archive only plus-address mail, and never filter retailer or .gov domains;
+  - single-key shortcuts are opt-in, with Undo;
+  - auto-open never opens a page twice and reports blocked popups;
+  - plus tags persist in `profile.plusTagMap`;
+  - reminders use `signedUpAt`;
+  - the link checker has a DEAD class and exit code 2 for crashes.
+- Docs and final checks (`haiku`): README and PRIVACY updated. `node --test` passes 80/80, the build leaves no diff, and offline at 375px the page made 0 requests with no errors. CI passes on GitHub.
+- Model audit: 20 subagent transcripts, 15 `claude-sonnet-5-5` and 5 `claude-haiku-5-5`, none on any other model.
