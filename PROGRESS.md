@@ -8,12 +8,12 @@
 ## Phase A, research (done)
 Seven `sonnet` researchers wrote `research/<lane>.json` and `research/<lane>-notes.md` for the formula, diapers-wipes, registry-box, feeding-baby-care, health-assistance, rewards-testing and open-sweep lanes. Raw total: 46 entries (25 high, 21 medium) before merging.
 
-## Phase B, data: in progress
-- Merge (`sonnet`) into `data/programs.json`, `research/excluded.md` and `research/merge-log.md`: running
-- Fact-check (fresh `sonnet`): next
-- Link check (`haiku`): after the fact-check
+## Phase B, data (done)
+- Merge (`sonnet`): 37 programs in `data/programs.json`; drops are in `research/excluded.md`, changes in `research/merge-log.md`.
+- Fact-check (fresh `sonnet`): 23 entries re-checked (all below high, plus a seeded random 30% of high). 6 confirmed, 10 fixed, 8 unverifiable because the sites block automated reading (kept at medium with a caveat in notes), 0 dropped. See `research/factcheck.md`.
+- Link check (`haiku`): 27 OK, 10 blocked (403, bot challenge or connection error), 0 not found, 0 off-domain. See `research/link-check.md`.
 
-## Phase C, build: not started
-The contract is in `ARCHITECTURE.md` (file ownership, `BFF` namespace, storage keys, filter definitions).
+## Phase C, build: review in progress
+The contract is in `ARCHITECTURE.md`. Builder 1 (shell, directory, build, logic), builder 2 (My info, tracker, guided run) and builder 3 (autofill helper) are done. A `sonnet` code review is running, and its findings go to `docs/code-review.md`.
 
 ## Phase D, checks and docs: not started
