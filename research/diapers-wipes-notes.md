@@ -1,19 +1,21 @@
 # diapers-wipes research notes (2026-11-08)
 
-Status: BLOCKED. No programs verified; diapers-wipes.json is an empty array.
+## Included
+- pampers-rewards (high): fetched https://www.pampers.com/en-us/rewards ; FAQ confirms free, app signup, $10 per 10 scans, 6-month expiry. Eligibility not stated.
+- huggies-rewards (medium): huggies.com returned Cloudflare 403 ("Just a moment..."); backed by allowed_domains search results only.
 
-WebFetch failed with getaddrinfo ENOTFOUND (host outside the session's allowed network domains) for:
-- https://www.pampers.com/en-us/pampers-club
-- https://www.huggies.com/en-us/rewards
-- https://www.waterwipes.com/us/en/sample
+## Excluded / unconfirmed
+- Hello Bello: https://www.hellobello.com/diaper-subscription - paid subscription bundle with "full-sized freebie with 1st purchase"; trial box is a paid product. Not a free offer. Enfamil page (https://www.hellobello.com/enfamil) says an Enfamil code redeems a first Bello Box; price/terms not stated, belongs to the formula lane.
+- The Honest Company: no free trial found. Search results show a paid Diapers + Wipes Trial Kit ($15.99, per search snippet) and subscriptions; the old free-trial URL 404s (https://honest.com/diapers-wipes/free-trial). Support sample article fetched but had no readable sample details.
+- Coterie: https://www.coterie.com/faq ; search snippet says no samples of wipes/swimsuit are offered; offers are 10% off Auto Renew. Not free.
+- Dyper: https://dyper.com/ - 30% off first subscription and a paid 3-pack sample (about $6 per search snippet). Not free.
+- WaterWipes: waterwipes.com fetch blocked by Cloudflare (403). Search only surfaced a "Request a Sample" page under health-care; consumer US free sample unconfirmed. Left out.
+- Luvs: luvs.com fetch failed (proxy 502); searches returned nothing. Unconfirmed.
+- Seventh Generation: homepage fetched; no free sample/trial program found. Left out.
+- Kudos, Rascals: sites return empty JS shells; Parasol: fetch failed (502). Searches found nothing. Unconfirmed.
+- Bambo Nature (bambo.com), Naty (naty.com), Millie Moon (mymilliemoon.com): homepages fetched; only discounts/free shipping seen, no free sample program found.
+- Huggies newborn/"No Baby Unhugged" free diaper pack: only seen in search snippets, could not confirm it is current for the US. Canada Hug Box is non-US. Left out.
+- Store brands (Up&Up, Parent's Choice): not researched; no sample programs found in searches.
 
-Per the brief, I stopped after the failures rather than use mirrors, caches or search-only guesses.
-
-Not researched (need official-domain access): Pampers Club/Rewards, Huggies Rewards/newborn offers, Honest Company, Hello Bello, Coterie, WaterWipes, Luvs, Seventh Generation, Kudos, Dyper, Parasol, Bambo Nature, Eco by Naty, Up&Up/Parent's Choice, Millie Moon, Rascals.
-
-Hosts to allow: pampers.com, huggies.com, waterwipes.com, honest.com, hellobello.com, coterie.com, luvs.com, seventhgeneration.com, plus the other brand domains above.
-
-## Update after coordinator correction
-No curl or spoofed user agent was used. WebFetch was blocked by DNS (hosts not allowed), so I used WebSearch with allowed_domains.
-- Pampers Rewards: added at medium confidence from pampers.com search results only (fetch blocked). Eligibility and exact terms unconfirmed.
-- All other leads remain unresearched. Blocked for fetch: pampers.com, huggies.com, waterwipes.com.
+## Blocked sites
+huggies.com, waterwipes.com (Cloudflare 403); luvs.com, parasol.co (proxy 502); kudoscare.com, rascals.com (empty JS shells).
