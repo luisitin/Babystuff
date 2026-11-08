@@ -34,6 +34,17 @@ node autofill.mjs --all-free              # same rule as the app's guided run: f
 
 (`npm start -- <id>` and `npm run list` also work.) For each site it prints what it filled (and outlines those fields in green in the browser), what it left alone, and a reminder. Then review, handle any CAPTCHA, submit by hand, and press Enter in the terminal to move on. Type `q` and Enter to quit; the browser closes at the end.
 
+## Use it with the app
+
+The helper can work from the web app's backup file, so the app and the helper share the same To do list.
+
+1. In the app, open Tracker, tick the option to include My info if you want it used, and download the backup (`baby-freebies-backup-YYYY-MM-DD.json`).
+2. Run `node autofill.mjs --from-backup ~/Downloads/baby-freebies-backup-YYYY-MM-DD.json`. It uses the backup's My info if present (otherwise `profile.json`) and visits programs marked To do that pass the app's guided-run rule, in the app's order. Add `--include-all-todo` to drop that rule, or `--only id,id` to pick some. With "Give each program its own plus address" on in the app (or `--plus-tags`) and an email provider that supports it, each site gets its own `you+tag@...` address, and the terminal prints which one was used.
+3. After each site, mark it: `d` done (signed up), `s` skip, `p` problem (it asks for a one-line note), Enter leave as To do, `q` quit. Nothing is submitted by the tool: you submit on the site yourself first.
+4. At the end (or on `q`) it writes a new `...-updated.json` next to the original (or where `--write-backup` says). It never changes your original backup or `profile.json`. In the app, open Tracker > Restore from backup and choose the `-updated.json` file; the app merges by newer date.
+
+The backup is a personal file when it includes My info: keep it private and delete it (and the updated copy) when you are done.
+
 ## Privacy
 
 `profile.json` stays on your computer and is gitignored (`tools/autofill/profile.json`). Never commit it. The script sends nothing anywhere; the only network traffic is the browser loading the sign-up pages themselves.
@@ -48,4 +59,4 @@ node autofill.mjs --all-free              # same rule as the app's guided run: f
 
 ## Testing (developers only)
 
-`node autofill.mjs --fixture /absolute/path/form.html --headless` runs the filler against a local `file://` test page and prints the final field values and whether the page's submit handler fired. It accepts only local files and is for local testing, not for real sites. The pure matching logic is covered by `node --test tests/autofill-matcher.test.mjs` from the repo root, no Playwright needed.
+`node autofill.mjs --fixture /absolute/path/form.html --headless` (add `--from-backup file.json --only id --fixture-answer d` to test the backup write-back without typing; the canned answer works only in fixture mode) runs the filler against a local `file://` test page and prints the final field values and whether the page's submit handler fired. It accepts only local files and is for local testing, not for real sites. The pure matching logic is covered by `node --test tests/autofill-matcher.test.mjs` from the repo root, no Playwright needed.
