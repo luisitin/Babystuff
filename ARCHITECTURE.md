@@ -87,32 +87,38 @@ Everything here still runs offline in the browser. The app makes no network requ
 
 ### `BFF.email` (`src/js/email.js`, loaded after `store.js`)
 UMD like `logic.js`, so Node tests and `tools/autofill` can `require` it. Pure functions:
-- `tagFor(program, allPrograms)` returns a deterministic, unique, readable plus tag (`[a-z0-9-]`, at most 24 characters). The base is the first word of `brand` with parenthetical text removed, lowercased and stripped to `[a-z0-9]`, falling back to the first id segment. Programs that share a base are sorted by `id`. The first keeps the base, and each later one gets `base-<first id segment that isn't the base>`, plus `-2`, `-3` and so on if that still collides.
-- `tagMap(allPrograms)` returns `{id: tag}`.
+- `tagFor(program, allPrograms, existing?)` returns a deterministic, unique, readable plus tag (`[a-z0-9-]`, at most 24 characters). The base comes from the brand with parenthetical text removed: lowercase words of `[a-z0-9]`, dropping the stopwords the, a, an, of, for, and, us, usa and pure numbers. The base is the first remaining word, or the first two joined if the first is under 4 characters. It falls back to the same rule on the id, then `program`. Programs are handled in `id` order. A program whose base is taken gets `base-<first id word that isn't the base>`, plus `-2`, `-3` and so on if that still collides. `existing` is `{id: tag}`: those tags are kept as they are, and a tag in `existing` is never given to another program.
+- `tagMap(allPrograms, existing?)` returns `{id: tag}`.
 - `plusAddress(email, tag)` returns `local+tag@domain`. If the local part already has a `+`, the old suffix is replaced. Invalid or empty email gives `''`.
-- `supportsPlus(email)` is true for gmail.com, googlemail.com, outlook.com, hotmail.com, live.com, icloud.com, me.com, fastmail.com, proton.me, protonmail.com and yahoo.com (Yahoo uses `-`; return false for yahoo and say so in the UI). Otherwise it returns null, meaning unknown: the UI says "check your provider".
-- `gmailSearchUrl({email, tag, domain})` builds `https://mail.google.com/mail/u/0/#search/` + an encoded query: `to:(plus address)` OR `from:(domain)`, or just `from:(domain)` when there's no tag. Only used when the email is Gmail.
-- `gmailFiltersXml(programs, {email, usePlus, archive})` returns Gmail's filter-import Atom XML: one entry per program with `to` (plus address, when usePlus) or `from` (signup domain), `label` = `Baby Freebies/<program name>` (with `/` in names replaced), and `shouldArchive` when `archive`. Values are XML-escaped.
-- `mailtoChecklist({to, programs, statusOf})` returns a `mailto:` URL with the subject "Baby freebies checklist" and a body listing each program's name, status and signupUrl. It keeps the URL under 1,900 characters by truncating the list and adding "…and N more (see the app)". It also returns `{url, truncated, fullText}`.
-- `icsReminders(entries, {days})` returns iCalendar text. One all-day VEVENT per entry `{id, name, date}` at `date + days` (default 28), titled "Check for <name> mail or box". It has a stable UID `<id>@baby-freebies-finder`, CRLF line endings and lines folded at 75 octets. It has no network-dependent fields.
+- `supportsPlus(email)` is true for gmail.com, googlemail.com, outlook.com, hotmail.com, live.com, icloud.com, me.com, fastmail.com, proton.me and protonmail.com. It returns false for yahoo.com (Yahoo uses `-`; the UI says so) and null otherwise, meaning unknown: the UI says "check your provider". `plusAddress` itself does not check this; callers do, and `gmailFiltersXml` ignores `usePlus` for Yahoo.
+- `registrableDomain(host)` (register.gerber.com becomes gerber.com) and `isBroadDomain(domain)` (any .gov or .mil, plus a denylist of retailers and big senders such as amazon.com, target.com, walmart.com).
+- `gmailSearchUrl({email, tag, domain, account})` builds `https://mail.google.com/mail/u/<account>/#search/` (account 0 to 9, default 0) + an encoded query: `to:(plus address)` OR `from:(registrable domain)`, or just one of them. Broad domains are never searched by `from:`; with nothing to search it returns ''. Only used when the email is Gmail.
+- `gmailFiltersXml(programs, {email, usePlus, archive, tagMap, allPrograms})` returns Gmail's filter-import Atom XML. With plus tags on (and a valid, non-Yahoo email) there is one `to:(plus address)` filter per program, and `archive` adds `shouldArchive`. Otherwise there is one `from:(registrable domain)` filter per distinct domain, skipping broad domains, and it never archives. `label` is `Baby Freebies/<program name>` (with `/` in names replaced). Values are XML-escaped.
+- `mailtoChecklist({to, programs, statusOf})` returns a `mailto:` URL with the subject "Baby freebies checklist" and a body listing each program's name, status and signupUrl. It keeps the URL under 1,900 characters by truncating the list and adding "…and N more (see the app)". Lines are separated by CRLF. It also returns `{url, truncated, fullText}`.
+- `icsReminders(entries, {days})` returns iCalendar text. One all-day VEVENT per entry `{id, name, date}` at `date + days` (default 28), titled "Check for <name> mail or box". It has a stable UID `<id>@baby-freebies-finder`, CRLF line endings and lines folded at 75 octets. It has no network-dependent fields. With no valid entries it returns ''.
 
 ### Profile additions (`profile.v1`)
-- `usePlusTags` (boolean, default false): "Give each program its own plus address". When on, My info previews e.g. `jane+similac@gmail.com`, the guided run's Email copy uses the tagged address, and the tracker shows each program's address.
-- Backups (`exportJSON({includeProfile:true})`) include `usePlusTags`.
+- `usePlusTags` (boolean, default false): "Give each program its own plus address". When on, My info previews e.g. `jane+similac@gmail.com` (updated on blur and on toggling, not per keystroke), the guided run offers both "Email for this program" and "Email (plain)", and the tracker shows each program's address.
+- `plusTagMap` (`{id: tag}`): assigned for every program when plus tags are first turned on, and for new programs on later loads. A stored tag is never changed or reused. `BFF.plusTags.map()` and `forProgram(p)` (in `profile.js`) read it; `tools/autofill` reads `profile.plusTagMap[id]` first, then falls back to `BFF.email.tagMap`.
+- Backups (`exportJSON({includeProfile:true})`) include `usePlusTags` and `plusTagMap`; import accepts both (map entries only fill ids that have none, and never reuse a tag).
+- Tracker entries gain an optional `signedUpAt` ISO string, set when the status changes to `signed-up`. It is exported and accepted on import. Reminders count from `signedUpAt`, falling back to `updatedAt` for older data. `BFF.tracker.getEntry(id)` and `restoreEntry(id, entry)` support the guided run's Undo.
+- Prefs: `prefs.v1.gmailAccount` (0 to 9, default 0).
 
 ### Button automation
 - **Guided run:**
-  - The toggle "When I tap Done, open the next sign-up page", saved in `guided.v1` as `autoOpenNext` (default true), calls `window.open` inside the Done click handler, so it counts as a user gesture.
-  - Keyboard shortcuts while the run step is shown and focus isn't in a text field: O open, C copy all, D done, S skip, P problem, B back, N next. They're listed in a small "Shortcuts" `<details>`.
-- **Directory:** a "Start a guided run with these N" button that sets the guided selection to the currently filtered ids (via `BFF.guided.preselect(ids)`) and routes to `#guided`.
+  - The toggle "When I tap Done or Skip, open the next sign-up page", saved in `guided.v1` as `autoOpenNext` (default true), opens the next page inside the click handler, so it counts as a user gesture. The run records `opened` ids and never opens the same program twice in a run. It calls `window.open(url, '_blank')` and cuts `opener` right after, because the `noopener` feature makes `window.open` return null always and would hide blocked popups. When it returns null, the live region says "Popup blocked, use the Open button". The page sends no referrer (meta policy).
+  - Single-key shortcuts are off by default (WCAG 2.1.4). A checkbox "Enable single-key shortcuts" inside the "Shortcuts" `<details>`, saved in `guided.v1` as `shortcuts`, turns them on: O open, C copy all, D done, S skip, P problem, B back, N next. They are ignored while typing in a text field, with modifier keys held, while composing, and for non-ASCII keys.
+  - After Done or Skip an "Undo" button restores that program's previous status and note and returns to it. It stays until the next action.
+  - `BFF.guided.preselect(ids)` sets the setup selection and replaces any run in progress; `BFF.guided.runInfo()` reports `{index, total}` of a run in progress or null.
+- **Directory:** a "Start a guided run with these N" button that sets the guided selection to the currently filtered ids (via `BFF.guided.preselect(ids)`) and routes to `#guided`. If a run is in progress it first asks "Replace your current run?" with the inline `BFF.ui.confirm` panel.
 - **Tracker:**
-  - "Email me my checklist" (mailto, to the profile email; if the list was truncated, the full text is also copied);
-  - "Download Gmail filters" (shown for any email, with import steps: Gmail Settings > See all settings > Filters and Blocked Addresses > Import filters), with an option to skip the inbox;
-  - "Download reminders (.ics)" for programs marked Signed up, dated from their `updatedAt`;
-  - a per-row "Search my Gmail" link (Gmail only).
+  - "Email me my checklist" (mailto, to the profile email) lists Signed up and Received programs, or all non-skipped ones if none are started. If the list was truncated, the full text is also copied, or shown in a text box if copying fails;
+  - "Download Gmail filters" (shown for any email, with import steps: Gmail Settings > See all settings > Filters and Blocked Addresses > Import filters). "Skip the inbox" is enabled only with plus tags on; the UI says "For tidy, safe filters, turn on plus addresses in My info.";
+  - "Download reminders (.ics)" for programs marked Signed up, 28 days after `signedUpAt`;
+  - a per-row "Search my Gmail" link (Gmail only), with a "Gmail account number" setting.
 
 ### Allowed outbound links (updated)
-Program `signupUrl` and `sourceUrls`, plus `mailto:` links to the person's own address and `https://mail.google.com/mail/u/0/#search/…` links, which open the person's own Gmail. The build test allowlist covers these and the two Gmail filter XML namespace URIs (`http://www.w3.org/2005/Atom`, `http://schemas.google.com/apps/2006`), which are never fetched.
+Program `signupUrl` and `sourceUrls`, plus `mailto:` links to the person's own address and `https://mail.google.com/mail/u/<n>/#search/…` links, which open the person's own Gmail. The build test allowlist covers these and the two Gmail filter XML namespace URIs (`http://www.w3.org/2005/Atom`, `http://schemas.google.com/apps/2006`), which are never fetched.
 
 ### Repo automation (GitHub Actions)
 - `.github/workflows/ci.yml` runs on every push and pull request: build, `git diff --exit-code`, then `node --test`.

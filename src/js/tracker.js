@@ -49,6 +49,7 @@
       if (e.note !== undefined && typeof e.note !== 'string') throw new Error('Entry "' + id + '" has a note that is not text.');
       if (e.updatedAt !== undefined && typeof e.updatedAt !== 'string') throw new Error('Entry "' + id + '" has a bad date.');
       clean[id] = { status: e.status, note: (e.note || '').slice(0, MAX_NOTE), updatedAt: (e.updatedAt || '').slice(0, 40) };
+      if (typeof e.signedUpAt === 'string' && e.signedUpAt.length <= 40 && !isNaN(Date.parse(e.signedUpAt))) clean[id].signedUpAt = e.signedUpAt;
     });
     var profile = null;
     if (data.profile !== undefined && data.profile !== null) {
@@ -58,6 +59,13 @@
         if (typeof data.profile[k] === 'string') profile[k] = data.profile[k].slice(0, MAX_FIELD);
       });
       if (typeof data.profile.usePlusTags === 'boolean') profile.usePlusTags = data.profile.usePlusTags;
+      var ptm = data.profile.plusTagMap;
+      if (ptm && typeof ptm === 'object' && !Array.isArray(ptm)) {
+        profile.plusTagMap = {};
+        Object.keys(ptm).slice(0, MAX_ENTRIES).forEach(function (id) {
+          if (id !== '__proto__' && id !== 'constructor' && id !== 'prototype' && id.length <= MAX_FIELD && typeof ptm[id] === 'string' && /^[a-z0-9-]{1,24}$/.test(ptm[id])) profile.plusTagMap[id] = ptm[id];
+        });
+      }
       if (profile.dueDate) profile.dueDate = BFF.util.normalizeDate(profile.dueDate);
     }
     return { tracker: clean, profile: profile };
@@ -99,7 +107,24 @@
       if (STATUSES.indexOf(status) < 0) return false;
       var s = state();
       var e = entryOf(s, id);
-      s[id] = { status: status, note: e.note || '', updatedAt: new Date().toISOString() };
+      var now = new Date().toISOString();
+      var prev = STATUSES.indexOf(e.status) >= 0 ? e.status : 'todo';
+      s[id] = { status: status, note: e.note || '', updatedAt: now };
+      // signedUpAt marks when the program became Signed up; it is what reminders count from.
+      if (status === 'signed-up' && prev !== 'signed-up') s[id].signedUpAt = now;
+      else if (e.signedUpAt) s[id].signedUpAt = e.signedUpAt;
+      var ok = store.set(KEY, s);
+      emit(id);
+      return ok;
+    },
+    // Copy of one entry (or null) and an exact restore, used by the guided run's Undo.
+    getEntry: function (id) {
+      var s = state();
+      return has(s, id) && s[id] ? Object.assign({}, s[id]) : null;
+    },
+    restoreEntry: function (id, entry) {
+      var s = state();
+      if (entry) s[id] = Object.assign({}, entry); else delete s[id];
       var ok = store.set(KEY, s);
       emit(id);
       return ok;
@@ -111,6 +136,7 @@
       var s = state();
       var e = entryOf(s, id);
       s[id] = { status: e.status || 'todo', note: String(text), updatedAt: new Date().toISOString() };
+      if (e.signedUpAt) s[id].signedUpAt = e.signedUpAt;
       var ok = store.set(KEY, s);
       emit(id);
       return ok;
@@ -155,7 +181,16 @@
         // Only fill blanks; never overwrite details already on this device.
         var cur = store.get('profile.v1', {}) || {};
         Object.keys(parsed.profile).forEach(function (k) {
-          if (!cur[k] && parsed.profile[k]) cur[k] = parsed.profile[k];
+          if (k === 'plusTagMap') {
+            var m = cur.plusTagMap && typeof cur.plusTagMap === 'object' ? cur.plusTagMap : {};
+            var used = {};
+            Object.keys(m).forEach(function (id) { used[m[id]] = 1; });
+            Object.keys(parsed.profile.plusTagMap).forEach(function (id) {
+              var t = parsed.profile.plusTagMap[id];
+              if (!has(m, id) && !used[t]) { m[id] = t; used[t] = 1; }
+            });
+            cur.plusTagMap = m;
+          } else if (!cur[k] && parsed.profile[k]) cur[k] = parsed.profile[k];
         });
         saved = store.set('profile.v1', cur) && saved;
         try { document.dispatchEvent(new CustomEvent('bff:profile-changed')); } catch (e) {}
@@ -306,8 +341,19 @@
   function plusOn(pr) {
     return !!pr.usePlusTags && BFF.email.supportsPlus(pr.email) !== false && !!BFF.email.plusAddress(pr.email, 'x');
   }
+  function tagMapNow() { return BFF.plusTags ? BFF.plusTags.map() : BFF.email.tagMap(BFF.programs || []); }
+  function gmailAccount() {
+    var p = store.get('prefs.v1', {});
+    var n = p && typeof p === 'object' ? parseInt(p.gmailAccount, 10) : 0;
+    return n >= 0 && n <= 9 ? n : 0;
+  }
   function activePrograms() {
     return (BFF.programs || []).filter(function (p) { return tracker.getStatus(p.id) !== 'skipped'; });
+  }
+  // Programs the person has signed up for (or received); before that, everything still on their list.
+  function checklistPrograms() {
+    var started = (BFF.programs || []).filter(function (p) { var st = tracker.getStatus(p.id); return st === 'signed-up' || st === 'received'; });
+    return started.length ? started : activePrograms();
   }
   function localDate(iso) {
     var t = Date.parse(iso);
@@ -344,17 +390,24 @@
   function syncEmailBits() {
     var pr = profileOf(), E = BFF.email, all = BFF.programs || [];
     var plus = plusOn(pr), gmail = E.isGmail(pr.email);
-    var map = plus ? E.tagMap(all) : {};
+    var map = plus ? tagMapNow() : {};
+    var acct = gmailAccount();
     all.forEach(function (p) {
       var r = view.rows[p.id];
       if (!r) return;
       var tag = plus ? map[p.id] : '';
       r.addr.hidden = !plus;
       r.addr.textContent = plus ? 'Sign up with: ' + E.plusAddress(pr.email, tag) : '';
-      r.gm.hidden = !gmail;
-      if (gmail) r.gm.setAttribute('href', E.gmailSearchUrl({ email: pr.email, tag: tag, domain: E.domainOfUrl(p.signupUrl) }));
-      else r.gm.removeAttribute('href');
+      var href = gmail ? E.gmailSearchUrl({ email: pr.email, tag: tag, domain: E.domainOfUrl(p.signupUrl), account: acct }) : '';
+      r.gm.hidden = !href;
+      if (href) r.gm.setAttribute('href', href); else r.gm.removeAttribute('href');
     });
+    if (view.archive) {
+      view.archive.disabled = !plus;
+      if (!plus) view.archive.checked = false;
+      view.plusHint.hidden = plus;
+    }
+    if (view.acctRow) view.acctRow.hidden = !gmail;
     if (view.mailHint) view.mailHint.hidden = !!E.plusAddress(pr.email, 'x');
     if (view.gmailNote) view.gmailNote.hidden = !gmail;
   }
@@ -375,26 +428,37 @@
         return;
       }
       var r = E.mailtoChecklist({
-        to: pr.email.trim(), programs: activePrograms(),
+        to: pr.email.trim(), programs: checklistPrograms(),
         statusOf: function (p) { return LABELS[tracker.getStatus(p.id)]; }
       });
       if (r.truncated) {
         copyText(r.fullText).then(function (ok) {
-          msg.textContent = ok ? 'The list was too long for an email link, so it is cut short there. The full list is copied to your clipboard: paste it into the message.'
-            : 'The list was too long for an email link, so it is cut short there, and copying the full list failed.';
+          if (view.fallback) { view.fallback.remove(); view.fallback = null; }
+          if (ok) msg.textContent = 'The list was too long for an email link, so it is cut short there. The full list is copied to your clipboard: paste it into the message.';
+          else {
+            msg.textContent = 'The list was too long for an email link, so it is cut short there. Copying failed, so the full list is below: select it and copy it.';
+            view.fallback = h('textarea', { class: 'fx-textarea', readonly: '', rows: '6', 'aria-label': 'Full checklist text' });
+            view.fallback.value = r.fullText;
+            msg.parentNode.insertBefore(view.fallback, msg.nextSibling);
+          }
         });
-      } else msg.textContent = 'Opening your email app with the checklist.';
+      } else msg.textContent = 'Trying to open your email app with the checklist. If nothing opens, this device may have no mail app set up.';
       openLink(r.url);
     });
     // 2. Gmail filters
     var arch = h('input', { type: 'checkbox', id: 'trk-archive' });
+    view.archive = arch;
+    view.plusHint = h('p', { class: 'fx-small', hidden: '' }, [document.createTextNode('For tidy, safe filters, turn on plus addresses in '), h('a', { href: '#info', text: 'My info' }),
+      document.createTextNode('. Without them, filters only add a label for each program\u2019s sender domain (big stores and .gov sites are left out), and Skip the inbox is off.')]);
     var fBtn = h('button', { type: 'button', class: 'fx-btn', text: 'Download Gmail filters' });
     fBtn.addEventListener('click', function () {
       var pr = profileOf();
-      var xml = E.gmailFiltersXml(activePrograms(), { email: pr.email, usePlus: plusOn(pr), archive: arch.checked, allPrograms: BFF.programs || [] });
+      var usePlus = plusOn(pr);
+      var xml = E.gmailFiltersXml(activePrograms(), { email: pr.email, usePlus: usePlus, archive: usePlus && arch.checked, tagMap: usePlus ? tagMapNow() : null, allPrograms: BFF.programs || [] });
+      var n = (xml.match(/<entry>/g) || []).length;
       try {
         download('baby-freebies-gmail-filters.xml', xml, 'application/xml');
-        msg.textContent = 'Downloaded baby-freebies-gmail-filters.xml. Import it in Gmail with the steps below.';
+        msg.textContent = 'Downloaded ' + plural(n, 'filter') + ' in baby-freebies-gmail-filters.xml. Import it in Gmail with the steps below.';
       } catch (e) { msg.textContent = 'Could not create the file: ' + e.message; }
     });
     var steps = h('details', { class: 'fx-about' }, [
@@ -404,7 +468,7 @@
         h('li', { text: 'Choose Import filters, then Choose file, and pick the downloaded file.' }),
         h('li', { text: 'Select Open file, tick the filters you want, and choose Create filters.' })
       ]),
-      h('p', { class: 'fx-small', text: 'Each filter adds a label like Baby Freebies/Program name to that program\u2019s mail. With plus addresses on, it matches the tagged address; otherwise it matches the program\u2019s sign-up domain.' })
+      h('p', { class: 'fx-small', text: 'Each filter adds a label like Baby Freebies/Program name. With plus addresses on, it matches the tagged address exactly, so Skip the inbox is safe. Otherwise it matches the program\u2019s sender domain and never archives.' })
     ]);
     // 3. reminders
     var iBtn = h('button', { type: 'button', class: 'fx-btn', text: 'Download reminders (.ics)' });
@@ -412,7 +476,8 @@
       var entries = [];
       (BFF.programs || []).forEach(function (p) {
         if (tracker.getStatus(p.id) !== 'signed-up') return;
-        var d = localDate(entryOf(state(), p.id).updatedAt);
+        var en = entryOf(state(), p.id);
+        var d = localDate(en.signedUpAt || en.updatedAt); // older data has no signedUpAt
         if (d) entries.push({ id: p.id, name: p.name, date: d });
       });
       if (!entries.length) {
@@ -425,16 +490,33 @@
       } catch (e) { msg.textContent = 'Could not create the file: ' + e.message; }
     });
     view.gmailNote = h('p', { class: 'fx-small', hidden: '', text: 'The Search my Gmail links on each row open your own Gmail in a new tab. This app never sees your mail.' });
+    var acct = h('input', { type: 'number', id: 'trk-acct', class: 'fx-input fx-input--short', min: '0', max: '9', step: '1' });
+    acct.value = String(gmailAccount());
+    acct.addEventListener('change', function () {
+      var n = parseInt(acct.value, 10);
+      if (!(n >= 0 && n <= 9)) n = 0;
+      acct.value = String(n);
+      var pf = store.get('prefs.v1', {});
+      if (!pf || typeof pf !== 'object') pf = {};
+      pf.gmailAccount = n;
+      store.set('prefs.v1', pf);
+      syncEmailBits();
+    });
+    view.acctRow = h('div', { class: 'fx-field', hidden: '' }, [
+      h('label', { 'for': 'trk-acct', text: 'Gmail account number' }), acct,
+      h('span', { class: 'fx-small', text: 'Use 0 for the first Google account you are signed in to, 1 for the second, and so on.' })]);
     return h('section', { class: 'fx-card', 'aria-labelledby': 'trk-mail-h' }, [
       h('h3', { id: 'trk-mail-h', text: 'Email and calendar' }),
       h('p', { class: 'fx-muted', text: 'These hand off to your own mail app, Gmail or calendar. Nothing is sent from this app.' }),
       view.mailHint,
       h('div', { class: 'fx-actions' }, [mailBtn]),
       h('div', { class: 'fx-check' }, [arch, h('label', { 'for': 'trk-archive', text: 'Skip the inbox (archive)' })]),
+      view.plusHint,
       h('div', { class: 'fx-actions' }, [fBtn]),
       steps,
       h('div', { class: 'fx-actions' }, [iBtn]),
       view.gmailNote,
+      view.acctRow,
       msg
     ]);
   }

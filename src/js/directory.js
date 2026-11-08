@@ -109,8 +109,15 @@
     els.start = h('button', { type: 'button', class: 'btn btn-primary start-run' });
     els.start.addEventListener('click', function () {
       if (!shownIds.length || !BFF.guided) return;
-      BFF.guided.preselect(shownIds.slice());
-      location.hash = '#guided';
+      var ids = shownIds.slice();
+      function go() { BFF.guided.preselect(ids); location.hash = '#guided'; }
+      var ri = BFF.guided.runInfo && BFF.guided.runInfo();
+      if (!ri || !BFF.ui) { go(); return; }
+      BFF.ui.confirm({
+        after: els.start.parentNode, returnTo: els.start, confirmLabel: 'Replace run',
+        message: 'Replace your current run? You are at ' + ri.index + ' of ' + ri.total + ' in a guided run. A new run starts from this list. Statuses you already set are kept.',
+        onConfirm: go
+      });
     });
 
     root.appendChild(filters);

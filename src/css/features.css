@@ -1,5 +1,5 @@
 /* Styles for My info, Tracker and Do it for me. Uses base.css tokens, with fallbacks. */
-.fx-view { --fx-bg: var(--bg, #fff); --fx-surface: var(--surface, #f6f7f9); --fx-text: var(--text, #1c2430); --fx-muted: var(--muted, #5b6676);
+.fx-view, .fx-confirm { --fx-bg: var(--bg, #fff); --fx-surface: var(--surface, #f6f7f9); --fx-text: var(--text, #1c2430); --fx-muted: var(--muted, #5b6676);
   --fx-primary: var(--primary, #2457c5); --fx-pc: var(--primary-contrast, #fff); --fx-border: var(--border, #cfd6e0);
   --fx-success: var(--success, #1f7a46); --fx-wbg: var(--warning-bg, #fff4d6); --fx-wtext: var(--warning-text, #6b4a00);
   --fx-r: var(--radius, 10px); --fx-s1: var(--space-1, 4px); --fx-s2: var(--space-2, 8px); --fx-s3: var(--space-3, 12px); --fx-s4: var(--space-4, 16px); --fx-s5: var(--space-5, 24px); --fx-s6: var(--space-6, 32px);
@@ -108,3 +108,7 @@
 .fx-card ol { margin: var(--fx-s2) 0; padding-left: var(--fx-s5); }
 .fx-card ol li { margin: var(--fx-s1) 0; }
 @media (prefers-reduced-motion: reduce) { .fx-view * { transition: none !important; } }
+.fx-input--short { width: 6rem; }
+.fx-undo { display: flex; flex-wrap: wrap; align-items: center; gap: var(--fx-s2) var(--fx-s3); background: var(--fx-surface); border: 1px solid var(--fx-border); border-radius: var(--fx-r); padding: var(--fx-s2) var(--fx-s3); margin: var(--fx-s2) 0; }
+.fx-undo span { flex: 1 1 10rem; }
+.fx-confirm { box-sizing: border-box; }

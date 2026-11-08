@@ -64,14 +64,37 @@
       inputs[f.key].value = v;
       if (f.check) validate(f);
     });
-    if (plusBox) { plusBox.checked = !!p.usePlusTags; updatePlus(); }
+    if (plusBox) { plusBox.checked = !!p.usePlusTags; if (p.usePlusTags) tagMapNow(false); updatePlus(); }
   }
   // Live preview of the tagged address plus a note about the person's email provider.
+  // Stable tags live in profile.v1 as plusTagMap. Assigned when plus tags are first turned on, and
+  // for new programs later; a tag that is already stored is never changed or reused.
+  function cleanMap(m) {
+    var out = {};
+    if (m && typeof m === 'object' && !Array.isArray(m)) Object.keys(m).forEach(function (id) {
+      if (typeof m[id] === 'string' && /^[a-z0-9-]{1,24}$/.test(m[id])) out[id] = m[id];
+    });
+    return out;
+  }
+  function tagMapNow(force) {
+    var pr = read(), cur = cleanMap(pr.plusTagMap);
+    if (!force && !pr.usePlusTags) return cur;
+    var next = BFF.email.tagMap(BFF.programs || [], cur), changed = false;
+    Object.keys(next).forEach(function (id) { if (cur[id] !== next[id]) { cur[id] = next[id]; changed = true; } });
+    if (changed) { pr.plusTagMap = cur; store.set(KEY, pr); }
+    return cur;
+  }
+  BFF.plusTags = {
+    map: function () { return tagMapNow(false); },
+    forProgram: function (prog) { return tagMapNow(false)[prog.id] || BFF.email.tagFor(prog, BFF.programs || [], cleanMap(read().plusTagMap)); }
+  };
   function updatePlus() {
     if (!plusPreview) return;
     var E = BFF.email, email = inputs.email.value.trim();
-    var progs = BFF.programs || [];
-    var ex = progs[0], tag = ex && E ? E.tagFor(ex, progs) : 'similac';
+    var progs = BFF.programs || [], ex = null;
+    progs.forEach(function (p) { if (!ex && /similac/.test(p.id)) ex = p; });
+    ex = ex || progs[0];
+    var tag = ex && E ? BFF.plusTags.forProgram(ex) : 'similac';
     var addr = E ? E.plusAddress(email, tag) : '';
     var sup = E ? E.supportsPlus(email) : null;
     if (!addr) {
@@ -90,6 +113,8 @@
     FIELDS.forEach(function (f) { p[f.key] = inputs[f.key].value.trim(); });
     if (!p.dueDate && keptDue) p.dueDate = keptDue;
     p.usePlusTags = !!(plusBox && plusBox.checked);
+    var keepMap = cleanMap(read().plusTagMap);
+    if (Object.keys(keepMap).length) p.plusTagMap = keepMap;
     var ok = store.set(KEY, p);
     statusEl.className = 'fx-saved fx-saved--block' + (ok ? '' : ' fx-hint');
     statusEl.textContent = ok ? 'Saved on this device' : 'Could not save on this device (storage is full or blocked). Your info is kept only until you close this page.';
@@ -123,7 +148,6 @@
         hints[f.key] = hint;
         var evt = f.select || f.type === 'date' ? 'change' : 'input';
         input.addEventListener(evt, function () {
-          if (f.key === 'email') updatePlus();
           if (f.check) validate(f);
           if (f.key === 'dueDate' && input.value) { keptDue = ''; hint.textContent = ''; }
           statusEl.className = 'fx-saved fx-saved--block';
@@ -132,14 +156,17 @@
           timer = setTimeout(saveNow, 400);
         });
         if (f.check) input.addEventListener('blur', function () { validate(f); });
+        if (f.key === 'email') { input.addEventListener('change', updatePlus); input.addEventListener('blur', updatePlus); }
         form.appendChild(h('div', { class: 'fx-field' }, [h('label', { 'for': id, text: f.label }), input, hint]));
       });
       el.appendChild(form);
 
       plusBox = h('input', { type: 'checkbox', id: 'info-plus' });
-      plusPreview = h('p', { class: 'fx-plus-preview', role: 'status', 'aria-live': 'polite' });
+      plusPreview = h('p', { class: 'fx-plus-preview' });
       plusNote = h('p', { class: 'fx-muted' });
       plusBox.addEventListener('change', function () {
+        if (plusBox.checked) tagMapNow(true);
+        updatePlus();
         statusEl.className = 'fx-saved fx-saved--block';
         statusEl.textContent = 'Saving…';
         if (timer) clearTimeout(timer);

@@ -47,7 +47,7 @@
   function taggedEmail(pr, prog) {
     var E = BFF.email;
     if (!E || !pr.usePlusTags || !prog || E.supportsPlus(pr.email) === false) return '';
-    return E.plusAddress(pr.email, E.tagFor(prog, progs()));
+    return E.plusAddress(pr.email, BFF.plusTags ? BFF.plusTags.forProgram(prog) : E.tagFor(prog, progs()));
   }
   function detailList(p, prog) {
     var out = [];
@@ -61,7 +61,7 @@
     add('Full name', full);
     var tagged = taggedEmail(p, prog);
     if (tagged) add('Email for this program', tagged);
-    else add('Email', p.email);
+    add(tagged ? 'Email (plain)' : 'Email', p.email);
     add('Phone', p.phone);
     add('Address line 1', p.address1);
     add('Address line 2', p.address2);
@@ -112,10 +112,10 @@
   // ---- state ----
   var el, body, selected = null, run = null, focusHeading = false;
   var actions = null; // buttons of the program on screen, for keyboard shortcuts
-  var autoOpen = (function () {
-    var r = store.get(KEY, null);
-    return !(r && r.autoOpenNext === false);
-  })();
+  var undoInfo = null; // {id, entry, index, text}: lets the last Done or Skip be taken back
+  var saved0 = store.get(KEY, null);
+  var autoOpen = !(saved0 && saved0.autoOpenNext === false);
+  var shortcutsOn = !!(saved0 && saved0.shortcuts === true);
 
   function loadRun() {
     var r = store.get(KEY, null);
@@ -129,9 +129,32 @@
   }
   // guided.v1 holds the current run plus the auto-open preference. Between runs it keeps only the preference.
   function saveRun() {
-    if (run) { run.autoOpenNext = autoOpen; store.set(KEY, run); }
-    else if (autoOpen) store.remove(KEY);
-    else store.set(KEY, { autoOpenNext: false });
+    if (run) { run.autoOpenNext = autoOpen; run.shortcuts = shortcutsOn; store.set(KEY, run); }
+    else if (autoOpen && !shortcutsOn) store.remove(KEY);
+    else store.set(KEY, { autoOpenNext: autoOpen, shortcuts: shortcutsOn });
+  }
+  // Open a program's page once per run. Returns '' (not needed), 'opened' or 'blocked'.
+  function openOnce(prog) {
+    if (!run) return '';
+    run.opened = Array.isArray(run.opened) ? run.opened : [];
+    if (run.opened.indexOf(prog.id) >= 0) return '';
+    // No "noopener" feature here: it makes window.open return null always, hiding blocked popups.
+    // The opener link is cut right after instead, and the page sends no referrer.
+    var w = window.open(prog.signupUrl, '_blank');
+    if (!w) return 'blocked';
+    try { w.opener = null; } catch (e) {}
+    run.opened.push(prog.id);
+    return 'opened';
+  }
+  function shortcutToggle() {
+    var cb = h('input', { type: 'checkbox', id: 'gd-shortcuts' });
+    cb.checked = shortcutsOn;
+    cb.addEventListener('change', function () {
+      shortcutsOn = cb.checked;
+      saveRun();
+      announce(shortcutsOn ? 'Single-key shortcuts are on.' : 'Single-key shortcuts are off.');
+    });
+    return h('div', { class: 'fx-check' }, [cb, h('label', { 'for': 'gd-shortcuts', text: 'Enable single-key shortcuts' })]);
   }
   function autoToggle(idSuffix) {
     var id = 'gd-auto-' + idSuffix;
@@ -140,9 +163,9 @@
     cb.addEventListener('change', function () {
       autoOpen = cb.checked;
       saveRun();
-      announce(autoOpen ? 'Will open the next sign-up page when you tap Done.' : 'Will not open pages automatically.');
+      announce(autoOpen ? 'Will open the next sign-up page when you tap Done or Skip.' : 'Will not open pages automatically.');
     });
-    return h('div', { class: 'fx-check' }, [cb, h('label', { 'for': id, text: 'When I tap Done, open the next sign-up page' })]);
+    return h('div', { class: 'fx-check' }, [cb, h('label', { 'for': id, text: 'When I tap Done or Skip, open the next sign-up page' })]);
   }
 
   function initSelection() {
@@ -218,7 +241,8 @@
     return h('div', { class: cls || 'fx-block' }, [h('h4', { text: title })].concat(items));
   }
 
-  function go(delta) {
+  function go(delta, keepUndo) {
+    if (!keepUndo) undoInfo = null;
     run.index += delta;
     if (run.index >= run.ids.length) { run.index = run.ids.length - 1; run.step = 'finish'; }
     if (run.index < 0) run.index = 0;
@@ -228,6 +252,7 @@
   }
 
   function startOver() {
+    undoInfo = null;
     run = null;
     saveRun();
     initSelection();
@@ -236,6 +261,25 @@
   }
 
   var SAVE_FAIL = 'Could not save on this device (storage is full or blocked). Your progress is kept only until you close this page.';
+
+  // "Undo" after Done or Skip: restores that program's status and note and returns to it.
+  function undoBar() {
+    if (!undoInfo) return null;
+    var u = undoInfo;
+    var btn = h('button', { type: 'button', class: 'fx-btn fx-btn--small', text: 'Undo' });
+    btn.setAttribute('aria-label', 'Undo: ' + u.text);
+    btn.addEventListener('click', function () {
+      undoInfo = null;
+      if (!T().restoreEntry(u.id, u.entry)) announce(SAVE_FAIL);
+      run.index = Math.max(0, Math.min(u.index, run.ids.length - 1));
+      run.step = 'run';
+      saveRun();
+      focusHeading = true;
+      render();
+      announce('Undone. Back on ' + (byId(u.id) ? byId(u.id).name : 'the program') + '.');
+    });
+    return h('div', { class: 'fx-undo' }, [h('span', { class: 'fx-small', text: u.text }), btn]);
+  }
 
   function renderRun() {
     var p = byId(run.ids[run.index]);
@@ -254,6 +298,8 @@
       next
     ]));
     if (!store.persistent) body.appendChild(h('p', { class: 'fx-warn', role: 'alert', text: SAVE_FAIL }));
+    var ub = undoBar();
+    if (ub) body.appendChild(ub);
     var title = h('h3', { class: 'fx-run-title', tabindex: '-1', text: p.name });
     body.appendChild(title);
     body.appendChild(h('p', { class: 'fx-muted fx-tight', text: p.brand + ' · Status: ' + T().LABELS[st] }));
@@ -261,7 +307,11 @@
     // (b) open button
     var open = h('button', { type: 'button', class: 'fx-btn fx-btn--primary fx-btn--big', text: 'Open sign-up page ↗' });
     open.addEventListener('click', function () {
-      window.open(p.signupUrl, '_blank', 'noopener,noreferrer');
+      var w = window.open(p.signupUrl, '_blank');
+      if (!w) { announce('Popup blocked, use the plain link below.'); return; }
+      try { w.opener = null; } catch (e) {}
+      run.opened = Array.isArray(run.opened) ? run.opened : [];
+      if (run.opened.indexOf(p.id) < 0) { run.opened.push(p.id); saveRun(); }
       announce('Opened the ' + p.name + ' sign-up page in a new tab.');
     });
     actions.open = open;
@@ -306,7 +356,8 @@
     body.appendChild(autoToggle('run'));
     body.appendChild(h('details', { class: 'fx-about fx-shortcuts' }, [
       h('summary', { text: 'Shortcuts' }),
-      h('p', { class: 'fx-small', text: 'Press a key when you are not typing in a field.' }),
+      shortcutToggle(),
+      h('p', { class: 'fx-small', text: 'When on, press a key while you are not typing in a field.' }),
       h('ul', { class: 'fx-keys' }, [['O', 'Open the sign-up page'], ['C', 'Copy all details'], ['D', 'Done and go on'], ['S', 'Skip'],
         ['P', 'Report a problem'], ['B', 'Back'], ['N', 'Next without changing']].map(function (k) {
         return h('li', {}, [h('kbd', { text: k[0] }), document.createTextNode(' ' + k[1])]);
@@ -329,27 +380,27 @@
       saved(T().setNote(p.id, 'Problem: ' + txt + (old ? '\n' + old : '')));
       go(1);
     });
-    var done = h('button', { type: 'button', class: 'fx-btn fx-btn--primary', text: 'Done' });
-    done.addEventListener('click', function () {
-      // Never downgrade: only todo or skipped programs become signed-up.
-      if (st === 'todo' || st === 'skipped') saved(T().setStatus(p.id, 'signed-up'));
+    // Done and Skip share one path. Opening the next page happens inside the click (a user gesture).
+    function advance(kind) {
+      var prev = T().getEntry(p.id);
+      if (kind === 'done') { if (st === 'todo' || st === 'skipped') saved(T().setStatus(p.id, 'signed-up')); }
+      else if (st === 'todo') saved(T().setStatus(p.id, 'skipped'));
+      var msg = p.name + (kind === 'done' ? ' marked as signed up.' : ' skipped.');
       var nextP = last ? null : byId(run.ids[run.index + 1]);
-      var msg = p.name + ' marked as signed up.';
-      // Opened inside this click so the browser counts it as the person's own action.
       if (autoOpen && nextP) {
-        window.open(nextP.signupUrl, '_blank', 'noopener,noreferrer');
-        msg += ' Opened the ' + nextP.name + ' sign-up page in a new tab.';
+        var r = openOnce(nextP);
+        if (r === 'opened') msg += ' Opened the ' + nextP.name + ' sign-up page in a new tab.';
+        else if (r === 'blocked') msg += ' Popup blocked, use the Open button.';
       }
-      go(1);
-      announce(msg);
-    });
+      undoInfo = { id: p.id, entry: prev, index: run.index, text: msg };
+      go(1, true);
+      announce(msg + ' Undo is available.');
+    }
+    var done = h('button', { type: 'button', class: 'fx-btn fx-btn--primary', text: 'Done' });
+    done.addEventListener('click', function () { advance('done'); });
     actions.done = done;
     var skip = h('button', { type: 'button', class: 'fx-btn', text: 'Skip' });
-    skip.addEventListener('click', function () {
-      if (st === 'todo') saved(T().setStatus(p.id, 'skipped'));
-      go(1);
-      announce(p.name + ' skipped.');
-    });
+    skip.addEventListener('click', function () { advance('skip'); });
     actions.skip = skip;
     var prob = h('button', { type: 'button', class: 'fx-btn', text: 'Problem', 'aria-expanded': 'false' });
     prob.addEventListener('click', function () {
@@ -377,6 +428,8 @@
       else if (st === 'skipped') skipL.push(p);
       else if (/^Problem:/.test(T().getNote(id))) probL.push(p);
     });
+    var ub = undoBar();
+    if (ub) body.appendChild(ub);
     var title = h('h3', { class: 'fx-run-title', tabindex: '-1', text: 'All done for now' });
     body.appendChild(title);
     body.appendChild(h('p', { class: 'fx-lead', text: doneL.length + ' signed up, ' + skipL.length + ' skipped, ' + probL.length + ' with problems.' }));
@@ -407,14 +460,14 @@
   // ---- keyboard shortcuts ----
   var KEYS = { o: 'open', c: 'copyAll', d: 'done', s: 'skip', p: 'prob', b: 'back', n: 'next' };
   function onKey(e) {
-    if (e.defaultPrevented || e.repeat || e.ctrlKey || e.metaKey || e.altKey) return;
+    if (!shortcutsOn || e.defaultPrevented || e.repeat || e.isComposing || e.ctrlKey || e.metaKey || e.altKey) return;
     if (!el || el.hidden || !run || run.step !== 'run' || !actions) return;
     var t = e.target, tag = t && t.tagName ? t.tagName.toLowerCase() : '';
     var itype = tag === 'input' ? String(t.type || '').toLowerCase() : '';
     var typing = tag === 'textarea' || tag === 'select' || (t && t.isContentEditable) ||
       (tag === 'input' && ['checkbox', 'radio', 'button', 'submit', 'reset'].indexOf(itype) < 0);
     if (typing) return; // text fields keep their own keys; checkboxes and buttons do not type letters
-    var name = e.key && e.key.length === 1 ? KEYS[e.key.toLowerCase()] : null;
+    var name = e.key && /^[a-zA-Z]$/.test(e.key) ? KEYS[e.key.toLowerCase()] : null;
     if (!name) return;
     var btn = actions[name];
     if (!btn) { announce(name === 'copyAll' ? 'Nothing to copy. Add My info first.' : 'That is not available here.'); return; }
@@ -425,10 +478,13 @@
 
   // Set the setup selection (for example from the directory's filtered list). Any run in progress is replaced.
   BFF.guided = {
+    // Position of a run in progress, or null.
+    runInfo: function () { return run && run.step === 'run' ? { index: run.index + 1, total: run.ids.length } : null; },
     preselect: function (ids) {
       var valid = {};
       (Array.isArray(ids) ? ids : []).forEach(function (id) { if (byId(id)) valid[id] = true; });
       selected = valid;
+      undoInfo = null;
       if (run) { run = null; saveRun(); }
       if (body) render();
     }
@@ -445,6 +501,7 @@
       el.appendChild(live);
       run = loadRun();
       if (run && run.autoOpenNext === false) autoOpen = false;
+      if (run && run.shortcuts === true) shortcutsOn = true;
       document.addEventListener('keydown', onKey);
       render();
     },
