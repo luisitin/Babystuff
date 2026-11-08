@@ -41,12 +41,13 @@
     "region": "US",
     "signupUrl": "https://register.gerber.com/",
     "sourceUrls": [
+      "https://www.gerber.com/mygerber",
       "https://www.gerber.com/gerberr-good-startr-soothepro-powder-infant-formula",
       "https://register.gerber.com/"
     ],
     "verifiedOn": "2026-11-08",
     "confidence": "medium",
-    "catches": "Samples are only 'if they become available'; an address is needed to receive them. Good Start formula has moved to Perrigo, so the current sample offer is unconfirmed.",
+    "catches": "Samples are only 'if they become available' and an address is required only if you tick the sample box. Gerber also markets a new-member sample box, but no published schedule or sample eligibility was found. Good Start formula has moved to Perrigo, so the current sample offer is unconfirmed.",
     "notes": "Checked from the official site's search results; the site blocks automated reading, so details may be incomplete. gerber.com returned 403 to our fetcher and register.gerber.com failed through the proxy; details come from official-domain search results only."
   },
   {
@@ -54,7 +55,7 @@
     "name": "MySimilac Rewards",
     "brand": "Similac (Abbott)",
     "category": "formula",
-    "whatYouGet": "Formula coupons, points toward a bonus coupon, nutrition guidance and a free Shutterfly photo book (see registration form details). The welcome kit may include formula samples.",
+    "whatYouGet": "Formula coupons, points toward a bonus coupon, nutrition guidance and partner perks. The welcome kit may include formula samples.",
     "costToClaim": "free",
     "costDetail": "Free to join",
     "requirements": [
@@ -71,7 +72,7 @@
     ],
     "verifiedOn": "2026-11-08",
     "confidence": "high",
-    "catches": "Samples are not guaranteed ('may'). Optional SMS opt-in; email and postal mail marketing continue even if you decline texts. Points are earned only when a coupon is redeemed (5 points each); a special coupon comes at 35 points. Program can change or end at any time.",
+    "catches": "Samples are not guaranteed ('may'). The Shutterfly free photo book shown on the page carried an offer expiry of July 31, 2026, so it is not listed. Optional SMS opt-in; email and postal marketing continue even if you decline texts. Points are earned only when a coupon is redeemed (5 points each); a special coupon comes at 35 points. Some offers may need a visit to a participating healthcare facility. Program can change or end at any time.",
     "notes": "Registration asks for name, home address, email and baby's birth or due date, plus a password. Coupons may arrive by mail, in your account or by email."
   },
   {
@@ -79,7 +80,7 @@
     "name": "Nutramigen Support Program (within Enfamil Family Beginnings)",
     "brand": "Enfamil (Mead Johnson / Reckitt)",
     "category": "formula",
-    "whatYouGet": "Specialized track within Enfamil Family Beginnings for families managing cow's milk allergy: tailored tips and content, with the page saying samples to fit your needs and insurance support.",
+    "whatYouGet": "Specialized track within Enfamil Family Beginnings for families managing cow's milk allergy: emails with articles and expert tips on cow's milk protein allergy, plus free samples and offers (the form says 'tips and samples to fit your needs'). Members also get an entry in the free-formula-for-a-year sweepstakes.",
     "costToClaim": "free",
     "costDetail": "Free to join",
     "requirements": [
@@ -94,9 +95,9 @@
       "https://www.enfamil.com/nutramigen-savings-and-support-program/"
     ],
     "verifiedOn": "2026-11-08",
-    "confidence": "medium",
-    "catches": "Sample contents and availability are not specified on the page. Form includes an optional mobile number for text messages. Agrees to receive offers from Mead Johnson affiliated companies.",
-    "notes": "Form asks name, email, address, due or birth date and relationship to baby. Talk to your pediatrician before choosing a hypoallergenic formula."
+    "confidence": "high",
+    "catches": "Sample contents and timing are not specified on the page; some gifts may arrive closer to your due date. Form includes an optional mobile number for text messages. Agrees to receive offers from Mead Johnson affiliated companies and shares your information with them.",
+    "notes": "Form asks name, email, address, due or birth date and relationship to baby. Talk to your pediatrician before choosing a hypoallergenic formula. Page no longer mentions insurance support."
   },
   {
     "id": "amazon-baby-registry-welcome-box",
@@ -107,9 +108,9 @@
     "costToClaim": "membership-required",
     "costDetail": "Requires an active Prime account, a registry with 10 unique items, and over $10 of purchases from the registry (by you or others).",
     "requirements": [
-      "membership",
       "registry",
-      "purchase"
+      "purchase",
+      "membership"
     ],
     "eligibility": "Primary registry owner with an active Prime account; Amazon Business accounts do not qualify.",
     "region": "US",
@@ -132,9 +133,9 @@
     "costToClaim": "purchase-required",
     "costDetail": "Free box. Registry created on or after 2/1/25, open 7+ days, 20+ unique items, and over $25 purchased through your registry link (items marked Purchased don't count).",
     "requirements": [
+      "address",
       "registry",
-      "purchase",
-      "address"
+      "purchase"
     ],
     "eligibility": "Adults 18+ in the 50 US states and Puerto Rico; one box per person, Walmart account and household per 365 days.",
     "region": "US (50 states and Puerto Rico)",
@@ -158,9 +159,9 @@
     "costToClaim": "purchase-required",
     "costDetail": "Registry open 7+ days with 20+ unique items and $300 spent on items from the registry (by you or invited gifters).",
     "requirements": [
+      "address",
       "registry",
-      "purchase",
-      "address"
+      "purchase"
     ],
     "eligibility": "Adults 18+ in the 48 contiguous states; limit one per person. Registry must be created on or after the reward start date (Feb 9, 2026).",
     "region": "US (48 contiguous states)",
@@ -183,14 +184,14 @@
     "costToClaim": "purchase-required",
     "costDetail": "Add 3 items from other stores, complete 40% of the registry checklist, make a $30+ Babylist Shop purchase (a gifter may), and pay $8.95 plus tax shipping.",
     "requirements": [
-      "registry",
-      "purchase",
       "address",
-      "due-date"
+      "due-date",
+      "registry",
+      "purchase"
     ],
     "eligibility": "Arrival date under 9 months away or baby under 4 weeks old; one box per household and per registry; US addresses.",
     "region": "US",
-    "signupUrl": "https://www.babylist.com/hello-baby-box",
+    "signupUrl": "https://www.babylist.com/hello-baby/box",
     "sourceUrls": [
       "https://help.babylist.com/hc/en-us/articles/360054057353-How-do-I-get-a-Hello-Baby-Box",
       "https://help.babylist.com/hc/en-us/articles/360053264354-What-is-a-Hello-Baby-Box",
@@ -199,14 +200,14 @@
     "verifiedOn": "2026-11-08",
     "confidence": "medium",
     "catches": "Shipping fee is non-refundable and orders can't be changed; AK/HI total shipping $18.95; gift cards and return credit can't pay the fee; Babylist Health and other retailer orders don't count toward the $30.",
-    "notes": "Babylist's help center (the source of these terms) returned a bot challenge, so details come from official-domain search results. Babylist's marketing FAQ says one box per household per year; the help center says per household and per registry. babylist.com's own page did not describe the box."
+    "notes": "Checked from the official site's search results; the site blocks automated reading, so details may be incomplete. Babylist's help center (the source of these terms) returned a bot challenge, so details come from official-domain search results. Babylist's marketing FAQ says one box per household per year; the help center says per household and per registry. babylist.com's own page did not describe the box. The previously listed /hello-baby-box URL returns a 404; the official footer link is /hello-baby/box."
   },
   {
     "id": "macrobaby-gift-box",
     "name": "MacroBaby Gift Box",
     "brand": "MacroBaby",
     "category": "registry-box",
-    "whatYouGet": "Random, seasonal gift box valued at about $80 or more.",
+    "whatYouGet": "Free welcome box of baby samples, coupons and products from trusted brands, est. value $80+; contents are random and seasonal. Added to your shipment after your first qualifying registry purchase.",
     "costToClaim": "purchase-required",
     "costDetail": "Add at least 20 items to a registry and make a first qualifying purchase of $15 or more from it.",
     "requirements": [
@@ -221,9 +222,9 @@
       "https://www.macrobaby.com/pages/baby-registry"
     ],
     "verifiedOn": "2026-11-08",
-    "confidence": "medium",
+    "confidence": "high",
     "catches": "Contents can't be requested; if the qualifying items are returned the box must be returned or an $80 fee applies; program can change or end without notice.",
-    "notes": "The Baby Registry page's description says 'free $80+ welcome box'; the gift box page body did not render in readable text, so the 20-item and $15 conditions come from official-domain search results. MacroBaby also advertises 5% cash back on registry purchases."
+    "notes": "Gift box page confirmed directly: add at least 20 items to your registry and make a first qualifying purchase of $15.00 or more from it. The Baby Registry page also advertises 5% cash back on registry purchases."
   },
   {
     "id": "buybuy-baby-registry-welcome-bag",
@@ -245,7 +246,7 @@
     "verifiedOn": "2026-11-08",
     "confidence": "medium",
     "catches": "Pickup in stores only; ask for the bag when registering in person per store pages. Eligibility and any purchase conditions were not stated in the results.",
-    "notes": "buybuy BABY pages refused or failed to fetch; store-page search snippets still describe a free goody bag with samples, coupons and a registry guide. Snippets also mention a 15% completion discount and free first-year shipping after $1,500 of registry gifts."
+    "notes": "Checked from the official site's search results; the site blocks automated reading, so details may be incomplete. buybuy BABY pages refused or failed to fetch; store-page search snippets still describe a free goody bag with samples, coupons and a registry guide. Snippets also mention a 15% completion discount and free first-year shipping after $1,500 of registry gifts."
   },
   {
     "id": "target-registry-welcome-kit",
@@ -254,9 +255,9 @@
     "category": "registry-box",
     "whatYouGet": "Welcome kit valued at $100, a mix of samples and a Target Circle Bonus.",
     "costToClaim": "shipping-fee",
-    "costDetail": "Free kit, but shipping and handling fees apply. Join Target Circle, create a baby registry, add 10 unique items, and purchase over $10 from the registry (by you or others).",
+    "costDetail": "Free kit, but shipping and handling fees apply. Needs a free Target Circle account (Target says Circle is free to join), a baby registry with 10 unique items, and a purchase over $10 from the registry (by you or others).",
     "requirements": [
-      "membership",
+      "email",
       "registry",
       "purchase"
     ],
@@ -323,7 +324,7 @@
     "id": "huggies-rewards",
     "name": "Huggies Rewards",
     "brand": "Huggies",
-    "category": "rewards",
+    "category": "diapers-wipes",
     "whatYouGet": "Free rewards program and app where purchases of Huggies products earn points that can be redeemed for rewards such as gift cards.",
     "costToClaim": "purchase-required",
     "costDetail": "Free to join; earning points requires buying Huggies products.",
@@ -342,7 +343,7 @@
     "verifiedOn": "2026-11-08",
     "confidence": "medium",
     "catches": "Points require buying Huggies products. Search snippets disagree on the sign-up bonus amount, so none is listed. Older Rewards+ (Fetch) earning ended per a Huggies page.",
-    "notes": "huggies.com blocks automated fetching (Cloudflare 403); details come from huggies.com search results only."
+    "notes": "Checked from the official site's search results; the site blocks automated reading, so details may be incomplete. huggies.com blocks automated fetching (Cloudflare 403); details come from huggies.com search results only."
   },
   {
     "id": "pg-brandsaver-rewards",
@@ -373,10 +374,10 @@
     "id": "pampers-rewards",
     "name": "Pampers Rewards",
     "brand": "Pampers",
-    "category": "rewards",
-    "whatYouGet": "Free loyalty app: scan the code inside Pampers diaper or wipe packs to earn Pampers Cash ($10 per 10 diaper scans), redeemable for discounts on Pampers at retailers.",
+    "category": "diapers-wipes",
+    "whatYouGet": "Free loyalty app: scan the QR code inside Pampers diaper or wipe packs to earn Pampers Cash; the page says $10 Pampers Cash for every 10 diaper scans (most boxes have 2 scans), redeemable for discounts on Pampers at retailers.",
     "costToClaim": "purchase-required",
-    "costDetail": "Free to download and join; page says no subscription or hidden fees. Earning rewards requires buying Pampers products, and rewards are discounts on Pampers purchases.",
+    "costDetail": "Free to download and join (page says no subscription or hidden fees). No sign-up gift or bonus is stated on the page; earning Pampers Cash requires buying Pampers products, and rewards are discounts on Pampers purchases.",
     "requirements": [
       "email",
       "app",
@@ -392,14 +393,14 @@
     "verifiedOn": "2026-11-08",
     "confidence": "high",
     "catches": "Earning needs Pampers purchases. Pampers Cash expires 6 months after being added or if the account is inactive 6 months. App works on one device at a time. Page also promotes a 7-day free trial of a separate Baby Sleep app.",
-    "notes": "Formerly called Pampers Club. Referral: invite up to 5 friends for $2 each for them and up to $10 for you."
+    "notes": "Formerly called Pampers Club. Page says extra bonuses at milestones and a referral: invite up to 5 friends for $2 each for them and up to $10 for you. Rate checked on pampers.com today: $10 per 10 diaper scans is what the page states."
   },
   {
     "id": "edgepark-breast-pump-insurance",
     "name": "Breast pumps through insurance",
     "brand": "Edgepark",
     "category": "health-benefits",
-    "whatYouGet": "Supplier checks your insurance, handles paperwork and ships a covered breast pump if your plan covers one.",
+    "whatYouGet": "Supplier checks your insurance, gets the prescription from your doctor and ships a covered breast pump if your plan covers one; shipping is free.",
     "costToClaim": "free",
     "costDetail": "No cost to you if your plan covers the pump; upgrades may cost extra",
     "requirements": [
@@ -414,8 +415,8 @@
     ],
     "verifiedOn": "2026-11-08",
     "confidence": "medium",
-    "catches": "Edgepark says verification is never a guarantee of coverage; some plans have preferred pumps and timing limits.",
-    "notes": "Checked from the official site's search results; the site blocks automated reading, so details may be incomplete. Edgepark's site resets automated connections, so this entry rests on official-domain search results only. Exact coverage-check page not confirmed; FAQ page used. Coverage is generally one pump per pregnancy per Edgepark."
+    "catches": "Edgepark says verification is never a guarantee of coverage; out-of-pocket cost depends on your plan and deductible; some models have restricted access and plans may only ship closer to the due date.",
+    "notes": "Checked from the official site's search results; the site blocks automated reading, so details may be incomplete. Search results say you can order during pregnancy and up to one year after birth, and that Edgepark works with 1,400+ plans. Edgepark's site resets automated connections."
   },
   {
     "id": "healthcare-gov-insurance-covered-breast-pump",
@@ -470,9 +471,9 @@
     "name": "Health coverage if you're pregnant",
     "brand": "HealthCare.gov",
     "category": "health-benefits",
-    "whatYouGet": "Explains that all Marketplace and Medicaid plans cover pregnancy and childbirth, and how to enroll or report a pregnancy.",
+    "whatYouGet": "Explains that all Marketplace and Medicaid plans cover pregnancy and childbirth, and how to apply (create an account for Marketplace coverage, or check Medicaid/CHIP eligibility) or report a pregnancy or birth.",
     "costToClaim": "free",
-    "costDetail": "Free to apply; plan costs vary",
+    "costDetail": "Free to apply; Medicaid/CHIP coverage is free or low-cost; Marketplace plans may have premiums.",
     "requirements": [
       "insurance",
       "eligibility"
@@ -485,7 +486,7 @@
     ],
     "verifiedOn": "2026-11-08",
     "confidence": "high",
-    "catches": "Pregnancy alone does not open a Special Enrollment Period; the birth of a child does (apply within 60 days of birth). Open Enrollment runs Nov 1 - Jan 15.",
+    "catches": "Pregnancy alone does not open a Special Enrollment Period; the birth of a child does (apply within 60 days of birth). Open Enrollment runs Nov 1 - Jan 15. Marketplace plans can have premiums, deductibles and copays.",
     "notes": "Medicaid or CHIP coverage can begin any time if you are eligible."
   },
   {
@@ -509,7 +510,7 @@
     ],
     "verifiedOn": "2026-11-08",
     "confidence": "high",
-    "catches": "Site says most moms are fully covered; shipping follows insurance guidelines, so start the check early. Other paid products (e.g. gender test) are separate.",
+    "catches": "Site says most moms are fully covered; shipping follows insurance guidelines, so start the check around week 20. Breast pumps cannot be returned or exchanged once shipped. If your plan is not covered, the site offers 20% off retail instead. Other paid products (e.g. gender test, $169) are separate.",
     "notes": "Steps per 1NW: 1) Check coverage (about 2 minutes). 2) Choose a covered pump and accessories. 3) Pump ships free, timed to your insurance guidelines. Sign-up page is /register."
   },
   {
@@ -519,22 +520,24 @@
     "category": "health-benefits",
     "whatYouGet": "Insurance-covered lactation consultations with an IBCLC, in-home, in-office or online.",
     "costToClaim": "free",
-    "costDetail": "Covered by insurance where your plan is eligible; page says it will confirm eligibility",
+    "costDetail": "Page says care is covered by insurance where your plan is eligible; the registration step confirms eligibility. Your plan's copay or deductible, if any, is not stated.",
     "requirements": [
+      "email",
+      "phone",
       "insurance",
       "eligibility"
     ],
-    "eligibility": "People whose insurance covers lactation support and is in The Lactation Network's network.",
-    "region": "US (states in TLN's network)",
+    "eligibility": "People whose insurance covers lactation support and is in The Lactation Network's network; you provide your insurance card details at registration.",
+    "region": "US (50 states and DC; insurance-network dependent)",
     "signupUrl": "https://lactationnetwork.com/",
     "sourceUrls": [
       "https://lactationnetwork.com/",
       "https://lactationnetwork.com/about-us/"
     ],
     "verifiedOn": "2026-11-08",
-    "confidence": "medium",
-    "catches": "Coverage check is not a guarantee; network participation is verified after you submit.",
-    "notes": "How it works per the site: fill out the patient intake form with personal and insurance information; team confirms eligibility within 72 hours; you are matched with an IBCLC. Pump supply was not confirmed on the pages read. Medium because the exact form page was not read."
+    "confidence": "high",
+    "catches": "Coverage check is not a guarantee; eligibility is confirmed after you register. Babies cannot be added to insurance before birth, so baby insurance details are added after the birth.",
+    "notes": "Fetched directly: home page says see an IBCLC in-home, in-office or online, all covered by insurance; Check eligibility goes to the registration form. FAQ says registration asks for demographics, email, phone and insurance card. Pump supply is not part of this offer on the pages read."
   },
   {
     "id": "medicaid-chip-pregnancy-coverage",
@@ -570,8 +573,8 @@
     "costDetail": "No cost to you if your plan covers the pump; upgrades may cost extra",
     "requirements": [
       "email",
-      "due-date",
       "phone",
+      "due-date",
       "insurance",
       "eligibility"
     ],
@@ -593,9 +596,9 @@
     "name": "2-1-1",
     "brand": "United Way 211",
     "category": "assistance",
-    "whatYouGet": "Confidential help finding local resources for bills, food and other needs; the 2-1-1 line connects to local experts.",
+    "whatYouGet": "Confidential help finding local resources for paying bills, food, housing, utilities, healthcare and other needs: call 2-1-1 and a local expert connects you to services. National Diaper Bank Network's page also points families to 2-1-1 for diaper assistance.",
     "costToClaim": "free",
-    "costDetail": "Page does not state a cost; NDBN's page also points to 2-1-1",
+    "costDetail": "Page does not state a cost; the service is a referral line, not a benefit itself.",
     "requirements": [],
     "eligibility": "Anyone.",
     "region": "US",
@@ -605,8 +608,8 @@
     ],
     "verifiedOn": "2026-11-08",
     "confidence": "medium",
-    "catches": "Resources vary by local 211 service.",
-    "notes": "Home page says experts are available 24/7 and calls are confidential and can be anonymous."
+    "catches": "Resources and what they offer vary by local 211 service; 2-1-1 refers you to programs rather than providing items itself.",
+    "notes": "Fetched directly: home page says every call is completely confidential and links to local 211 lookup. Not baby-specific."
   },
   {
     "id": "early-head-start-pregnant-women",
@@ -623,12 +626,13 @@
     "region": "US (local programs)",
     "signupUrl": "https://www.headstart.gov/how-apply",
     "sourceUrls": [
-      "https://www.headstart.gov/how-apply"
+      "https://www.headstart.gov/how-apply",
+      "https://headstart.gov/about-us/article/head-start-faqs"
     ],
     "verifiedOn": "2026-11-08",
     "confidence": "medium",
     "catches": "Not every program serves pregnant women; waiting lists possible.",
-    "notes": "Checked from the official site's search results; the site blocks automated reading, so details may be incomplete. headstart.gov returned 403 to automated fetching; details from official-domain search results."
+    "notes": "Checked from the official site's search results; the site blocks automated reading, so details may be incomplete. headstart.gov returned 403 to automated fetching; official-domain search results say apply by contacting a local program (Head Start Center Locator or toll-free line 1-866-763-6481) and that waitlists are common."
   },
   {
     "id": "cribs-for-kids-find-a-crib",
@@ -641,7 +645,7 @@
     "requirements": [
       "eligibility"
     ],
-    "eligibility": "Financial need, infant 12 months or younger, and receiving safe sleep education (per search result).",
+    "eligibility": "Financial need, infant 12 months or younger, and receiving safe sleep education (per search result); each partner sets its own criteria; crib limits 30 lb and 35 in.",
     "region": "US (via local partners)",
     "signupUrl": "https://cribsforkids.org/find-a-crib/",
     "sourceUrls": [
@@ -650,7 +654,7 @@
     "verifiedOn": "2026-11-08",
     "confidence": "medium",
     "catches": "Some partners provide education only; availability varies.",
-    "notes": "Checked from the official site's search results; the site blocks automated reading, so details may be incomplete. Site returned 403 to automated fetching, so this rests on official-domain search results."
+    "notes": "Checked from the official site's search results; the site blocks automated reading, so details may be incomplete. Site returned 403 to automated fetching, so this rests on official-domain search results. Search results say you find the nearest partner on the site map and call to apply; if you are not eligible the site suggests Healthy Start or local health departments."
   },
   {
     "id": "safe-kids-car-seat-check",
@@ -669,8 +673,8 @@
     ],
     "verifiedOn": "2026-11-08",
     "confidence": "high",
-    "catches": "Inspection and education only; not a free car seat. Availability depends on local events and technicians, and fees for individual technicians or locations were not confirmed. Sessions take about 20-30 minutes and you do the installation yourself with guidance.",
-    "notes": "Bring the car seat and vehicle manuals; appointments take about 20-30 minutes. NHTSA site blocked automated fetching (403)."
+    "catches": "Inspection and education only; not a free car seat. The page says events are free but does not say whether individual technicians or inspection stations charge. Availability depends on local events and technicians.",
+    "notes": "Fetched directly: page says Safe Kids coalitions host more than 8,000 free car seat inspection events and lists three ways to find a certified technician (events, the technician search, NHTSA's directory). Bring the car seat and vehicle manuals; you install the seat yourself with guidance."
   },
   {
     "id": "national-diaper-bank-network-get-help",
@@ -693,7 +697,7 @@
     "verifiedOn": "2026-11-08",
     "confidence": "high",
     "catches": "Availability varies by community; NDBN does not distribute diapers directly.",
-    "notes": "Per the site: call 2-1-1 or search 211.org for diapers or basic needs, check faith-based groups and food pantries, or use the member directory (240+ diaper banks). /find-a-diaper-bank/ returns 404; the directory is at /member-directory/."
+    "notes": "Fetched directly. Per the page: call 2-1-1 or search 211.org for diapers or basic needs, check listings under children, try faith-based groups and food pantries, or use the member diaper bank directory at /member-directory/."
   },
   {
     "id": "hrsa-healthy-start",
@@ -704,8 +708,8 @@
     "costToClaim": "free",
     "costDetail": "Free through local projects",
     "requirements": [
-      "eligibility",
-      "address"
+      "address",
+      "eligibility"
     ],
     "eligibility": "Pregnant women, new parents, children to 18 months and partners in a funded service area.",
     "region": "US (funded project areas)",
@@ -717,27 +721,28 @@
     "verifiedOn": "2026-11-08",
     "confidence": "medium",
     "catches": "Only in funded communities.",
-    "notes": "Checked from the official site's search results; the site blocks automated reading, so details may be incomplete. hrsa.gov and mchb.hrsa.gov returned 403; details from official-domain search results."
+    "notes": "Checked from the official site's search results; the site blocks automated reading, so details may be incomplete. hrsa.gov and mchb.hrsa.gov returned 403; official-domain search results say projects have different enrollment guidelines, you must live in a served area, and the HRSA page lists a site finder."
   },
   {
     "id": "postpartum-support-international-helpline",
     "name": "PSI HelpLine",
     "brand": "Postpartum Support International",
     "category": "assistance",
-    "whatYouGet": "Free, confidential helpline for perinatal mental health support and resources; call or text 800-944-4773.",
+    "whatYouGet": "Free, confidential helpline for perinatal mental health support and resources; call or text 800-944-4773 (Spanish text 971-203-7773), leave a message and a trained volunteer returns your call or text.",
     "costToClaim": "free",
     "costDetail": "Free and confidential",
     "requirements": [],
     "eligibility": "Anyone; no diagnosis needed.",
     "region": "US",
-    "signupUrl": "https://postpartum.net/contact-us/",
+    "signupUrl": "https://postpartum.net/get-help/psi-helpline/",
     "sourceUrls": [
+      "https://postpartum.net/get-help/psi-helpline/",
       "https://postpartum.net/contact-us/"
     ],
     "verifiedOn": "2026-11-08",
     "confidence": "medium",
-    "catches": "Not for emergencies; volunteers return messages within about 48 hours.",
-    "notes": "Checked from the official site's search results; the site blocks automated reading, so details may be incomplete. postpartum.net returned 403 to automated fetching; details from official-domain search results. In crisis call 988 or 1-833-852-6262."
+    "catches": "Not for emergencies; response times vary (search results cite business-hours return, and up to about 48 hours on the Spanish page).",
+    "notes": "Checked from the official site's search results; the site blocks automated reading, so details may be incomplete. postpartum.net returned 403 to automated fetching; details from official-domain search results. In crisis call or text 988."
   },
   {
     "id": "usda-wic",
@@ -748,8 +753,8 @@
     "costToClaim": "free",
     "costDetail": "Foods provided at no cost; apply through a local WIC agency",
     "requirements": [
-      "eligibility",
-      "address"
+      "address",
+      "eligibility"
     ],
     "eligibility": "Women who are pregnant, postpartum (up to 6 months after pregnancy ends) or breastfeeding (up to the infant's first birthday), infants, and children under 5; income at or below WIC limits (or on Medicaid, SNAP or TANF), live in the state, and complete a free health check.",
     "region": "US (apply through your state or local WIC agency)",
@@ -776,7 +781,7 @@
       "email",
       "eligibility"
     ],
-    "eligibility": "Must be 18+ (or age of majority) and a resident of the US, UK or Canada (excl. Quebec)",
+    "eligibility": "Must be 18+ (or the age of majority where you live); the platform is operated in the United States.",
     "region": "US",
     "signupUrl": "https://bzzagent.com/how-it-works/",
     "sourceUrls": [
@@ -827,6 +832,7 @@
     "costToClaim": "free",
     "costDetail": "Free to join; boxes go to selected members only",
     "requirements": [
+      "email",
       "app"
     ],
     "eligibility": "Terms bar anyone under 16 from using the service",
@@ -839,8 +845,8 @@
     ],
     "verifiedOn": "2026-11-08",
     "confidence": "medium",
-    "catches": "Not guaranteed a VoxBox; selection depends on activity and impact score. Recipients are expected to post reviews or social content and disclose the product was free. Privacy policy: shares name/last initial/location with third parties who may publish it, shares aggregate data with advertisers, and shares data with partners and service providers; reviews and profile are public. Marketing about specials and new features by email.",
-    "notes": "Home page and article pages returned a Cloudflare bot challenge (403), so offer details rest on official-domain search results. Privacy policy and terms pages were read. Not parenting-specific."
+    "catches": "Official guide (via search results) says to be eligible for a VoxBox you must sign up and download the app. Not guaranteed a VoxBox; selection depends on activity and impact score. Recipients are expected to post reviews or social content and disclose the product was free. Privacy policy: shares name/last initial/location with third parties who may publish it, shares aggregate data with advertisers, and shares data with partners and service providers; reviews and profile are public. Marketing about specials and new features by email.",
+    "notes": "Checked from the official site's search results; the site blocks automated reading, so details may be incomplete. Home page and article pages returned a Cloudflare bot challenge (403), so offer details rest on official-domain search results. Privacy policy and terms pages were read. Not parenting-specific."
   },
   {
     "id": "pinchme-samples",
@@ -879,7 +885,7 @@
       "email",
       "eligibility"
     ],
-    "eligibility": "18+; sponsors select by demographics such as location, age or number of children",
+    "eligibility": "18+ (per Terms of Use); US and Canada applicants accepted; sponsors select by demographics such as location, age or number of children",
     "region": "US",
     "signupUrl": "https://www.tryazon.com/host-sign-up-form/",
     "sourceUrls": [
@@ -890,7 +896,7 @@
     ],
     "verifiedOn": "2026-11-08",
     "confidence": "medium",
-    "catches": "Applications are shared with the sponsoring brand. FAQ says selection also looks at social accounts and who actively shares, and hosts follow FTC disclosure rules, so expect to post on social media. Privacy policy says it will not sell or rent your information and shares aggregated demographics with partners. Email communications with unsubscribe.",
+    "catches": "As fetched today, the sign-up form page displayed 'forms are currently under maintenance' and the TryaBox page listed no open opportunities. Applications are shared with the sponsoring brand. FAQ says selection also looks at social accounts and who actively shares, and hosts follow FTC disclosure rules, so expect to post on social media. Privacy policy says it will not sell or rent your information and shares aggregated demographics with partners. Email communications with unsubscribe.",
     "notes": "Terms of Use page shows an effective date of May 25, 2018. Specific what-you-get varies by party or TryaBox."
   }
 ]

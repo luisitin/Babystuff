@@ -30,7 +30,7 @@ Layout: `src/` (HTML, CSS, vanilla JS), `data/programs.json`, `scripts/build.mjs
 - Each research subagent writes `research/<category>.json` in the schema below and `research/<category>-notes.md` listing what it left out and why.
 
 ### Program schema (`data/programs.json` is an array of these)
-`id` (kebab-case, unique), `name`, `brand`, `category` (formula, diapers-wipes, registry-box, feeding, baby-care, rewards, health-benefits, assistance, product-testing), `whatYouGet`, `costToClaim` (free, shipping-fee, purchase-required, membership-required), `costDetail`, `requirements` (list from: email, address, due-date, registry, app, purchase, membership, phone, account, eligibility), `eligibility`, `region`, `signupUrl` (https, official domain), `sourceUrls` (list of official https pages), `verifiedOn` (YYYY-MM-DD), `confidence` (high, medium, low), `catches`, `notes`.
+`id` (kebab-case, unique), `name`, `brand`, `category` (formula, diapers-wipes, registry-box, feeding, baby-care, rewards, health-benefits, assistance, product-testing), `whatYouGet`, `costToClaim` (free, shipping-fee, purchase-required, membership-required), `costDetail`, `requirements` (list from: email, address, phone, due-date, registry, app, purchase, membership, insurance, eligibility; `membership` means a paid membership, a free store account counts as `email`), `eligibility`, `region`, `signupUrl` (https, official domain), `sourceUrls` (list of official https pages), `verifiedOn` (YYYY-MM-DD), `confidence` (high, medium, low), `catches`, `notes`.
 
 ## Product rules
 - The app never submits forms itself, has no ads, analytics, trackers or third-party scripts, makes no network calls, and links out only to official program pages.
