@@ -35,3 +35,9 @@ Seven `sonnet` researchers wrote `research/<lane>.json` and `research/<lane>-not
 - Eight entries rest on official-domain search results because their sites block automated reading: Gerber, Babylist, buybuy BABY, Huggies, Edgepark, Early Head Start, Cribs for Kids, Healthy Start and PSI. Recheck them in a normal browser.
 - Diapers, feeding and baby care have few real freebies. Most brands offer only discounts or paid trials (see `research/excluded.md`).
 - Offers change. Re-run research and fact-checking every few months and update `verifiedOn`.
+
+## Phase E, button and email automation (in progress)
+The user asked to "automate through buttons and email connections" and keep going without check-ins. The contract is in ARCHITECTURE.md ("Phase E"). Nothing submits sign-up forms or clicks through bot checks, which is the user's original rule.
+- Builder A (`sonnet`): `BFF.email` (per-program plus addresses, Gmail filter XML, Gmail search links, mailto checklist, .ics reminders); the guided run's Done opens the next page, plus keyboard shortcuts; the directory's "Start a guided run with these N".
+- Builder B (`sonnet`): GitHub Actions CI (build, diff, tests) and a weekly or button-triggered link check that opens or closes a `link-check` issue (GitHub emails the owner); `scripts/check-links.mjs`.
+- Next: autofill reads the app's backup and writes statuses back (`sonnet`), then review (`sonnet`), docs and final checks (`haiku`).
