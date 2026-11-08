@@ -1,22 +1,18 @@
-# rewards-testing notes
+# rewards-testing notes (round 2, 2026-11-08)
 
-Date: 2026-11-08. Result: no programs verified; JSON is an empty array.
+Fetched with the approved helper (fetch-page.mjs); no curl or other workaround.
 
-All six first-pass WebFetch calls failed, so the network is restricted and I stopped per the brief (no mirrors, caches or curl workarounds):
-- www.pgeveryday.com: ENOTFOUND (host not in the session's allowed domains)
-- www.thebump.com: ENOTFOUND
-- www.influenster.com: ENOTFOUND
-- www.bzzagent.com: ENOTFOUND
-- www.whattoexpect.com: "unable to fetch"
-- www.babycenter.com: "unable to fetch"
+## Included
+- pg-brandsaver-rewards (high): pgeveryday.com now redirects to pgbrandsaver.com. Rewards, fan-clubs pages and P&G privacy policy read. No baby-specific offer.
+- influenster-voxbox (medium): home and article pages returned a Cloudflare challenge (403); accepted. /privacy and /terms read; offer text from official-domain search.
+- bzzagent-campaigns (medium): how-it-works, about, privacy, terms read. Join link goes to sampling.powerreviews.com, off the bzzagent.com domain.
+- home-tester-club-us-product-tests (high), pinchme-samples (high), tryazon-tryabox-parties (medium), babycenter-app-rewards (medium; one-line mention only).
 
-Not attempted (same restriction): Moms Meet, Home Tester Club US, Smiley360, Tryazon, PINCHme, Kimberly-Clark/Huggies panels, Kenvue rewards.
-
-To retry, allow these hosts in the session's network settings: pgeveryday.com, whattoexpect.com, babycenter.com, thebump.com, influenster.com, bzzagent.com, momsmeet.com, plus the other panels' domains.
-
-## Update after coordinator correction (WebFetch only, no curl; search-backed entries capped at medium)
-I never used curl. Fetch failures were DNS/allowlist errors, not bot blocks. WebSearch with allowed_domains worked for pgeveryday.com and influenster.com, so two medium-confidence entries were added from official-domain search snippets only: pg-good-everyday, influenster-voxbox. Privacy policies were not read; eligibility fields left blank.
-- whattoexpect.com: WebSearch also rejected the domain ("not accessible to our user agent"). Blocked.
-- babycenter.com: fetch failed. Blocked. Not searched.
-- thebump.com, bzzagent.com: fetch DNS failure, not searched.
-- Moms Meet, Home Tester Club, Smiley360, Tryazon, PINCHme, Kenvue, Huggies panels: not checked.
+## Left out or unconfirmed
+- What to Expect: home page loads, subpages (e.g. /baby-products/best-free-baby-samples/) return 403, and WebSearch rejects the domain. Home page links only an editorial "Best Free Baby Samples" roundup; no WTE-run freebie or registry gift program confirmed. Blocked.
+- The Bump (thebump.com): 403 Access Denied. Blocked; search not attempted.
+- Moms Meet (momsmeet.com): HTTP 522 error. Unreachable.
+- Smiley360 (smiley360.com): proxy 502 on connect. Unreachable.
+- Kenvue / Johnson & Johnson rewards: kenvue.com returned no rewards or member program; nothing verified.
+- Huggies Rewards: 403 bot challenge; also belongs to the diapers-wipes lane.
+- BabyCenter: WebSearch rejects the domain, so no rewards terms page could be found.
