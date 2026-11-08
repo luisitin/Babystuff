@@ -8,9 +8,10 @@ Two GitHub Actions workflows live in `.github/workflows/`. You do not need to in
 
 **Link check (`link-check.yml`)** runs every Monday and whenever you start it by hand. It visits the `signupUrl` of every program in `data/programs.json`, one at a time with a pause between requests, and writes a report (uploaded as the `link-report` artifact on the run page).
 
-- If any link is NOT-FOUND (404/410 or a "page not found" title) or OFF-DOMAIN (it now redirects to an unexpected site), the run fails (red in the Actions tab) and an issue labeled `link-check` is opened, or a comment is added to the one already open.
+- If any link is NOT-FOUND (404/410 or a "page not found" title), OFF-DOMAIN (it now redirects to an unexpected site) or DEAD (DNS lookup fails, connection refused, or a bad TLS certificate), the run fails (red in the Actions tab) and an issue labeled `link-check` is opened, or a comment is added to the one already open.
 - If everything is fine and a `link-check` issue is open, the workflow comments "All links OK" and closes it.
-- BLOCKED results (403, bot challenges, timeouts, network errors) are listed in the report but never fail the run. The checker uses one honest User-Agent and never retries with other headers.
+- If the checker itself crashes (exit code 2), the run fails with a clear error but no issue is opened; GitHub already emails the owner about failed scheduled runs.
+- BLOCKED results (403, bot challenges, timeouts, resets, insecure `http:` redirects) are listed in the report but never fail the run. The checker uses one honest User-Agent and never retries with other headers.
 
 ## Run the link check by hand
 
@@ -27,13 +28,15 @@ node scripts/check-links.mjs --out link-report.md --json link-report.json
 node scripts/check-links.mjs --only similac-mysimilac-rewards,pampers-rewards
 ```
 
-Without `--out` the Markdown report prints to the terminal. The exit code is 1 only when a NOT-FOUND or OFF-DOMAIN entry exists. The full run takes a few minutes because of the 1.5 second pause between requests.
+Without `--out` the Markdown report prints to the terminal. Exit codes: 0 means all OK (BLOCKED allowed), 1 means links need attention (NOT-FOUND, OFF-DOMAIN or DEAD), 2 means the checker itself failed. The full run takes a few minutes because of the 1.5 second pause between requests.
 
 Behind an HTTPS proxy, Node's `fetch` ignores `HTTPS_PROXY` unless you run with `NODE_USE_ENV_PROXY=1` (Node 22.21 or newer):
 
 ```
 NODE_USE_ENV_PROXY=1 node scripts/check-links.mjs
 ```
+
+A local run behind a restricted network (a proxy or sandbox that blocks sites) can show DEAD falsely. GitHub's runners have normal internet, so the scheduled run is the one to trust.
 
 ## Blocked sites need a manual look
 

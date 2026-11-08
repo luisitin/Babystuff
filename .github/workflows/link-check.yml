@@ -9,19 +9,29 @@ permissions:
   contents: read
   issues: write
 
+concurrency:
+  group: link-check
+  cancel-in-progress: false
+
 jobs:
   link-check:
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    # Actions use major-version tags so they are easy to update; they can be pinned to commit SHAs for stricter supply-chain safety.
     steps:
       - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
       - uses: actions/setup-node@v4
         with:
           node-version: 22
       - name: Check signup links
         id: check
-        continue-on-error: true
-        run: node scripts/check-links.mjs --out link-report.md --json link-report.json
+        # Exit codes: 0 all OK (BLOCKED allowed), 1 links need attention, 2 the checker itself failed.
+        run: |
+          set +e
+          node scripts/check-links.mjs --out link-report.md --json link-report.json
+          echo "code=$?" >> "$GITHUB_OUTPUT"
       - name: Upload reports
         if: always()
         uses: actions/upload-artifact@v4
@@ -34,12 +44,14 @@ jobs:
       - name: Open, update or close the link-check issue
         uses: actions/github-script@v7
         env:
-          CHECK_OUTCOME: ${{ steps.check.outcome }}
+          CHECK_CODE: ${{ steps.check.outputs.code }}
         with:
           script: |
             const fs = require('fs');
             const { owner, repo } = context.repo;
-            const failed = process.env.CHECK_OUTCOME !== 'success';
+            const code = process.env.CHECK_CODE;
+            if (code === '0' || code === '1') { /* handled below */ } else { core.error('Link checker itself failed (exit ' + code + '); not touching the issue.'); return; }
+            const failed = code === '1';
             const runUrl = `${process.env.GITHUB_SERVER_URL}/${owner}/${repo}/actions/runs/${process.env.GITHUB_RUN_ID}`;
             let report = fs.existsSync('link-report.md')
               ? fs.readFileSync('link-report.md', 'utf8')
@@ -49,8 +61,15 @@ jobs:
             if (report.length > limit) report = report.slice(0, limit - suffix.length) + suffix;
             const body = `${report}\n\nWorkflow run: ${runUrl}`.slice(0, 65000);
 
+            if (failed) {
+              try {
+                await github.rest.issues.createLabel({ owner, repo, name: 'link-check', color: 'fbca04', description: 'Automated link check findings' });
+              } catch (e) {
+                if (e.status !== 422) throw e; // 422 means the label already exists
+              }
+            }
             const open = await github.rest.issues.listForRepo({
-              owner, repo, state: 'open', labels: 'link-check', per_page: 1,
+              owner, repo, state: 'open', labels: 'link-check', sort: 'created', direction: 'asc', per_page: 30,
             });
             const existing = open.data.find((i) => !i.pull_request);
 
@@ -75,7 +94,13 @@ jobs:
               });
             }
       - name: Fail the job if links need attention
-        if: steps.check.outcome != 'success'
+        if: steps.check.outputs.code != '0'
+        env:
+          CHECK_CODE: ${{ steps.check.outputs.code }}
         run: |
-          echo "::error::Link check found NOT-FOUND or OFF-DOMAIN entries. See the link-check issue and the link-report artifact."
+          if [ "$CHECK_CODE" = "1" ]; then
+            echo "::error::Link check found NOT-FOUND, OFF-DOMAIN or DEAD entries. See the link-check issue and the link-report artifact."
+          else
+            echo "::error::The link checker itself failed (exit code $CHECK_CODE). See the step log."
+          fi
           exit 1
