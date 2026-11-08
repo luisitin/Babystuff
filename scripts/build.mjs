@@ -10,28 +10,20 @@ const JS = ['logic.js', 'store.js', 'tracker.js', 'profile.js', 'directory.js', 
 );
 const inlined = [];
 
-function readPart(rel, required) {
+function readPart(rel) {
   const p = join(root, rel);
-  if (!existsSync(p)) {
-    if (required) throw new Error('Missing required file: ' + rel);
-    console.warn('warning: skipping missing file ' + rel);
-    return null;
-  }
+  if (!existsSync(p)) throw new Error('Missing required file: ' + rel);
   inlined.push(rel);
   return readFileSync(p, 'utf8').replace(/\r\n/g, '\n');
 }
 
 function collect(list) {
   return list
-    .map((rel) => {
-      const t = readPart(rel, false);
-      return t === null ? null : t.replace(/\n+$/, '');
-    })
-    .filter((t) => t !== null);
+    .map((rel) => readPart(rel).replace(/\n+$/, ''));
 }
 
-const shell = readPart('src/index.html', true);
-const dataText = readPart('data/programs.json', true);
+const shell = readPart('src/index.html');
+const dataText = readPart('data/programs.json');
 const data = JSON.stringify(JSON.parse(dataText))
   .replace(/</g, '\\u003c')
   .replace(/\u2028/g, '\\u2028')

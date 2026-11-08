@@ -5,6 +5,7 @@
 
   var VIEWS = ['directory', 'info', 'tracker', 'guided', 'safety'];
   var THEMES = ['system', 'light', 'dark'];
+  var THEME_ICONS = { system: '\u25D0', light: '\u2600', dark: '\u263E' };
   var THEME_LABELS = { system: 'System', light: 'Light', dark: 'Dark' };
   var inited = {};
 
@@ -26,15 +27,21 @@
     if (t === 'system') root.removeAttribute('data-theme'); else root.setAttribute('data-theme', t);
     var btn = document.getElementById('theme-toggle');
     if (btn) {
-      btn.textContent = 'Theme: ' + THEME_LABELS[t];
+      var icon = btn.querySelector('.theme-icon'), txt = btn.querySelector('.theme-text');
+      if (icon) icon.textContent = THEME_ICONS[t];
+      if (txt) txt.textContent = 'Theme: ' + THEME_LABELS[t];
       var next = THEMES[(THEMES.indexOf(t) + 1) % THEMES.length];
       btn.setAttribute('aria-label', 'Theme: ' + THEME_LABELS[t] + '. Tap to switch to ' + THEME_LABELS[next] + '.');
     }
   }
 
+  var current = 'directory';
+  // Unknown hashes (e.g. #main) keep the current view instead of jumping to Programs.
   function currentView() {
     var name = (location.hash || '').replace(/^#/, '');
-    return VIEWS.indexOf(name) === -1 ? 'directory' : name;
+    if (VIEWS.indexOf(name) !== -1) current = name;
+    else if (!name) current = 'directory';
+    return current;
   }
 
   function guarded(fn, name) {
@@ -87,6 +94,13 @@
 
     lastChecked();
 
+    var skip = document.querySelector('.skip-link');
+    var main = document.getElementById('main');
+    if (skip && main) skip.addEventListener('click', function (e) {
+      e.preventDefault();
+      main.focus();
+    });
+
     VIEWS.forEach(function (v) {
       var el = document.getElementById('view-' + v);
       var view = BFF.views[v];
@@ -94,6 +108,12 @@
         inited[v] = true;
         guarded(function () { view.init(el); }, v);
       }
+    });
+
+    VIEWS.forEach(function (v) {
+      var sec = document.getElementById('view-' + v);
+      var ref = sec && sec.getAttribute('aria-labelledby');
+      if (ref && !document.getElementById(ref) && window.console) console.warn('view-' + v + ': missing heading #' + ref);
     });
 
     window.addEventListener('hashchange', function () { route(true); });

@@ -1,8 +1,10 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { createRequire } from 'node:module';
-const require = createRequire(import.meta.url);
-const L = require('../src/js/logic.js');
+import { readFileSync } from 'node:fs';
+// Load as CommonJS regardless of any "type": "module" in package.json.
+const mod = { exports: {} };
+new Function('module', readFileSync(new URL('../src/js/logic.js', import.meta.url), 'utf8'))(mod);
+const L = mod.exports;
 
 const P = (o) => Object.assign({ name: 'X', brand: 'B', category: 'formula', costToClaim: 'free',
   requirements: ['email'], whatYouGet: '', notes: '', eligibility: '', verifiedOn: '2026-01-01', confidence: 'high' }, o);
@@ -104,4 +106,24 @@ test('escapeHtml', () => {
   assert.equal(L.escapeHtml('<a href="x">&\'</a>'), '&lt;a href=&quot;x&quot;&gt;&amp;&#39;&lt;/a&gt;');
   assert.equal(L.escapeHtml(null), '');
   assert.equal(L.escapeHtml(5), '5');
+});
+
+test('sortPrograms recommended', () => {
+  const list = [
+    P({ name: 'z-guided-high-email', category: 'formula', confidence: 'high' }),
+    P({ name: 'a-assistance', category: 'assistance', confidence: 'high' }),
+    P({ name: 'b-guided-addr-high', requirements: ['email', 'address'], confidence: 'high' }),
+    P({ name: 'c-guided-email-low', confidence: 'low' }),
+    P({ name: 'd-guided-email-med-rewards', category: 'rewards', confidence: 'medium' }),
+    P({ name: 'e-guided-email-med-formula', category: 'formula', confidence: 'medium' }),
+    P({ name: 'f-ship', costToClaim: 'shipping-fee', confidence: 'high' }),
+    P({ name: 'A-guided-email-med-formula', category: 'formula', confidence: 'medium' })
+  ];
+  assert.deepEqual(L.sortPrograms(list, 'recommended').map((p) => p.name), [
+    'z-guided-high-email', 'A-guided-email-med-formula', 'e-guided-email-med-formula',
+    'd-guided-email-med-rewards', 'c-guided-email-low', 'b-guided-addr-high',
+    'f-ship', 'a-assistance'
+  ]);
+  assert.deepEqual(L.sortPrograms([], 'recommended'), []);
+  assert.deepEqual(L.sortPrograms([P({ category: 'zzz', confidence: undefined })], 'recommended').length, 1);
 });

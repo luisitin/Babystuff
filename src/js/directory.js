@@ -4,8 +4,9 @@
   BFF.views = BFF.views || {};
 
   var L = BFF.logic;
-  var DEFAULTS = { query: '', category: '', trulyFree: false, emailOnly: false, needsRegistry: false, sort: 'name' };
+  var DEFAULTS = { query: '', category: '', trulyFree: false, emailOnly: false, needsRegistry: false, sort: 'recommended' };
   var SORTS = [
+    ['recommended', 'Recommended'],
     ['name', 'Name A-Z'],
     ['verified', 'Recently verified'],
     ['category', 'Category'],
@@ -39,7 +40,7 @@
       state.trulyFree = !!f.trulyFree;
       state.emailOnly = !!f.emailOnly;
       state.needsRegistry = !!f.needsRegistry;
-      state.sort = SORTS.some(function (s) { return s[0] === f.sort; }) ? f.sort : 'name';
+      state.sort = SORTS.some(function (s) { return s[0] === f.sort; }) ? f.sort : 'recommended';
     }
   }
   function savePrefs() {
@@ -67,10 +68,10 @@
       var input = h('input', { type: 'checkbox' });
       input.addEventListener('change', function () { state[key] = input.checked; savePrefs(); render(); });
       els[key] = input;
-      return h('label', { class: 'check' }, [input, h('span', { text: label })]);
+      return h('label', { class: 'chip-toggle' }, [input, h('span', { text: label })]);
     }
 
-    els.clear = h('button', { type: 'button', class: 'btn', text: 'Clear filters' });
+    els.clear = h('button', { type: 'button', class: 'btn btn-small', text: 'Clear filters' });
     els.clear.addEventListener('click', clearFilters);
 
     var timer = null;
@@ -91,11 +92,11 @@
         check('trulyFree', 'Truly free'),
         check('emailOnly', 'Email only'),
         check('needsRegistry', 'Needs a registry')
-      ]),
-      h('div', { class: 'filter-actions' }, [els.clear])
+      ])
     ]);
 
     els.count = h('p', { class: 'result-count', 'aria-live': 'polite', 'aria-atomic': 'true' });
+    var resultRow = h('div', { class: 'result-row' }, [els.count, els.clear]);
     els.list = h('div', { class: 'card-grid' });
     els.empty = h('div', { class: 'empty', hidden: true }, [
       h('p', { text: 'No programs match those filters.' })
@@ -105,7 +106,7 @@
     els.empty.appendChild(emptyClear);
 
     root.appendChild(filters);
-    root.appendChild(els.count);
+    root.appendChild(resultRow);
     root.appendChild(els.list);
     root.appendChild(els.empty);
   }
@@ -173,20 +174,27 @@
       if (p.notes) d.push(h('p', { text: p.notes }));
       if (sources.length) {
         d.push(h('ul', { class: 'source-list' }, sources.map(function (u) {
-          return h('li', null, [h('a', { href: u, target: '_blank', rel: 'noopener noreferrer', text: L.domainOf(u) + ' page' + ' ↗' })]);
+          return h('li', null, [h('a', { href: u, target: '_blank', rel: 'noopener noreferrer' }, [
+            document.createTextNode(L.domainOf(u) + ' page '),
+            h('span', { class: 'visually-hidden', text: '(opens in a new tab)' }),
+            h('span', { 'aria-hidden': 'true', text: '\u2197' })
+          ])]);
         })));
       }
       kids.push(h('details', null, d));
     }
 
     var foot = [
-      h('a', { class: 'btn btn-primary', href: p.signupUrl, target: '_blank', rel: 'noopener noreferrer',
-        text: 'Sign up on ' + L.domainOf(p.signupUrl) + ' ↗' }),
+      h('a', { class: 'btn btn-primary', href: p.signupUrl, target: '_blank', rel: 'noopener noreferrer' }, [
+        document.createTextNode('Sign up on ' + L.domainOf(p.signupUrl) + ' '),
+        h('span', { class: 'visually-hidden', text: '(opens in a new tab)' }),
+        h('span', { 'aria-hidden': 'true', text: '\u2197' })
+      ]),
       h('p', { class: 'verified', text: 'Verified ' + (p.verifiedOn || 'date unknown') + ' · ' + (p.confidence || 'unknown') + ' confidence' })
     ];
     if (BFF.tracker) {
       var sid = 'st-' + p.id;
-      var sel = h('select', { id: sid, 'data-program-id': p.id }, STATUSES.map(function (s) { return h('option', { value: s[0], text: s[1] }); }));
+      var sel = h('select', { id: sid, 'data-program-id': p.id, 'aria-label': 'My status for ' + p.name }, STATUSES.map(function (s) { return h('option', { value: s[0], text: s[1] }); }));
       sel.value = BFF.tracker.getStatus(p.id) || 'todo';
       sel.addEventListener('change', function () { BFF.tracker.setStatus(p.id, sel.value); });
       foot.push(h('div', { class: 'status-row' }, [h('label', { for: sid, text: 'My status' }), sel]));

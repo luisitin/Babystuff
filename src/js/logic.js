@@ -97,6 +97,12 @@
         var x = a.verifiedOn || '', y = b.verifiedOn || '';
         return x === y ? byName(a, b) : x < y ? 1 : -1;
       };
+    } else if (key === 'recommended') {
+      cmp = function (a, b) {
+        return (guidedDefault(a) ? 0 : 1) - (guidedDefault(b) ? 0 : 1) ||
+          (isEmailOnly(a) ? 0 : 1) - (isEmailOnly(b) ? 0 : 1) ||
+          confRank(a) - confRank(b) || catIndex(a) - catIndex(b) || byName(a, b);
+      };
     } else if (key === 'category') {
       cmp = function (a, b) { return catIndex(a) - catIndex(b) || byName(a, b); };
     } else if (key === 'confidence') {

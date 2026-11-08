@@ -42,7 +42,7 @@
   --space-5: 24px;
   --space-6: 32px;
   --font: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-  --nav-h: 60px;
+  --nav-h: calc(60px + env(safe-area-inset-bottom, 0px));
   color-scheme: light;
 }
 
@@ -99,7 +99,7 @@
 }
 
 *, *::before, *::after { box-sizing: border-box; }
-html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; scroll-padding-top: var(--space-3); scroll-padding-bottom: calc(var(--nav-h) + 80px); }
 body {
   margin: 0;
   background: var(--bg);
@@ -108,7 +108,6 @@ body {
   font-size: 16px;
   line-height: 1.5;
   overflow-wrap: anywhere;
-  padding-bottom: calc(var(--nav-h) + env(safe-area-inset-bottom, 0px) + var(--space-4));
 }
 h1, h2, h3, p, ul { margin: 0; }
 ul { padding: 0; list-style: none; }
@@ -137,19 +136,22 @@ a { color: var(--primary); }
   clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap;
 }
 
-/* Header */
-.app-header { padding: calc(var(--space-4) + env(safe-area-inset-top, 0px)) var(--space-4) var(--space-2); }
-.header-inner { display: flex; gap: var(--space-3); align-items: flex-start; justify-content: space-between; max-width: 1080px; margin: 0 auto; }
-.app-name { font-size: 1.5rem; line-height: 1.2; color: var(--primary); }
-.promise { color: var(--muted); font-size: .9375rem; margin-top: var(--space-1); }
+/* Header: compact on phones */
+.app-header { padding: calc(var(--space-2) + env(safe-area-inset-top, 0px)) var(--space-4) var(--space-2); }
+.header-inner { display: flex; gap: var(--space-3); align-items: center; justify-content: space-between; max-width: 1080px; margin: 0 auto; min-height: 44px; }
+.app-name { font-size: 1.25rem; line-height: 1.2; color: var(--primary); white-space: nowrap; }
+.promise { color: var(--muted); font-size: .875rem; margin: 0 0 var(--space-3); }
 .theme-toggle {
-  flex: none; min-height: 44px; min-width: 44px; padding: 0 var(--space-3);
+  flex: none; min-height: 44px; min-width: 44px; padding: 0 var(--space-2);
+  display: inline-flex; align-items: center; justify-content: center; gap: var(--space-2);
   background: var(--surface); color: var(--text); border: 1px solid var(--border-strong);
   border-radius: var(--radius-sm); font: inherit; font-size: .875rem; cursor: pointer;
 }
+.theme-icon { font-size: 1.25rem; line-height: 1; }
+.theme-text { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 .theme-toggle:hover { border-color: var(--primary); }
 .notice {
-  max-width: 1080px; margin: var(--space-3) auto 0; padding: var(--space-2) var(--space-3);
+  max-width: 1080px; margin: var(--space-2) auto 0; padding: var(--space-2) var(--space-3);
   background: var(--warning-bg); color: var(--warning-text); border: 1px solid var(--warning-border);
   border-radius: var(--radius-sm); font-size: .875rem;
 }
@@ -158,41 +160,49 @@ a { color: var(--primary); }
 .app-nav {
   position: fixed; left: 0; right: 0; bottom: 0; z-index: 50;
   background: var(--surface); border-top: 1px solid var(--border);
-  padding-bottom: env(safe-area-inset-bottom, 0px);
+  height: var(--nav-h); padding-bottom: env(safe-area-inset-bottom, 0px);
   padding-left: env(safe-area-inset-left, 0px); padding-right: env(safe-area-inset-right, 0px);
 }
 .app-nav ul { display: flex; }
 .app-nav li { flex: 1 1 0; min-width: 0; }
 .app-nav a {
   display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;
-  min-height: var(--nav-h); padding: var(--space-1) 2px;
-  color: var(--muted); text-decoration: none; font-size: .6875rem; line-height: 1.15; text-align: center;
+  height: 60px; padding: var(--space-1) 2px;
+  color: var(--muted); text-decoration: none; font-size: .75rem; line-height: 1.15; text-align: center;
 }
 .nav-icon { font-size: 1.125rem; line-height: 1; }
 .app-nav a[aria-current="page"] { color: var(--primary); font-weight: 700; box-shadow: inset 0 3px 0 var(--primary); }
 .app-nav a:focus-visible { outline-offset: -3px; }
 
 /* Layout */
-main { display: block; max-width: 1080px; margin: 0 auto; padding: var(--space-3) var(--space-4) var(--space-5); }
+main { display: block; width: 100%; max-width: 1080px; margin: 0 auto; padding: var(--space-2) var(--space-4) var(--space-4); }
+main:focus { outline: none; }
 .lede { color: var(--muted); margin-bottom: var(--space-4); }
 
-/* Filters */
-.filters {
-  background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
-  padding: var(--space-4); display: grid; gap: var(--space-3); box-shadow: var(--shadow);
-}
-.field { display: grid; gap: var(--space-1); min-width: 0; }
-.field label, .field-label { font-size: .875rem; font-weight: 600; }
-.field input[type="search"], .field select, .status-select select, select.status-select {
+/* Filters: flat and compact on phones */
+.filters { display: grid; gap: var(--space-2); }
+.field { display: grid; gap: 2px; min-width: 0; }
+.field label, .field-label { font-size: .8125rem; font-weight: 600; color: var(--muted); }
+.field input[type="search"], .field select, .status-row select {
   width: 100%; min-height: 44px; padding: 0 var(--space-3); font: inherit; color: var(--text);
-  background: var(--bg); border: 1px solid var(--border-strong); border-radius: var(--radius-sm);
+  background: var(--surface); border: 1px solid var(--border-strong); border-radius: var(--radius-sm);
 }
-.field-row { display: grid; gap: var(--space-3); grid-template-columns: 1fr; }
-.checks { display: flex; flex-wrap: wrap; gap: var(--space-2) var(--space-4); }
-.check { display: inline-flex; align-items: center; gap: var(--space-2); min-height: 44px; cursor: pointer; }
-.check input { width: 22px; height: 22px; accent-color: var(--primary); margin: 0; }
-.filter-actions { display: flex; align-items: center; justify-content: space-between; gap: var(--space-3); flex-wrap: wrap; }
-.result-count { color: var(--muted); font-size: .9375rem; margin: var(--space-4) 0 var(--space-3); }
+.field-row { display: grid; gap: var(--space-2); grid-template-columns: 1fr 1fr; }
+.field-row select { padding: 0 var(--space-2); }
+.checks { display: flex; gap: var(--space-2); overflow-x: auto; padding: 2px 2px var(--space-1); margin: 0 -2px; scrollbar-width: thin; }
+.chip-toggle { flex: none; position: relative; cursor: pointer; }
+.chip-toggle input { position: absolute; opacity: 0; width: 100%; height: 100%; inset: 0; margin: 0; cursor: pointer; }
+.chip-toggle span {
+  display: inline-flex; align-items: center; min-height: 44px; padding: 0 var(--space-4);
+  border: 1px solid var(--border-strong); border-radius: 999px; background: var(--surface);
+  color: var(--text); font-size: .9375rem; white-space: nowrap;
+}
+.chip-toggle input:checked + span { background: var(--primary); border-color: var(--primary); color: var(--primary-contrast); font-weight: 600; }
+.chip-toggle input:checked + span::before { content: "\2713\00a0"; }
+.chip-toggle input:focus-visible + span { outline: 3px solid var(--focus); outline-offset: 2px; }
+.result-row { display: flex; align-items: center; justify-content: space-between; gap: var(--space-3); margin: var(--space-2) 0 var(--space-2); }
+.result-count { color: var(--muted); font-size: .9375rem; margin: 0; }
+.btn-small { min-height: 44px; padding: 0 var(--space-3); font-size: .875rem; }
 
 /* Buttons */
 .btn {
@@ -239,7 +249,8 @@ main { display: block; max-width: 1080px; margin: 0 auto; padding: var(--space-3
 .card summary { min-height: 44px; display: flex; align-items: center; cursor: pointer; font-weight: 600; color: var(--primary); }
 .card details p { margin-bottom: var(--space-2); }
 .source-list { list-style: disc; padding-left: var(--space-5); }
-.source-list li { margin-bottom: var(--space-1); }
+.source-list li { margin-bottom: 0; }
+.source-list a { display: inline-flex; align-items: center; min-height: 44px; }
 .card-foot { margin-top: auto; display: grid; gap: var(--space-3); }
 .verified { font-size: .8125rem; color: var(--muted); }
 .status-row { display: flex; align-items: center; gap: var(--space-3); }
@@ -256,20 +267,29 @@ main { display: block; max-width: 1080px; margin: 0 auto; padding: var(--space-3
 .safety-card h3 { margin-bottom: var(--space-1); }
 
 /* Footer */
-.app-footer { max-width: 1080px; margin: 0 auto; padding: var(--space-4); color: var(--muted); font-size: .875rem; display: grid; gap: var(--space-1); }
+.app-footer { width: 100%; max-width: 1080px; margin: 0 auto; padding: var(--space-4) var(--space-4) calc(var(--nav-h) + var(--space-4)); color: var(--muted); font-size: .875rem; display: grid; gap: var(--space-1); }
 
 @media (min-width: 720px) {
-  body { padding-bottom: 0; }
-  .app-nav { position: static; border-top: 0; border-bottom: 1px solid var(--border); padding: 0 var(--space-4); }
+  :root { --nav-h: 0px; }
+  html { scroll-padding-bottom: 80px; }
+  body { display: flex; flex-direction: column; min-height: 100vh; }
+  .app-header { order: 1; padding-top: var(--space-4); }
+  .app-nav { order: 2; position: static; height: auto; border-top: 0; border-bottom: 1px solid var(--border); padding: 0 var(--space-4); }
+  main { order: 3; flex: 1 0 auto; padding: var(--space-5) var(--space-4); }
+  .app-footer { order: 4; padding-bottom: var(--space-4); }
+  .app-name { font-size: 1.5rem; }
+  .theme-text { position: static; width: auto; height: auto; overflow: visible; clip-path: none; }
   .app-nav ul { max-width: 1080px; margin: 0 auto; gap: var(--space-2); }
   .app-nav li { flex: none; }
-  .app-nav a { flex-direction: row; gap: var(--space-2); min-height: 48px; padding: 0 var(--space-4); font-size: .9375rem; box-shadow: none !important; border-bottom: 3px solid transparent; }
+  .app-nav a { flex-direction: row; gap: var(--space-2); height: 48px; padding: 0 var(--space-4); font-size: .9375rem; box-shadow: none !important; border-bottom: 3px solid transparent; }
   .app-nav a[aria-current="page"] { border-bottom-color: var(--primary); }
   .nav-icon { font-size: 1rem; }
-  main { padding: var(--space-5) var(--space-4); }
-  .field-row { grid-template-columns: 1fr 1fr; }
+  .filters { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--space-4); box-shadow: var(--shadow); gap: var(--space-3); grid-template-columns: 2fr 1fr 1fr; align-items: end; }
+  .filters .checks, .filters .field-row-wrap { grid-column: 1 / -1; }
+  .field-row { display: contents; }
   .card-grid { grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); }
   .safety-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .promise { font-size: 1rem; }
 }
 @media (min-width: 1000px) {
   .safety-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
@@ -364,28 +384,16 @@ main { display: block; max-width: 1080px; margin: 0 auto; padding: var(--space-3
 <a class="skip-link" href="#main">Skip to content</a>
 <header class="app-header">
   <div class="header-inner">
-    <div class="brand">
-      <h1 class="app-name">Baby Freebies Finder</h1>
-      <p class="promise">Legit US sign-ups for free baby stuff. Official links only. Your details never leave this device.</p>
-    </div>
-    <button type="button" id="theme-toggle" class="theme-toggle" aria-label="Theme: System. Tap to change.">Theme: System</button>
+    <h1 class="app-name">Baby Freebies Finder</h1>
+    <button type="button" id="theme-toggle" class="theme-toggle" aria-label="Theme: System. Tap to switch to Light."><span class="theme-icon" aria-hidden="true">&#9680;</span><span class="theme-text" aria-hidden="true">Theme: System</span></button>
   </div>
   <p id="storage-notice" class="notice" role="status" hidden></p>
 </header>
 
-<nav class="app-nav" aria-label="Main">
-  <ul>
-    <li><a href="#directory" data-view="directory"><span class="nav-icon" aria-hidden="true">&#9776;</span><span>Programs</span></a></li>
-    <li><a href="#info" data-view="info"><span class="nav-icon" aria-hidden="true">&#9998;</span><span>My info</span></a></li>
-    <li><a href="#tracker" data-view="tracker"><span class="nav-icon" aria-hidden="true">&#10003;</span><span>Tracker</span></a></li>
-    <li><a href="#guided" data-view="guided"><span class="nav-icon" aria-hidden="true">&#9654;</span><span>Do it for me</span></a></li>
-    <li><a href="#safety" data-view="safety"><span class="nav-icon" aria-hidden="true">&#9888;</span><span>Spot a fake</span></a></li>
-  </ul>
-</nav>
-
-<main id="main">
+<main id="main" tabindex="-1">
   <section id="view-directory" class="view" aria-labelledby="h-directory" hidden>
     <h2 id="h-directory" tabindex="-1">Free baby programs</h2>
+    <p class="promise">Legit US sign-ups for free baby stuff. Official links only. Your details never leave this device.</p>
   </section>
 
   <section id="view-info" class="view" aria-labelledby="h-info" hidden>
@@ -443,6 +451,16 @@ main { display: block; max-width: 1080px; margin: 0 auto; padding: var(--space-3
     </div>
   </section>
 </main>
+
+<nav class="app-nav" aria-label="Main">
+  <ul>
+    <li><a href="#directory" data-view="directory"><span class="nav-icon" aria-hidden="true">&#9776;</span><span>Programs</span></a></li>
+    <li><a href="#info" data-view="info"><span class="nav-icon" aria-hidden="true">&#9998;</span><span>My info</span></a></li>
+    <li><a href="#tracker" data-view="tracker"><span class="nav-icon" aria-hidden="true">&#10003;</span><span>Tracker</span></a></li>
+    <li><a href="#guided" data-view="guided"><span class="nav-icon" aria-hidden="true">&#9654;</span><span>Do it for me</span></a></li>
+    <li><a href="#safety" data-view="safety"><span class="nav-icon" aria-hidden="true">&#9888;</span><span>Spot a fake</span></a></li>
+  </ul>
+</nav>
 
 <footer class="app-footer">
   <p>Program data last checked on <span id="last-checked">recently</span>. Offers change, so confirm details on the official page before you sign up.</p>
@@ -550,6 +568,12 @@ main { display: block; max-width: 1080px; margin: 0 auto; padding: var(--space-3
         var x = a.verifiedOn || '', y = b.verifiedOn || '';
         return x === y ? byName(a, b) : x < y ? 1 : -1;
       };
+    } else if (key === 'recommended') {
+      cmp = function (a, b) {
+        return (guidedDefault(a) ? 0 : 1) - (guidedDefault(b) ? 0 : 1) ||
+          (isEmailOnly(a) ? 0 : 1) - (isEmailOnly(b) ? 0 : 1) ||
+          confRank(a) - confRank(b) || catIndex(a) - catIndex(b) || byName(a, b);
+      };
     } else if (key === 'category') {
       cmp = function (a, b) { return catIndex(a) - catIndex(b) || byName(a, b); };
     } else if (key === 'confidence') {
@@ -607,16 +631,33 @@ main { display: block; max-width: 1080px; margin: 0 auto; padding: var(--space-3
   } catch (e) {
     ls = null;
   }
+  var has = function (o, k) { return Object.prototype.hasOwnProperty.call(o, k); };
+
+  // After any failed write, copy everything stored so far into memory and serve reads from
+  // memory from then on, so the app never shows stale data or reports a false success.
+  function fail() {
+    var was = store.persistent;
+    if (ls) {
+      try {
+        for (var i = 0; i < ls.length; i++) {
+          var k = ls.key(i);
+          if (k && k.indexOf(PREFIX) === 0 && !has(mem, k.slice(PREFIX.length))) mem[k.slice(PREFIX.length)] = ls.getItem(k);
+        }
+      } catch (e) {}
+    }
+    store.persistent = false;
+    if (was) {
+      try { document.dispatchEvent(new CustomEvent('bff:storage-failed')); } catch (e) {}
+    }
+  }
 
   var store = {
     persistent: !!ls,
     get: function (key, fallback) {
       var raw = null;
-      try {
-        raw = ls ? ls.getItem(PREFIX + key) : Object.prototype.hasOwnProperty.call(mem, key) ? mem[key] : null;
-      } catch (e) {
-        raw = Object.prototype.hasOwnProperty.call(mem, key) ? mem[key] : null;
-      }
+      if (store.persistent) {
+        try { raw = ls.getItem(PREFIX + key); } catch (e) { fail(); raw = has(mem, key) ? mem[key] : null; }
+      } else raw = has(mem, key) ? mem[key] : null;
       if (raw === null || raw === undefined) return fallback;
       try {
         return JSON.parse(raw);
@@ -624,26 +665,25 @@ main { display: block; max-width: 1080px; margin: 0 auto; padding: var(--space-3
         return fallback;
       }
     },
+    // Returns true only if the value reached localStorage.
     set: function (key, value) {
       var raw = JSON.stringify(value);
       mem[key] = raw;
-      if (ls) {
-        try {
-          ls.setItem(PREFIX + key, raw);
-          return true;
-        } catch (e) {
-          store.persistent = false;
-        }
+      if (!store.persistent) return false;
+      try {
+        ls.setItem(PREFIX + key, raw);
+        return true;
+      } catch (e) {
+        fail();
+        return false;
       }
-      return false;
     },
     remove: function (key) {
       delete mem[key];
-      if (ls) {
-        try {
-          ls.removeItem(PREFIX + key);
-        } catch (e) {}
+      if (ls && store.persistent) {
+        try { ls.removeItem(PREFIX + key); } catch (e) { fail(); }
       }
+      return store.persistent;
     }
   };
   BFF.store = store;
@@ -660,6 +700,68 @@ main { display: block; max-width: 1080px; margin: 0 auto; padding: var(--space-3
   }
   BFF.programs = programs;
   BFF.views = BFF.views || {};
+
+  // ---- shared helpers for my views ----
+  var MONTHS = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'];
+  function pad(n) { return (n < 10 ? '0' : '') + n; }
+  function iso(y, m, d) {
+    if (m < 1 || m > 12 || d < 1 || y < 1900 || y > 2100) return '';
+    var dim = [31, (y % 4 === 0 && (y % 100 !== 0 || y % 400 === 0)) ? 29 : 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31][m - 1];
+    return d > dim ? '' : y + '-' + pad(m) + '-' + pad(d);
+  }
+  // Returns YYYY-MM-DD or '' if the text is not a recognisable date. Never uses new Date(string).
+  function normalizeDate(s) {
+    s = String(s || '').trim();
+    var m;
+    if ((m = /^(\d{4})-(\d{1,2})-(\d{1,2})$/.exec(s))) return iso(+m[1], +m[2], +m[3]);
+    if ((m = /^(\d{1,2})[\/.-](\d{1,2})[\/.-](\d{4}|\d{2})$/.exec(s))) return iso(m[3].length === 2 ? 2000 + +m[3] : +m[3], +m[1], +m[2]);
+    if ((m = /^([A-Za-z]{3,9})\.?\s+(\d{1,2})(?:st|nd|rd|th)?,?\s+(\d{4})$/.exec(s))) {
+      var mi = MONTHS.indexOf(m[1].slice(0, 3).toLowerCase());
+      return mi < 0 ? '' : iso(+m[3], mi + 1, +m[2]);
+    }
+    return '';
+  }
+  BFF.util = { normalizeDate: normalizeDate };
+
+  // Inline confirm panel (window.confirm can be blocked in sandboxed iframes).
+  var openPanel = null;
+  function closePanel(returnTo) {
+    if (openPanel) { openPanel.remove(); openPanel = null; }
+    if (returnTo && returnTo.isConnected && returnTo.focus) returnTo.focus();
+  }
+  BFF.ui = {
+    // opts: {after: element to insert the panel after, message, confirmLabel, onConfirm, onCancel, returnTo}
+    confirm: function (opts) {
+      closePanel();
+      var panel = document.createElement('div');
+      panel.className = 'fx-confirm';
+      panel.setAttribute('role', 'alertdialog');
+      panel.setAttribute('aria-label', 'Please confirm');
+      var msg = document.createElement('p');
+      msg.className = 'fx-confirm-msg';
+      msg.tabIndex = -1;
+      msg.textContent = opts.message;
+      panel.setAttribute('aria-describedby', 'fx-confirm-msg');
+      msg.id = 'fx-confirm-msg';
+      var row = document.createElement('div');
+      row.className = 'fx-actions';
+      var ok = document.createElement('button');
+      ok.type = 'button'; ok.className = 'fx-btn fx-btn--primary'; ok.textContent = opts.confirmLabel || 'Confirm';
+      var no = document.createElement('button');
+      no.type = 'button'; no.className = 'fx-btn'; no.textContent = 'Cancel';
+      row.appendChild(ok); row.appendChild(no);
+      panel.appendChild(msg); panel.appendChild(row);
+      ok.addEventListener('click', function () { closePanel(opts.returnTo); if (opts.onConfirm) opts.onConfirm(); });
+      no.addEventListener('click', function () { closePanel(opts.returnTo); if (opts.onCancel) opts.onCancel(); });
+      panel.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') { e.preventDefault(); no.click(); }
+      });
+      opts.after.parentNode.insertBefore(panel, opts.after.nextSibling);
+      openPanel = panel;
+      msg.focus();
+    },
+    closeConfirm: closePanel
+  };
 })();
 (function () {
   'use strict';
@@ -671,6 +773,8 @@ main { display: block; max-width: 1080px; margin: 0 auto; padding: var(--space-3
   var LABELS = { todo: 'To do', 'signed-up': 'Signed up', received: 'Received', skipped: 'Skipped' };
   var APP = 'baby-freebies-finder';
   var KEY = 'tracker.v1';
+  var MAX_BYTES = 1024 * 1024, MAX_ENTRIES = 5000, MAX_NOTE = 2000, MAX_FIELD = 200;
+  var PROFILE_KEYS = ['firstName', 'lastName', 'email', 'phone', 'address1', 'address2', 'city', 'state', 'zip', 'dueDate'];
   var has = function (o, k) { return Object.prototype.hasOwnProperty.call(o, k); };
 
   function emit(id) {
@@ -693,6 +797,7 @@ main { display: block; max-width: 1080px; margin: 0 auto; padding: var(--space-3
   // ---- pure helpers (also used by tests) ----
   function parseBackup(text) {
     var data;
+    if (typeof text !== 'string' || text.length > MAX_BYTES) throw new Error('That file is too large to be a backup (the limit is 1 MB).');
     try { data = JSON.parse(text); } catch (e) { throw new Error('That file is not valid JSON, so it cannot be a backup.'); }
     if (!data || typeof data !== 'object' || Array.isArray(data)) throw new Error('That file is not a Baby Freebies Finder backup.');
     if (data.app !== APP) throw new Error('That file is not a Baby Freebies Finder backup (wrong app name).');
@@ -700,21 +805,24 @@ main { display: block; max-width: 1080px; margin: 0 auto; padding: var(--space-3
     var t = data.tracker;
     if (!t || typeof t !== 'object' || Array.isArray(t)) throw new Error('The backup has no tracker section.');
     var clean = {};
-    Object.keys(t).forEach(function (id) {
+    var ids = Object.keys(t).filter(function (id) { return id !== '__proto__' && id !== 'constructor' && id !== 'prototype'; });
+    if (ids.length > MAX_ENTRIES) throw new Error('This backup has too many entries (' + ids.length + '; the limit is ' + MAX_ENTRIES + ').');
+    ids.forEach(function (id) {
       var e = t[id];
       if (!e || typeof e !== 'object') throw new Error('Entry "' + id + '" is malformed.');
       if (STATUSES.indexOf(e.status) < 0) throw new Error('Entry "' + id + '" has an unknown status.');
       if (e.note !== undefined && typeof e.note !== 'string') throw new Error('Entry "' + id + '" has a note that is not text.');
       if (e.updatedAt !== undefined && typeof e.updatedAt !== 'string') throw new Error('Entry "' + id + '" has a bad date.');
-      clean[id] = { status: e.status, note: e.note || '', updatedAt: e.updatedAt || '' };
+      clean[id] = { status: e.status, note: (e.note || '').slice(0, MAX_NOTE), updatedAt: (e.updatedAt || '').slice(0, 40) };
     });
     var profile = null;
     if (data.profile !== undefined && data.profile !== null) {
       if (typeof data.profile !== 'object' || Array.isArray(data.profile)) throw new Error('The profile section is malformed.');
       profile = {};
-      Object.keys(data.profile).forEach(function (k) {
-        if (typeof data.profile[k] === 'string') profile[k] = data.profile[k];
+      PROFILE_KEYS.forEach(function (k) {
+        if (typeof data.profile[k] === 'string') profile[k] = data.profile[k].slice(0, MAX_FIELD);
       });
+      if (profile.dueDate) profile.dueDate = BFF.util.normalizeDate(profile.dueDate);
     }
     return { tracker: clean, profile: profile };
   }
@@ -722,6 +830,7 @@ main { display: block; max-width: 1080px; margin: 0 auto; padding: var(--space-3
   // Merge parsed.tracker into a copy of current. Newer updatedAt wins; ties keep current.
   function mergeImport(current, parsed) {
     var next = {};
+    if (Object.keys(current).length > MAX_ENTRIES * 2) throw new Error('Too many saved entries to merge.');
     Object.keys(current).forEach(function (k) { next[k] = current[k]; });
     var imported = 0, skipped = 0;
     Object.keys(parsed.tracker).forEach(function (id) {
@@ -751,12 +860,13 @@ main { display: block; max-width: 1080px; margin: 0 auto; padding: var(--space-3
       return STATUSES.indexOf(st) >= 0 ? st : 'todo';
     },
     setStatus: function (id, status) {
-      if (STATUSES.indexOf(status) < 0) return;
+      if (STATUSES.indexOf(status) < 0) return false;
       var s = state();
       var e = entryOf(s, id);
       s[id] = { status: status, note: e.note || '', updatedAt: new Date().toISOString() };
-      store.set(KEY, s);
+      var ok = store.set(KEY, s);
       emit(id);
+      return ok;
     },
     getNote: function (id) {
       return entryOf(state(), id).note || '';
@@ -765,8 +875,9 @@ main { display: block; max-width: 1080px; margin: 0 auto; padding: var(--space-3
       var s = state();
       var e = entryOf(s, id);
       s[id] = { status: e.status || 'todo', note: String(text), updatedAt: new Date().toISOString() };
-      store.set(KEY, s);
+      var ok = store.set(KEY, s);
       emit(id);
+      return ok;
     },
     all: function () {
       return state();
@@ -782,8 +893,9 @@ main { display: block; max-width: 1080px; margin: 0 auto; padding: var(--space-3
       return c;
     },
     reset: function () {
-      store.remove(KEY);
+      var ok = store.remove(KEY);
       emit(null);
+      return ok;
     },
     exportJSON: function (opts) {
       var profile = opts && opts.includeProfile ? store.get('profile.v1', {}) : null;
@@ -801,18 +913,18 @@ main { display: block; max-width: 1080px; margin: 0 auto; padding: var(--space-3
     importJSON: function (text) {
       var parsed = parseBackup(text);
       var m = mergeImport(state(), parsed);
-      store.set(KEY, m.state);
+      var saved = store.set(KEY, m.state);
       if (parsed.profile) {
         // Only fill blanks; never overwrite details already on this device.
         var cur = store.get('profile.v1', {}) || {};
         Object.keys(parsed.profile).forEach(function (k) {
           if (!cur[k] && parsed.profile[k]) cur[k] = parsed.profile[k];
         });
-        store.set('profile.v1', cur);
+        saved = store.set('profile.v1', cur) && saved;
         try { document.dispatchEvent(new CustomEvent('bff:profile-changed')); } catch (e) {}
       }
       emit(null);
-      return { imported: m.imported, skipped: m.skipped };
+      return { imported: m.imported, skipped: m.skipped, saved: saved };
     },
     _parseBackup: parseBackup,
     _mergeImport: mergeImport,
@@ -836,10 +948,10 @@ main { display: block; max-width: 1080px; margin: 0 auto; padding: var(--space-3
     var d = new Date();
     return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate());
   }
-
-  var view = { rows: {}, filter: 'all' };
-
   function plural(n, w) { return n + ' ' + (n === 1 ? w : w.replace(/y$/, 'ie') + 's'); }
+  var SAVE_FAIL = 'Could not save on this device (storage is full or blocked). Your changes are kept only until you close this page.';
+
+  var view = { rows: {}, filter: 'all', flushers: [] };
 
   function updateSummary() {
     if (!view.bar) return;
@@ -850,21 +962,34 @@ main { display: block; max-width: 1080px; margin: 0 auto; padding: var(--space-3
     view.bar.setAttribute('aria-label', c.done + ' of ' + c.active + ' programs done');
     STATUSES.forEach(function (st) { view.countEls[st].textContent = c[st]; });
     view.empty.hidden = !!(BFF.programs && BFF.programs.length);
+    view.storeWarn.hidden = store.persistent;
   }
 
   function applyFilter() {
     var shown = 0;
-    (BFF.programs || []).forEach(function (p) {
+    var active = document.activeElement, moved = null;
+    var list = BFF.programs || [];
+    list.forEach(function (p) {
       var r = view.rows[p.id];
       if (!r) return;
       var ok = view.filter === 'all' || tracker.getStatus(p.id) === view.filter;
+      if (!ok && !r.el.hidden && active && r.el.contains(active)) moved = p;
       r.el.hidden = !ok;
       if (ok) shown++;
     });
-    view.none.hidden = shown > 0 || !(BFF.programs || []).length;
+    view.none.hidden = shown > 0 || !list.length;
     Array.prototype.forEach.call(view.tabs, function (b) {
       b.setAttribute('aria-pressed', b.getAttribute('data-filter') === view.filter ? 'true' : 'false');
     });
+    if (moved) {
+      // The row with focus just left this filter: hand focus to the next visible row.
+      var idx = list.indexOf(moved), target = null, i;
+      for (i = idx + 1; i < list.length && !target; i++) if (!view.rows[list[i].id].el.hidden) target = view.rows[list[i].id].select;
+      for (i = idx - 1; i >= 0 && !target; i--) if (!view.rows[list[i].id].el.hidden) target = view.rows[list[i].id].select;
+      if (!target) target = view.tabs[STATUSES.indexOf(view.filter) + 1];
+      if (target) target.focus();
+      view.live.textContent = moved.name + ' moved to ' + LABELS[tracker.getStatus(moved.id)] + '.';
+    }
   }
 
   function syncRow(id, force) {
@@ -889,25 +1014,33 @@ main { display: block; max-width: 1080px; margin: 0 auto; padding: var(--space-3
         h('div', { class: 'fx-trk-name' }, [h('strong', { text: p.name }), h('span', { class: 'fx-muted', text: p.brand || '' })]),
         link
       ]),
-      h('div', { class: 'fx-field' }, [h('label', { 'for': sid, text: 'Status' }), select]),
-      h('div', { class: 'fx-field' }, [h('label', { 'for': nid, text: 'Notes' }), note, hint])
+      h('div', { class: 'fx-field' }, [h('label', { 'for': sid, text: 'Status for ' + p.name }), select]),
+      h('div', { class: 'fx-field' }, [h('label', { 'for': nid, text: 'Notes for ' + p.name }), note, hint])
     ]);
     var timer = null;
     function flush() {
       if (timer === null) return;
       clearTimeout(timer);
       timer = null;
-      tracker.setNote(id, note.value);
-      hint.textContent = 'Saved';
-      setTimeout(function () { if (hint.textContent === 'Saved') hint.textContent = ''; }, 1500);
+      if (tracker.setNote(id, note.value)) {
+        hint.className = 'fx-saved';
+        hint.textContent = 'Saved';
+        setTimeout(function () { if (hint.textContent === 'Saved') hint.textContent = ''; }, 1500);
+      } else {
+        hint.className = 'fx-hint';
+        hint.textContent = SAVE_FAIL;
+      }
     }
+    view.flushers.push(flush);
     note.addEventListener('input', function () {
       hint.textContent = '';
       if (timer !== null) clearTimeout(timer);
       timer = setTimeout(flush, 500);
     });
     note.addEventListener('blur', flush);
-    select.addEventListener('change', function () { tracker.setStatus(id, select.value); });
+    select.addEventListener('change', function () {
+      if (!tracker.setStatus(id, select.value)) view.msg.textContent = SAVE_FAIL;
+    });
     view.rows[id] = { el: el, select: select, note: note };
     return el;
   }
@@ -926,9 +1059,8 @@ main { display: block; max-width: 1080px; margin: 0 auto; padding: var(--space-3
 
   view.init = function (el) {
     view.el = el;
-    el.textContent = '';
-    if (!el.querySelector('h2')) el.appendChild(h('h2', { tabindex: '-1', text: 'Tracker' }));
     el.classList.add('fx-view');
+    if (!el.querySelector('h2')) el.appendChild(h('h2', { tabindex: '-1', text: 'Tracker' }));
 
     view.bar = h('progress', { class: 'fx-progress', value: '0', max: '1' });
     view.barText = h('p', { class: 'fx-progress-text' });
@@ -940,7 +1072,13 @@ main { display: block; max-width: 1080px; margin: 0 auto; padding: var(--space-3
       counts.appendChild(h('li', {}, [n, h('span', { text: ' ' + LABELS[st] })]));
     });
     view.empty = h('p', { class: 'fx-muted', text: 'No programs loaded.', hidden: '' });
+    view.storeWarn = h('p', { class: 'fx-warn', role: 'alert', text: 'This browser is not saving data. ' + SAVE_FAIL, hidden: '' });
+    view.live = h('div', { class: 'fx-sr', role: 'status', 'aria-live': 'polite' });
+    view.msg = h('p', { class: 'fx-hint', role: 'alert' });
     el.appendChild(h('div', { class: 'fx-card' }, [view.barText, view.bar, counts, view.empty]));
+    el.appendChild(view.storeWarn);
+    el.appendChild(view.msg);
+    el.appendChild(view.live);
 
     var bar = h('div', { class: 'fx-tabs', role: 'group', 'aria-label': 'Filter by status' });
     [['all', 'All']].concat(STATUSES.map(function (s) { return [s, LABELS[s]]; })).forEach(function (f) {
@@ -970,44 +1108,53 @@ main { display: block; max-width: 1080px; margin: 0 auto; padding: var(--space-3
       } catch (e) { msg.textContent = 'Could not create the backup: ' + e.message; }
     });
     var file = h('input', { type: 'file', id: 'trk-restore', accept: 'application/json,.json', class: 'fx-file' });
+    var actions1 = h('div', { class: 'fx-actions' }, [dl]);
     file.addEventListener('change', function () {
       var f = file.files && file.files[0];
       if (!f) return;
+      if (f.size > MAX_BYTES) { msg.textContent = 'Restore failed: that file is too large to be a backup (the limit is 1 MB).'; file.value = ''; return; }
       var fr = new FileReader();
       fr.onerror = function () { msg.textContent = 'Could not read that file.'; };
       fr.onload = function () {
-        try {
-          var text = String(fr.result);
-          var a = tracker.analyzeImport(text);
-          var q = 'Restore from "' + f.name + '"?\n\n' + plural(a.imported, 'program entry') + ' will be added or updated (newer changes win).\n' +
-            plural(a.skipped, 'entry') + ' will be left as they are because yours are newer.' +
-            (a.unknown ? '\n' + plural(a.unknown, 'entry') + ' for programs not in this version will be kept.' : '') +
-            (a.hasProfile ? '\nMy info in the file will fill in blank fields only.' : '');
-          if (!window.confirm(q)) { msg.textContent = 'Restore cancelled. Nothing changed.'; }
-          else {
-            var r = tracker.importJSON(text);
-            msg.textContent = 'Restored: ' + plural(r.imported, 'entry') + ' imported, ' + r.skipped + ' skipped.';
-          }
-        } catch (e) { msg.textContent = 'Restore failed: ' + e.message; }
-        file.value = '';
+        var text = String(fr.result), a;
+        try { a = tracker.analyzeImport(text); } catch (e) { msg.textContent = 'Restore failed: ' + e.message; file.value = ''; return; }
+        var q = 'Restore from "' + f.name + '"? ' + plural(a.imported, 'program entry') + ' will be added or updated (newer changes win). ' +
+          plural(a.skipped, 'entry') + ' will be left as they are because yours are newer.' +
+          (a.unknown ? ' ' + plural(a.unknown, 'entry') + ' for programs not in this version will be kept.' : '') +
+          (a.hasProfile ? ' My info in the file will fill in blank fields only.' : '');
+        msg.textContent = '';
+        BFF.ui.confirm({
+          after: file.parentNode, message: q, confirmLabel: 'Restore', returnTo: file,
+          onConfirm: function () {
+            try {
+              var r = tracker.importJSON(text);
+              msg.textContent = (r.saved ? 'Restored: ' : 'Restored for this visit only, but it could not be saved on this device: ') + plural(r.imported, 'entry') + ' imported, ' + r.skipped + ' skipped.';
+            } catch (e) { msg.textContent = 'Restore failed: ' + e.message; }
+            file.value = '';
+          },
+          onCancel: function () { msg.textContent = 'Restore cancelled. Nothing changed.'; file.value = ''; }
+        });
       };
       fr.readAsText(f);
     });
     var reset = h('button', { type: 'button', class: 'fx-btn fx-btn--danger', text: 'Reset tracker' });
+    var actions2 = h('div', { class: 'fx-actions' }, [reset]);
     reset.addEventListener('click', function () {
-      if (window.confirm('Reset the tracker? All statuses and notes on this device will be cleared. My info is not affected.')) {
-        tracker.reset();
-        msg.textContent = 'Tracker reset.';
-      }
+      BFF.ui.confirm({
+        after: actions2, confirmLabel: 'Reset tracker', returnTo: reset,
+        message: 'Reset the tracker? All statuses and notes on this device will be cleared. My info is not affected.',
+        onConfirm: function () { msg.textContent = tracker.reset() ? 'Tracker reset.' : 'Tracker reset for this visit, but the change could not be saved on this device.'; },
+        onCancel: function () { msg.textContent = 'Reset cancelled.'; }
+      });
     });
     el.appendChild(h('section', { class: 'fx-card', 'aria-labelledby': 'trk-backup-h' }, [
       h('h3', { id: 'trk-backup-h', text: 'Backup' }),
       h('p', { class: 'fx-muted', text: 'Your tracker lives only in this browser. Download a file to keep a copy or move to another device.' }),
       h('div', { class: 'fx-check' }, [inc, h('label', { 'for': 'trk-inc-profile', text: 'Include My info in the backup' })]),
       warn,
-      h('div', { class: 'fx-actions' }, [dl]),
+      actions1,
       h('div', { class: 'fx-field' }, [h('label', { 'for': 'trk-restore', text: 'Restore from backup' }), file]),
-      h('div', { class: 'fx-actions' }, [reset]),
+      actions2,
       msg
     ]));
 
@@ -1018,11 +1165,16 @@ main { display: block; max-width: 1080px; margin: 0 auto; padding: var(--space-3
       updateSummary();
       applyFilter();
     });
+    document.addEventListener('bff:storage-failed', updateSummary);
+    function flushAll() { view.flushers.forEach(function (f) { f(); }); }
+    window.addEventListener('pagehide', flushAll);
+    document.addEventListener('visibilitychange', function () { if (document.visibilityState === 'hidden') flushAll(); });
     updateSummary();
     applyFilter();
   };
   view.show = function () {
     (BFF.programs || []).forEach(function (p) { syncRow(p.id); });
+    view.msg.textContent = '';
     updateSummary();
     applyFilter();
   };
@@ -1156,8 +1308,9 @@ main { display: block; max-width: 1080px; margin: 0 auto; padding: var(--space-3
   BFF.views = BFF.views || {};
 
   var L = BFF.logic;
-  var DEFAULTS = { query: '', category: '', trulyFree: false, emailOnly: false, needsRegistry: false, sort: 'name' };
+  var DEFAULTS = { query: '', category: '', trulyFree: false, emailOnly: false, needsRegistry: false, sort: 'recommended' };
   var SORTS = [
+    ['recommended', 'Recommended'],
     ['name', 'Name A-Z'],
     ['verified', 'Recently verified'],
     ['category', 'Category'],
@@ -1191,7 +1344,7 @@ main { display: block; max-width: 1080px; margin: 0 auto; padding: var(--space-3
       state.trulyFree = !!f.trulyFree;
       state.emailOnly = !!f.emailOnly;
       state.needsRegistry = !!f.needsRegistry;
-      state.sort = SORTS.some(function (s) { return s[0] === f.sort; }) ? f.sort : 'name';
+      state.sort = SORTS.some(function (s) { return s[0] === f.sort; }) ? f.sort : 'recommended';
     }
   }
   function savePrefs() {
@@ -1219,10 +1372,10 @@ main { display: block; max-width: 1080px; margin: 0 auto; padding: var(--space-3
       var input = h('input', { type: 'checkbox' });
       input.addEventListener('change', function () { state[key] = input.checked; savePrefs(); render(); });
       els[key] = input;
-      return h('label', { class: 'check' }, [input, h('span', { text: label })]);
+      return h('label', { class: 'chip-toggle' }, [input, h('span', { text: label })]);
     }
 
-    els.clear = h('button', { type: 'button', class: 'btn', text: 'Clear filters' });
+    els.clear = h('button', { type: 'button', class: 'btn btn-small', text: 'Clear filters' });
     els.clear.addEventListener('click', clearFilters);
 
     var timer = null;
@@ -1243,11 +1396,11 @@ main { display: block; max-width: 1080px; margin: 0 auto; padding: var(--space-3
         check('trulyFree', 'Truly free'),
         check('emailOnly', 'Email only'),
         check('needsRegistry', 'Needs a registry')
-      ]),
-      h('div', { class: 'filter-actions' }, [els.clear])
+      ])
     ]);
 
     els.count = h('p', { class: 'result-count', 'aria-live': 'polite', 'aria-atomic': 'true' });
+    var resultRow = h('div', { class: 'result-row' }, [els.count, els.clear]);
     els.list = h('div', { class: 'card-grid' });
     els.empty = h('div', { class: 'empty', hidden: true }, [
       h('p', { text: 'No programs match those filters.' })
@@ -1257,7 +1410,7 @@ main { display: block; max-width: 1080px; margin: 0 auto; padding: var(--space-3
     els.empty.appendChild(emptyClear);
 
     root.appendChild(filters);
-    root.appendChild(els.count);
+    root.appendChild(resultRow);
     root.appendChild(els.list);
     root.appendChild(els.empty);
   }
@@ -1325,20 +1478,27 @@ main { display: block; max-width: 1080px; margin: 0 auto; padding: var(--space-3
       if (p.notes) d.push(h('p', { text: p.notes }));
       if (sources.length) {
         d.push(h('ul', { class: 'source-list' }, sources.map(function (u) {
-          return h('li', null, [h('a', { href: u, target: '_blank', rel: 'noopener noreferrer', text: L.domainOf(u) + ' page' + ' ↗' })]);
+          return h('li', null, [h('a', { href: u, target: '_blank', rel: 'noopener noreferrer' }, [
+            document.createTextNode(L.domainOf(u) + ' page '),
+            h('span', { class: 'visually-hidden', text: '(opens in a new tab)' }),
+            h('span', { 'aria-hidden': 'true', text: '\u2197' })
+          ])]);
         })));
       }
       kids.push(h('details', null, d));
     }
 
     var foot = [
-      h('a', { class: 'btn btn-primary', href: p.signupUrl, target: '_blank', rel: 'noopener noreferrer',
-        text: 'Sign up on ' + L.domainOf(p.signupUrl) + ' ↗' }),
+      h('a', { class: 'btn btn-primary', href: p.signupUrl, target: '_blank', rel: 'noopener noreferrer' }, [
+        document.createTextNode('Sign up on ' + L.domainOf(p.signupUrl) + ' '),
+        h('span', { class: 'visually-hidden', text: '(opens in a new tab)' }),
+        h('span', { 'aria-hidden': 'true', text: '\u2197' })
+      ]),
       h('p', { class: 'verified', text: 'Verified ' + (p.verifiedOn || 'date unknown') + ' · ' + (p.confidence || 'unknown') + ' confidence' })
     ];
     if (BFF.tracker) {
       var sid = 'st-' + p.id;
-      var sel = h('select', { id: sid, 'data-program-id': p.id }, STATUSES.map(function (s) { return h('option', { value: s[0], text: s[1] }); }));
+      var sel = h('select', { id: sid, 'data-program-id': p.id, 'aria-label': 'My status for ' + p.name }, STATUSES.map(function (s) { return h('option', { value: s[0], text: s[1] }); }));
       sel.value = BFF.tracker.getStatus(p.id) || 'todo';
       sel.addEventListener('change', function () { BFF.tracker.setStatus(p.id, sel.value); });
       foot.push(h('div', { class: 'status-row' }, [h('label', { for: sid, text: 'My status' }), sel]));
@@ -1734,6 +1894,7 @@ main { display: block; max-width: 1080px; margin: 0 auto; padding: var(--space-3
 
   var VIEWS = ['directory', 'info', 'tracker', 'guided', 'safety'];
   var THEMES = ['system', 'light', 'dark'];
+  var THEME_ICONS = { system: '\u25D0', light: '\u2600', dark: '\u263E' };
   var THEME_LABELS = { system: 'System', light: 'Light', dark: 'Dark' };
   var inited = {};
 
@@ -1755,15 +1916,21 @@ main { display: block; max-width: 1080px; margin: 0 auto; padding: var(--space-3
     if (t === 'system') root.removeAttribute('data-theme'); else root.setAttribute('data-theme', t);
     var btn = document.getElementById('theme-toggle');
     if (btn) {
-      btn.textContent = 'Theme: ' + THEME_LABELS[t];
+      var icon = btn.querySelector('.theme-icon'), txt = btn.querySelector('.theme-text');
+      if (icon) icon.textContent = THEME_ICONS[t];
+      if (txt) txt.textContent = 'Theme: ' + THEME_LABELS[t];
       var next = THEMES[(THEMES.indexOf(t) + 1) % THEMES.length];
       btn.setAttribute('aria-label', 'Theme: ' + THEME_LABELS[t] + '. Tap to switch to ' + THEME_LABELS[next] + '.');
     }
   }
 
+  var current = 'directory';
+  // Unknown hashes (e.g. #main) keep the current view instead of jumping to Programs.
   function currentView() {
     var name = (location.hash || '').replace(/^#/, '');
-    return VIEWS.indexOf(name) === -1 ? 'directory' : name;
+    if (VIEWS.indexOf(name) !== -1) current = name;
+    else if (!name) current = 'directory';
+    return current;
   }
 
   function guarded(fn, name) {
@@ -1816,6 +1983,13 @@ main { display: block; max-width: 1080px; margin: 0 auto; padding: var(--space-3
 
     lastChecked();
 
+    var skip = document.querySelector('.skip-link');
+    var main = document.getElementById('main');
+    if (skip && main) skip.addEventListener('click', function (e) {
+      e.preventDefault();
+      main.focus();
+    });
+
     VIEWS.forEach(function (v) {
       var el = document.getElementById('view-' + v);
       var view = BFF.views[v];
@@ -1823,6 +1997,12 @@ main { display: block; max-width: 1080px; margin: 0 auto; padding: var(--space-3
         inited[v] = true;
         guarded(function () { view.init(el); }, v);
       }
+    });
+
+    VIEWS.forEach(function (v) {
+      var sec = document.getElementById('view-' + v);
+      var ref = sec && sec.getAttribute('aria-labelledby');
+      if (ref && !document.getElementById(ref) && window.console) console.warn('view-' + v + ': missing heading #' + ref);
     });
 
     window.addEventListener('hashchange', function () { route(true); });

@@ -51,7 +51,7 @@ Written as `(function (root) { … if (typeof module === 'object' && module.expo
 - `isEligibilityBased(p)`: category is `health-benefits` or `assistance`, or requirements include `eligibility` or `insurance`
 - `guidedDefault(p)`: `isTrulyFree(p) && !isEligibilityBased(p)`
 - `filterPrograms(list, {query, category, trulyFree, emailOnly, needsRegistry})`: case-insensitive query over name, brand, whatYouGet, notes and eligibility; `category` '' means all
-- `sortPrograms(list, key)`: key is `name` (A-Z), `verified` (newest `verifiedOn` first), `category` (CATEGORIES order, then name) or `confidence` (high, medium, low, then name). Returns a new array.
+- `sortPrograms(list, key)`: key is `recommended` (the directory default: `guidedDefault` first, then email-only first, then confidence high/medium/low, then CATEGORIES order, then name), `name` (A-Z), `verified` (newest `verifiedOn` first), `category` (CATEGORIES order, then name) or `confidence` (high, medium, low, then name). Returns a new array.
 - `domainOf(url)`: hostname without `www.`
 - `escapeHtml(s)`
 

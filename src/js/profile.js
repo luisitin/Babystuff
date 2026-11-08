@@ -37,7 +37,7 @@
     return n;
   }
 
-  var inputs = {}, hints = {}, statusEl = null, timer = null;
+  var inputs = {}, hints = {}, statusEl = null, timer = null, keptDue = '', dueHint = null;
 
   function read() {
     var p = store.get(KEY, {});
@@ -45,12 +45,22 @@
   }
   function validate(f) {
     var c = CHECKS[f.check], v = inputs[f.key].value.trim();
-    hints[f.key].textContent = c && v && !c.re.test(v) ? c.msg : '';
+    var bad = !!(c && v && !c.re.test(v));
+    hints[f.key].textContent = bad ? 'Check this: ' + c.msg : '';
+    if (bad) inputs[f.key].setAttribute('aria-invalid', 'true'); else inputs[f.key].removeAttribute('aria-invalid');
   }
   function fill() {
     var p = read();
     FIELDS.forEach(function (f) {
-      inputs[f.key].value = typeof p[f.key] === 'string' ? p[f.key] : '';
+      var v = typeof p[f.key] === 'string' ? p[f.key] : '';
+      if (f.key === 'dueDate') {
+        // Date inputs only hold YYYY-MM-DD. Convert other formats; keep anything unreadable untouched.
+        var n = BFF.util.normalizeDate(v);
+        keptDue = v && !n ? v : '';
+        v = n;
+        hints.dueDate.textContent = keptDue ? 'The saved date \u201c' + keptDue + '\u201d could not be read. It is kept until you pick a new date.' : '';
+      }
+      inputs[f.key].value = v;
       if (f.check) validate(f);
     });
   }
@@ -58,14 +68,15 @@
     timer = null;
     var p = {};
     FIELDS.forEach(function (f) { p[f.key] = inputs[f.key].value.trim(); });
-    store.set(KEY, p);
-    statusEl.textContent = store.persistent ? 'Saved on this device' : 'Saved for this visit only (this browser blocks storage)';
+    if (!p.dueDate && keptDue) p.dueDate = keptDue;
+    var ok = store.set(KEY, p);
+    statusEl.className = 'fx-saved fx-saved--block' + (ok ? '' : ' fx-hint');
+    statusEl.textContent = ok ? 'Saved on this device' : 'Could not save on this device (storage is full or blocked). Your info is kept only until you close this page.';
     try { document.dispatchEvent(new CustomEvent('bff:profile-changed')); } catch (e) {}
   }
 
   BFF.views.info = {
     init: function (el) {
-      el.textContent = '';
       el.classList.add('fx-view');
       if (!el.querySelector('h2')) el.appendChild(h('h2', { tabindex: '-1', text: 'My info' }));
       el.appendChild(h('p', { class: 'fx-note', text: 'Stored only in this browser on this device. This app has no server and makes no network requests, so your details never leave your device. Clearing your browser data deletes them.' }));
@@ -85,13 +96,15 @@
           if (f.key === 'zip') input.setAttribute('maxlength', '10');
           if (f.type === 'email') input.setAttribute('autocapitalize', 'off');
         }
-        var hint = h('span', { id: hid, class: 'fx-hint', role: 'status' });
+        var hint = h('span', { id: hid, class: 'fx-hint' });
         input.setAttribute('aria-describedby', hid);
         inputs[f.key] = input;
         hints[f.key] = hint;
         var evt = f.select || f.type === 'date' ? 'change' : 'input';
         input.addEventListener(evt, function () {
           if (f.check) validate(f);
+          if (f.key === 'dueDate' && input.value) { keptDue = ''; hint.textContent = ''; }
+          statusEl.className = 'fx-saved fx-saved--block';
           statusEl.textContent = 'Saving…';
           if (timer) clearTimeout(timer);
           timer = setTimeout(saveNow, 400);
@@ -103,17 +116,28 @@
 
       statusEl = h('p', { class: 'fx-saved fx-saved--block', role: 'status', 'aria-live': 'polite' });
       var clear = h('button', { type: 'button', class: 'fx-btn fx-btn--danger', text: 'Clear my info' });
+      var clearRow = h('div', { class: 'fx-actions' }, [clear]);
       clear.addEventListener('click', function () {
-        if (!window.confirm('Clear all of My info from this device? This cannot be undone.')) return;
-        if (timer) { clearTimeout(timer); timer = null; }
-        store.remove(KEY);
-        fill();
-        statusEl.textContent = 'Your info was cleared from this device.';
-        try { document.dispatchEvent(new CustomEvent('bff:profile-changed')); } catch (e) {}
+        BFF.ui.confirm({
+          after: clearRow, confirmLabel: 'Clear my info', returnTo: clear,
+          message: 'Clear all of My info from this device? This cannot be undone.',
+          onConfirm: function () {
+            if (timer) { clearTimeout(timer); timer = null; }
+            var ok = store.remove(KEY);
+            fill();
+            statusEl.className = 'fx-saved fx-saved--block' + (ok ? '' : ' fx-hint');
+            statusEl.textContent = ok ? 'Your info was cleared from this device.' : 'Cleared for this visit, but the change could not be saved on this device.';
+            try { document.dispatchEvent(new CustomEvent('bff:profile-changed')); } catch (e) {}
+          },
+          onCancel: function () { statusEl.textContent = 'Clear cancelled. Nothing changed.'; }
+        });
       });
-      el.appendChild(h('div', { class: 'fx-actions' }, [clear]));
+      el.appendChild(clearRow);
       el.appendChild(statusEl);
       fill();
+      function flush() { if (timer) { clearTimeout(timer); saveNow(); } }
+      window.addEventListener('pagehide', flush);
+      document.addEventListener('visibilitychange', function () { if (document.visibilityState === 'hidden') flush(); });
     },
     show: function () {
       if (!timer) fill();

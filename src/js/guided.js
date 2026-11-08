@@ -205,74 +205,96 @@
     render();
   }
 
+  var SAVE_FAIL = 'Could not save on this device (storage is full or blocked). Your progress is kept only until you close this page.';
+
   function renderRun() {
     var p = byId(run.ids[run.index]);
     body.textContent = '';
-    var top = h('div', { class: 'fx-run-top' }, [
-      h('p', { class: 'fx-run-count', text: (run.index + 1) + ' of ' + run.ids.length }),
-      h('progress', { class: 'fx-progress', value: String(run.index + 1), max: String(run.ids.length), 'aria-label': 'Program ' + (run.index + 1) + ' of ' + run.ids.length })
-    ]);
-    var so = h('button', { type: 'button', class: 'fx-btn fx-btn--link', text: 'Start over' });
-    so.addEventListener('click', startOver);
-    top.appendChild(so);
-    body.appendChild(top);
+    var st = T().getStatus(p.id);
+    var last = run.index === run.ids.length - 1;
 
+    // (a) progress + name
+    var next = h('button', { type: 'button', class: 'fx-btn fx-btn--link', text: last ? 'Finish ›' : 'Next ›' });
+    next.setAttribute('aria-label', last ? 'Finish without changing this program' : 'Next program without changing this one');
+    next.addEventListener('click', function () { go(1); });
+    body.appendChild(h('div', { class: 'fx-run-top' }, [
+      h('p', { class: 'fx-run-count', text: (run.index + 1) + ' of ' + run.ids.length }),
+      h('progress', { class: 'fx-progress', value: String(run.index + 1), max: String(run.ids.length), 'aria-label': 'Program ' + (run.index + 1) + ' of ' + run.ids.length }),
+      next
+    ]));
+    if (!store.persistent) body.appendChild(h('p', { class: 'fx-warn', role: 'alert', text: SAVE_FAIL }));
     var title = h('h3', { class: 'fx-run-title', tabindex: '-1', text: p.name });
     body.appendChild(title);
-    var st = T().getStatus(p.id);
-    body.appendChild(h('p', { class: 'fx-muted', text: p.brand + ' · Current status: ' + T().LABELS[st] }));
-    body.appendChild(h('p', { text: p.whatYouGet }));
-    if (p.requirements && p.requirements.length) {
-      var rl = BFF.logic && BFF.logic.REQUIREMENT_LABELS ? BFF.logic.REQUIREMENT_LABELS : {};
-      body.appendChild(h('p', { class: 'fx-reqs' }, [h('strong', { text: 'You will need: ' }),
-        document.createTextNode(p.requirements.map(function (r) { return rl[r] || r; }).join(', '))]));
-    }
-    if (p.catches) body.appendChild(h('div', { class: 'fx-warn' }, [h('strong', { text: 'Catches: ' }), document.createTextNode(p.catches)]));
+    body.appendChild(h('p', { class: 'fx-muted fx-tight', text: p.brand + ' · Status: ' + T().LABELS[st] }));
 
+    // (b) open button
     var open = h('button', { type: 'button', class: 'fx-btn fx-btn--primary fx-btn--big', text: 'Open sign-up page ↗' });
     open.addEventListener('click', function () { window.open(p.signupUrl, '_blank', 'noopener,noreferrer'); });
     body.appendChild(open);
-    body.appendChild(h('p', { class: 'fx-small' }, [document.createTextNode('Or use the plain link: '),
-      h('a', { href: p.signupUrl, target: '_blank', rel: 'noopener noreferrer', text: 'open the sign-up page' })]));
+    body.appendChild(h('p', { class: 'fx-small fx-tight' }, [document.createTextNode('Popup blocked? '),
+      h('a', { href: p.signupUrl, target: '_blank', rel: 'noopener noreferrer', text: 'Use the plain link' })]));
 
+    // (c) details
     var details = detailList(profile());
-    var dsec = h('section', { class: 'fx-card', 'aria-labelledby': 'gd-details-h' }, [h('h4', { id: 'gd-details-h', text: 'Your details' })]);
+    var dsec = h('section', { class: 'fx-card fx-card--tight', 'aria-labelledby': 'gd-details-h' }, [h('h4', { id: 'gd-details-h', text: 'Your details' })]);
     if (!details.length) {
       dsec.appendChild(h('p', { class: 'fx-muted' }, [document.createTextNode('Nothing saved yet. '), h('a', { href: '#info', text: 'Add My info' })]));
     } else {
-      var all = h('button', { type: 'button', class: 'fx-btn', text: 'Copy all' });
+      var all = h('button', { type: 'button', class: 'fx-btn fx-btn--small', text: 'Copy all' });
       all.addEventListener('click', function () {
         copy(details.map(function (d) { return d.label + ': ' + d.value; }).join('\n'), 'all details', all);
       });
       dsec.appendChild(all);
       var dl = h('ul', { class: 'fx-details' });
       details.forEach(function (d) {
-        var b = h('button', { type: 'button', class: 'fx-btn fx-btn--small', text: 'Copy' });
-        b.setAttribute('aria-label', 'Copy ' + d.label.toLowerCase());
+        var b = h('button', { type: 'button', class: 'fx-btn fx-btn--small', text: d.value });
+        b.setAttribute('aria-label', 'Copy ' + d.label.toLowerCase() + ': ' + d.value);
+        b.title = d.label;
         b.addEventListener('click', function () { copy(d.value, d.label.toLowerCase(), b); });
-        dl.appendChild(h('li', {}, [h('span', { class: 'fx-d-label', text: d.label }), h('span', { class: 'fx-d-value', text: d.value }), b]));
+        dl.appendChild(h('li', {}, [h('span', { class: 'fx-d-label', text: d.label }), b]));
       });
       dsec.appendChild(dl);
     }
     body.appendChild(dsec);
 
-    // Problem box
-    var pbox = h('div', { class: 'fx-card', hidden: '' });
+    // (d) catches line + about
+    if (p.catches) body.appendChild(h('p', { class: 'fx-warn fx-warn--line', text: 'Catches: ' + p.catches }));
+    var about = h('details', { class: 'fx-about' }, [h('summary', { text: 'About this program' }), h('p', { text: p.whatYouGet })]);
+    if (p.requirements && p.requirements.length) {
+      var rl = BFF.logic && BFF.logic.REQUIREMENT_LABELS ? BFF.logic.REQUIREMENT_LABELS : {};
+      about.appendChild(h('p', {}, [h('strong', { text: 'You will need: ' }), document.createTextNode(p.requirements.map(function (r) { return rl[r] || r; }).join(', '))]));
+    }
+    if (p.catches) about.appendChild(h('p', { class: 'fx-warn' }, [h('strong', { text: 'Catches: ' }), document.createTextNode(p.catches)]));
+    if (p.notes) about.appendChild(h('p', {}, [h('strong', { text: 'Notes: ' }), document.createTextNode(p.notes)]));
+    body.appendChild(about);
+    var so = h('button', { type: 'button', class: 'fx-btn fx-btn--link', text: 'Start over' });
+    so.addEventListener('click', startOver);
+    body.appendChild(so);
+
+    // (e) sticky action bar
+    var pbox = h('div', { class: 'fx-problem', hidden: '' });
     var pta = h('textarea', { class: 'fx-textarea', id: 'gd-problem', rows: '2', maxlength: '500' });
     var psave = h('button', { type: 'button', class: 'fx-btn', text: 'Save problem and go on' });
     pbox.appendChild(h('div', { class: 'fx-field' }, [h('label', { 'for': 'gd-problem', text: 'What went wrong? (short note)' }), pta]));
     pbox.appendChild(psave);
+    function saved(ok) { if (!ok) announce(SAVE_FAIL); }
     psave.addEventListener('click', function () {
       var txt = pta.value.trim() || 'could not finish';
       var old = T().getNote(p.id);
-      T().setNote(p.id, 'Problem: ' + txt + (old ? '\n' + old : ''));
+      saved(T().setNote(p.id, 'Problem: ' + txt + (old ? '\n' + old : '')));
       go(1);
     });
-
     var done = h('button', { type: 'button', class: 'fx-btn fx-btn--primary', text: 'Done' });
-    done.addEventListener('click', function () { T().setStatus(p.id, 'signed-up'); go(1); });
+    done.addEventListener('click', function () {
+      // Never downgrade: only todo or skipped programs become signed-up.
+      if (st === 'todo' || st === 'skipped') saved(T().setStatus(p.id, 'signed-up'));
+      go(1);
+    });
     var skip = h('button', { type: 'button', class: 'fx-btn', text: 'Skip' });
-    skip.addEventListener('click', function () { T().setStatus(p.id, 'skipped'); go(1); });
+    skip.addEventListener('click', function () {
+      if (st === 'todo') saved(T().setStatus(p.id, 'skipped'));
+      go(1);
+    });
     var prob = h('button', { type: 'button', class: 'fx-btn', text: 'Problem', 'aria-expanded': 'false' });
     prob.addEventListener('click', function () {
       pbox.hidden = !pbox.hidden;
@@ -282,12 +304,7 @@
     var back = h('button', { type: 'button', class: 'fx-btn', text: 'Back' });
     back.disabled = run.index === 0;
     back.addEventListener('click', function () { go(-1); });
-    var next = h('button', { type: 'button', class: 'fx-btn', text: run.index === run.ids.length - 1 ? 'Finish' : 'Next' });
-    next.addEventListener('click', function () { go(1); });
-
-    body.appendChild(h('div', { class: 'fx-actions' }, [done, skip, prob]));
-    body.appendChild(pbox);
-    body.appendChild(h('div', { class: 'fx-actions' }, [back, next]));
+    body.appendChild(h('div', { class: 'fx-actionbar fx-sticky' }, [pbox, h('div', { class: 'fx-actionbar-row' }, [done, skip, prob, back])]));
     if (focusHeading) title.focus();
   }
 
@@ -330,7 +347,6 @@
   BFF.views.guided = {
     init: function (root) {
       el = root;
-      el.textContent = '';
       el.classList.add('fx-view');
       if (!el.querySelector('h2')) el.appendChild(h('h2', { tabindex: '-1', text: 'Do it for me' }));
       live = h('div', { class: 'fx-sr', role: 'status', 'aria-live': 'polite' });
@@ -341,7 +357,6 @@
       render();
     },
     show: function () {
-      if (!run) initSelection();
       render();
     }
   };
