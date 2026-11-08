@@ -1,0 +1,154 @@
+[
+  {
+    "id": "amazon-baby-registry-welcome-box",
+    "name": "Baby Registry Welcome Box",
+    "brand": "Amazon",
+    "category": "registry-box",
+    "whatYouGet": "Welcome box of baby products. The box shows a $35 charge at first and becomes $0 only if you apply your $35 promotional balance at checkout.",
+    "costToClaim": "membership-required",
+    "costDetail": "Requires active Prime (Student Prime ok), a registry with 10 unique checklist items, and over $10 of registry purchases shipped.",
+    "requirements": [
+      "membership",
+      "registry",
+      "purchase"
+    ],
+    "eligibility": "Primary registry owner with an active Prime account; Amazon Business accounts do not qualify.",
+    "region": "US",
+    "signupUrl": "https://www.amazon.com/baby-reg/welcomebox",
+    "sourceUrls": [
+      "https://www.amazon.com/gp/help/customer/display.html?nodeId=GBLXVKVYG5SBG8HF",
+      "https://www.amazon.com/baby-reg/welcomebox",
+      "https://www.amazon.com/baby-reg/homepage"
+    ],
+    "verifiedOn": "2026-11-08",
+    "confidence": "medium",
+    "catches": "Tax, shipping, Prime and gift card purchases don't count toward the $10; box can't be claimed until qualifying items ship; contiguous US only (no APO, AK, HI, territories); 8-month wait between boxes; offer limited-time and may change.",
+    "notes": "Some older pages mention a 60% checklist completion rule; the help page says 10 items. Official site blocked fetching; entry based on official-domain search results."
+  },
+  {
+    "id": "target-registry-welcome-kit",
+    "name": "Registry Welcome Kit (Target Baby Box)",
+    "brand": "Target",
+    "category": "registry-box",
+    "whatYouGet": "Welcome kit described as worth over $100, a mix of samples and Target Circle Bonus offers.",
+    "costToClaim": "purchase-required",
+    "costDetail": "Help article lists: join Target Circle, create a baby registry, add 10 unique items, make a purchase over $10 from the registry. Shipping and handling fees apply.",
+    "requirements": [
+      "registry",
+      "purchase",
+      "membership",
+      "email"
+    ],
+    "eligibility": "Active baby registries created after 08/15/2023 that haven't claimed a previous kit; one kit per year.",
+    "region": "US",
+    "signupUrl": "https://www.target.com/gift-registry/create-baby-registry",
+    "sourceUrls": [
+      "https://www.target.com/help/article/000062588",
+      "https://www.target.com/p/registry-welcome-kit-target-baby-box-8482/-/A-1010751328",
+      "https://www.target.com/gift-registry/create-baby-registry"
+    ],
+    "verifiedOn": "2026-11-08",
+    "confidence": "medium",
+    "catches": "Offer is added to the Target Circle deal list and must be accepted; online only; shipping and handling fees apply; steps in the help article may predate the current offer.",
+    "notes": "Check the registry dashboard for the current requirements. Official site blocked fetching; entry based on official-domain search results."
+  },
+  {
+    "id": "walmart-baby-registry-welcome-box",
+    "name": "Baby Registry Welcome Box",
+    "brand": "Walmart",
+    "category": "registry-box",
+    "whatYouGet": "Free box with at least six sample-size baby or parenting products plus discount coupons; items vary.",
+    "costToClaim": "purchase-required",
+    "costDetail": "Registry at least 7 days old with 20+ unique items and over $25 purchased through your registry link; then use Redeem on the My Registry tab.",
+    "requirements": [
+      "registry",
+      "purchase",
+      "address"
+    ],
+    "eligibility": "Adults 18+ in the 50 states and Puerto Rico; one box per person or address per 365 days.",
+    "region": "US",
+    "signupUrl": "https://www.walmart.com/cp/baby-registry/1229485",
+    "sourceUrls": [
+      "https://www.walmart.com/cp/baby-registry/1229485",
+      "https://www.walmart.com/help/article/baby-registry-gift-box-offer/9cd45411397d425b8e88bc89583deb62",
+      "https://www.walmart.com/help/article/baby-registry-welcome-box-offer-terms-of-use/ab7999bd49bd4745abd355cfbf41d3e8"
+    ],
+    "verifiedOn": "2026-11-08",
+    "confidence": "medium",
+    "catches": "While supplies last; no guarantee everyone who completes the requirements receives a box; allow 10-12 weeks by mail; items marked purchased don't count toward the 20.",
+    "notes": "Walmart's pages also mention a Postpartum Care Mom Box; no separate free mom box was confirmed. Terms reference a relaunch for registries created after Feb 1, 2025. Official site blocked fetching; entry based on official-domain search results."
+  },
+  {
+    "id": "babylist-hello-baby-box",
+    "name": "Hello Baby Box",
+    "brand": "Babylist",
+    "category": "registry-box",
+    "whatYouGet": "Free welcome box of product samples and partner offers (diapers/wipes, bottles, skincare, coupons); contents vary.",
+    "costToClaim": "purchase-required",
+    "costDetail": "Add 3 items from other stores, complete 40% of the registry checklist, make a $30+ Babylist Shop purchase (a gifter may), and pay $8.95 plus tax shipping.",
+    "requirements": [
+      "registry",
+      "purchase",
+      "address",
+      "due-date"
+    ],
+    "eligibility": "Arrival date under 9 months away or baby under 4 weeks old; one box per household and per registry; US addresses.",
+    "region": "US",
+    "signupUrl": "https://www.babylist.com/hello-baby-box",
+    "sourceUrls": [
+      "https://help.babylist.com/hc/en-us/articles/360054057353-How-do-I-get-a-Hello-Baby-Box",
+      "https://help.babylist.com/hc/en-us/articles/360053264354-What-is-a-Hello-Baby-Box",
+      "https://www.babylist.com/hello-baby/whats-inside-babylist-hello-baby-box"
+    ],
+    "verifiedOn": "2026-11-08",
+    "confidence": "medium",
+    "catches": "Shipping fee is non-refundable and orders can't be changed; AK/HI total shipping $18.95; gift cards and return credit can't pay the fee; Babylist Health and other retailer orders don't count toward the $30.",
+    "notes": "Babylist's marketing FAQ says one box per household per year; the help center rules differ slightly. Official site blocked fetching; entry based on official-domain search results."
+  },
+  {
+    "id": "macrobaby-gift-box",
+    "name": "MacroBaby Gift Box",
+    "brand": "MacroBaby",
+    "category": "registry-box",
+    "whatYouGet": "Random, seasonal gift box valued at about $80 or more.",
+    "costToClaim": "purchase-required",
+    "costDetail": "Add at least 20 items to a registry and make a first qualifying purchase of $15 or more from it.",
+    "requirements": [
+      "registry",
+      "purchase"
+    ],
+    "eligibility": "One box per qualifying registry.",
+    "region": "US",
+    "signupUrl": "https://www.macrobaby.com/pages/macrobaby-gift-box",
+    "sourceUrls": [
+      "https://www.macrobaby.com/pages/macrobaby-gift-box",
+      "https://www.macrobaby.com/pages/baby-registry"
+    ],
+    "verifiedOn": "2026-11-08",
+    "confidence": "medium",
+    "catches": "Contents can't be requested; if the qualifying items are returned the box must be returned or an $80 fee applies; program can change or end without notice.",
+    "notes": "MacroBaby also advertises 5% store credit on registry purchases. Official site blocked fetching; entry based on official-domain search results."
+  },
+  {
+    "id": "buybuy-baby-registry-welcome-bag",
+    "name": "Registry welcome bag",
+    "brand": "buybuy BABY",
+    "category": "registry-box",
+    "whatYouGet": "Goody bag with free samples, coupons and a Registry Guide.",
+    "costToClaim": "free",
+    "costDetail": "Free with registry; available for pickup in stores only.",
+    "requirements": [
+      "registry"
+    ],
+    "eligibility": "Baby registrants; details of eligibility not confirmed.",
+    "region": "US",
+    "signupUrl": "https://www.buybuybaby.com/store/page/BabyRegistry",
+    "sourceUrls": [
+      "https://www.buybuybaby.com/store/page/BabyRegistry"
+    ],
+    "verifiedOn": "2026-11-08",
+    "confidence": "low",
+    "catches": "In-store pickup only; snippet may be outdated, so current availability and any conditions are unconfirmed.",
+    "notes": "Search snippets also mention a 15% registry completion discount. Official site blocked fetching; entry based on official-domain search results."
+  }
+]

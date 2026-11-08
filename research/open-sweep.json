@@ -1,0 +1,20 @@
+[
+  {
+    "id": "imagination-library-free-books",
+    "name": "Dolly Parton's Imagination Library",
+    "brand": "Dolly Parton's Imagination Library",
+    "category": "baby-care",
+    "whatYouGet": "A free, age-appropriate book mailed monthly to enrolled children from birth to age 5.",
+    "costToClaim": "free",
+    "costDetail": "No cost to families",
+    "requirements": ["address", "due-date", "eligibility"],
+    "eligibility": "Children from birth to age 5 living in an area served by a local Imagination Library program; rules are set locally.",
+    "region": "Varies by area (some states have statewide coverage)",
+    "signupUrl": "https://imaginationlibrary.com/check-availability/",
+    "sourceUrls": ["https://imaginationlibrary.com/check-availability/", "https://imaginationlibrary.com/terms-and-conditions/"],
+    "verifiedOn": "",
+    "confidence": "medium",
+    "catches": "Availability depends on whether a local program covers your address. One local program notes the first book can take 8-10 weeks.",
+    "notes": "Backed by official-domain search results only; WebFetch was blocked in this session, so the pages were not read directly."
+  }
+]

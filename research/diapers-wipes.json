@@ -1,0 +1,20 @@
+[
+  {
+    "id": "pampers-rewards",
+    "name": "Pampers Rewards",
+    "brand": "Pampers",
+    "category": "rewards",
+    "whatYouGet": "Free app membership where scanning diaper packs earns Pampers Cash (search result says $10 per 10 scans) that can be redeemed in the rewards catalog.",
+    "costToClaim": "free",
+    "costDetail": "Free to join; page says no subscription or hidden fees",
+    "requirements": ["email", "app", "purchase"],
+    "eligibility": "",
+    "region": "US",
+    "signupUrl": "https://www.pampers.com/en-us/rewards",
+    "sourceUrls": ["https://www.pampers.com/en-us/rewards", "https://support.pampers.com/hc/en-us/articles/21676841189533-How-can-I-get-Pampers-samples-or-coupons"],
+    "verifiedOn": "2026-11-08",
+    "confidence": "medium",
+    "catches": "Earning points requires buying and scanning Pampers products. Referral bonus limited to the first 5 friends.",
+    "notes": "Previously called Pampers Club. Verified from official-domain search results only; page fetch was blocked."
+  }
+]

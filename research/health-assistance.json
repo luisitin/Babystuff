@@ -1,0 +1,369 @@
+[
+  {
+    "id": "healthcare-gov-insurance-covered-breast-pump",
+    "name": "Breastfeeding benefits (breast pump coverage)",
+    "brand": "HealthCare.gov",
+    "category": "health-benefits",
+    "whatYouGet": "Most health plans must cover a breast pump (rental or purchase) plus breastfeeding support and counseling, per the HealthCare.gov breastfeeding benefits page.",
+    "costToClaim": "free",
+    "costDetail": "Covered without cost-sharing under qualifying plans",
+    "requirements": [
+      "insurance",
+      "eligibility"
+    ],
+    "eligibility": "People with a health plan subject to the ACA preventive-services rule (Marketplace and most other plans; grandfathered plans are exempt)",
+    "region": "US",
+    "signupUrl": "https://www.healthcare.gov/coverage/breast-feeding-benefits/",
+    "sourceUrls": [
+      "https://www.healthcare.gov/coverage/breast-feeding-benefits/"
+    ],
+    "verifiedOn": "",
+    "confidence": "medium",
+    "catches": "Plans may set rules on manual vs electric, rental length, and timing (before or after birth); some require doctor preauthorization.",
+    "notes": "Not fetched directly (site unreachable from this session); details come from an official-domain search result. Check your plan or insurer for specifics. Step-by-step claim tips not yet verified."
+  },
+  {
+    "id": "aeroflow-breastpumps-insurance",
+    "name": "Qualify for a Free Breast Pump Through Insurance",
+    "brand": "Aeroflow Breastpumps",
+    "category": "health-benefits",
+    "whatYouGet": "Supplier that checks your insurance and ships a covered breast pump if your plan includes one.",
+    "costToClaim": "free",
+    "costDetail": "No cost if your plan covers the pump; upgrade models may carry a fee",
+    "requirements": [
+      "insurance",
+      "eligibility"
+    ],
+    "eligibility": "People whose health plan covers a breast pump; coverage, timing and prescription rules vary by plan",
+    "region": "US",
+    "signupUrl": "https://aeroflowbreastpumps.com/qualify-through-insurance",
+    "sourceUrls": [
+      "https://aeroflowbreastpumps.com/qualify-through-insurance",
+      "https://aeroflowbreastpumps.com/blog/can-i-get-a-breast-pump-through-insurance"
+    ],
+    "verifiedOn": "",
+    "confidence": "medium",
+    "catches": "Usually one pump per pregnancy; some plans need a prescription or preauthorization; upgrade fees may apply. Supplier will contact your insurer.",
+    "notes": "Search result says you can apply during pregnancy and up to one year after delivery. Claim tips: 1) Call the number on your insurance card to confirm pump coverage, models, prescription and timing. 2) Use the supplier's online form to check coverage. 3) Supplier verifies benefits and handles paperwork. 4) Get a prescription if your plan requires one. 5) Order once your plan allows (some ship only near the due date). Only one supplier per pregnancy. Site not fetched; backed by official-domain search results."
+  },
+  {
+    "id": "edgepark-breast-pump-insurance",
+    "name": "Breast pumps through insurance",
+    "brand": "Edgepark",
+    "category": "health-benefits",
+    "whatYouGet": "Supplier that checks your insurance and ships a covered breast pump if your plan includes one.",
+    "costToClaim": "free",
+    "costDetail": "No cost if your plan covers the pump; upgrade models may carry a fee",
+    "requirements": [
+      "insurance",
+      "eligibility"
+    ],
+    "eligibility": "People whose health plan covers a breast pump; coverage, timing and prescription rules vary by plan",
+    "region": "US",
+    "signupUrl": "https://edgepark.com/faqs_breastpumps",
+    "sourceUrls": [
+      "https://edgepark.com/faqs_breastpumps"
+    ],
+    "verifiedOn": "",
+    "confidence": "medium",
+    "catches": "Usually one pump per pregnancy; some plans need a prescription or preauthorization; upgrade fees may apply. Supplier will contact your insurer.",
+    "notes": "Edgepark says its verification is never a guarantee of coverage; some plans have preferred pumps. Site not fetched; backed by official-domain search results. Exact eligibility-check page not confirmed."
+  },
+  {
+    "id": "byram-healthcare-breast-pumps-insurance",
+    "name": "Breast Pumps Through Insurance",
+    "brand": "Byram Healthcare",
+    "category": "health-benefits",
+    "whatYouGet": "Supplier that checks your insurance and ships a covered breast pump if your plan includes one.",
+    "costToClaim": "free",
+    "costDetail": "No cost if your plan covers the pump; upgrade models may carry a fee",
+    "requirements": [
+      "insurance",
+      "eligibility"
+    ],
+    "eligibility": "People whose health plan covers a breast pump; coverage, timing and prescription rules vary by plan",
+    "region": "US",
+    "signupUrl": "https://breastpumps.byramhealthcare.com/",
+    "sourceUrls": [
+      "https://breastpumps.byramhealthcare.com/",
+      "https://breastpumps.byramhealthcare.com/blog/2021/02/22/12-common-questions-about-getting-a-breast-pump-through-insurance"
+    ],
+    "verifiedOn": "",
+    "confidence": "medium",
+    "catches": "Usually one pump per pregnancy; some plans need a prescription or preauthorization; upgrade fees may apply. Supplier will contact your insurer.",
+    "notes": "Many plans ship only within about 30 days of the due date, per Byram's FAQ. Site not fetched; backed by official-domain search results."
+  },
+  {
+    "id": "1-natural-way-breast-pump-insurance",
+    "name": "Insurance-Covered Breast Pumps",
+    "brand": "1 Natural Way",
+    "category": "health-benefits",
+    "whatYouGet": "Supplier that checks your insurance and ships a covered breast pump if your plan includes one.",
+    "costToClaim": "free",
+    "costDetail": "No cost if your plan covers the pump; upgrade models may carry a fee",
+    "requirements": [
+      "insurance",
+      "eligibility"
+    ],
+    "eligibility": "People whose health plan covers a breast pump; coverage, timing and prescription rules vary by plan",
+    "region": "US",
+    "signupUrl": "https://www.1naturalway.com/products/insurance-breast-pump-options",
+    "sourceUrls": [
+      "https://www.1naturalway.com/products/insurance-breast-pump-options"
+    ],
+    "verifiedOn": "",
+    "confidence": "medium",
+    "catches": "Usually one pump per pregnancy; some plans need a prescription or preauthorization; upgrade fees may apply. Supplier will contact your insurer.",
+    "notes": "Coverage varies by insurer (e.g. Cigna eligibility from week 28 per the site). Site not fetched; backed by official-domain search results."
+  },
+  {
+    "id": "pumping-essentials-breast-pump-insurance",
+    "name": "Qualify for a Free Breast Pump Through Insurance",
+    "brand": "Pumping Essentials",
+    "category": "health-benefits",
+    "whatYouGet": "Supplier that checks your insurance and ships a covered breast pump if your plan includes one.",
+    "costToClaim": "free",
+    "costDetail": "No cost if your plan covers the pump; upgrade models may carry a fee",
+    "requirements": [
+      "insurance",
+      "eligibility"
+    ],
+    "eligibility": "People whose health plan covers a breast pump; coverage, timing and prescription rules vary by plan",
+    "region": "US",
+    "signupUrl": "https://pumpingessentials.com/qualify-through-insurance",
+    "sourceUrls": [
+      "https://pumpingessentials.com/qualify-through-insurance",
+      "https://pumpingessentials.com/faq-pe"
+    ],
+    "verifiedOn": "",
+    "confidence": "medium",
+    "catches": "Usually one pump per pregnancy; some plans need a prescription or preauthorization; upgrade fees may apply. Supplier will contact your insurer.",
+    "notes": "Site says it contacts your insurer for you. Site not fetched; backed by official-domain search results."
+  },
+  {
+    "id": "usda-wic",
+    "name": "WIC (Special Supplemental Nutrition Program for Women, Infants, and Children)",
+    "brand": "USDA Food and Nutrition Service",
+    "category": "assistance",
+    "whatYouGet": "Nutrition support for pregnant, postpartum and breastfeeding women, infants and children under 5, delivered through local WIC agencies.",
+    "costToClaim": "free",
+    "costDetail": "Free; apply through a local WIC agency",
+    "requirements": [
+      "eligibility",
+      "address"
+    ],
+    "eligibility": "Pregnant, postpartum or breastfeeding women, infants and children up to age 5 who meet income limits (generally at or below 185% of poverty; SNAP, Medicaid or TANF participation can meet this), live in the state, and are at nutritional risk.",
+    "region": "US (administered by state/local agencies)",
+    "signupUrl": "https://www.fns.usda.gov/wic/applicant-participant/eligibility",
+    "sourceUrls": [
+      "https://www.fns.usda.gov/wic/applicant-participant/eligibility",
+      "https://www.fns.usda.gov/wic/frequently-asked-questions",
+      "https://www.fns.usda.gov/wic/application-toolkit"
+    ],
+    "verifiedOn": "",
+    "confidence": "medium",
+    "catches": "Appointment at a local agency and a free health check are required.",
+    "notes": "Online pre-screening tool only checks likely eligibility; it is not an application. States may set lower income limits. The official 'how to apply' page was not confirmed; signupUrl is the eligibility page. Not fetched directly; backed by official-domain search results."
+  },
+  {
+    "id": "healthcare-gov-pregnancy-coverage",
+    "name": "Health coverage options for pregnant people",
+    "brand": "HealthCare.gov",
+    "category": "health-benefits",
+    "whatYouGet": "Information on Marketplace, Medicaid and CHIP coverage when pregnant.",
+    "costToClaim": "free",
+    "costDetail": "Free to apply; premiums depend on plan",
+    "requirements": [
+      "eligibility",
+      "insurance"
+    ],
+    "eligibility": "Pregnant people; Medicaid/CHIP eligibility depends on state and income.",
+    "region": "US",
+    "signupUrl": "https://www.healthcare.gov/what-if-im-pregnant-or-plan-to-get-pregnant/",
+    "sourceUrls": [
+      "https://www.healthcare.gov/what-if-im-pregnant-or-plan-to-get-pregnant/"
+    ],
+    "verifiedOn": "",
+    "confidence": "medium",
+    "catches": "",
+    "notes": "Page title only seen in search results; content not read. Low detail. Not fetched directly; backed by official-domain search results."
+  },
+  {
+    "id": "medicaid-gov-chip-eligibility",
+    "name": "Medicaid and CHIP pregnancy coverage",
+    "brand": "Medicaid.gov / InsureKidsNow.gov",
+    "category": "health-benefits",
+    "whatYouGet": "Medicaid covers pregnancy-related care at least through 60 days postpartum; some states cover 12 months. CHIP can cover pregnant people in some states, and newborns of enrolled mothers are generally covered automatically.",
+    "costToClaim": "free",
+    "costDetail": "Costs vary by state",
+    "requirements": [
+      "eligibility"
+    ],
+    "eligibility": "Income-based; limits vary by state (see CMS eligibility-levels table).",
+    "region": "Varies by state",
+    "signupUrl": "https://www.medicaid.gov/chip/chip-eligibility-enrollment",
+    "sourceUrls": [
+      "https://www.medicaid.gov/chip/chip-eligibility-enrollment",
+      "https://www.medicaid.gov/medicaid/national-medicaid-chip-program-information/medicaid-childrens-health-insurance-program-basic-health-program-eligibility-levels",
+      "https://www.insurekidsnow.gov/initiatives/maternal-health"
+    ],
+    "verifiedOn": "",
+    "confidence": "medium",
+    "catches": "",
+    "notes": "Apply through your state Medicaid agency or HealthCare.gov. Some figures seen may be outdated. Not fetched directly; backed by official-domain search results."
+  },
+  {
+    "id": "national-diaper-bank-network-get-help",
+    "name": "Get Help Now (find a diaper bank)",
+    "brand": "National Diaper Bank Network",
+    "category": "assistance",
+    "whatYouGet": "Directory of 225+ local diaper banks that give free diapers to families in need, plus a pointer to 2-1-1.",
+    "costToClaim": "free",
+    "costDetail": "Free from member diaper banks",
+    "requirements": [
+      "eligibility"
+    ],
+    "eligibility": "Families in need; each local bank sets its own rules.",
+    "region": "US",
+    "signupUrl": "https://nationaldiaperbanknetwork.org/get-help-now/",
+    "sourceUrls": [
+      "https://nationaldiaperbanknetwork.org/get-help-now/"
+    ],
+    "verifiedOn": "",
+    "confidence": "medium",
+    "catches": "Local availability and eligibility vary.",
+    "notes": "Page URL found by search; wording of the page not read. The requested find-a-diaper-bank URL could not be confirmed. Not fetched directly; backed by official-domain search results."
+  },
+  {
+    "id": "cribs-for-kids-find-a-crib",
+    "name": "Find a Crib",
+    "brand": "Cribs for Kids",
+    "category": "assistance",
+    "whatYouGet": "Free portable crib and safe sleep education through local partners.",
+    "costToClaim": "free",
+    "costDetail": "Free through partner organizations",
+    "requirements": [
+      "eligibility"
+    ],
+    "eligibility": "Financial need, infant 12 months or younger, and receiving safe sleep education.",
+    "region": "US (via local partners)",
+    "signupUrl": "https://cribsforkids.org/find-a-crib/",
+    "sourceUrls": [
+      "https://cribsforkids.org/find-a-crib/"
+    ],
+    "verifiedOn": "",
+    "confidence": "medium",
+    "catches": "Some partners provide education only; availability varies by area.",
+    "notes": "Cribs for Kids does not sell to individual families. Not fetched directly; backed by official-domain search results."
+  },
+  {
+    "id": "safe-kids-car-seat-check",
+    "name": "Get a Car Seat Checked",
+    "brand": "Safe Kids Worldwide",
+    "category": "assistance",
+    "whatYouGet": "Free car seat inspection by certified child passenger safety technicians.",
+    "costToClaim": "free",
+    "costDetail": "Free; appointment often recommended",
+    "requirements": [],
+    "eligibility": "Anyone with a child car seat.",
+    "region": "US",
+    "signupUrl": "https://cert.safekids.org/get-car-seat-checked",
+    "sourceUrls": [
+      "https://cert.safekids.org/get-car-seat-checked",
+      "https://www.nhtsa.gov/car-seats-and-booster-seats/child-passenger-safety-week"
+    ],
+    "verifiedOn": "",
+    "confidence": "medium",
+    "catches": "Checks are inspections, not free car seats.",
+    "notes": "NHTSA also lists National Seat Check Saturday each September. Not fetched directly; backed by official-domain search results."
+  },
+  {
+    "id": "postpartum-support-international-helpline",
+    "name": "PSI HelpLine",
+    "brand": "Postpartum Support International",
+    "category": "assistance",
+    "whatYouGet": "Free, confidential helpline for support and resources on perinatal mental health; call or text 800-944-4773 (English; Spanish text 971-203-7773).",
+    "costToClaim": "free",
+    "costDetail": "Free and confidential",
+    "requirements": [],
+    "eligibility": "Anyone; no diagnosis needed.",
+    "region": "US",
+    "signupUrl": "https://postpartum.net/contact-us/",
+    "sourceUrls": [
+      "https://postpartum.net/contact-us/",
+      "https://postpartum.net/bluedot/"
+    ],
+    "verifiedOn": "",
+    "confidence": "medium",
+    "catches": "Not for emergencies; messages are returned by volunteers (up to 48 hours).",
+    "notes": "In crisis: 988 or National Maternal Mental Health Hotline 1-833-852-6262. Not fetched directly; backed by official-domain search results."
+  },
+  {
+    "id": "211-org-community-help",
+    "name": "2-1-1",
+    "brand": "211.org",
+    "category": "assistance",
+    "whatYouGet": "Free, confidential helpline connecting people to local help (housing, food, health care, basic needs).",
+    "costToClaim": "free",
+    "costDetail": "Free",
+    "requirements": [],
+    "eligibility": "Anyone.",
+    "region": "US",
+    "signupUrl": "https://211.org/",
+    "sourceUrls": [
+      "https://211.org/",
+      "https://211.org/about-us"
+    ],
+    "verifiedOn": "",
+    "confidence": "medium",
+    "catches": "",
+    "notes": "Services provided by local 211 organizations and vary by area. Not fetched directly; backed by official-domain search results."
+  },
+  {
+    "id": "early-head-start-pregnant-women",
+    "name": "Early Head Start (services for pregnant women)",
+    "brand": "Head Start (HHS/ACF)",
+    "category": "assistance",
+    "whatYouGet": "Early Head Start programs may serve pregnant women and expectant families.",
+    "costToClaim": "free",
+    "costDetail": "Free",
+    "requirements": [
+      "eligibility"
+    ],
+    "eligibility": "Generally income at or below the federal poverty level, or receiving TANF, SSI or SNAP; some programs serve pregnant women only if they choose to.",
+    "region": "US (local programs)",
+    "signupUrl": "https://www.headstart.gov/how-apply",
+    "sourceUrls": [
+      "https://www.headstart.gov/how-apply",
+      "https://headstart.gov/publication/services-pregnant-women-expectant-families-early-head-start"
+    ],
+    "verifiedOn": "",
+    "confidence": "medium",
+    "catches": "Not every program serves pregnant women; waiting lists possible.",
+    "notes": "Contact local program. Not fetched directly; backed by official-domain search results."
+  },
+  {
+    "id": "hrsa-healthy-start",
+    "name": "Healthy Start",
+    "brand": "HRSA",
+    "category": "assistance",
+    "whatYouGet": "Community projects offering care coordination, education and support before, during and after pregnancy.",
+    "costToClaim": "free",
+    "costDetail": "Free through local projects",
+    "requirements": [
+      "eligibility",
+      "address"
+    ],
+    "eligibility": "Pregnant women, new parents, children to 18 months and partners living in a served area.",
+    "region": "US (115 funded project areas)",
+    "signupUrl": "https://mchb.hrsa.gov/programs-impact/healthy-start",
+    "sourceUrls": [
+      "https://mchb.hrsa.gov/programs-impact/healthy-start",
+      "https://www.hrsa.gov/services/healthy-start"
+    ],
+    "verifiedOn": "",
+    "confidence": "medium",
+    "catches": "Only available in funded communities.",
+    "notes": "Page not read in full; a search summary only. Not fetched directly; backed by official-domain search results."
+  }
+]
