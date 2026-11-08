@@ -33,7 +33,8 @@ Layout: `src/` (HTML, CSS, vanilla JS), `data/programs.json`, `scripts/build.mjs
 `id` (kebab-case, unique), `name`, `brand`, `category` (formula, diapers-wipes, registry-box, feeding, baby-care, rewards, health-benefits, assistance, product-testing), `whatYouGet`, `costToClaim` (free, shipping-fee, purchase-required, membership-required), `costDetail`, `requirements` (list from: email, address, phone, due-date, registry, app, purchase, membership, insurance, eligibility; `membership` means a paid membership, a free store account counts as `email`), `eligibility`, `region`, `signupUrl` (https, official domain), `sourceUrls` (list of official https pages), `verifiedOn` (YYYY-MM-DD), `confidence` (high, medium, low), `catches`, `notes`.
 
 ## Product rules
-- The app never submits forms itself, has no ads, analytics, trackers or third-party scripts, makes no network calls, and links out only to official program pages.
+- The app never submits forms itself, has no ads, analytics, trackers or third-party scripts, and makes no network calls. It links out only to official program pages, plus the person's own email (`mailto:` to their own address and Gmail search links, added at the user's request for email automation).
 - No frameworks and no runtime dependencies. `node scripts/build.mjs` builds one self-contained `index.html` that works offline, on GitHub Pages, or pasted into a Claude artifact.
 - Personal details live only in the browser's localStorage.
 - The autofill helper never submits, never bypasses CAPTCHAs or bot checks, and does one site at a time.
+- Automation (Phase E) means one-tap buttons, downloads (Gmail filters, .ics reminders, backups) and GitHub Actions. It never means submitting sign-up forms or clicking through bot checks.
