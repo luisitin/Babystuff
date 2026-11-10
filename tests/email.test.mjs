@@ -105,8 +105,10 @@ test('plusAddress', () => {
 });
 
 test('supportsPlus', () => {
-  for (const d of ['gmail.com', 'googlemail.com', 'outlook.com', 'hotmail.com', 'live.com', 'icloud.com', 'me.com', 'fastmail.com', 'proton.me', 'protonmail.com'])
+  for (const d of ['gmail.com', 'googlemail.com', 'fastmail.com', 'proton.me', 'protonmail.com'])
     assert.equal(E.supportsPlus('a@' + d), true, d);
+  for (const d of ['outlook.com', 'hotmail.com', 'live.com', 'icloud.com', 'me.com'])
+    assert.equal(E.supportsPlus('a@' + d), null, d);
   assert.equal(E.supportsPlus('A@GMAIL.COM'), true);
   assert.equal(E.supportsPlus('a@yahoo.com'), false);
   assert.equal(E.supportsPlus('a@example.org'), null);

@@ -3,8 +3,7 @@
 (function (root) {
   'use strict';
 
-  var PLUS_OK = ['gmail.com', 'googlemail.com', 'outlook.com', 'hotmail.com', 'live.com', 'icloud.com', 'me.com',
-    'fastmail.com', 'proton.me', 'protonmail.com'];
+  var PLUS_OK = ['gmail.com', 'googlemail.com', 'fastmail.com', 'proton.me', 'protonmail.com'];
   var GMAIL = ['gmail.com', 'googlemail.com'];
   var MAX_TAG = 24;
   var MAX_URL = 1900;

@@ -39,16 +39,15 @@
     ],
     "eligibility": "Parents with a child's birthday or due date",
     "region": "US",
-    "signupUrl": "https://register.gerber.com/",
+    "signupUrl": "https://www.gerber.com/about-mygerber",
     "sourceUrls": [
-      "https://www.gerber.com/mygerber",
-      "https://www.gerber.com/gerberr-good-startr-soothepro-powder-infant-formula",
-      "https://register.gerber.com/"
+      "https://www.gerber.com/about-mygerber",
+      "https://www.gerber.com/gerberr-good-startr-soothepro-powder-infant-formula"
     ],
-    "verifiedOn": "2026-11-08",
+    "verifiedOn": "2026-11-10",
     "confidence": "medium",
     "catches": "Samples are only 'if they become available' and an address is required only if you tick the sample box. Gerber also markets a new-member sample box, but no published schedule or sample eligibility was found. Good Start formula has moved to Perrigo, so the current sample offer is unconfirmed.",
-    "notes": "Checked from the official site's search results; the site blocks automated reading, so details may be incomplete. gerber.com returned 403 to our fetcher and register.gerber.com failed through the proxy; details come from official-domain search results only."
+    "notes": "gerber.com blocks automated reading, so details come from gerber.com search results only and may be incomplete. On 2026-11-10 the sign-up link was moved to the \"Join MyGerber Membership\" page on www.gerber.com because the older register.gerber.com address did not resolve in our link check."
   },
   {
     "id": "similac-mysimilac-rewards",
@@ -191,16 +190,16 @@
     ],
     "eligibility": "Arrival date under 9 months away or baby under 4 weeks old; one box per household and per registry; US addresses.",
     "region": "US",
-    "signupUrl": "https://www.babylist.com/hello-baby/box",
+    "signupUrl": "https://www.babylist.com/registry/new",
     "sourceUrls": [
       "https://help.babylist.com/hc/en-us/articles/360054057353-How-do-I-get-a-Hello-Baby-Box",
       "https://help.babylist.com/hc/en-us/articles/360053264354-What-is-a-Hello-Baby-Box",
       "https://www.babylist.com/hello-baby/whats-inside-babylist-hello-baby-box"
     ],
-    "verifiedOn": "2026-11-08",
+    "verifiedOn": "2026-11-10",
     "confidence": "medium",
     "catches": "Shipping fee is non-refundable and orders can't be changed; AK/HI total shipping $18.95; gift cards and return credit can't pay the fee; Babylist Health and other retailer orders don't count toward the $30.",
-    "notes": "Checked from the official site's search results; the site blocks automated reading, so details may be incomplete. Babylist's help center (the source of these terms) returned a bot challenge, so details come from official-domain search results. Babylist's marketing FAQ says one box per household per year; the help center says per household and per registry. babylist.com's own page did not describe the box. The previously listed /hello-baby-box URL returns a 404; the official footer link is /hello-baby/box."
+    "notes": "Babylist's help center blocks automated reading, so these terms come from official-domain search results and may be incomplete. Babylist's marketing FAQ says one box per household per year; the help center says per household and per registry. The sign-up link opens Babylist's \"Create a Baby Registry\" page because a registry is needed first; the help center says to claim the box from the For You tile on your registry dashboard or in the app. The older /hello-baby/box address only redirects to the help center."
   },
   {
     "id": "macrobaby-gift-box",
@@ -335,15 +334,14 @@
     ],
     "eligibility": "",
     "region": "US",
-    "signupUrl": "https://www.huggies.com/en-us/rewards",
+    "signupUrl": "https://www.huggies.com/en-us/rewards/rewardsapp",
     "sourceUrls": [
-      "https://www.huggies.com/en-us/rewards/rewardsapp",
-      "https://www1.huggies.com/en-us/offers-and-rewards/rewards"
+      "https://www.huggies.com/en-us/rewards/rewardsapp"
     ],
-    "verifiedOn": "2026-11-08",
+    "verifiedOn": "2026-11-10",
     "confidence": "medium",
-    "catches": "Points require buying Huggies products. Search snippets disagree on the sign-up bonus amount, so none is listed. Older Rewards+ (Fetch) earning ended per a Huggies page.",
-    "notes": "Checked from the official site's search results; the site blocks automated reading, so details may be incomplete. huggies.com blocks automated fetching (Cloudflare 403); details come from huggies.com search results only."
+    "catches": "Points require buying Huggies products. Search snippets disagree on the sign-up bonus amount, so none is listed. Older Rewards+ (Fetch) earning ended per a Huggies page. Huggies pages disagree on whether the program runs in the Huggies app or as Huggies Rewards+ inside the Fetch app; check the app page before you buy anything for points.",
+    "notes": "huggies.com blocks automated reading, so details come from huggies.com search results only and may be incomplete. On 2026-11-10 the sign-up link was moved to the Rewards app page on www.huggies.com, and an older www1.huggies.com source page was removed because that host no longer resolves."
   },
   {
     "id": "pg-brandsaver-rewards",
@@ -409,14 +407,14 @@
     ],
     "eligibility": "People whose health plan covers a breast pump; coverage, timing and prescription rules vary by plan.",
     "region": "US",
-    "signupUrl": "https://edgepark.com/faqs_breastpumps",
+    "signupUrl": "https://www.edgepark.com/faqs_breastpumps",
     "sourceUrls": [
-      "https://edgepark.com/faqs_breastpumps"
+      "https://www.edgepark.com/faqs_breastpumps"
     ],
-    "verifiedOn": "2026-11-08",
+    "verifiedOn": "2026-11-10",
     "confidence": "medium",
     "catches": "Edgepark says verification is never a guarantee of coverage; out-of-pocket cost depends on your plan and deductible; some models have restricted access and plans may only ship closer to the due date.",
-    "notes": "Checked from the official site's search results; the site blocks automated reading, so details may be incomplete. Search results say you can order during pregnancy and up to one year after birth, and that Edgepark works with 1,400+ plans. Edgepark's site resets automated connections."
+    "notes": "Checked from the official site's search results; the site blocks automated reading, so details may be incomplete. Search results say you can order during pregnancy and up to one year after birth, and that Edgepark works with 1,400+ plans. On 2026-11-10 the link was changed to the www address, which is the one official search results list."
   },
   {
     "id": "healthcare-gov-insurance-covered-breast-pump",
