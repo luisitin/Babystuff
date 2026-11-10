@@ -74,7 +74,8 @@ export async function open(browser, o = {}) {
       const f = fixtures[u];
       return route.fulfill({ status: 200, contentType: f.contentType || 'text/html; charset=utf-8', body: f.body });
     }
-    if (!/^(file|data|blob|about):/.test(u)) net.push(u);
+    if (/^(file|data|blob|about):/.test(u)) return route.continue();
+    net.push(u);
     return route.abort();
   });
   const h = { ctx, net, errors: [], mode, claude: o.claude || 'full' };
