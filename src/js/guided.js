@@ -191,10 +191,23 @@
     return h('div', { class: 'fx-check' }, [cb, h('label', { 'for': id, text: 'When I tap Done or Skip, open the next sign-up page' })]);
   }
 
+  // Programs for other states are left out of the list unless the person chose to show them.
+  function hiddenByState(p) {
+    var L = BFF.logic;
+    if (!L || !L.hiddenByState) return false;
+    var prefs = store.get('prefs.v1', {});
+    if (prefs && typeof prefs === 'object' && prefs.showOtherStates) return false;
+    var st = profile().state;
+    return L.hiddenByState(p, typeof st === 'string' ? st : '');
+  }
+  function setupProgs() {
+    return progs().filter(function (p) { return !hiddenByState(p) || !!(selected && selected[p.id]); });
+  }
+
   function initSelection() {
     selected = {};
     preorder = null;
-    progs().forEach(function (p) { if (!handled(p) && defaultOn(p)) selected[p.id] = true; });
+    progs().forEach(function (p) { if (!handled(p) && !hiddenByState(p) && defaultOn(p)) selected[p.id] = true; });
   }
 
   // ---- views ----
@@ -210,13 +223,13 @@
     var count = h('p', { class: 'fx-count', role: 'status', 'aria-live': 'polite' });
     var start = h('button', { type: 'button', class: 'fx-btn fx-btn--primary' });
     var boxes = [];
+    var shownList = ranked(setupProgs());
     function refresh() {
       var n = Object.keys(selected).length;
-      count.textContent = n + ' of ' + progs().length + ' selected';
+      count.textContent = n + ' of ' + shownList.length + ' selected';
       start.textContent = 'Start (' + n + ' program' + (n === 1 ? '' : 's') + ')';
       start.disabled = n === 0;
     }
-    var shownList = ranked(progs());
     function setAll(fn) {
       selected = {};
       shownList.forEach(function (p, i) { var on = fn(p); boxes[i].checked = on; if (on) selected[p.id] = true; });

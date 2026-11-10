@@ -167,8 +167,9 @@
       var missing = done.length - t.count;
       var lead = 'Estimated value of what you have signed up for: ';
       if (!t.count) return lead + 'not known (' + plural(missing, 'program') + ' with no known value)';
-      var lo = Math.round(t.low), hi = Math.round(t.high);
-      var range = lo === hi ? '$' + lo : '$' + lo + ' to $' + hi;
+      var lo = t.low, hi = t.high;
+      if (t.count > 1) { lo = L.roundTotal(lo); hi = L.roundTotal(hi); }
+      var range = Math.round(lo) === Math.round(hi) ? L.money(lo) : L.money(lo) + ' to ' + L.money(hi);
       return lead + 'about ' + range + ' (our estimate' +
         (missing ? '; ' + plural(missing, 'program') + ' with no known value ' + (missing === 1 ? 'is' : 'are') + ' not counted' : '') + ')';
     },

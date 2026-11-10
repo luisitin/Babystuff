@@ -25,7 +25,8 @@ function usage() {
                                            free, no purchase/membership/insurance/eligibility,
                                            not health-benefits or assistance, a real product
                                            comes first (not coupons, points, a draw or testing),
-                                           and not a draw or selection (certainty is not 'chance')
+                                           and not a draw or selection (certainty is not 'chance'),
+                                           and not limited to states other than the one in profile.json
 
 Use with the app's backup (Tracker > Back up, with My info included):
   node autofill.mjs --from-backup <backup.json> [--only id,id] [--include-all-todo]
@@ -278,7 +279,11 @@ async function main() {
     if (only) for (const id of only) if (!programs.some((p) => p.id === id)) { console.error(`Unknown program id: ${id} (try --list)`); process.exit(1); }
     if (!chosen.length) { console.log('Nothing to do: no programs in that backup are still To do (and guided-run eligible).'); return; }
   } else if (!fixtureMode || positional.length || args.includes('--all-free')) {
-    const ids = args.includes('--all-free') ? programs.filter(isGuidedDefault).map((p) => p.id) : positional;
+    const allFree = args.includes('--all-free');
+    const myState = allFree ? String(loadProfile(fixtureMode).state || '').trim().toUpperCase() : '';
+    // Programs limited to some states are skipped unless the profile's state is one of them (none set: skipped).
+    const hiddenByState = (p) => Array.isArray(p.states) && p.states.length > 0 && !p.states.some((x) => String(x).toUpperCase() === myState);
+    const ids = allFree ? programs.filter((p) => isGuidedDefault(p) && !hiddenByState(p)).map((p) => p.id) : positional;
     if (!ids.length) { usage(); process.exit(1); }
     for (const id of ids) {
       const p = programs.find((x) => x.id === id);
