@@ -223,6 +223,83 @@
     return !isOpenToAll(p);
   }
 
+  // ---- kinds (tabs) ----
+  var KINDS = [
+    { id: 'stuff', label: 'Free stuff' },
+    { id: 'money', label: 'Money' },
+    { id: 'care', label: 'Care and cover' }
+  ];
+  // By the first offer. Unknown or missing offers count as stuff.
+  function kindOf(p) {
+    var first = firstOffer(p);
+    if (first === 'cash') return 'money';
+    if (first === 'service' || first === 'coverage') return 'care';
+    return 'stuff';
+  }
+
+  // ---- fit: the person's answers in My info against a program's audience ----
+  var COVERS = ['private', 'marketplace', 'medicaid', 'tricare', 'none'];
+  function ans(profile, key) {
+    var v = profile && typeof profile === 'object' && typeof profile[key] === 'string' ? profile[key].trim() : '';
+    return v;
+  }
+  function coverOf(profile) {
+    var c = ans(profile, 'cover');
+    return COVERS.indexOf(c) === -1 ? '' : c;
+  }
+  function yesNo(profile, key) {
+    var v = ans(profile, key);
+    return v === 'yes' || v === 'no' ? v : '';
+  }
+  // 'yes', 'no' or '' (unknown) for one audience tag.
+  function tagFit(tag, p, profile) {
+    var cover = coverOf(profile);
+    var low = yesNo(profile, 'lowIncome');
+    var job = yesNo(profile, 'job');
+    var ins = ans(profile, 'insurer');
+    switch (tag) {
+      case 'medicaid': return !cover ? '' : cover === 'medicaid' ? 'yes' : 'no';
+      case 'wic':
+      case 'low-income':
+        if (low) return low;
+        return cover === 'medicaid' ? 'yes' : '';
+      case 'insured': return !cover ? '' : cover === 'none' ? 'no' : 'yes';
+      case 'marketplace': return !cover ? '' : cover === 'marketplace' ? 'yes' : 'no';
+      case 'military': return !cover ? '' : cover === 'tricare' ? 'yes' : 'no';
+      case 'employer': return job === 'no' ? 'no' : '';
+      case 'worker': return job;
+      case 'member':
+        if (ins) return p && ins === p.insurer ? 'yes' : 'no';
+        return cover === 'none' ? 'no' : '';
+      default: return '';
+    }
+  }
+  function fit(p, profile) {
+    var tags = p && Array.isArray(p.audience) ? p.audience : [];
+    if (!tags.length) return 'yes';
+    var allYes = true;
+    for (var i = 0; i < tags.length; i++) {
+      var f = tagFit(tags[i], p, profile);
+      if (f === 'no') return 'no';
+      if (f !== 'yes') allYes = false;
+    }
+    return allYes ? 'yes' : 'maybe';
+  }
+  function hasSituation(profile) {
+    return !!(coverOf(profile) || ans(profile, 'insurer') || yesNo(profile, 'lowIncome') || yesNo(profile, 'job'));
+  }
+  // True when the answers rule the program out. A program the person is already
+  // working on (a status other than todo) is never hidden.
+  function hiddenByAnswers(p, profile, status) {
+    if (status && status !== 'todo') return false;
+    return fit(p, profile) === 'no';
+  }
+  function hiddenByAnswersCount(list, profile, statusOf) {
+    return (list || []).filter(function (p) {
+      return p && hiddenByAnswers(p, profile, typeof statusOf === 'function' ? statusOf(p.id) : '');
+    }).length;
+  }
+
   function filterPrograms(list, opts) {
     opts = opts || {};
     var q = String(opts.query || '').trim().toLowerCase();
@@ -235,6 +312,9 @@
       if (opts.offer && offers(p).indexOf(opts.offer) === -1) return false;
       if (opts.openToAll && !isOpenToAll(p)) return false;
       if (opts.hideOtherStates && hiddenByState(p, opts.state)) return false;
+      if (opts.kind && opts.kind !== 'all' && kindOf(p) !== opts.kind) return false;
+      if (opts.hideNoFit && hiddenByAnswers(p, opts.profile, typeof opts.statusOf === 'function' ? opts.statusOf(p.id) : '')) return false;
+      if (opts.fitsMine && fit(p, opts.profile) !== 'yes') return false;
       if (q) {
         var hay = [p.name, p.brand, p.whatYouGet, p.notes, p.eligibility, p.freeStuff].join('\n').toLowerCase();
         if (hay.indexOf(q) === -1) return false;
@@ -382,6 +462,12 @@
     hiddenByState: hiddenByState,
     otherStateCount: otherStateCount,
     needsQualifying: needsQualifying,
+    KINDS: KINDS,
+    kindOf: kindOf,
+    fit: fit,
+    hasSituation: hasSituation,
+    hiddenByAnswers: hiddenByAnswers,
+    hiddenByAnswersCount: hiddenByAnswersCount,
     money: money,
     roundTotal: roundTotal,
     valueText: valueText,
