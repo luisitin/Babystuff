@@ -123,3 +123,114 @@ Program `signupUrl` and `sourceUrls`, plus `mailto:` links to the person's own a
 ### Repo automation (GitHub Actions)
 - `.github/workflows/ci.yml` runs on every push and pull request: build, `git diff --exit-code`, then `node --test`.
 - `.github/workflows/link-check.yml` runs weekly and from a "Run workflow" button. It runs `node scripts/check-links.mjs`, uploads the report, and opens or updates a `link-check` issue when a link is NOT-FOUND or OFF-DOMAIN; GitHub emails the repo owner. When all links are fine it closes the issue. Blocked sites (403, bot challenges) are reported but never fail the check, and are never retried with other user agents.
+
+## Phase F: Gmail connection, iPhone fill script, links that always work (contract)
+Goal: the app is fully usable on an iPhone, either as the Claude artifact or as the standalone page, with one optional connection (the person's own Gmail) and one optional helper (a fill script for Safari).
+
+Hard rules, unchanged: the app never submits a sign-up form, never clicks through a bot check, never ticks consent boxes, never sends mail, never deletes or archives mail, and makes no network request of its own (`fetch`, XHR, beacons and the rest stay banned by the build test). Gmail is reached only through the Claude viewer's connector runtime, only after a tap.
+
+### Two build outputs
+`node scripts/build.mjs` writes both, deterministically:
+- `index.html`: the standalone page, as before (full document, CSP meta).
+- `artifact.html`: the same app as a Claude artifact fragment. No doctype, `<html>`, `<head>`, `<body>` or CSP meta (the Artifact tool adds its own skeleton and CSP). It starts with `<title>Baby Freebies Finder</title>`, then `<meta name="claude:viewport-fit-sides" content="cover">`, then the `<style>`, then the body markup, the data block and the script. It is built from the same `src/index.html` shell by taking the title and the body's inner HTML.
+
+Artifact frame facts the code must respect (from the Artifact page contract):
+- `<a download>` and script-started downloads are inert. Files go through the `downloads` capability.
+- `window.open` returns null for most viewers. Every outbound link must be a real `<a href target="_blank" rel="noopener noreferrer">` the person taps.
+- `mailto:` and other app links may do nothing, and the page cannot tell. Always show the text with a Copy button beside any mailto link, and never say a message was sent.
+- `alert`, `confirm`, `prompt` and `window.print` do nothing.
+- Only plain `#name` hashes work. Route names stay `directory`, `info`, `tracker`, `guided`, `safety` (never `settings`, `sidebar`, `customize`, `upgrade`, `downloads`, `comment-*`).
+- Side gutter: `padding-left: max(16px, env(safe-area-inset-left, 0px))` and the same on the right, on one outer wrapper. A sticky header uses `top: env(safe-area-inset-top, 0px)`. The fixed bottom nav adds the bottom inset. Keep the skeleton's `:root` padding.
+
+### New files, load order and owners
+JS order in both outputs: `logic.js`, `store.js`, `email.js`, `zip.js`, `host.js`, `fieldmatch.js`, `fillscript.js`, `inbox.js`, `tracker.js`, `profile.js`, `directory.js`, `guided.js`, `inboxview.js`, `phone.js`, `app.js`. CSS order: `base.css`, `features.css`, `phase-f.css`.
+
+| File | Owner | Purpose |
+|---|---|---|
+| `scripts/build.mjs`, `src/index.html`, `src/css/base.css`, `src/js/app.js` | F1 | two outputs, safe-area gutter, apple-touch-icon, routing |
+| `src/js/zip.js` | F1 | `BFF.zip.store(files)`: stored (no compression) ZIP with CRC-32, UMD, Node-testable |
+| `src/js/host.js` | F1 | `BFF.host`: where the page runs and how files, copying and links behave there |
+| `src/js/tracker.js` | F1 | uses `BFF.host` for every file and mailto; mounts the inbox panel |
+| `src/js/guided.js`, `src/js/directory.js` | F1 | links that work without `window.open` |
+| `scripts/check-links.mjs`, `.github/workflows/*`, `tests/check-links.test.mjs` | F1 | link check covers `signupUrl` and every `sourceUrls` entry |
+| `tests/build.test.mjs`, `tests/host.test.mjs` | F1 | both outputs, zip, host helpers |
+| `src/js/inbox.js` | F2 | `BFF.inbox`: pure Gmail logic, UMD, Node-testable |
+| `src/js/inboxview.js` | F2 | `BFF.inboxView.mount(el)`: the "Gmail connection" panel |
+| `src/css/phase-f.css` (section `/* inbox */`) | F2 | panel styles, tokens from `base.css` only |
+| `tests/inbox.test.mjs` | F2 | |
+| `src/js/fieldmatch.js` | F3 | the field matcher moved from `tools/autofill/field-matcher.mjs`, UMD |
+| `tools/autofill/field-matcher.mjs` | F3 | thin wrapper re-exporting `src/js/fieldmatch.js`; existing tests keep passing unchanged |
+| `src/js/fillscript.js` | F3 | `BFF.fill`: builds the fill script and bookmarklet, UMD |
+| `src/js/phone.js` | F3 | `BFF.phoneView.mount(el)`: "Fill forms on your phone" panel |
+| `src/js/profile.js` | F3 | mounts the phone panel at the end of My info |
+| `src/css/phase-f.css` (section `/* phone */`) | F3 | |
+| `tests/fillscript.test.mjs` | F3 | |
+
+Mount points (so builders do not edit each other's files): `tracker.js` calls `BFF.inboxView && BFF.inboxView.mount(node)` with an empty `<div id="trk-inbox">` placed right after the "Email and calendar" card. `profile.js` calls `BFF.phoneView && BFF.phoneView.mount(node)` with `<div id="info-phone">` at the end of the view. `guided.js` shows a one-line hint ("Filling on your phone? Set up the fill script in My info.") linking to `#info`. Both `mount` functions must tolerate being called before or after their script loads (views init at boot, after all scripts).
+
+### `BFF.host` (`src/js/host.js`)
+- `inArtifact`: `!!(window.claude && typeof window.claude.use === 'function')`. There is no other `window.claude` member to read.
+- `use(name)`: `Promise` of the capability namespace or `null`. Without a runtime it resolves `null` at once. Never throws. The first call happens on a user gesture or after first paint, never during the first synchronous run.
+- `saveFile({name, text, mime})`: `Promise<{status, name}>` with status `saved`, `declined`, `shown` or `failed`.
+  - Standalone: Blob plus `a[download]`, as today, status `saved`.
+  - Artifact: `downloads.save({filename, data})`. Allowed extensions are gif png jpg jpeg webp mp4 webm mov txt json md docx pptx epub csv ttf html svg pdf xlsx zip fig. A file with another extension (`.xml`, `.ics`, `.vcf`) is wrapped in `<name>.zip` with `BFF.zip.store`. Branch on the rejection `code`: `declined` gives status `declined` with no retry; `rate_limited` tells the person to wait a moment; anything else falls through to `shown`.
+  - `shown`: the caller gets the text shown in a read-only `<textarea>` with a Copy button (helper `BFF.host.showText({after, label, text})`), so nothing is ever a dead end.
+- `copyText(text)`: `Promise<boolean>`; `navigator.clipboard.writeText` inside the click handler, falling back to selecting a temporary textarea with `document.execCommand('copy')`, then `false`.
+- `canPopup`: false in the artifact. The guided run's "open the next page automatically" option is hidden there; Done and Skip move focus to the next program's "Open sign-up page" link instead, which is a real anchor.
+- `mailtoNote`: in the artifact, mailto links are labelled "May not open from here" and the Copy path is the primary button.
+
+### `BFF.zip` (`src/js/zip.js`)
+`store([{name, text}])` returns a `Uint8Array`: local headers, stored data, central directory, end record, UTF-8 names (flag bit 11), fixed DOS date 1980-01-01 so output is deterministic, CRC-32 computed with a table. `crc32(bytes)` is exported for tests (compare with `node:zlib` `crc32`).
+
+### `BFF.inbox` (`src/js/inbox.js`), pure
+The connector is the viewer's own Gmail, declared at publish as `mcp: {servers: [{server: "Gmail", tools: ["search_threads", "list_labels", "create_label", "label_thread", "create_draft"]}]}`. Nothing else is declared, so the page cannot send, delete, trash or archive.
+
+Observed shapes (field names only; never put real values in code, tests or docs):
+- `search_threads` input `{query, pageSize (max 50), pageToken?, view: "SUMMARY"}`. Result payload is `{}` when nothing matches, else `{threads: [{id, messageCount, viewUrl, messages: [{id, threadId, date (ISO 8601), internalDate (ms as a string), labelIds[], sender (email string), addressDisplayNames: [{displayName, emailAddress}], snippet (HTML-entity-encoded text), subject, toRecipients[], viewUrl}]}], nextPageToken?, resultCountEstimate (string)}`. `viewUrl` looks like `https://mail.google.com/mail/?authuser=<address>#all/thread-f:<id>`.
+- `list_labels` input `{}`; payload `{labels: [{labelId, name, labelType: "SYSTEM"|"USER", ...}]}`.
+- `create_label` input `{displayName}`; `label_thread` input `{threadId, labelIds: [labelId]}`.
+- `create_draft` input `{to: [address], subject, body (plain text), attachments?: [{content (base64), filename, mimeType}]}`; the result has `id` and may have `viewUrl`.
+Treat every field as optional and every payload as untrusted text: render with `textContent`, decode entities with a small pure decoder (never `innerHTML`), and open only `viewUrl` values that pass `safeViewUrl` (must start with `https://mail.google.com/mail/`).
+
+Functions:
+- `buildQueries({programs, email, tagMap, usePlus, days})`: Gmail search strings, each under 1,500 characters, that together cover every program: `to:(plus address)` terms when plus tags are on, and `from:(registrable domain)` terms for domains that are not broad (`BFF.email.isBroadDomain`). Terms are OR-ed in braces, with `newer_than:<days>d` (default 120). Returns `[{query, programIds}]`.
+- `matchThreads(threads, {programs, email, tagMap})`: `[{programId, threadId, subject, snippet, from, date, viewUrl, certainty, kind}]`, newest first, one per thread. `certainty` is `exact` when a recipient equals the program's plus address, `likely` when the sender's registrable domain equals the program's domain and that domain belongs to exactly one program and is not broad. Anything else is dropped.
+- `classify({subject, snippet})`: `confirm` (asks the person to confirm or verify an address), `shipped` (shipped, on its way, out for delivery, delivered), `welcome` (welcome, thanks for signing up or joining, you're in), or `other`.
+- `suggest(matches, statusOf)`: at most one suggestion per program: `welcome` or `confirm` on a `todo` program suggests `signed-up`; `shipped` suggests `received` only when the text says delivered, otherwise keeps `signed-up` with a note. Never suggests moving a status backwards and never touches `skipped`.
+- `accountFromViewUrl(url)`: the `authuser` address, or `''`.
+- `safeViewUrl(url)`, `decodeEntities(text)`.
+- `checklistDraft({email, programs, statusOf})` and `kitDraft({email, files})`: `create_draft` inputs. `to` is always exactly the person's own address. Attachments are base64 of text the app generated (reminders `.ics`, Gmail filters `.xml`).
+- `errorCopy(code)`: one short sentence per `McpError` code. Groups: `consent_required`, `approval_required`, `not_granted` (the person said no: explain, offer no retry button this page load); `needs_reauth`, `server_not_connected`, `server_not_found`, `selection_required` (Gmail is not connected in Claude: say where to connect it); `rate_limited`, `server_unavailable`, `upstream_error` (try again later; one automatic retry only when `retryable` is true and only for reads); `blocked_by_policy`, `not_in_manifest`, `capability_disabled`, `capability_removed`, `self_only`, `user_changed` (not available here: hide the feature and drop any mail data on screen); `tool_error`, `bad_request`, `cancelled`, `transform_error` (plain failure message). Unknown codes read as unavailable.
+
+### `BFF.inboxView` (`src/js/inboxview.js`)
+A card titled "Gmail connection" in the tracker.
+- Standalone page, or `use("mcp")` resolves `null`: the card says the connection works when the app is opened as a Claude artifact with Gmail connected, and points to the existing "Search my Gmail" links. No buttons that cannot work.
+- With `mcp`: buttons, each calling the connector only inside its click handler:
+  1. **Check my Gmail**: runs the `buildQueries` searches one at a time, read-only, and lists matches grouped by program with subject, sender, date, a "needs you to confirm" badge for `confirm`, and an "Open in Gmail" link. Suggestions appear as "Mark Similac as Signed up" buttons plus one "Apply all N"; statuses change only when tapped, through `BFF.tracker.setStatus`, with the tracker's normal Undo-free flow (a line says what changed).
+  2. **Use this address**: when My info has no email and a result reveals the account address, offer to fill it in. Only on tap.
+  3. **Label these in Gmail**: `list_labels`, then `create_label` "Baby Freebies" if it is missing, then `label_thread` for each exact or likely match. Shows a count first and asks with the inline `BFF.ui.confirm` panel. A write is never retried automatically.
+  4. **Draft my checklist** and **Draft my setup kit**: `create_draft` to the person's own address. The message says "Draft created in your Gmail. Nothing was sent." with a link when `viewUrl` is safe.
+- Nothing from the mailbox is stored. Only `prefs.v1.inboxCheckedAt` (ISO time) is saved. Results live in memory and are cleared on any authorization-type error.
+- A live region announces progress and results. Buttons are disabled while a call runs.
+
+### `BFF.fieldmatch` and `BFF.fill` (fill script for Safari on iPhone, and any desktop browser)
+- `src/js/fieldmatch.js` exposes the same API the autofill helper already has: `cleanText`, `registrableDomain`, `sameSite`, `isGuidedDefault`, `classifyField`, `valueFor`. One source of truth for the app, the fill script and `tools/autofill`.
+- `BFF.fill.build({profile, programs, tagMap})` returns a self-contained script string. It holds the matcher (via `Function.prototype.toString()` of its factory), a JSON blob with the person's details, and a list of `{domain, id, name, email}` for programs (email is the plus address when plus tags are on).
+- What the script does when run on a page:
+  1. Works out the page's registrable domain. If it is not the domain of a program in the list, it changes nothing and reports "This is not one of the official sign-up sites in your list", showing the domain.
+  2. Otherwise it scans visible, enabled `input`, `select` and `textarea` elements in the top document (same-origin iframes included), classifies each with `classifyField`, and fills the ones that are empty, using the native value setter and dispatching `input` and `change` so frameworks notice.
+  3. It never clicks anything, never submits, never ticks a checkbox or radio, never fills password, card, SSN, security-question or one-time-code fields (the matcher's skip rules), and never overwrites a field that already has text.
+  4. It shows a small banner at the top of the page: "Filled N fields. Check them, tick any boxes yourself, and submit when you are ready." with a Close button. The banner uses `textContent` only.
+  5. It returns a plain result `{ok, filled, skipped, domain, message}`, and calls `completion(result)` when that function exists (the Shortcuts "Run JavaScript on Web Page" action requires it).
+- `BFF.fill.bookmarklet(script)` returns a `javascript:` URL.
+- The script is plain ES5-compatible code with no network calls, no `eval`, no storage access.
+- `BFF.phoneView` ("Fill forms on your phone", in My info): explains the three ways in order of effort: (a) Safari AutoFill from your contact card, (b) the Shortcut with one "Run JavaScript on Web Page" action, (c) a bookmarklet. Buttons: "Copy fill script", "Copy bookmarklet", "Save fill script as a file". A warning says the script contains your details, so keep it private and make a new one after changing My info. Exact steps come from `research/phase-f/` and are filled in after the research lands.
+
+### Links
+- Every outbound anchor has `target="_blank" rel="noopener noreferrer"` and an `https:` href taken from the data or built by `BFF.email.gmailSearchUrl`, or it is a `viewUrl` that passed `safeViewUrl`.
+- `scripts/check-links.mjs` checks `signupUrl` and every `sourceUrls` entry (deduplicated). The report lists each URL with the program ids that use it. BLOCKED (403, bot challenge) still never fails the run and is never retried with another user agent.
+- Allowed URL prefixes in the build test: the Phase E list, plus `https://mail.google.com/mail/` (the `safeViewUrl` prefix).
+
+### Tests
+- `node --test` (CI): all existing tests, plus `host`, `inbox`, `fillscript`, and build tests for both outputs (fresh-build match, no external resources, no network APIs, URL allowlist; `artifact.html` has no doctype, `<html>`, `<head>`, `<body>` or CSP meta and starts with `<title>`).
+- `node tests/e2e/run.mjs` (local, needs the preinstalled Playwright; not part of CI): phone-size checks of both outputs, every link and route, the mocked `window.claude` flows for downloads and Gmail (mock built from the type files and the shapes above, synthetic values only), and the fill script against fixture forms served by request interception for official program URLs.
