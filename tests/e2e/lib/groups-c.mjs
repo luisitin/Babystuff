@@ -1,15 +1,28 @@
 // Groups 8 to 10: fill script on fixture forms, persistence and privacy, accessibility smoke.
 import fs from 'node:fs';
 import path from 'node:path';
-import { ROOT, ROUTES, PROGRAMS, PROFILE, open, clean, runGroup, contrast, lsDump } from './harness.mjs';
+import { ROOT, OUT, ROUTES, PROGRAMS, PROFILE, open, clean, runGroup, contrast, lsDump } from './harness.mjs';
 import { FORM_HTML } from './fixtures.mjs';
 import { prepare } from './groups-a.mjs';
+import { L, E, ALL, byId, byDomain, domainOf } from './model.mjs';
 
 const KEYS = ['firstName', 'lastName', 'email', 'phone', 'address1', 'address2', 'city', 'state', 'zip', 'dueDate'];
+// Domains picked from the data. A "single brand" domain has exactly one listed program and it passes
+// BFF.email.inEmailFeatures, so the plus address is the only sensible one. "Multi" domains have two or more
+// listed programs with different tags, so the runtime rule falls back to the plain address. A government
+// domain only has programs that are outside the email features.
+const SHARED = /^(?:github\.io|google\.com|facebook\.com|[a-z]{2}\.us|co\.uk)$/;
+const single = Object.entries(byDomain).find(([d, l]) => l.length === 1 && E.inEmailFeatures(l[0]) && !SHARED.test(d));
+const SINGLE = { domain: single[0], program: single[1][0] };
+const govProg = byId['tenncare-diaper-benefit'];
+const GOV = { domain: domainOf(govProg), program: govProg };
 const FIX = {
   enfamil: 'https://www.enfamil.com/e2e-form',
   similac: 'https://www.similac.com/e2e-form',
   target: 'https://registry.target.com/e2e-form',
+  single: 'https://www.' + SINGLE.domain + '/e2e-form',
+  singleSub: 'https://shop.' + SINGLE.domain + '/e2e-form',
+  gov: 'https://www.' + GOV.domain + '/e2e-form',
   evil: 'https://evil.example/e2e-form',
   plain: 'http://www.enfamil.com/e2e-form'
 };
@@ -52,6 +65,9 @@ export async function fill(env) {
       g.note('personal data embedded in the script: ' + Object.keys(D.profile).join(', ') + ' (plus plus-addresses per program when plus tags are on)');
       const Don = JSON.parse(/^\(function\(\)\{var D=(\{[\s\S]*?\});var FM=\(/.exec(on.script)[1]);
       g.check('plus-address mode embeds a tagged email per program', Don.programs.some((p) => p.email && p.email.includes('+')) && D.programs.every((p) => p.email === ''));
+      const embBad = Don.programs.filter((p) => { const q = byId[p.id]; return E.inEmailFeatures(q) ? p.email !== plusOf(on.tags, p.id) : p.email !== ''; }).map((p) => p.id);
+      g.check('plus-address mode tags exactly the programs that pass inEmailFeatures, and no government or no-email program', embBad.length === 0 && Don.programs.some((p) => p.email === '') && Don.programs.some((p) => p.id === GOV.program.id && p.email === ''), embBad.slice(0, 4).join(','));
+      g.check('picked domains are as intended: single brand domain has one listed program, similac and target have two or more, the government domain has no email-feature program', byDomain[SINGLE.domain].length === 1 && byDomain['similac.com'].length >= 2 && byDomain['target.com'].length >= 2 && byDomain[GOV.domain].every((q) => !E.inEmailFeatures(q)));
     }
     const h = await open(browser, { goto: false, fixtures });
     const page = h.page;
@@ -71,8 +87,16 @@ export async function fill(env) {
       { name: 'enfamil (two programs, same domain)', url: FIX.enfamil, script: off.script, email: plainEmail },
       { name: 'similac', url: FIX.similac, script: off.script, email: plainEmail },
       { name: 'target subdomain registry.target.com', url: FIX.target, script: off.script, email: plainEmail },
-      { name: 'similac with plus addresses', url: FIX.similac, script: on.script, email: plusOf(on.tags, 'similac-mysimilac-rewards') },
-      { name: 'target subdomain with plus addresses', url: FIX.target, script: on.script, email: plusOf(on.tags, 'target-registry-welcome-kit') }
+      // one listed program on the domain, in the email features: its own plus address
+      { name: 'single-program brand domain ' + SINGLE.domain + ' with plus addresses', url: FIX.single, script: on.script, email: plusOf(on.tags, SINGLE.program.id) },
+      { name: 'subdomain of ' + SINGLE.domain + ' with plus addresses', url: FIX.singleSub, script: on.script, email: plusOf(on.tags, SINGLE.program.id) },
+      // several listed programs on the domain with different tags: the plain address, even with plus addresses on
+      { name: 'similac.com (two programs) with plus addresses gets the plain address', url: FIX.similac, script: on.script, email: plainEmail },
+      { name: 'enfamil.com (two programs) with plus addresses gets the plain address', url: FIX.enfamil, script: on.script, email: plainEmail },
+      { name: 'target subdomain registry.target.com (two programs) with plus addresses gets the plain address', url: FIX.target, script: on.script, email: plainEmail },
+      // a government sign-up page is outside the email features: plain address
+      { name: 'government program domain ' + GOV.domain + ' with plus addresses gets the plain address', url: FIX.gov, script: on.script, email: plainEmail },
+      { name: 'same single-program brand domain ' + SINGLE.domain + ' with plus addresses off gets the plain address', url: FIX.single, script: off.script, email: plainEmail }
     ];
     for (const c of cases) {
       await prep(c.url);
@@ -124,7 +148,7 @@ export async function persistence(env) {
   const { browser } = env;
   const KNOWN = ['bff.profile.v1', 'bff.tracker.v1', 'bff.prefs.v1', 'bff.guided.v1'];
   await runGroup('9 persistence and privacy: known keys only, no cookies or other storage, reload keeps data, blocked storage degrades', async (g) => {
-    const src = fs.readFileSync(path.join(ROOT, 'index.html'), 'utf8');
+    const src = fs.readFileSync(path.join(OUT, 'index.html'), 'utf8');
     g.check('page source never touches cookies, sessionStorage or IndexedDB', !/document\.cookie|sessionStorage|indexedDB/.test(src));
     for (const mode of ['standalone', 'artifact']) {
       const h = await open(browser, { mode });
@@ -147,8 +171,15 @@ export async function persistence(env) {
       await h.go('info');
       const f = await page.evaluate(() => ({ fn: document.getElementById('info-firstName').value, em: document.getElementById('info-email').value, plus: document.getElementById('info-plus').checked }));
       g.check(mode + ': reload keeps My info', f.fn === 'Sam' && f.em === PROFILE.email && f.plus === true, JSON.stringify(f));
+      // Truly free is still on after the reload, so the directory lists only truly free programs. Look for the
+      // statuses where a person would: in the Tracker (every program), and in the directory for a program it still lists.
+      await h.go('tracker');
+      g.check(mode + ': reload keeps tracker statuses (first program is Signed up in the Tracker)', (await page.locator('#trk-s-' + PROGRAMS[0].id).inputValue()) === 'signed-up');
       await h.go('directory');
-      g.check(mode + ': reload keeps tracker statuses', (await page.locator('select[data-program-id="' + PROGRAMS[0].id + '"]').inputValue()) === 'signed-up');
+      const seen = await page.evaluate(() => Object.fromEntries([...document.querySelectorAll('#view-directory select[data-program-id]')].map((s) => [s.dataset.programId, s.value])));
+      const marked = PROGRAMS.slice(0, 3).map((p, i) => [p, ['signed-up', 'received', 'skipped'][i]]).filter(([p]) => L.isTrulyFree(p));
+      g.check(mode + ': reload keeps statuses on the directory cards that Truly free still lists', marked.length > 0 ? marked.every(([p, v]) => seen[p.id] === v) : true, JSON.stringify(seen).slice(0, 200));
+      g.check(mode + ': a program that is not truly free is not listed while Truly free is on', !Object.keys(seen).includes(PROGRAMS[0].id) || L.isTrulyFree(PROGRAMS[0]));
       g.check(mode + ': reload keeps prefs (theme and filter)', (await page.evaluate(() => document.documentElement.getAttribute('data-theme'))) === 'dark' && (await page.getByLabel('Truly free').isChecked()));
       await h.go('tracker');
       g.check(mode + ': reload keeps notes', (await page.locator('#trk-n-' + PROGRAMS[0].id).inputValue()) === 'kept note');

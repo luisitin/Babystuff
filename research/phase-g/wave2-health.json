@@ -1,0 +1,1241 @@
+[
+ {
+  "id": "healthcare-gov-pregnancy-coverage",
+  "name": "Health coverage if you're pregnant",
+  "brand": "HealthCare.gov",
+  "category": "health-benefits",
+  "whatYouGet": "Explains that all Marketplace and Medicaid plans cover pregnancy and childbirth, and how to apply (create an account for Marketplace coverage, or check Medicaid/CHIP eligibility) or report a pregnancy or birth.",
+  "costToClaim": "free",
+  "costDetail": "Free to apply; Medicaid/CHIP coverage is free or low-cost; Marketplace plans may have premiums.",
+  "requirements": [
+   "insurance",
+   "eligibility"
+  ],
+  "eligibility": "People who are pregnant or recently gave birth; Medicaid/CHIP depends on state and income.",
+  "region": "US",
+  "signupUrl": "https://www.healthcare.gov/what-if-im-pregnant-or-plan-to-get-pregnant/",
+  "sourceUrls": [
+   "https://www.healthcare.gov/what-if-im-pregnant-or-plan-to-get-pregnant/"
+  ],
+  "verifiedOn": "2026-11-10",
+  "confidence": "medium",
+  "catches": "Pregnancy alone does not open a Special Enrollment Period; the birth of a child does (apply within 60 days of birth). Open Enrollment runs Nov 1 - Jan 15. Marketplace plans can have premiums, deductibles and copays.",
+  "notes": "Medicaid or CHIP coverage can begin any time if you are eligible.",
+  "offers": [
+   "coverage"
+  ],
+  "certainty": "if-eligible",
+  "freeStuff": "",
+  "valueLow": 9000,
+  "valueHigh": 28000,
+  "valueSource": "estimate",
+  "valueBasis": "HHS (ASPE) 2010-11 payments for a birth episode: about $9,100 to $13,600 Medicaid, $18,300 to $27,900 commercial; old data, not a current price",
+  "effort": "involved",
+  "when": "pregnancy",
+  "whenNote": "Pregnancy alone does not open a Special Enrollment Period; Open Enrollment runs Nov 1 to Jan 15; Medicaid/CHIP can start any time.",
+  "states": []
+ },
+ {
+  "id": "medicaid-chip-pregnancy-coverage",
+  "name": "Medicaid & CHIP coverage (pregnancy)",
+  "brand": "Medicaid.gov / HealthCare.gov",
+  "category": "health-benefits",
+  "whatYouGet": "Free or low-cost coverage for eligible pregnant women; CHIP states can cover prenatal, delivery and postpartum care, and newborns of covered mothers are deemed eligible.",
+  "costToClaim": "free",
+  "costDetail": "Free or low-cost; varies by state",
+  "requirements": [
+   "eligibility"
+  ],
+  "eligibility": "Income-based (MAGI) and non-financial criteria; rules vary by state. Postpartum care is covered at least 60 days, and many states extend to 12 months.",
+  "region": "Varies by state",
+  "signupUrl": "https://www.healthcare.gov/medicaid-chip/getting-medicaid-chip/",
+  "sourceUrls": [
+   "https://www.healthcare.gov/medicaid-chip/getting-medicaid-chip/",
+   "https://www.medicaid.gov/chip/chip-eligibility-enrollment",
+   "https://www.insurekidsnow.gov/initiatives/maternal-health"
+  ],
+  "verifiedOn": "2026-11-10",
+  "confidence": "medium",
+  "catches": "Details such as income limits differ by state.",
+  "notes": "You can apply any time of year. When a pregnant woman is enrolled in Medicaid or CHIP, her newborn is automatically enrolled (InsureKidsNow.gov).",
+  "offers": [
+   "coverage"
+  ],
+  "certainty": "if-eligible",
+  "freeStuff": "",
+  "valueLow": 9000,
+  "valueHigh": 14000,
+  "valueSource": "estimate",
+  "valueBasis": "HHS (ASPE) 2010-11 Medicaid payments for a birth episode: about $9,100 (vaginal) to $13,600 (cesarean); old data, not a current price",
+  "effort": "involved",
+  "when": "pregnancy",
+  "whenNote": "You can apply any time of year; postpartum coverage lasts at least 60 days and many states extend to 12 months.",
+  "states": []
+ },
+ {
+  "id": "tenncare-diaper-benefit",
+  "name": "TennCare diaper benefit",
+  "brand": "TennCare (Tennessee)",
+  "category": "diapers-wipes",
+  "whatYouGet": "Up to 100 diapers a month for TennCare and CoverKids members under age 2, picked up at a participating pharmacy.",
+  "costToClaim": "free",
+  "costDetail": "No cost or copay; no prescription needed.",
+  "requirements": [
+   "eligibility",
+   "insurance"
+  ],
+  "eligibility": "Babies under age 2 enrolled in TennCare or CoverKids; the baby is eligible only after birth.",
+  "region": "Tennessee",
+  "signupUrl": "https://www.tn.gov/tenncare/members-applicants/benefits-services/diapers.html",
+  "sourceUrls": [
+   "https://www.tn.gov/tenncare/members-applicants/benefits-services/diapers.html",
+   "https://www.tn.gov/tenncare/members-applicants/benefits-services/tenncare-healthy-moms-babies.html"
+  ],
+  "verifiedOn": "2026-11-10",
+  "confidence": "medium",
+  "catches": "Limit of 100 diapers per 30 days and 200 per 60 days from an approved brand list. Only after the baby is born. Pharmacy must participate.",
+  "notes": "Newborns waiting on an ID can use the parent's TennCare pharmacy ID. Update TennCare Connect after birth.",
+  "offers": [
+   "product"
+  ],
+  "certainty": "if-eligible",
+  "freeStuff": "Free diapers from a participating pharmacy for TennCare or CoverKids babies.",
+  "valueLow": 200,
+  "valueHigh": 360,
+  "valueSource": "estimate",
+  "valueBasis": "Up to 100 newborn diapers a month at about $0.30 each, for 6 to 12 months",
+  "effort": "some",
+  "when": "after-birth",
+  "whenNote": "The baby becomes eligible only after birth.",
+  "states": [
+   "TN"
+  ]
+ },
+ {
+  "id": "delaware-medicaid-postpartum-diapers-meals",
+  "name": "Delaware Medicaid postpartum diapers, wipes and meals",
+  "brand": "Delaware Health and Social Services (Diamond State Health Plan)",
+  "category": "diapers-wipes",
+  "whatYouGet": "For 12 weeks after birth, Medicaid covers up to 80 diapers and a pack of wipes a week, plus home-delivered meals or a shelf-stable food box.",
+  "costToClaim": "free",
+  "costDetail": "Covered by Delaware Medicaid for postpartum members.",
+  "requirements": [
+   "insurance",
+   "eligibility"
+  ],
+  "eligibility": "Low-income postpartum members of the Diamond State Health Plan (Delaware Medicaid).",
+  "region": "Delaware",
+  "signupUrl": "https://dhss.delaware.gov/dmma/home/medicaid/waiver-programs/",
+  "sourceUrls": [
+   "https://dhss.delaware.gov/dmma/home/medicaid/waiver-programs/",
+   "https://news.delaware.gov/2024/06/03/delaware-first-to-focus-on-healthier-start-for-new-moms-with-12-weeks-of-free-diapers-home-delivered-meals/"
+  ],
+  "verifiedOn": "2026-11-10",
+  "confidence": "low",
+  "catches": "This is a Medicaid waiver pilot; I found no 2026 page confirming it still runs. The state has warned of possible cuts. How to claim (through the Medicaid plan) is not spelled out in the results.",
+  "notes": "Terms from the June 2024 state announcement and the waiver page.",
+  "offers": [
+   "product"
+  ],
+  "certainty": "if-eligible",
+  "freeStuff": "Free diapers, wipes and meals for 12 weeks after birth for Delaware Medicaid members.",
+  "valueLow": 250,
+  "valueHigh": 325,
+  "valueSource": "estimate",
+  "valueBasis": "80 diapers a week for 12 weeks at about $0.30 plus 12 packs of wipes at about $3; meals not counted",
+  "effort": "some",
+  "when": "after-birth",
+  "whenNote": "Benefit runs for the first 12 weeks after birth.",
+  "states": [
+   "DE"
+  ]
+ },
+ {
+  "id": "aetna-better-health-pregnancy-rewards",
+  "name": "Aetna Better Health pregnancy rewards and baby items",
+  "brand": "Aetna Better Health (Medicaid)",
+  "category": "health-benefits",
+  "whatYouGet": "Medicaid members earn a gift card, or in Illinois a car seat, highchair or play yard, for prenatal visits; amounts depend on the state plan.",
+  "costToClaim": "free",
+  "costDetail": "Members of the plan only; earned by attending visits.",
+  "requirements": [
+   "insurance",
+   "eligibility"
+  ],
+  "eligibility": "Members of an Aetna Better Health Medicaid plan in the listed states.",
+  "region": "KY, IL, LA, OK, FL",
+  "signupUrl": "https://www.aetnabetterhealth.com/kentucky/pregnancy-care.html",
+  "sourceUrls": [
+   "https://www.aetnabetterhealth.com/kentucky/pregnancy-care.html",
+   "https://www.aetnabetterhealth.com/illinois-medicaid/pregnancy-care.html",
+   "https://www.aetnabetterhealth.com/oklahoma/extra-benefits.html",
+   "https://ch.aetnabetterhealth.com/louisiana/rewards-program.html"
+  ],
+  "verifiedOn": "2026-11-10",
+  "confidence": "medium",
+  "catches": "Only for members of that plan. Kentucky and Oklahoma need 7 prenatal visits and 37+ weeks; Illinois needs a health risk screening and a prenatal visit; Florida and Louisiana give a $150 or $50 baby-items stipend. Page dates vary.",
+  "notes": "Amounts seen: KY up to $90, OK $100, FL $150, LA $50.",
+  "offers": [
+   "cash",
+   "product"
+  ],
+  "certainty": "if-eligible",
+  "freeStuff": "Gift card (or in Illinois a car seat, highchair or play yard) for plan members who keep prenatal visits.",
+  "valueLow": 50,
+  "valueHigh": 150,
+  "valueSource": "official",
+  "valueBasis": "Plan pages state $50 (LA), $90 (KY), $100 (OK) and $150 (FL)",
+  "effort": "some",
+  "when": "late-pregnancy",
+  "whenNote": "Kentucky and Oklahoma reward is earned at 37 weeks or later.",
+  "states": [
+   "KY",
+   "IL",
+   "LA",
+   "OK",
+   "FL"
+  ]
+ },
+ {
+  "id": "amerihealth-caritas-bright-start",
+  "name": "AmeriHealth Caritas Bright Start rewards",
+  "brand": "AmeriHealth Caritas",
+  "category": "health-benefits",
+  "whatYouGet": "Plan members who join Bright Start can earn CARE Card or gift card rewards, a breast pump, and a portable crib or car seat for prenatal visits.",
+  "costToClaim": "free",
+  "costDetail": "Members of the plan only.",
+  "requirements": [
+   "insurance",
+   "eligibility",
+   "phone"
+  ],
+  "eligibility": "Pregnant members of AmeriHealth Caritas Delaware (reward list seen); Florida and Ohio pages describe care management without amounts.",
+  "region": "DE (rewards listed); FL, OH care management",
+  "signupUrl": "https://www.amerihealthcaritasde.com/member/benefits/bright-start",
+  "sourceUrls": [
+   "https://www.amerihealthcaritasde.com/member/benefits/bright-start",
+   "https://www.amerihealthcaritasnext.com/fl/members/care-coordination/pregnancy",
+   "https://www.amerihealthcaritasnext.com/oh/members/care-coordination/pregnancy"
+  ],
+  "verifiedOn": "2026-11-10",
+  "confidence": "low",
+  "catches": "Delaware figures come from pages up to a year old. Must enroll (1-833-669-7672) and complete visits (for example eight prenatal visits by 38 weeks for the crib or car seat). A 2027 page mentions changed extras.",
+  "notes": "Delaware list: $15 for reporting pregnancy early, $30 for four visits by week 26, $30 postpartum visit.",
+  "offers": [
+   "cash",
+   "product"
+  ],
+  "certainty": "if-eligible",
+  "freeStuff": "Gift cards plus a portable crib or car seat for members who complete prenatal visits.",
+  "valueLow": 75,
+  "valueHigh": 175,
+  "valueSource": "estimate",
+  "valueBasis": "$15 + $30 + $30 in cards, plus a portable crib or car seat at about $80 to $100 at the high end",
+  "effort": "some",
+  "when": "pregnancy",
+  "whenNote": "Rewards are tied to visits by set weeks; enroll as early as possible.",
+  "states": [
+   "DE",
+   "FL",
+   "OH"
+  ]
+ },
+ {
+  "id": "caresource-babies-first-rewards",
+  "name": "CareSource Babies First rewards",
+  "brand": "CareSource",
+  "category": "health-benefits",
+  "whatYouGet": "Medicaid members who enroll can earn rewards on a prepaid card for prenatal, postpartum and well-baby visits.",
+  "costToClaim": "free",
+  "costDetail": "Members of the plan only; must enroll each pregnancy.",
+  "requirements": [
+   "insurance",
+   "eligibility"
+  ],
+  "eligibility": "CareSource Medicaid members in states with the program (Indiana, Kentucky, Ohio and others).",
+  "region": "IN, KY, OH, GA",
+  "signupUrl": "https://www.caresource.com/plans/medicaid/benefits-services/additional-services/babies-first/",
+  "sourceUrls": [
+   "https://www.caresource.com/plans/medicaid/benefits-services/additional-services/babies-first/",
+   "https://www.caresource.com/documents/babies-first-rewards-program-ky-med/"
+  ],
+  "verifiedOn": "2026-11-10",
+  "confidence": "low",
+  "catches": "Rewards post only after the claim is processed (up to 45 to 60 days). Amounts differ by state and some brochures are old.",
+  "notes": "Seen: Indiana up to $200, Kentucky up to $150, Ohio $75 for the first prenatal visit.",
+  "offers": [
+   "cash"
+  ],
+  "certainty": "if-eligible",
+  "freeStuff": "Prepaid-card rewards for prenatal, postpartum and well-baby visits.",
+  "valueLow": 75,
+  "valueHigh": 200,
+  "valueSource": "official",
+  "valueBasis": "Plan materials say Ohio $75 first visit, Kentucky up to $150, Indiana up to $200",
+  "effort": "some",
+  "when": "pregnancy",
+  "whenNote": "Re-enroll with each pregnancy; earn from early prenatal visits.",
+  "states": [
+   "IN",
+   "KY",
+   "OH",
+   "GA"
+  ]
+ },
+ {
+  "id": "my-health-pays-prenatal-rewards",
+  "name": "My Health Pays prenatal rewards (Centene Medicaid plans)",
+  "brand": "Sunshine Health, Superior HealthPlan, Coordinated Care, Peach State Health Plan",
+  "category": "health-benefits",
+  "whatYouGet": "Medicaid members earn money on a prepaid card for early prenatal visits and a postpartum visit.",
+  "costToClaim": "free",
+  "costDetail": "Members of those plans only.",
+  "requirements": [
+   "insurance",
+   "eligibility"
+  ],
+  "eligibility": "Medicaid or CHIP members of the listed plans.",
+  "region": "FL, TX, WA, GA",
+  "signupUrl": "https://www.superiorhealthplan.com/members/medicaid/value-added-services/healthy-rewards-program.html",
+  "sourceUrls": [
+   "https://www.sunshinehealth.com/members/smi/benefits-services/pregnancy-and-newborn-services/pregnancy-services/my-health-pays-rewards.html",
+   "https://www.superiorhealthplan.com/members/medicaid/value-added-services/healthy-rewards-program.html",
+   "https://www.coordinatedcarehealth.com/members/medicaid/benefits-services/healthy-rewards-program.html"
+  ],
+  "verifiedOn": "2026-11-10",
+  "confidence": "medium",
+  "catches": "Superior requires enrollment from Jan 1, 2027 and caps rewards at $150 a year; Coordinated Care 2027 requires a Notification of Pregnancy. Amounts differ by plan and year.",
+  "notes": "Superior TX $75 to $100 first-trimester visit; Sunshine FL up to $100; Coordinated WA $25 (2026) rising to $30; Peach State GA up to $90 for pregnancy items.",
+  "offers": [
+   "cash"
+  ],
+  "certainty": "if-eligible",
+  "freeStuff": "Prepaid-card rewards for early prenatal visits and a postpartum visit.",
+  "valueLow": 25,
+  "valueHigh": 150,
+  "valueSource": "official",
+  "valueBasis": "Plan pages state $25 to $100 per visit and a $150 yearly cap at Superior",
+  "effort": "some",
+  "when": "pregnancy",
+  "whenNote": "First-trimester visits (or within 42 days of enrolling) earn the most.",
+  "states": [
+   "FL",
+   "TX",
+   "WA",
+   "GA"
+  ]
+ },
+ {
+  "id": "wellcare-nc-better-beginnings",
+  "name": "WellCare of North Carolina Better Beginnings rewards",
+  "brand": "WellCare of North Carolina (Medicaid)",
+  "category": "health-benefits",
+  "whatYouGet": "Medicaid members who notify the plan of pregnancy earn $25 for a prenatal visit and $25 for a postpartum visit, plus a choice of stroller, play yard, car seat or diapers.",
+  "costToClaim": "free",
+  "costDetail": "Members of the plan only.",
+  "requirements": [
+   "insurance",
+   "eligibility"
+  ],
+  "eligibility": "WellCare of NC Medicaid members who submit a Notification of Pregnancy.",
+  "region": "North Carolina",
+  "signupUrl": "https://www.wellcarenc.com/members/medicaid/healthy-moms-and-babies/better-beginnings.html",
+  "sourceUrls": [
+   "https://www.wellcarenc.com/members/medicaid/healthy-moms-and-babies/better-beginnings.html",
+   "https://www.wellcarenc.com/members/medicaid/benefits/my-health-pays.html"
+  ],
+  "verifiedOn": "2026-11-10",
+  "confidence": "medium",
+  "catches": "Must notify the plan before the birth. Up to $75 a year in rewards. A New Parent package and free pump are also mentioned; confirm with the plan.",
+  "notes": "South Carolina and Georgia WellCare pages exist but are older and not included.",
+  "offers": [
+   "cash",
+   "product"
+  ],
+  "certainty": "if-eligible",
+  "freeStuff": "Rewards plus a stroller, play yard, car seat or diapers for members who attend a prenatal visit.",
+  "valueLow": 100,
+  "valueHigh": 150,
+  "valueSource": "estimate",
+  "valueBasis": "$25 to $50 in rewards plus one item such as a play yard at about $80 to $100",
+  "effort": "some",
+  "when": "pregnancy",
+  "whenNote": "Notify the plan during pregnancy; reward follows a prenatal visit.",
+  "states": [
+   "NC"
+  ]
+ },
+ {
+  "id": "blue-cross-special-beginnings",
+  "name": "Blue Cross Special Beginnings maternity rewards",
+  "brand": "Blue Cross Community Health Plans (Illinois) and Blue Cross Blue Shield of Texas",
+  "category": "health-benefits",
+  "whatYouGet": "Medicaid members who join Special Beginnings can get a car seat or portable crib or gift cards for prenatal and postpartum visits.",
+  "costToClaim": "free",
+  "costDetail": "Members of those plans only.",
+  "requirements": [
+   "insurance",
+   "eligibility",
+   "phone"
+  ],
+  "eligibility": "Pregnant members of Blue Cross Community Health Plans (IL) or BCBSTX Medicaid/CHIP; join by phone 1-888-421-7781.",
+  "region": "IL, TX",
+  "signupUrl": "https://www.bcbsil.com/bcchp/resources/maternal-and-infant-health",
+  "sourceUrls": [
+   "https://www.bcbsil.com/bcchp/resources/maternal-and-infant-health",
+   "https://www.bcbsil.com/medicaid/pdf/bcchp-special-beginnings.pdf",
+   "https://www.bcbstx.com/medicaid/member-resources/maternal-and-infant-health"
+  ],
+  "verifiedOn": "2026-11-10",
+  "confidence": "low",
+  "catches": "Sources disagree on exact rewards ($30 cards vs a car seat or crib in IL; $50 and $25 cards in TX). Enrolling is generally required.",
+  "notes": "Plan name and Baby Yourself program not found in results.",
+  "offers": [
+   "product",
+   "cash"
+  ],
+  "certainty": "if-eligible",
+  "freeStuff": "A car seat or portable crib (Illinois) or gift cards (Texas) for plan members who enroll and attend visits.",
+  "valueLow": 75,
+  "valueHigh": 130,
+  "valueSource": "estimate",
+  "valueBasis": "Texas $50 + $25 cards, or an Illinois crib or car seat at about $80 to $100 plus a $30 card",
+  "effort": "some",
+  "when": "pregnancy",
+  "whenNote": "Join early in pregnancy; first-trimester visit earns the reward.",
+  "states": [
+   "IL",
+   "TX"
+  ]
+ },
+ {
+  "id": "highmark-mom-options-mom-matters",
+  "name": "Highmark MOM Options and MOM Matters",
+  "brand": "Highmark Health Options and Highmark Wholecare",
+  "category": "health-benefits",
+  "whatYouGet": "Medicaid members who keep prenatal visits can choose an infant car seat, stroller, Pack n Play or baby shower box; Wholecare pays money for visits and offers free classes and rides.",
+  "costToClaim": "free",
+  "costDetail": "Members of those plans only.",
+  "requirements": [
+   "insurance",
+   "eligibility"
+  ],
+  "eligibility": "Highmark Health Options (DE, WV) or Highmark Wholecare (PA) Medicaid members.",
+  "region": "DE, WV, PA",
+  "signupUrl": "https://www.highmark.com/wholecare/medicaid/coverage-benefits/pregnancy-pediatrics/mom-matters",
+  "sourceUrls": [
+   "https://www.highmark.com/wholecare/medicaid/coverage-benefits/pregnancy-pediatrics/mom-matters",
+   "https://www.highmark.com/health-options-de/medicaid/benefits-programs/pregnancy-newborn-benefits",
+   "https://www.highmark.com/health-options-wv/medicaid-chip/benefits-services/maternity-coverage"
+  ],
+  "verifiedOn": "2026-11-10",
+  "confidence": "low",
+  "catches": "Search summaries only; the exact amounts and visit rules were not shown.",
+  "notes": "Highmark Baby Blocks not found. Baby Blueprints is a commercial-plan coaching program.",
+  "offers": [
+   "product",
+   "cash"
+  ],
+  "certainty": "if-eligible",
+  "freeStuff": "A choice of car seat, stroller or Pack n Play for plan members who keep prenatal visits.",
+  "valueLow": 80,
+  "valueHigh": 100,
+  "valueSource": "estimate",
+  "valueBasis": "One baby item such as a portable crib at about $80 to $100",
+  "effort": "some",
+  "when": "pregnancy",
+  "whenNote": "Rewards tied to regular prenatal visits.",
+  "states": [
+   "DE",
+   "WV",
+   "PA"
+  ]
+ },
+ {
+  "id": "wellpoint-medicaid-baby-essentials",
+  "name": "Wellpoint Medicaid baby essentials gift card",
+  "brand": "Wellpoint (Elevance Health)",
+  "category": "health-benefits",
+  "whatYouGet": "Washington members can get a $100 gift card for baby items, and West Virginia members up to $170 after six prenatal visits.",
+  "costToClaim": "free",
+  "costDetail": "Members of the plan only.",
+  "requirements": [
+   "insurance",
+   "eligibility"
+  ],
+  "eligibility": "Wellpoint Medicaid members in WA or WV who complete required visits.",
+  "region": "WA, WV",
+  "signupUrl": "https://www.wellpoint.com/wa/medicaid/extras",
+  "sourceUrls": [
+   "https://www.wellpoint.com/wa/medicaid/extras",
+   "https://www.wellpoint.com/wv/medicaid/extras"
+  ],
+  "verifiedOn": "2026-11-10",
+  "confidence": "medium",
+  "catches": "One card per pregnancy. Anthem Ohio offers a choice of two items; amounts on some Anthem pages are old.",
+  "notes": "Healthy Rewards line seen: 888-990-8681.",
+  "offers": [
+   "cash"
+  ],
+  "certainty": "if-eligible",
+  "freeStuff": "A gift card for baby items for Wellpoint Medicaid members.",
+  "valueLow": 100,
+  "valueHigh": 170,
+  "valueSource": "official",
+  "valueBasis": "Plan pages state $100 (WA) and up to $170 (WV)",
+  "effort": "some",
+  "when": "pregnancy",
+  "whenNote": "Card is earned through prenatal visits.",
+  "states": [
+   "WA",
+   "WV"
+  ]
+ },
+ {
+  "id": "upmc-for-you-baby-steps-gift",
+  "name": "UPMC for You Baby Steps baby gift",
+  "brand": "UPMC Health Plan",
+  "category": "health-benefits",
+  "whatYouGet": "Medicaid members who finish the Baby Steps program can pick a free baby gift bundle.",
+  "costToClaim": "free",
+  "costDetail": "Members of UPMC for You only.",
+  "requirements": [
+   "insurance",
+   "eligibility",
+   "phone"
+  ],
+  "eligibility": "UPMC for You members who join Baby Steps before 34 weeks and start prenatal care before 13 weeks.",
+  "region": "Pennsylvania",
+  "signupUrl": "https://medicaid.upmchealthplan.com/learn/additional-benefits/",
+  "sourceUrls": [
+   "https://medicaid.upmchealthplan.com/learn/additional-benefits/",
+   "https://www.upmchealthplan.com/maternity/maternity-care-management"
+  ],
+  "verifiedOn": "2026-11-10",
+  "confidence": "medium",
+  "catches": "Must join by 34 weeks, keep calls and prenatal tests. Gift format changed over the years (car seat, stroller, play yard, now an online bundle).",
+  "notes": "Eligibility set by the Baby Steps health coach.",
+  "offers": [
+   "product"
+  ],
+  "certainty": "if-eligible",
+  "freeStuff": "A baby gift bundle for members who complete Baby Steps.",
+  "valueLow": 80,
+  "valueHigh": 100,
+  "valueSource": "estimate",
+  "valueBasis": "One portable crib or car seat equivalent at about $80 to $100",
+  "effort": "some",
+  "when": "pregnancy",
+  "whenNote": "Join before 34 weeks of pregnancy.",
+  "states": [
+   "PA"
+  ]
+ },
+ {
+  "id": "kaiser-permanente-prenatal-classes",
+  "name": "Kaiser Permanente prenatal and childbirth classes",
+  "brand": "Kaiser Permanente",
+  "category": "health-benefits",
+  "whatYouGet": "Members can take childbirth preparation and newborn classes at no fee at most regions.",
+  "costToClaim": "free",
+  "costDetail": "No fee for members; one site lists $150 per couple for nonmembers.",
+  "requirements": [
+   "insurance"
+  ],
+  "eligibility": "Kaiser Permanente members; some regions open some classes to nonmembers.",
+  "region": "CA, GA, MD, VA, DC",
+  "signupUrl": "https://healthy.kaiserpermanente.org/northern-california/health-wellness/maternity/find-hospital/san-jose/classes-resources",
+  "sourceUrls": [
+   "https://healthy.kaiserpermanente.org/northern-california/health-wellness/maternity/find-hospital/san-jose/classes-resources",
+   "https://georgia.kaiserpermanente.org/healthyliving/classes/pregnancy-newborn-care/"
+  ],
+  "verifiedOn": "2026-11-10",
+  "confidence": "medium",
+  "catches": "Fees and formats differ by region; register 3 to 4 weeks ahead at some sites.",
+  "notes": "Only for people with Kaiser coverage.",
+  "offers": [
+   "service"
+  ],
+  "certainty": "if-eligible",
+  "freeStuff": "Free childbirth preparation classes for Kaiser members.",
+  "valueLow": 150,
+  "valueHigh": 150,
+  "valueSource": "estimate",
+  "valueBasis": "One site lists $150 per couple for nonmembers",
+  "effort": "some",
+  "when": "pregnancy",
+  "whenNote": "Classes are usually taken in the third trimester; register weeks ahead.",
+  "states": [
+   "CA",
+   "GA",
+   "MD",
+   "VA",
+   "DC"
+  ]
+ },
+ {
+  "id": "pampers-free-online-childbirth-classes",
+  "name": "Pampers free online childbirth classes",
+  "brand": "Pampers",
+  "category": "baby-care",
+  "whatYouGet": "A free online series of childbirth classes led by clinical experts, from labor to postpartum care.",
+  "costToClaim": "free",
+  "costDetail": "Free; registration required.",
+  "requirements": [
+   "email"
+  ],
+  "eligibility": "Anyone expecting a baby.",
+  "region": "US",
+  "signupUrl": "https://www.pampers.com/en-us/pregnancy/birthing-classes",
+  "sourceUrls": [
+   "https://www.pampers.com/en-us/pregnancy/birthing-classes"
+  ],
+  "verifiedOn": "2026-11-10",
+  "confidence": "medium",
+  "catches": "Pages are undated; one says 10 parts, another 9. Confirm that it is still offered.",
+  "notes": "",
+  "offers": [
+   "service"
+  ],
+  "certainty": "guaranteed",
+  "freeStuff": "Free online childbirth classes.",
+  "valueLow": null,
+  "valueHigh": null,
+  "valueSource": "none",
+  "valueBasis": "",
+  "effort": "quick",
+  "when": "late-pregnancy",
+  "whenNote": "Classes cover labor and birth, so most useful before the due date.",
+  "states": []
+ },
+ {
+  "id": "aeroflow-prenatal-breastfeeding-classes",
+  "name": "Aeroflow prenatal and breastfeeding classes",
+  "brand": "Aeroflow Breastpumps",
+  "category": "feeding",
+  "whatYouGet": "Live classes on pregnancy, pumping and breastfeeding billed to your insurance as a preventive lactation benefit.",
+  "costToClaim": "free",
+  "costDetail": "Aeroflow says many plans cover them in full; some list a small copay or deductible.",
+  "requirements": [
+   "insurance"
+  ],
+  "eligibility": "Members of plans that cover preventive lactation benefits.",
+  "region": "US",
+  "signupUrl": "https://aeroflowbreastpumps.com/pregnancy-breastfeeding-classes",
+  "sourceUrls": [
+   "https://aeroflowbreastpumps.com/pregnancy-breastfeeding-classes",
+   "https://aeroflowbreastpumps.com/lactation-know-your-benefits"
+  ],
+  "verifiedOn": "2026-11-10",
+  "confidence": "medium",
+  "catches": "Aetna and TRICARE cap combined preventive lactation visits at 6 a year, so classes use up visits. Aeroflow pages conflict on cost-sharing.",
+  "notes": "Backed by Aeroflow pages only, not by insurers.",
+  "offers": [
+   "service"
+  ],
+  "certainty": "if-eligible",
+  "freeStuff": "Insurance-paid prenatal and breastfeeding classes.",
+  "valueLow": null,
+  "valueHigh": null,
+  "valueSource": "none",
+  "valueBasis": "",
+  "effort": "some",
+  "when": "pregnancy",
+  "whenNote": "Aeroflow suggests 2 to 3 classes during pregnancy and saving the rest for after birth.",
+  "states": []
+ },
+ {
+  "id": "aeroflow-breast-pump-resupply-insurance",
+  "name": "Aeroflow breast pump resupply through insurance",
+  "brand": "Aeroflow Breastpumps",
+  "category": "feeding",
+  "whatYouGet": "Replacement pump parts and milk storage bags shipped on a schedule when your plan covers them, even if the pump came from elsewhere.",
+  "costToClaim": "free",
+  "costDetail": "Many plans cover in full; some have a small copay or deductible.",
+  "requirements": [
+   "insurance"
+  ],
+  "eligibility": "Members of plans that cover pump supplies.",
+  "region": "US",
+  "signupUrl": "https://aeroflowbreastpumps.com/replacing-breast-pump-parts",
+  "sourceUrls": [
+   "https://aeroflowbreastpumps.com/replacing-breast-pump-parts",
+   "https://aeroflowbreastpumps.com/breast-milk-storage-bags-through-insurance"
+  ],
+  "verifiedOn": "2026-11-10",
+  "confidence": "medium",
+  "catches": "Coverage varies by plan; some pages are old or show items out of stock. Babylist says many plans reimburse parts from 30 days after birth for up to a year.",
+  "notes": "Babylist Health and Pumping Essentials only route pumps (Pumping Essentials works through Aeroflow), so not added.",
+  "offers": [
+   "product"
+  ],
+  "certainty": "if-eligible",
+  "freeStuff": "Free replacement pump parts and milk storage bags through insurance.",
+  "valueLow": null,
+  "valueHigh": null,
+  "valueSource": "none",
+  "valueBasis": "",
+  "effort": "some",
+  "when": "after-birth",
+  "whenNote": "Resupply usually starts after the baby is born.",
+  "states": []
+ },
+ {
+  "id": "wic-farmers-market-nutrition-program",
+  "name": "WIC Farmers Market Nutrition Program",
+  "brand": "USDA Food and Nutrition Service",
+  "category": "assistance",
+  "whatYouGet": "Coupons for fresh fruits, vegetables and herbs at approved farmers markets, issued on top of regular WIC benefits.",
+  "costToClaim": "free",
+  "costDetail": "Free for WIC participants.",
+  "requirements": [
+   "eligibility"
+  ],
+  "eligibility": "WIC-certified women, infants over 4 months and children; offered only by participating states.",
+  "region": "Participating states only",
+  "signupUrl": "https://www.fns.usda.gov/fmnp/wic-farmers-market-nutrition-program",
+  "sourceUrls": [
+   "https://www.fns.usda.gov/fmnp/wic-farmers-market-nutrition-program",
+   "https://www.fns.usda.gov/fmnp/overview"
+  ],
+  "verifiedOn": "2026-11-10",
+  "confidence": "medium",
+  "catches": "Not every state or local agency runs it. Federal benefit is $10 to $30 a year; states may add more.",
+  "notes": "Ask the local WIC office.",
+  "offers": [
+   "product"
+  ],
+  "certainty": "if-eligible",
+  "freeStuff": "Farmers market produce coupons for WIC participants.",
+  "valueLow": 10,
+  "valueHigh": 30,
+  "valueSource": "official",
+  "valueBasis": "USDA says $10 to $30 a year per person federally",
+  "effort": "some",
+  "when": "pregnancy",
+  "whenNote": "Issued to certified WIC participants, including pregnant women.",
+  "states": []
+ },
+ {
+  "id": "wic-breastfeeding-support-food-package",
+  "name": "WIC breastfeeding support and enhanced food package",
+  "brand": "USDA Food and Nutrition Service",
+  "category": "assistance",
+  "whatYouGet": "WIC breastfeeding mothers can get a peer counselor and an enhanced food package, and many WIC offices lend or give breast pumps.",
+  "costToClaim": "free",
+  "costDetail": "Free for WIC participants.",
+  "requirements": [
+   "eligibility"
+  ],
+  "eligibility": "WIC participants who breastfeed; pump rules and peer counselor access vary by state.",
+  "region": "US",
+  "signupUrl": "https://wicbreastfeeding.fns.usda.gov/breastfeeding-benefits",
+  "sourceUrls": [
+   "https://wicbreastfeeding.fns.usda.gov/breastfeeding-benefits",
+   "https://wicworks.fns.usda.gov/topic/wic-food-packages/food-package-vii-fully-breastfeeding",
+   "https://www.fns.usda.gov/wic/breastfeeding-promotion-wic-current-federal-requirements"
+  ],
+  "verifiedOn": "2026-11-10",
+  "confidence": "medium",
+  "catches": "63% of state agencies set conditions for a single-user electric pump; peer counselors are not available everywhere. Food amounts differ between two USDA pages.",
+  "notes": "Extra to the usda-wic entry; fully breastfeeding mothers get more food for up to 12 months.",
+  "offers": [
+   "product",
+   "service"
+  ],
+  "certainty": "if-eligible",
+  "freeStuff": "Extra WIC food, a peer counselor and often a breast pump for breastfeeding mothers.",
+  "valueLow": null,
+  "valueHigh": null,
+  "valueSource": "none",
+  "valueBasis": "",
+  "effort": "some",
+  "when": "after-birth",
+  "whenNote": "Fully breastfeeding mothers can keep the package until the baby is 12 months old.",
+  "states": []
+ },
+ {
+  "id": "count-the-kicks-app",
+  "name": "Count the Kicks free app",
+  "brand": "Healthy Birth Day, Inc.",
+  "category": "health-benefits",
+  "whatYouGet": "A free app and paper charts to count baby movements in the third trimester and spot changes early.",
+  "costToClaim": "free",
+  "costDetail": "Free app in 20+ languages.",
+  "requirements": [
+   "app"
+  ],
+  "eligibility": "Anyone pregnant; starting at 28 weeks (26 if high risk).",
+  "region": "US",
+  "signupUrl": "https://countthekicks.org/",
+  "sourceUrls": [
+   "https://countthekicks.org/",
+   "https://countthekicks.org/faq/"
+  ],
+  "verifiedOn": "2026-11-10",
+  "confidence": "medium",
+  "catches": "Not medical advice; call your provider if movements change.",
+  "notes": "",
+  "offers": [
+   "service"
+  ],
+  "certainty": "guaranteed",
+  "freeStuff": "A free kick-counting app.",
+  "valueLow": null,
+  "valueHigh": null,
+  "valueSource": "none",
+  "valueBasis": "",
+  "effort": "quick",
+  "when": "late-pregnancy",
+  "whenNote": "Counting starts at 28 weeks, or 26 weeks for high-risk pregnancies.",
+  "states": []
+ },
+ {
+  "id": "postpartum-support-international-online-groups",
+  "name": "Postpartum Support International online support groups",
+  "brand": "Postpartum Support International",
+  "category": "health-benefits",
+  "whatYouGet": "Free weekly online support groups for pregnant and postpartum parents on Zoom, including first-time moms and loss support.",
+  "costToClaim": "free",
+  "costDetail": "Free; skip the paid upgrade offered at sign-up.",
+  "requirements": [
+   "email"
+  ],
+  "eligibility": "Pregnant and postpartum people and partners.",
+  "region": "US",
+  "signupUrl": "https://postpartum.net/get-help/psi-online-support-meetings/",
+  "sourceUrls": [
+   "https://postpartum.net/get-help/psi-online-support-meetings/",
+   "https://postpartum.net/get-help/"
+  ],
+  "verifiedOn": "2026-11-10",
+  "confidence": "medium",
+  "catches": "Groups cap at 16 to 25 people; arrive early. The helpline is a separate listed entry.",
+  "notes": "",
+  "offers": [
+   "service"
+  ],
+  "certainty": "guaranteed",
+  "freeStuff": "Free online peer support groups.",
+  "valueLow": null,
+  "valueHigh": null,
+  "valueSource": "none",
+  "valueBasis": "",
+  "effort": "quick",
+  "when": "anytime",
+  "whenNote": "Open during pregnancy and up to two years postpartum for the main group.",
+  "states": []
+ },
+ {
+  "id": "march-of-dimes-mom-baby-mobile-health-centers",
+  "name": "March of Dimes Mom & Baby Mobile Health Centers",
+  "brand": "March of Dimes",
+  "category": "health-benefits",
+  "whatYouGet": "Mobile clinics giving prenatal and postpartum care, free or regardless of ability to pay, in selected communities.",
+  "costToClaim": "free",
+  "costDetail": "Free or pay-what-you-can at some sites; confirm per site.",
+  "requirements": [
+   "eligibility"
+  ],
+  "eligibility": "People in underserved areas, including the uninsured and underinsured.",
+  "region": "Columbus and Southeast OH, Tucson and Phoenix AZ, DC area, New York City, Houston",
+  "signupUrl": "https://www.marchofdimes.org/our-work/programs/mobile-health-centers",
+  "sourceUrls": [
+   "https://www.marchofdimes.org/our-work/programs/mobile-health-centers",
+   "https://www.marchofdimes.org/find-support/support-your-area"
+  ],
+  "verifiedOn": "2026-11-10",
+  "confidence": "low",
+  "catches": "Limited locations. Whether every site is free was not confirmed.",
+  "notes": "New centers planned in AZ and AL in 2026.",
+  "offers": [
+   "service"
+  ],
+  "certainty": "if-eligible",
+  "freeStuff": "Prenatal and postpartum care in a mobile clinic.",
+  "valueLow": null,
+  "valueHigh": null,
+  "valueSource": "none",
+  "valueBasis": "",
+  "effort": "some",
+  "when": "pregnancy",
+  "whenNote": "Prenatal care is best started early.",
+  "states": [
+   "OH",
+   "AZ",
+   "DC",
+   "MD",
+   "NY",
+   "TX"
+  ]
+ },
+ {
+  "id": "ny-free-portable-crib-safe-sleep",
+  "name": "New York free portable crib",
+  "brand": "New York State Department of Health",
+  "category": "baby-care",
+  "whatYouGet": "Families with no safe place for baby to sleep may get a free portable crib and sheet through their local social services office.",
+  "costToClaim": "free",
+  "costDetail": "Free.",
+  "requirements": [
+   "eligibility"
+  ],
+  "eligibility": "Households on public assistance or with limited resources.",
+  "region": "New York",
+  "signupUrl": "https://www.health.ny.gov/diseases/conditions/safesleep/",
+  "sourceUrls": [
+   "https://www.health.ny.gov/diseases/conditions/safesleep/"
+  ],
+  "verifiedOn": "2026-11-10",
+  "confidence": "medium",
+  "catches": "Apply through the local department of social services. Hospitals and home visiting programs also give safe sleep kits.",
+  "notes": "Check CPSC recalls on any donated crib.",
+  "offers": [
+   "product"
+  ],
+  "certainty": "if-eligible",
+  "freeStuff": "A free portable crib and sheet for families in need.",
+  "valueLow": 80,
+  "valueHigh": 80,
+  "valueSource": "estimate",
+  "valueBasis": "One portable crib at about $80",
+  "effort": "involved",
+  "when": "late-pregnancy",
+  "whenNote": "Needed before the baby comes home.",
+  "states": [
+   "NY"
+  ]
+ },
+ {
+  "id": "al-dhr-baby-box-initiative",
+  "name": "Alabama Baby Box Initiative",
+  "brand": "Alabama Department of Human Resources",
+  "category": "baby-care",
+  "whatYouGet": "Expecting and new parents can pick up a free Baby Box with safe sleep education from a local DHR office.",
+  "costToClaim": "free",
+  "costDetail": "Free.",
+  "requirements": [
+   "address"
+  ],
+  "eligibility": "Expecting and new parents in Alabama.",
+  "region": "Alabama",
+  "signupUrl": "https://dhr.alabama.gov/child-protective-services/baby-box-initiative/",
+  "sourceUrls": [
+   "https://dhr.alabama.gov/child-protective-services/baby-box-initiative/"
+  ],
+  "verifiedOn": "2026-11-10",
+  "confidence": "medium",
+  "catches": "Pick up in person at the county DHR office; supplies may vary.",
+  "notes": "Current stock not confirmed.",
+  "offers": [
+   "product"
+  ],
+  "certainty": "likely",
+  "freeStuff": "A free Baby Box (safe sleep space).",
+  "valueLow": null,
+  "valueHigh": null,
+  "valueSource": "none",
+  "valueBasis": "",
+  "effort": "some",
+  "when": "late-pregnancy",
+  "whenNote": "Offered to expecting and new parents.",
+  "states": [
+   "AL"
+  ]
+ },
+ {
+  "id": "virginia-low-income-car-seat-program",
+  "name": "Virginia seat distribution program",
+  "brand": "Virginia Department of Health",
+  "category": "assistance",
+  "whatYouGet": "Free child car seats for families that qualify by income, given out at local sites.",
+  "costToClaim": "free",
+  "costDetail": "Free; class may be required.",
+  "requirements": [
+   "eligibility",
+   "phone"
+  ],
+  "eligibility": "Parents eligible for WIC, SNAP, Medicaid, TANF or FAMIS with a child 7 or younger.",
+  "region": "Virginia",
+  "signupUrl": "https://www.vdh.virginia.gov/child-passenger-safety/low-income-safety-seat-program/",
+  "sourceUrls": [
+   "https://www.vdh.virginia.gov/child-passenger-safety/low-income-safety-seat-program/"
+  ],
+  "verifiedOn": "2026-11-10",
+  "confidence": "medium",
+  "catches": "Call 1-800-732-8333 to find a local site.",
+  "notes": "",
+  "offers": [
+   "product"
+  ],
+  "certainty": "if-eligible",
+  "freeStuff": "A free car seat for income-eligible Virginia families.",
+  "valueLow": 100,
+  "valueHigh": 100,
+  "valueSource": "estimate",
+  "valueBasis": "One infant car seat at about $100",
+  "effort": "involved",
+  "when": "late-pregnancy",
+  "whenNote": "Get the seat before the hospital trip home.",
+  "states": [
+   "VA"
+  ]
+ },
+ {
+  "id": "texas-safe-riders-car-seats",
+  "name": "Texas Safe Riders child safety seats",
+  "brand": "Texas Department of State Health Services",
+  "category": "assistance",
+  "whatYouGet": "Free or low-cost car seats for low-income families after an education session.",
+  "costToClaim": "free",
+  "costDetail": "Free for qualifying families.",
+  "requirements": [
+   "eligibility",
+   "phone"
+  ],
+  "eligibility": "Low-income families or those with financial hardship; caregivers attend a class.",
+  "region": "Texas",
+  "signupUrl": "https://www.dshs.texas.gov/injury-prevention/safe-riders/child-safety-seat-distribution",
+  "sourceUrls": [
+   "https://www.dshs.texas.gov/injury-prevention/safe-riders/child-safety-seat-distribution"
+  ],
+  "verifiedOn": "2026-11-10",
+  "confidence": "medium",
+  "catches": "Call 800-252-8255 for a site; seat supply depends on the site.",
+  "notes": "",
+  "offers": [
+   "product"
+  ],
+  "certainty": "if-eligible",
+  "freeStuff": "A free car seat for qualifying Texas families.",
+  "valueLow": 100,
+  "valueHigh": 100,
+  "valueSource": "estimate",
+  "valueBasis": "One infant car seat at about $100",
+  "effort": "involved",
+  "when": "late-pregnancy",
+  "whenNote": "Get the seat before the baby is born.",
+  "states": [
+   "TX"
+  ]
+ },
+ {
+  "id": "mississippi-safe-riders-magnolia",
+  "name": "Mississippi Safe Riders Magnolia",
+  "brand": "Mississippi State Department of Health",
+  "category": "assistance",
+  "whatYouGet": "Car seat distribution for low-income households applied for through an online form.",
+  "costToClaim": "free",
+  "costDetail": "Free for qualifying households.",
+  "requirements": [
+   "eligibility"
+  ],
+  "eligibility": "Low-income households or those receiving federal aid.",
+  "region": "Mississippi",
+  "signupUrl": "https://msdh.ms.gov/page/43,0,98,1074.html",
+  "sourceUrls": [
+   "https://msdh.ms.gov/page/43,0,98,1074.html"
+  ],
+  "verifiedOn": "2026-11-10",
+  "confidence": "low",
+  "catches": "Details thinly shown; confirm with injuryprevention@msdh.ms.gov.",
+  "notes": "",
+  "offers": [
+   "product"
+  ],
+  "certainty": "if-eligible",
+  "freeStuff": "A car seat for qualifying Mississippi families.",
+  "valueLow": 100,
+  "valueHigh": 100,
+  "valueSource": "estimate",
+  "valueBasis": "One infant car seat at about $100",
+  "effort": "involved",
+  "when": "late-pregnancy",
+  "whenNote": "Apply before the baby arrives.",
+  "states": [
+   "MS"
+  ]
+ },
+ {
+  "id": "family-connects-nurse-home-visit",
+  "name": "Family Connects nurse home visit",
+  "brand": "Family Connects International",
+  "category": "health-benefits",
+  "whatYouGet": "A free nurse home visit about 3 weeks after birth to check mother and baby and link families to help.",
+  "costToClaim": "free",
+  "costDetail": "Free and voluntary.",
+  "requirements": [
+   "address"
+  ],
+  "eligibility": "All families with newborns in participating communities.",
+  "region": "Participating communities in about 18 states",
+  "signupUrl": "https://familyconnects.org/",
+  "sourceUrls": [
+   "https://familyconnects.org/",
+   "https://familyconnects.org/our-work/"
+  ],
+  "verifiedOn": "2026-11-10",
+  "confidence": "medium",
+  "catches": "Only in communities that run it. Oregon and New Jersey have statewide versions.",
+  "notes": "Ask the birth hospital or health department.",
+  "offers": [
+   "service"
+  ],
+  "certainty": "if-eligible",
+  "freeStuff": "A free nurse visit at home after birth.",
+  "valueLow": null,
+  "valueHigh": null,
+  "valueSource": "none",
+  "valueBasis": "",
+  "effort": "some",
+  "when": "after-birth",
+  "whenNote": "Visit usually about 3 weeks after birth.",
+  "states": []
+ },
+ {
+  "id": "cdc-vaccines-for-children",
+  "name": "Vaccines for Children program",
+  "brand": "CDC",
+  "category": "health-benefits",
+  "whatYouGet": "Free childhood vaccines, including RSV antibody nirsevimab, for children who are Medicaid-eligible, uninsured, underinsured or American Indian/Alaska Native.",
+  "costToClaim": "free",
+  "costDetail": "Vaccine is free; the office may charge a visit fee.",
+  "requirements": [
+   "eligibility"
+  ],
+  "eligibility": "Children 18 and under in the listed groups.",
+  "region": "US",
+  "signupUrl": "https://www.cdc.gov/vaccines-for-children/vfc-information-for-parents/index.html",
+  "sourceUrls": [
+   "https://www.cdc.gov/vaccines-for-children/vfc-information-for-parents/index.html",
+   "https://www.cdc.gov/vaccines-for-children/hcp/program-eligibility/index.html",
+   "https://www.cdc.gov/rsv/vaccines/protect-infants.html"
+  ],
+  "verifiedOn": "2026-11-10",
+  "confidence": "medium",
+  "catches": "Underinsured children only get it at community health centers; CHIP-only children do not qualify. Ask the doctor to confirm they take VFC.",
+  "notes": "",
+  "offers": [
+   "service"
+  ],
+  "certainty": "if-eligible",
+  "freeStuff": "Free childhood vaccines for eligible babies.",
+  "valueLow": null,
+  "valueHigh": null,
+  "valueSource": "none",
+  "valueBasis": "",
+  "effort": "some",
+  "when": "after-birth",
+  "whenNote": "Vaccines begin at birth and through childhood.",
+  "states": []
+ },
+ {
+  "id": "healthcare-gov-preventive-care-women",
+  "name": "Free preventive care for women under the ACA",
+  "brand": "HealthCare.gov",
+  "category": "health-benefits",
+  "whatYouGet": "Most plans cover contraception, breastfeeding support and supplies and folic acid at no cost, including after birth.",
+  "costToClaim": "free",
+  "costDetail": "No cost sharing when from an in-network provider.",
+  "requirements": [
+   "insurance"
+  ],
+  "eligibility": "People with ACA-compliant plans; some religious employers are exempt.",
+  "region": "US",
+  "signupUrl": "https://www.healthcare.gov/preventive-care-women/",
+  "sourceUrls": [
+   "https://www.healthcare.gov/preventive-care-women/",
+   "https://www.healthcare.gov/coverage/preventive-care-benefits/"
+  ],
+  "verifiedOn": "2026-11-10",
+  "confidence": "low",
+  "catches": "Pages are old. $0 is not guaranteed in every case. Tdap and flu in pregnancy and RSV were not confirmed here.",
+  "notes": "",
+  "offers": [
+   "coverage"
+  ],
+  "certainty": "if-eligible",
+  "freeStuff": "Contraception, lactation support and folic acid at no cost.",
+  "valueLow": null,
+  "valueHigh": null,
+  "valueSource": "none",
+  "valueBasis": "",
+  "effort": "some",
+  "when": "anytime",
+  "whenNote": "Postpartum contraception and lactation support are used after birth.",
+  "states": []
+ },
+ {
+  "id": "masshealth-free-prenatal-vitamins",
+  "name": "MassHealth free prenatal vitamins",
+  "brand": "MassHealth",
+  "category": "health-benefits",
+  "whatYouGet": "MassHealth members can get prenatal vitamins free at a local pharmacy without a prescription.",
+  "costToClaim": "free",
+  "costDetail": "Free for MassHealth members.",
+  "requirements": [
+   "insurance"
+  ],
+  "eligibility": "MassHealth members who are pregnant or lactating.",
+  "region": "Massachusetts",
+  "signupUrl": "https://www.mass.gov/info-details/providers-caring-for-pregnant-and-postpartum-masshealth-members",
+  "sourceUrls": [
+   "https://www.mass.gov/info-details/providers-caring-for-pregnant-and-postpartum-masshealth-members"
+  ],
+  "verifiedOn": "2026-11-10",
+  "confidence": "low",
+  "catches": "Based on one search result from a provider page; confirm with the pharmacy.",
+  "notes": "",
+  "offers": [
+   "product"
+  ],
+  "certainty": "if-eligible",
+  "freeStuff": "Free prenatal vitamins from the pharmacy.",
+  "valueLow": null,
+  "valueHigh": null,
+  "valueSource": "none",
+  "valueBasis": "",
+  "effort": "quick",
+  "when": "pregnancy",
+  "whenNote": "Used during pregnancy.",
+  "states": [
+   "MA"
+  ]
+ },
+ {
+  "id": "text4baby-free-text-messages",
+  "name": "Text4baby free text messages",
+  "brand": "Text4baby (Wellpass)",
+  "category": "baby-care",
+  "whatYouGet": "Three free texts a week with pregnancy and baby health tips, timed to the due date, until the baby turns one.",
+  "costToClaim": "free",
+  "costDetail": "Free, even without a text plan.",
+  "requirements": [
+   "phone"
+  ],
+  "eligibility": "Pregnant women and parents of babies under one.",
+  "region": "US",
+  "signupUrl": "https://partners.text4baby.org/index.php/sign-up",
+  "sourceUrls": [
+   "https://partners.text4baby.org/index.php/about",
+   "https://partners.text4baby.org/index.php/sign-up"
+  ],
+  "verifiedOn": "2026-11-10",
+  "confidence": "low",
+  "catches": "Undated pages; sponsor details differ, so confirm the service is still active.",
+  "notes": "Text BABY (or BEBE) to 511411.",
+  "offers": [
+   "service"
+  ],
+  "certainty": "guaranteed",
+  "freeStuff": "Free health text messages.",
+  "valueLow": null,
+  "valueHigh": null,
+  "valueSource": "none",
+  "valueBasis": "",
+  "effort": "quick",
+  "when": "pregnancy",
+  "whenNote": "Messages timed to the due date.",
+  "states": []
+ }
+]

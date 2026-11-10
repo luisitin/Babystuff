@@ -1,0 +1,528 @@
+[
+ {
+  "id": "amazon-baby-registry-welcome-box",
+  "name": "Baby Registry Welcome Box",
+  "brand": "Amazon",
+  "category": "registry-box",
+  "whatYouGet": "Gift box of sample and full-size items for parent and baby; Amazon does not list the contents. It is not free without Prime and registry purchases.",
+  "costToClaim": "membership-required",
+  "costDetail": "Requires an active Prime account, a registry with 10 unique items, and over $10 of purchases from the registry (by you or others).",
+  "requirements": [
+   "registry",
+   "purchase",
+   "membership"
+  ],
+  "eligibility": "Primary registry owner with an active Prime account; Amazon Business accounts do not qualify.",
+  "region": "US",
+  "signupUrl": "https://www.amazon.com/baby-reg/welcomebox",
+  "sourceUrls": [
+   "https://www.amazon.com/baby-reg/welcomebox",
+   "https://www.amazon.com/gp/help/customer/display.html?nodeId=GBLXVKVYG5SBG8HF"
+  ],
+  "verifiedOn": "2026-11-08",
+  "confidence": "high",
+  "catches": "Amazon's help page (read via domain search snippet; the page itself did not fetch cleanly) says tax, shipping, Prime and gift card purchases don't count toward the $10, the box shows $35 until a $35 promotional balance is applied, it ships to the contiguous US only, and a new box needs an 8-month wait. Limited-time and subject to change. Needs a paid Prime membership and a purchase from the registry, so nothing arrives with no purchase. Contents are a surprise and past reviews vary from useful samples to mostly coupons.",
+  "notes": "The same registry page also advertises a 15% completion discount, up to $300 in savings, and free 1-year returns. Older Q&A mentions a 60% checklist rule; the current page says 10 items.",
+  "offers": [
+   "product",
+   "coupons"
+  ],
+  "certainty": "likely",
+  "freeStuff": "",
+  "valueLow": 15,
+  "valueHigh": 35,
+  "valueSource": "estimate",
+  "valueBasis": "Box shown at $35 before the promo balance; contents are a surprise, so low end taken",
+  "effort": "some",
+  "when": "pregnancy",
+  "whenNote": "",
+  "states": []
+ },
+ {
+  "id": "walmart-baby-registry-welcome-box",
+  "name": "Baby Registry Welcome Box",
+  "brand": "Walmart",
+  "category": "registry-box",
+  "whatYouGet": "Baby Box with at least six sample-size baby or parenting products plus discount coupons; contents vary.",
+  "costToClaim": "purchase-required",
+  "costDetail": "Free box. Registry created on or after 2/1/25, open 7+ days, 20+ unique items, and over $25 purchased through your registry link (items marked Purchased don't count).",
+  "requirements": [
+   "address",
+   "registry",
+   "purchase"
+  ],
+  "eligibility": "Adults 18+ in the 50 US states and Puerto Rico; one box per person, Walmart account and household per 365 days.",
+  "region": "US (50 states and Puerto Rico)",
+  "signupUrl": "https://www.walmart.com/cp/baby-registry/1229485",
+  "sourceUrls": [
+   "https://www.walmart.com/cp/baby-registry/1229485",
+   "https://www.walmart.com/help/article/baby-registry-gift-box-offer/9cd45411397d425b8e88bc89583deb62",
+   "https://www.walmart.com/help/article/baby-registry-welcome-box-offer-terms-of-use/ab7999bd49bd4745abd355cfbf41d3e8"
+  ],
+  "verifiedOn": "2026-11-08",
+  "confidence": "high",
+  "catches": "While supplies last, first come first served; not guaranteed even after meeting requirements and Walmart need not notify you if supplies run out; contents may be substituted; allow 10-12 weeks by US mail to the registry address (no P.O. boxes). The box is free, but only after over $25 is purchased through the registry.",
+  "notes": "Claim via the banner on your registry page; you get a confirmation email. Support: support@walmartbabywelcomebox.com. The page shows no separate free postpartum or mom box.",
+  "offers": [
+   "product",
+   "coupons"
+  ],
+  "certainty": "likely",
+  "freeStuff": "",
+  "valueLow": 10,
+  "valueHigh": 25,
+  "valueSource": "estimate",
+  "valueBasis": "At least six sample-size items plus coupons; low end of what such samples cost",
+  "effort": "some",
+  "when": "pregnancy",
+  "whenNote": "Registry must be open 7+ days; box takes 10-12 weeks to arrive by mail",
+  "states": []
+ },
+ {
+  "id": "walmart-baby-registry-free-home-cleaning",
+  "name": "Free cleaning service with baby registry",
+  "brand": "Walmart",
+  "category": "registry-box",
+  "whatYouGet": "One free home cleaning (1 bedroom, 1 bathroom, kitchen and common areas in a single home, a $99 value) from a partner service provider.",
+  "costToClaim": "purchase-required",
+  "costDetail": "Registry open 7+ days with 20+ unique items and $300 spent on items from the registry (by you or invited gifters).",
+  "requirements": [
+   "address",
+   "registry",
+   "purchase"
+  ],
+  "eligibility": "Adults 18+ in the 48 contiguous states; limit one per person. Registry must be created on or after the reward start date (Feb 9, 2026).",
+  "region": "US (48 contiguous states)",
+  "signupUrl": "https://www.walmart.com/cp/baby-registry/1229485",
+  "sourceUrls": [
+   "https://www.walmart.com/cp/baby-registry/1229485",
+   "https://www.walmart.com/help/article/baby-registry-welcome-box-offer-terms-of-use/ab7999bd49bd4745abd355cfbf41d3e8"
+  ],
+  "verifiedOn": "2026-11-08",
+  "confidence": "high",
+  "catches": "Available while supplies last; fulfilled by an unaffiliated service provider with its own terms; must redeem no later than 90 days after your registry event date; merchandise total excludes taxes, shipping and fees, and items marked purchased don't count.",
+  "notes": "Walmart calls this a Tier 2 registry reward alongside the Baby Box.",
+  "offers": [
+   "service"
+  ],
+  "certainty": "likely",
+  "freeStuff": "",
+  "valueLow": 99,
+  "valueHigh": 99,
+  "valueSource": "official",
+  "valueBasis": "Walmart states a $99 value; needs $300 of registry purchases first",
+  "effort": "some",
+  "when": "pregnancy",
+  "whenNote": "Redeem no later than 90 days after your registry event date",
+  "states": []
+ },
+ {
+  "id": "babylist-hello-baby-box",
+  "name": "Hello Baby Box",
+  "brand": "Babylist",
+  "category": "registry-box",
+  "whatYouGet": "Free welcome box of product samples and partner offers (diapers/wipes, bottles, skincare, coupons); contents vary.",
+  "costToClaim": "purchase-required",
+  "costDetail": "Add 3 items from other stores, complete 40% of the registry checklist, make a $30+ Babylist Shop purchase (a gifter may), and pay $8.95 plus tax shipping.",
+  "requirements": [
+   "address",
+   "due-date",
+   "registry",
+   "purchase"
+  ],
+  "eligibility": "Arrival date under 9 months away or baby under 4 weeks old; one box per household and per registry; US addresses.",
+  "region": "US",
+  "signupUrl": "https://www.babylist.com/registry/new",
+  "sourceUrls": [
+   "https://help.babylist.com/hc/en-us/articles/360054057353-How-do-I-get-a-Hello-Baby-Box",
+   "https://help.babylist.com/hc/en-us/articles/360053264354-What-is-a-Hello-Baby-Box",
+   "https://www.babylist.com/hello-baby/whats-inside-babylist-hello-baby-box"
+  ],
+  "verifiedOn": "2026-11-10",
+  "confidence": "medium",
+  "catches": "Shipping fee is non-refundable and orders can't be changed; AK/HI total shipping $18.95; gift cards and return credit can't pay the fee; Babylist Health and other retailer orders don't count toward the $30.",
+  "notes": "Babylist's help center blocks automated reading, so these terms come from official-domain search results and may be incomplete. Babylist's marketing FAQ says one box per household per year; the help center says per household and per registry. The sign-up link opens Babylist's \"Create a Baby Registry\" page because a registry is needed first; the help center says to claim the box from the For You tile on your registry dashboard or in the app. The older /hello-baby/box address only redirects to the help center.",
+  "offers": [
+   "product",
+   "coupons"
+  ],
+  "certainty": "likely",
+  "freeStuff": "",
+  "valueLow": 10,
+  "valueHigh": 25,
+  "valueSource": "estimate",
+  "valueBasis": "Sample-size items and partner offers that vary; low end taken, minus the $8.95 shipping fee",
+  "effort": "some",
+  "when": "pregnancy",
+  "whenNote": "Arrival date must be under 9 months away, or baby under 4 weeks old",
+  "states": []
+ },
+ {
+  "id": "macrobaby-gift-box",
+  "name": "MacroBaby Gift Box",
+  "brand": "MacroBaby",
+  "category": "registry-box",
+  "whatYouGet": "Free welcome box of baby samples, coupons and products from trusted brands, est. value $80+; contents are random and seasonal. Added to your shipment after your first qualifying registry purchase.",
+  "costToClaim": "purchase-required",
+  "costDetail": "Add at least 20 items to a registry and make a first qualifying purchase of $15 or more from it.",
+  "requirements": [
+   "registry",
+   "purchase"
+  ],
+  "eligibility": "One box per qualifying registry.",
+  "region": "US",
+  "signupUrl": "https://www.macrobaby.com/pages/macrobaby-gift-box",
+  "sourceUrls": [
+   "https://www.macrobaby.com/pages/macrobaby-gift-box",
+   "https://www.macrobaby.com/pages/baby-registry"
+  ],
+  "verifiedOn": "2026-11-08",
+  "confidence": "high",
+  "catches": "Contents can't be requested; if the qualifying items are returned the box must be returned or an $80 fee applies; program can change or end without notice.",
+  "notes": "Gift box page confirmed directly: add at least 20 items to your registry and make a first qualifying purchase of $15.00 or more from it. The Baby Registry page also advertises 5% cash back on registry purchases.",
+  "offers": [
+   "product",
+   "coupons"
+  ],
+  "certainty": "likely",
+  "freeStuff": "",
+  "valueLow": 80,
+  "valueHigh": 80,
+  "valueSource": "official",
+  "valueBasis": "MacroBaby gives an est. value of $80+; contents are random and seasonal",
+  "effort": "some",
+  "when": "pregnancy",
+  "whenNote": "",
+  "states": []
+ },
+ {
+  "id": "buybuy-baby-registry-welcome-bag",
+  "name": "Registry welcome bag",
+  "brand": "buybuy BABY",
+  "category": "registry-box",
+  "whatYouGet": "Goody bag with free samples, coupons and a Registry Guide.",
+  "costToClaim": "free",
+  "costDetail": "Free with registry; no purchase stated in the search results; available for pickup in stores only.",
+  "requirements": [
+   "registry"
+  ],
+  "eligibility": "Baby registrants; details of eligibility not confirmed.",
+  "region": "US",
+  "signupUrl": "https://www.buybuybaby.com/store/page/BabyRegistry",
+  "sourceUrls": [
+   "https://www.buybuybaby.com/store/page/BabyRegistry"
+  ],
+  "verifiedOn": "2026-11-08",
+  "confidence": "medium",
+  "catches": "Pickup in stores only; ask for the bag when registering in person per store pages. Eligibility and any purchase conditions were not stated in the results.",
+  "notes": "Checked from the official site's search results; the site blocks automated reading, so details may be incomplete. buybuy BABY pages refused or failed to fetch; store-page search snippets still describe a free goody bag with samples, coupons and a registry guide. Snippets also mention a 15% completion discount and free first-year shipping after $1,500 of registry gifts.",
+  "offers": [
+   "product",
+   "coupons"
+  ],
+  "certainty": "likely",
+  "freeStuff": "A bag of free samples, coupons and a Registry Guide, picked up in a store when you register.",
+  "valueLow": 5,
+  "valueHigh": 15,
+  "valueSource": "estimate",
+  "valueBasis": "A few samples and a guide; the contents are not listed",
+  "effort": "some",
+  "when": "pregnancy",
+  "whenNote": "",
+  "states": []
+ },
+ {
+  "id": "target-registry-welcome-kit",
+  "name": "Registry Welcome Kit (Target Baby Box)",
+  "brand": "Target",
+  "category": "registry-box",
+  "whatYouGet": "Welcome kit valued at $100, a mix of samples and a Target Circle Bonus.",
+  "costToClaim": "purchase-required",
+  "costDetail": "Kit is free of charge but shipping and handling fees apply. Needs a free Target Circle account, a baby registry with 10 unique items, and a purchase over $10 from the registry (by you or others).",
+  "requirements": [
+   "email",
+   "registry",
+   "purchase"
+  ],
+  "eligibility": "Active baby registries created after 08/15/2023 that haven't claimed a previous kit; one kit per year.",
+  "region": "US",
+  "signupUrl": "https://www.target.com/gift-registry/create-baby-registry",
+  "sourceUrls": [
+   "https://www.target.com/help/article/000062588"
+  ],
+  "verifiedOn": "2026-11-10",
+  "confidence": "medium",
+  "catches": "Online only, as a Target Circle Bonus that must be accepted; shipping and handling fees apply; limit one kit per year; registries that claimed a previous kit aren't eligible. Allow 24-48 hours for the bonus to be issued.",
+  "notes": "Active registries created after 08/15/2023 are eligible. The bonus shows on the registry dashboard. Target's registry sign-up page and product page did not mention the kit in readable text, so only the help article confirms it.",
+  "offers": [
+   "product",
+   "coupons"
+  ],
+  "certainty": "likely",
+  "freeStuff": "",
+  "valueLow": 15,
+  "valueHigh": 40,
+  "valueSource": "estimate",
+  "valueBasis": "Target labels it a $100 value, but that mixes samples with a Circle Bonus; samples at low end, bonus counted as a saving",
+  "effort": "some",
+  "when": "pregnancy",
+  "whenNote": "",
+  "states": []
+ },
+ {
+  "category": "registry-box",
+  "costToClaim": "free",
+  "region": "US",
+  "offers": [
+   "coupons"
+  ],
+  "certainty": "guaranteed",
+  "freeStuff": "",
+  "valueSource": "estimate",
+  "effort": "some",
+  "states": [],
+  "verifiedOn": "2026-11-10",
+  "confidence": "medium",
+  "id": "amazon-baby-registry-completion-discount",
+  "name": "Registry Completion Discount (15%)",
+  "brand": "Amazon",
+  "whatYouGet": "15% off remaining eligible registry items, saving up to $300.",
+  "costDetail": "Free to use. Baby registry active at least 14 days; primary registrant only.",
+  "requirements": [
+   "registry"
+  ],
+  "eligibility": "Primary registry owner.",
+  "signupUrl": "https://www.amazon.com/gp/help/customer/display.html?nodeId=GV4FFW94JAGFL4RH",
+  "sourceUrls": [
+   "https://www.amazon.com/gp/help/customer/display.html?nodeId=GV4FFW94JAGFL4RH",
+   "https://www.amazon.com/baby-reg/benefits/summary"
+  ],
+  "valueLow": 60,
+  "valueHigh": 300,
+  "valueBasis": "Amazon caps the saving at $300; 15% of about $400 to $2,000 left on the registry",
+  "when": "late-pregnancy",
+  "whenNote": "Window opens 60 days before your arrival date and ends 90 days after",
+  "catches": "Cannot be combined with Lightning Deals or Prime Day deals; returned items do not restore the discount; terms can change.",
+  "notes": "Seen only as Amazon help-page search results. The registry benefits page also mentions free gift returns for a year."
+ },
+ {
+  "category": "registry-box",
+  "costToClaim": "free",
+  "region": "US",
+  "offers": [
+   "coupons"
+  ],
+  "certainty": "guaranteed",
+  "freeStuff": "",
+  "valueSource": "estimate",
+  "effort": "some",
+  "states": [],
+  "verifiedOn": "2026-11-10",
+  "confidence": "medium",
+  "id": "target-registry-completion-discount",
+  "name": "Registry Completion Discount (15%)",
+  "brand": "Target",
+  "whatYouGet": "15% off storewide Target Circle offer for items left on your baby registry, usable twice.",
+  "costDetail": "Free. Registry must be active at least 14 days.",
+  "requirements": [
+   "registry",
+   "email"
+  ],
+  "eligibility": "Registry owner with a free Target Circle account.",
+  "signupUrl": "https://www.target.com/help/article/000062273",
+  "sourceUrls": [
+   "https://www.target.com/help/article/000062273",
+   "https://target.com/gift-registry/completion-coupon-faq"
+  ],
+  "valueLow": 45,
+  "valueHigh": 225,
+  "valueBasis": "15% of about $300 to $1,500 bought after the offer arrives",
+  "when": "late-pregnancy",
+  "whenNote": "Offer is generated eight weeks before the expected arrival date",
+  "catches": "Redeemable twice (one in-store, one online per one help page); expires in 6 months; once per 12 months; cannot be combined with price match.",
+  "notes": "Search results from different Target pages differ slightly on the use limits."
+ },
+ {
+  "category": "registry-box",
+  "costToClaim": "free",
+  "region": "US",
+  "offers": [
+   "coupons"
+  ],
+  "certainty": "guaranteed",
+  "freeStuff": "",
+  "valueSource": "estimate",
+  "effort": "some",
+  "states": [],
+  "verifiedOn": "2026-11-10",
+  "confidence": "medium",
+  "id": "babylist-registry-completion-discount",
+  "name": "Registry Completion Discount (15%)",
+  "brand": "Babylist",
+  "whatYouGet": "15% off eligible items in the Babylist Shop, up to $600 saved on $4,000 of purchases.",
+  "costDetail": "Free to use. Registry must be at least 30 days old.",
+  "requirements": [
+   "registry"
+  ],
+  "eligibility": "Registry owner and partner; collaborators cannot use it.",
+  "signupUrl": "https://www.babylist.com/registry-discount",
+  "sourceUrls": [
+   "https://www.babylist.com/registry-discount",
+   "https://help.babylist.com/hc/en-us/articles/115006102688-How-do-I-use-my-Babylist-registry-discount"
+  ],
+  "valueLow": 45,
+  "valueHigh": 225,
+  "valueBasis": "15% of about $300 to $1,500 bought in the Babylist Shop",
+  "when": "late-pregnancy",
+  "whenNote": "Activates 60 days before the due date; the FAQ says 90 days after (an older page says 6 months)",
+  "catches": "Applies only to Babylist Shop items, not other stores added to the registry.",
+  "notes": "Window length differs between Babylist pages; the shorter, newer one is used."
+ },
+ {
+  "category": "registry-box",
+  "costToClaim": "free",
+  "region": "US",
+  "offers": [
+   "coupons"
+  ],
+  "certainty": "guaranteed",
+  "freeStuff": "",
+  "valueSource": "estimate",
+  "effort": "some",
+  "states": [],
+  "verifiedOn": "2026-11-10",
+  "confidence": "medium",
+  "id": "pottery-barn-kids-registry-completion-discount",
+  "name": "Registry Completion Discount (15%)",
+  "brand": "Pottery Barn Kids",
+  "whatYouGet": "15% off remaining registry items and items you add, online, in store or by phone.",
+  "costDetail": "Free to use; click Redeem in your registry before each online purchase.",
+  "requirements": [
+   "registry"
+  ],
+  "eligibility": "Registry owner.",
+  "signupUrl": "https://www.potterybarnkids.com/pages/registry/registry-completion/",
+  "sourceUrls": [
+   "https://www.potterybarnkids.com/pages/registry/registry-completion/",
+   "https://www.potterybarnkids.com/customer-service/registry-faq.html"
+  ],
+  "valueLow": 20,
+  "valueHigh": 100,
+  "valueBasis": "15% of about $130 to $650 of non-excluded items; baby gear is excluded",
+  "when": "late-pregnancy",
+  "whenNote": "Eligible 60 days before the event date and for up to 180 days after",
+  "catches": "Excludes all baby gear, MSRP items and select clearance items.",
+  "notes": "Older pages show shorter windows; the current page says 60 days before to 180 days after."
+ },
+ {
+  "category": "registry-box",
+  "costToClaim": "free",
+  "region": "US",
+  "offers": [
+   "coupons"
+  ],
+  "certainty": "guaranteed",
+  "freeStuff": "",
+  "valueSource": "estimate",
+  "effort": "some",
+  "states": [],
+  "verifiedOn": "2026-11-10",
+  "confidence": "medium",
+  "id": "crate-and-kids-registry-completion-discount",
+  "name": "Registry Completion Discount (15%)",
+  "brand": "Crate & Kids",
+  "whatYouGet": "Two 15% discount codes by email: one single-use before the due date, one multi-use after.",
+  "costDetail": "Free; used in US stores, on crateandkids.com or by phone.",
+  "requirements": [
+   "registry",
+   "email"
+  ],
+  "eligibility": "Registry owner; US only.",
+  "signupUrl": "https://www.crateandbarrel.com/gift-registry/terms-and-conditions",
+  "sourceUrls": [
+   "https://www.crateandbarrel.com/gift-registry/terms-and-conditions",
+   "https://www.crateandbarrel.com/customer-service/baby-registry-faq"
+  ],
+  "valueLow": 20,
+  "valueHigh": 100,
+  "valueBasis": "15% of about $130 to $650 bought for the nursery; excludes books and gift cards",
+  "when": "late-pregnancy",
+  "whenNote": "First code valid 3 months before the event date, second for 6 months after",
+  "catches": "Not for kids books, gift cards or certain brands; cannot be combined with other offers except free shipping; terms can change. Some pages say 10%.",
+  "notes": "The terms page says 15%; other pages differ."
+ },
+ {
+  "category": "registry-box",
+  "costToClaim": "free",
+  "region": "US",
+  "offers": [
+   "coupons"
+  ],
+  "certainty": "guaranteed",
+  "freeStuff": "",
+  "valueSource": "estimate",
+  "effort": "some",
+  "states": [],
+  "verifiedOn": "2026-11-10",
+  "confidence": "medium",
+  "id": "macys-baby-registry-completion-discount",
+  "name": "Baby Registry Completion Discount (10%)",
+  "brand": "Macy's",
+  "whatYouGet": "10% off select remaining registry items and select new additions, online or in store.",
+  "costDetail": "Free to use.",
+  "requirements": [
+   "registry"
+  ],
+  "eligibility": "Registry owner.",
+  "signupUrl": "https://www.macys.com/s/promotional-details/baby-registry-completion/",
+  "sourceUrls": [
+   "https://www.macys.com/s/promotional-details/baby-registry-completion/",
+   "https://www.macys.com/registry/baby"
+  ],
+  "valueLow": 10,
+  "valueHigh": 50,
+  "valueBasis": "10% of about $100 to $500 of eligible brands; baby gear is excluded",
+  "when": "late-pregnancy",
+  "whenNote": "Starts 60 days before the arrival date and runs 180 days after",
+  "catches": "Select brands only; cannot be combined with other coupons. Macy's help says its Baby Box ended in February 2026.",
+  "notes": "Macy's older welcome box product page still shows up in search but help says it ended."
+ },
+ {
+  "category": "registry-box",
+  "costToClaim": "free",
+  "region": "US",
+  "offers": [
+   "product",
+   "coupons"
+  ],
+  "certainty": "likely",
+  "freeStuff": "A welcome box with baby and parent items, free with the coupon once you have a registry.",
+  "valueSource": "estimate",
+  "effort": "some",
+  "states": [],
+  "verifiedOn": "2026-11-10",
+  "confidence": "low",
+  "id": "kohls-babies-r-us-welcome-box",
+  "name": "Babies \"R\" Us Welcome Box",
+  "brand": "Kohl's",
+  "whatYouGet": "Welcome box of skincare, feeding essentials and accessories, listed at $20 and free with a coupon.",
+  "costDetail": "Box is free when you apply the coupon from your digital wallet; shipping and tax not stated in the results.",
+  "requirements": [
+   "email",
+   "registry"
+  ],
+  "eligibility": "Primary registry owner with a free Kohl's Rewards account; one box per customer per year.",
+  "signupUrl": "https://www.kohls.com/babyregistry",
+  "sourceUrls": [
+   "https://www.kohls.com/product/prd-7344513/babies-r-us-welcome-box.jsp",
+   "https://www.kohls.com/babyregistry"
+  ],
+  "valueLow": 10,
+  "valueHigh": 20,
+  "valueBasis": "Box listed at $20; contents not itemized, so the low end is taken",
+  "when": "pregnancy",
+  "whenNote": "",
+  "catches": "Time-limited; box cannot be returned. One Kohl's page says the baby registry program may be discontinued, so check before relying on it. Contents not itemized.",
+  "notes": "Kohl's pages conflict on whether the registry program still runs, so this entry is low confidence."
+ }
+]

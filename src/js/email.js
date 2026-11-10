@@ -99,6 +99,7 @@
     if (parts.length <= 2) return parts.join('.');
     var tld = parts[parts.length - 1], sld = parts[parts.length - 2];
     var n = tld.length === 2 && ['co', 'com', 'org', 'net', 'gov', 'edu', 'ac'].indexOf(sld) >= 0 ? 3 : 2;
+    if (tld === 'us' && sld.length === 2) n = 3; // state sites: revenue.state.mn.us -> state.mn.us
     return parts.slice(-n).join('.');
   }
   // Retailers, marketplaces and other big senders whose mail is not just baby freebies.
@@ -110,8 +111,28 @@
     return !d || /\.(gov|mil)$/.test(d) || BROAD.indexOf(d) >= 0;
   }
 
+  // The ONE rule for which programs belong in the email features (Gmail filters, Gmail searches, the Gmail
+  // connection's searches and labels, plus-address links). A program belongs when signing up means mail
+  // arrives from the brand: its requirements include "email" and its sign-up page is not on a government
+  // domain (.gov, .mil, or a state .xx.us site). Tax forms, benefit applications and helplines stay out, so
+  // nothing from irs.gov, ssa.gov or a state office is ever labelled "Baby freebies". Everything else in the
+  // app (list, tracker, checklist, reminders, guided run) still shows every program.
+  function isGovDomain(domain) {
+    var d = str(domain).toLowerCase();
+    return /\.(gov|mil)$/.test(d) || /\.state\.[a-z]{2}\.us$/.test(d);
+  }
+  function inEmailFeatures(p) {
+    if (!p || typeof p !== 'object') return false;
+    var req = Array.isArray(p.requirements) ? p.requirements : [];
+    if (req.indexOf('email') < 0) return false;
+    var host = domainOfUrl(p.signupUrl);
+    return !!host && !isGovDomain(host);
+  }
+  function emailPrograms(list) { return (Array.isArray(list) ? list : []).filter(inEmailFeatures); }
+
   function gmailSearchUrl(o) {
     o = o || {};
+    if (o.program && !inEmailFeatures(o.program)) return '';
     var domain = registrableDomain(str(o.domain).trim());
     if (isBroadDomain(domain)) domain = '';
     var plus = o.tag ? plusAddress(o.email, o.tag) : '';
@@ -131,9 +152,10 @@
   // Without: one from:(registrable domain) filter per domain, skipping broad senders, and never archiving.
   function gmailFiltersXml(programs, opts) {
     opts = opts || {};
-    var list = Array.isArray(programs) ? programs : [];
+    var list = emailPrograms(programs);
     var usePlus = !!opts.usePlus && supportsPlus(opts.email) !== false && !!plusAddress(opts.email, 'x');
     var map = opts.tagMap || tagMap(Array.isArray(opts.allPrograms) ? opts.allPrograms : list);
+    // One entry per filter; Gmail takes many entries in one file, so no chunking is needed here.
     var archive = usePlus && !!opts.archive;
     var out = ['<?xml version="1.0" encoding="UTF-8"?>',
       '<feed xmlns="' + NS_ATOM + '" xmlns:apps="' + NS_APPS + '">',
@@ -241,7 +263,7 @@
   }
 
   var api = {
-    tagFor: tagFor, tagMap: tagMap, plusAddress: plusAddress, supportsPlus: supportsPlus, isGmail: isGmail, registrableDomain: registrableDomain, isBroadDomain: isBroadDomain,
+    tagFor: tagFor, tagMap: tagMap, plusAddress: plusAddress, supportsPlus: supportsPlus, isGmail: isGmail, registrableDomain: registrableDomain, isBroadDomain: isBroadDomain, inEmailFeatures: inEmailFeatures, emailPrograms: emailPrograms, isGovDomain: isGovDomain,
     gmailSearchUrl: gmailSearchUrl, gmailFiltersXml: gmailFiltersXml, mailtoChecklist: mailtoChecklist,
     icsReminders: icsReminders, domainOfUrl: domainOfUrl, MAX_TAG: MAX_TAG
   };

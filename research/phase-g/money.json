@@ -1,0 +1,652 @@
+[
+  {
+    "requirements": [
+      "eligibility"
+    ],
+    "eligibility": "Child born Jan 1, 2025 to Dec 31, 2028, a US citizen with a valid Social Security number, and a qualifying child of the person who elects. One pilot election per child.",
+    "region": "US",
+    "sourceUrls": [
+      "https://www.irs.gov/newsroom/heres-how-to-claim-trump-account-seed-money-for-your-child",
+      "https://www.irs.gov/pub/irs-pdf/f4547.pdf",
+      "https://www.irs.gov/pub/irs-pdf/i4547.pdf",
+      "https://home.treasury.gov/news/press-releases/sb0372"
+    ],
+    "verifiedOn": "2026-11-10",
+    "confidence": "medium",
+    "catches": "The parent must elect it: check the pilot box on Form 4547 (with the tax return, or through the Trump Accounts website, app or IRS online account). Search results showed no deposit before July 4, 2026. Confirm current steps on the IRS page.",
+    "notes": "Official names and steps taken from IRS and Treasury search results. SSA also puts Trump Account information with newborn Social Security cards.",
+    "states": [],
+    "costToClaim": "free",
+    "costDetail": "No cost; the election is made with Form 4547.",
+    "freeStuff": "$1,000 deposited into the child's account by the Treasury.",
+    "whenNote": "Needs the baby's Social Security number; elected on Form 4547, usually with the tax return.",
+    "category": "money",
+    "id": "treasury-trump-account-pilot-deposit",
+    "name": "Trump Account $1,000 pilot deposit",
+    "brand": "U.S. Treasury / IRS",
+    "whatYouGet": "A one-time $1,000 Treasury deposit into a Trump Account for eligible US citizen children born 2025 through 2028.",
+    "signupUrl": "https://www.irs.gov/newsroom/heres-how-to-claim-trump-account-seed-money-for-your-child",
+    "offers": [
+      "cash"
+    ],
+    "certainty": "if-eligible",
+    "valueLow": 1000,
+    "valueHigh": 1000,
+    "valueSource": "official",
+    "valueBasis": "Pilot deposit of $1,000 stated by the IRS",
+    "effort": "some",
+    "when": "after-birth"
+  },
+  {
+    "requirements": [
+      "eligibility"
+    ],
+    "eligibility": "Child under 17 at year end, a US citizen, national or resident, with a Social Security number valid for work issued by the return due date. Full credit up to $200,000 income ($400,000 joint); refundable part needs $2,500 earned income.",
+    "region": "US",
+    "sourceUrls": [
+      "https://www.irs.gov/credits-deductions/individuals/child-tax-credit",
+      "https://www.irs.gov/instructions/i1040s8"
+    ],
+    "verifiedOn": "2026-11-10",
+    "confidence": "medium",
+    "catches": "Amount shown is for tax year 2025 ($2,200 per child, indexed for inflation from 2026; the 2026 figure was not confirmed). Refundable part is capped ($1,700 per child in 2026 per IRS Form 1040-ES). A baby born in 2027 is claimed on the 2027 return.",
+    "notes": "Not tax advice. Describes the program only.",
+    "states": [],
+    "costToClaim": "free",
+    "costDetail": "No cost; claimed on the federal tax return (Schedule 8812).",
+    "freeStuff": "",
+    "whenNote": "Claimed on the tax return for the year the child is born; the child needs a Social Security number.",
+    "category": "money",
+    "id": "irs-child-tax-credit",
+    "name": "Child Tax Credit",
+    "brand": "IRS",
+    "whatYouGet": "A federal tax credit for each qualifying child under 17, partly refundable.",
+    "signupUrl": "https://www.irs.gov/credits-deductions/individuals/child-tax-credit",
+    "offers": [
+      "cash"
+    ],
+    "certainty": "if-eligible",
+    "valueLow": 1700,
+    "valueHigh": 2200,
+    "valueSource": "official",
+    "valueBasis": "$2,200 per child for tax year 2025; refundable part up to $1,700 per child in 2026",
+    "effort": "some",
+    "when": "after-birth"
+  },
+  {
+    "requirements": [
+      "eligibility"
+    ],
+    "eligibility": "Earned income under the limits for filing status and number of children; each qualifying child needs a valid Social Security number. Investment income and other limits apply.",
+    "region": "US",
+    "sourceUrls": [
+      "https://www.irs.gov/publications/p596",
+      "https://www.irs.gov/pub/irs-pdf/n797.pdf",
+      "https://www.irs.gov/tax-professionals/eitc-central/eitc-facts-to-share"
+    ],
+    "verifiedOn": "2026-11-10",
+    "confidence": "medium",
+    "catches": "Maximum for 2026 is $4,427 with one child and $7,316 with two (IRS Notice 797); many families get less or nothing depending on income. 2026 income limits were not confirmed; 2025 limits start near $50,434 ($57,554 joint) with one child. Form 8862 may be needed after a past denial.",
+    "notes": "Signup URL is the standard IRS EITC page; the search showed the Publication 596 and Notice 797 pages directly.",
+    "states": [],
+    "costToClaim": "free",
+    "costDetail": "No cost; claimed on the federal tax return.",
+    "freeStuff": "",
+    "whenNote": "Claimed on the return for the year the child is born or lives with you.",
+    "category": "money",
+    "id": "irs-earned-income-tax-credit",
+    "name": "Earned Income Tax Credit (with a child)",
+    "brand": "IRS",
+    "whatYouGet": "A refundable federal tax credit for working families with income below set limits, larger with a qualifying child.",
+    "signupUrl": "https://www.irs.gov/credits-deductions/individuals/earned-income-tax-credit-eitc",
+    "offers": [
+      "cash"
+    ],
+    "certainty": "if-eligible",
+    "valueLow": 0,
+    "valueHigh": 4427,
+    "valueSource": "official",
+    "valueBasis": "IRS maximum for one qualifying child, tax year 2026; actual amount depends on income",
+    "effort": "some",
+    "when": "after-birth"
+  },
+  {
+    "requirements": [],
+    "eligibility": "Baby born in a US hospital; getting a number is voluntary. Providing parents' Social Security numbers is requested but you can apply without both.",
+    "region": "US",
+    "sourceUrls": [
+      "https://www.ssa.gov/pubs/EN-05-10023.pdf",
+      "https://www.ssa.gov/news/en/press/releases/2026-07-01.html"
+    ],
+    "verifiedOn": "2026-11-10",
+    "confidence": "low",
+    "catches": "Processing time for the card varies by state. Needed for the Child Tax Credit, EITC and the Trump Account deposit.",
+    "notes": "signupUrl is the main SSA number page; the search did not return it directly, so check it. Limited-edition commemorative cards were issued for births July 2 to Dec 31, 2026, per SSA.",
+    "states": [],
+    "costToClaim": "free",
+    "costDetail": "Free; SSA says anyone asking for payment is a scam.",
+    "freeStuff": "A free Social Security number and card for the baby.",
+    "whenNote": "Request it at the hospital when you give birth certificate information.",
+    "category": "money",
+    "id": "ssa-newborn-social-security-number",
+    "name": "Newborn Social Security number at the hospital",
+    "brand": "Social Security Administration",
+    "whatYouGet": "A free Social Security number and card for your baby, requested while completing the birth certificate at the hospital.",
+    "signupUrl": "https://www.ssa.gov/ssnumber/",
+    "offers": [
+      "service"
+    ],
+    "certainty": "guaranteed",
+    "valueLow": null,
+    "valueHigh": null,
+    "valueSource": "none",
+    "valueBasis": "",
+    "effort": "quick",
+    "when": "after-birth"
+  },
+  {
+    "requirements": [
+      "eligibility"
+    ],
+    "eligibility": "Work-related care for a child under 13; credit is 20% to 50% of up to $3,000 of expenses for one child, depending on income. FSA is only if your employer offers it.",
+    "region": "US",
+    "sourceUrls": [
+      "https://www.irs.gov/credits-deductions/individuals/child-and-dependent-care-credit-information",
+      "https://www.irs.gov/publications/p503",
+      "https://www.irs.gov/forms-pubs/correction-to-the-dependent-care-benefits-exclusion-amount-in-the-2026-general-instructions-for-forms-w-2-and-w-3"
+    ],
+    "verifiedOn": "2026-11-10",
+    "confidence": "medium",
+    "catches": "Employer FSA exclusion is $7,500 for 2026 ($3,750 if married filing separately), which uses up the amount for the credit. Only applies if you pay for child care.",
+    "notes": "Max credit $600 to $1,500 for one child is my estimate from the IRS rate and cap; IRS states the $3,000 cap and the 20% to 50% range.",
+    "states": [],
+    "costToClaim": "free",
+    "costDetail": "No cost; the credit is claimed on Form 2441, the FSA is offered by some employers.",
+    "freeStuff": "",
+    "whenNote": "Applies in the years you pay for child care.",
+    "category": "money",
+    "id": "irs-child-dependent-care-credit-fsa",
+    "name": "Child and Dependent Care Credit and dependent care FSA",
+    "brand": "IRS",
+    "whatYouGet": "A tax credit for child care costs so you can work, or tax-free dependent care FSA money through an employer.",
+    "signupUrl": "https://www.irs.gov/credits-deductions/individuals/child-and-dependent-care-credit-information",
+    "offers": [
+      "cash"
+    ],
+    "certainty": "if-eligible",
+    "valueLow": 600,
+    "valueHigh": 1500,
+    "valueSource": "estimate",
+    "valueBasis": "20% to 50% of the $3,000 expense cap for one child, only if you pay for care",
+    "effort": "some",
+    "when": "after-birth"
+  },
+  {
+    "requirements": [
+      "eligibility"
+    ],
+    "eligibility": "You need an HSA, FSA or HRA plan. Pub 502 excludes excess bottles for food storage.",
+    "region": "US",
+    "sourceUrls": [
+      "https://www.irs.gov/publications/p502",
+      "https://taxmap.irs.gov/taxmap/pubs/p502-004.htm"
+    ],
+    "verifiedOn": "2026-11-10",
+    "confidence": "low",
+    "catches": "The saving is the tax you would have paid, not a free item. Check your plan's own rules before buying.",
+    "notes": "Pub 502 text confirmed in search results; HSA/FSA use is the IRS reading of Announcement 2011-14 via a secondary summary.",
+    "states": [],
+    "costToClaim": "free",
+    "costDetail": "You still pay for the item, using pre-tax money.",
+    "freeStuff": "",
+    "whenNote": "Often bought in the last weeks of pregnancy or after birth.",
+    "category": "money",
+    "id": "irs-hsa-fsa-breast-pump-lactation",
+    "name": "HSA/FSA money for breast pumps and lactation supplies",
+    "brand": "IRS",
+    "whatYouGet": "Breast pumps and supplies that assist lactation count as medical expenses, so pre-tax HSA, FSA or HRA money can pay for them.",
+    "signupUrl": "https://www.irs.gov/publications/p502",
+    "offers": [
+      "coupons"
+    ],
+    "certainty": "if-eligible",
+    "valueLow": 30,
+    "valueHigh": 75,
+    "valueSource": "estimate",
+    "valueBasis": "About 20% to 25% tax saving on a $150 to $300 pump",
+    "effort": "some",
+    "when": "late-pregnancy"
+  },
+  {
+    "requirements": [
+      "eligibility"
+    ],
+    "eligibility": "Employed in a state with a program and meeting its work and earnings rules. Pay rates, length and start dates differ by state.",
+    "region": "US",
+    "sourceUrls": [
+      "https://www.dol.gov/agencies/wb/featured-paid-leave",
+      "https://www.dol.gov/sites/dolgov/files/WB/paid-leave/HistoryOfPaidLeaveUS.pdf"
+    ],
+    "verifiedOn": "2026-11-10",
+    "confidence": "low",
+    "catches": "No federal paid leave exists; FMLA is unpaid. DOL list (2024): CA, NJ, RI, NY, DC, WA, MA, CT, OR, CO, MD, DE, MN, ME. MD, DE, MN, ME benefits were to start in 2026; not confirmed. Apply through the state agency, not DOL.",
+    "notes": "Only a DOL overview was seen; state agency pages were not searched. Value left empty because pay depends on wages and state.",
+    "states": [
+      "CA",
+      "NJ",
+      "RI",
+      "NY",
+      "DC",
+      "WA",
+      "MA",
+      "CT",
+      "OR",
+      "CO",
+      "MD",
+      "DE",
+      "MN",
+      "ME"
+    ],
+    "costToClaim": "free",
+    "costDetail": "Funded by payroll contributions; no sign-up fee.",
+    "freeStuff": "",
+    "whenNote": "Most states ask for notice and an application before leave starts; check your state agency.",
+    "category": "money",
+    "id": "state-paid-family-leave-programs",
+    "name": "State paid family leave programs",
+    "brand": "U.S. Department of Labor (overview)",
+    "whatYouGet": "Partial pay while you take leave to bond with a new baby, in states that run a paid family and medical leave program.",
+    "signupUrl": "https://www.dol.gov/agencies/wb/featured-paid-leave",
+    "offers": [
+      "cash"
+    ],
+    "certainty": "if-eligible",
+    "valueLow": null,
+    "valueHigh": null,
+    "valueSource": "none",
+    "valueBasis": "",
+    "effort": "involved",
+    "when": "late-pregnancy"
+  },
+  {
+    "requirements": [
+      "eligibility"
+    ],
+    "eligibility": "Child born in California on or after July 1, 2023, any income.",
+    "region": "California",
+    "sourceUrls": [
+      "https://calkids.org/get-started/",
+      "https://calkids.org/wp-content/uploads/2024/03/CalKIDS-Program-Fast-Facts.pdf",
+      "https://calkids.org/wp-content/uploads/2026/05/CalKIDS-Program-Information-Guide_1.31.26.pdf"
+    ],
+    "verifiedOn": "2026-11-10",
+    "confidence": "medium",
+    "catches": "Claim at calkids.org with the birth-certificate Local Registration Number or letter code. Wait up to 90 days after birth. Extra $25 for claiming online and $50 for linking a ScholarShare 529 (up to $175 total).",
+    "notes": "Results disagreed on whether newborns get $500; the program FAQ and annual report say $500 is for eligible students, so I used $100.",
+    "states": [
+      "CA"
+    ],
+    "costToClaim": "free",
+    "costDetail": "No cost; no contribution needed.",
+    "freeStuff": "$100 deposited into a CalKIDS account for the baby.",
+    "whenNote": "Claim up to 90 days after birth.",
+    "category": "money",
+    "id": "calkids-newborn-account",
+    "name": "CalKIDS newborn account",
+    "brand": "CalKIDS (California State Treasurer)",
+    "whatYouGet": "An automatic $100 deposit for every child born in California on or after July 1, 2023, with small bonuses for claiming and linking a 529.",
+    "signupUrl": "https://calkids.org/get-started/",
+    "offers": [
+      "cash"
+    ],
+    "certainty": "guaranteed",
+    "valueLow": 100,
+    "valueHigh": 175,
+    "valueSource": "official",
+    "valueBasis": "$100 deposit plus $25 for claiming and $50 for linking a 529",
+    "effort": "quick",
+    "when": "after-birth"
+  },
+  {
+    "requirements": [
+      "eligibility"
+    ],
+    "eligibility": "Child born on or after Jan 1, 2019 to Pennsylvania residents, or later adopted by residents.",
+    "region": "Pennsylvania",
+    "sourceUrls": [
+      "https://www.pa529.com/keystone/",
+      "https://www.pa529.com/keystone/pdf/KS-Fact-Sheet.pdf",
+      "https://www.pa529.com/keystone/resources/Keystone-Scholars-Brochure.pdf"
+    ],
+    "verifiedOn": "2026-11-10",
+    "confidence": "medium",
+    "catches": "Account is created about 4 to 6 months after birth and a postcard explains how to claim it. Usable from age 18 to 29 if the child has a PA 529 account then.",
+    "notes": "Out-of-state births take longer. A separate $25 Allegheny County bonus had a Sept 30, 2026 deadline, so it is left out.",
+    "states": [
+      "PA"
+    ],
+    "costToClaim": "free",
+    "costDetail": "No cost; no deposit needed.",
+    "freeStuff": "$100 deposit into a 529-linked account.",
+    "whenNote": "Account appears about 4 to 6 months after birth.",
+    "category": "money",
+    "id": "pa-keystone-scholars",
+    "name": "Keystone Scholars",
+    "brand": "Pennsylvania 529 (PA Treasury)",
+    "whatYouGet": "A $100 starter deposit for children born or adopted into Pennsylvania families, created automatically.",
+    "signupUrl": "https://www.pa529.com/keystone/",
+    "offers": [
+      "cash"
+    ],
+    "certainty": "guaranteed",
+    "valueLow": 100,
+    "valueHigh": 100,
+    "valueSource": "official",
+    "valueBasis": "$100 starter deposit stated by the program",
+    "effort": "quick",
+    "when": "after-birth"
+  },
+  {
+    "requirements": [
+      "eligibility"
+    ],
+    "eligibility": "Baby born to Maine residents since Jan 1, 2013. Babies born elsewhere who become Maine residents before age 1 qualify if a NextGen 529 is opened before age 1.",
+    "region": "Maine",
+    "sourceUrls": [
+      "https://www.nextgenforme.com/grants-for-maine-residents/alfond-grant/",
+      "https://www.nextgenforme.com/faq/",
+      "https://www.famemaine.com/affording-education/make-a-plan/planning-by-age/infant-preschool/"
+    ],
+    "verifiedOn": "2026-11-10",
+    "confidence": "medium",
+    "catches": "The money is invested and may lose value; paid only to eligible schools; forfeited if not used by the child's 28th birthday. The $100 match needs a $25 contribution.",
+    "notes": "Official FAME and NextGen pages; no application for in-state births.",
+    "states": [
+      "ME"
+    ],
+    "costToClaim": "free",
+    "costDetail": "No cost; adding $25 to a NextGen 529 before the first birthday earns a further $100 match.",
+    "freeStuff": "$500 grant invested for the child.",
+    "whenNote": "Automatic for in-state births; open a NextGen 529 before the first birthday for the match.",
+    "category": "money",
+    "id": "me-alfond-grant",
+    "name": "My Alfond Grant",
+    "brand": "Alfond Scholarship Foundation / FAME (Maine)",
+    "whatYouGet": "A $500 grant for babies born to Maine residents, awarded automatically and held for higher education.",
+    "signupUrl": "https://www.nextgenforme.com/grants-for-maine-residents/alfond-grant/",
+    "offers": [
+      "cash"
+    ],
+    "certainty": "guaranteed",
+    "valueLow": 500,
+    "valueHigh": 500,
+    "valueSource": "official",
+    "valueBasis": "$500 grant stated by the program",
+    "effort": "quick",
+    "when": "after-birth"
+  },
+  {
+    "requirements": [
+      "eligibility"
+    ],
+    "eligibility": "Massachusetts resident child; open a new U.Fund 529 before the first birthday or adoption anniversary.",
+    "region": "Massachusetts",
+    "sourceUrls": [
+      "https://www.mass.gov/info-details/babysteps",
+      "https://www.mass.gov/info-details/about-the-babysteps-savings-plan"
+    ],
+    "verifiedOn": "2026-11-10",
+    "confidence": "medium",
+    "catches": "Must open a new account; it cannot be added to an existing 529. Deposit arrives about 6 weeks later. SNAP families get an extra $120 for a child under 1 (separate program, not entered here).",
+    "notes": "Opt-out window of 30 days after opening.",
+    "states": [
+      "MA"
+    ],
+    "costToClaim": "free",
+    "costDetail": "No fee or minimum to open the account.",
+    "freeStuff": "$50 deposit into a new 529 account.",
+    "whenNote": "Open the account before the child's first birthday.",
+    "category": "money",
+    "id": "ma-babysteps-savings-plan",
+    "name": "BabySteps Savings Plan",
+    "brand": "Massachusetts Treasurer / MEFA",
+    "whatYouGet": "A $50 seed deposit when you open a new MEFA U.Fund 529 for a baby within a year of birth or adoption.",
+    "signupUrl": "https://www.mass.gov/info-details/babysteps",
+    "offers": [
+      "cash"
+    ],
+    "certainty": "guaranteed",
+    "valueLow": 50,
+    "valueHigh": 50,
+    "valueSource": "official",
+    "valueBasis": "$50 seed deposit stated by the program",
+    "effort": "some",
+    "when": "after-birth"
+  },
+  {
+    "requirements": [
+      "eligibility"
+    ],
+    "eligibility": "Rhode Island child; open an account within a year of birth or adoption.",
+    "region": "Rhode Island",
+    "sourceUrls": [
+      "https://www.collegeboundsaver.com/home/resources/collegeboundstarter.html"
+    ],
+    "verifiedOn": "2026-11-10",
+    "confidence": "low",
+    "catches": "Replaced the older CollegeBoundbaby grant on July 1, 2021. Deposit about 45 to 60 days after opening. Results described it as a chance to receive the bonus; confirm terms.",
+    "notes": "Not the old $100 CollegeBoundbaby, which covered 2015 to mid-2021 births.",
+    "states": [
+      "RI"
+    ],
+    "costToClaim": "free",
+    "costDetail": "Free, no minimum to start.",
+    "freeStuff": "$100 deposit into a 529 account.",
+    "whenNote": "Open the account before the first birthday.",
+    "category": "money",
+    "id": "ri-collegebound-starter",
+    "name": "CollegeBound Starter",
+    "brand": "CollegeBound Saver (Rhode Island)",
+    "whatYouGet": "A $100 starter bonus in a CollegeBound Saver account for children born to or adopted by Rhode Island families.",
+    "signupUrl": "https://www.collegeboundsaver.com/home/resources/collegeboundstarter.html",
+    "offers": [
+      "cash"
+    ],
+    "certainty": "likely",
+    "valueLow": 100,
+    "valueHigh": 100,
+    "valueSource": "official",
+    "valueBasis": "$100 starter bonus stated by the program",
+    "effort": "some",
+    "when": "after-birth"
+  },
+  {
+    "requirements": [
+      "eligibility"
+    ],
+    "eligibility": "Child born or adopted in Colorado on or after Jan 1, 2020; parent or guardian owns the account; apply before the child's fifth birthday.",
+    "region": "Colorado",
+    "sourceUrls": [
+      "https://www.collegeinvest.org/images/pdfs/First%20Step%20Flyer%202026.pdf",
+      "https://www.collegeinvest.org/faqs/"
+    ],
+    "verifiedOn": "2026-11-10",
+    "confidence": "low",
+    "catches": "Official materials show different amounts ($100, $115, $118, $121); confirm on collegeinvest.org. Award arrives within about 30 days of applying.",
+    "notes": "Amount conflict across official documents, so confidence is low.",
+    "states": [
+      "CO"
+    ],
+    "costToClaim": "free",
+    "costDetail": "Can open with $0 and fund it with the award.",
+    "freeStuff": "A free deposit into a 529 account.",
+    "whenNote": "Apply before the child's fifth birthday.",
+    "category": "money",
+    "id": "co-first-step",
+    "name": "First Step (CollegeInvest)",
+    "brand": "CollegeInvest (Colorado)",
+    "whatYouGet": "A free contribution to a CollegeInvest 529 account for children born or adopted in Colorado on or after Jan 1, 2020.",
+    "signupUrl": "https://www.collegeinvest.org/enroll-529-savings-plan/",
+    "offers": [
+      "cash"
+    ],
+    "certainty": "likely",
+    "valueLow": 100,
+    "valueHigh": 121,
+    "valueSource": "official",
+    "valueBasis": "Range of award amounts shown in CollegeInvest materials",
+    "effort": "some",
+    "when": "after-birth"
+  },
+  {
+    "requirements": [
+      "eligibility"
+    ],
+    "eligibility": "Child born or adopted on or after Jan 1, 2023 to Illinois residents; parent or guardian claims it.",
+    "region": "Illinois",
+    "sourceUrls": [
+      "https://illinoistreasurer.gov/news/illinois-treasurer-michael-frerichs-reminds-new-parents-to-claim-50-deposit-in-illinois-529-college-savings-account/",
+      "https://illinoistreasurer.gov/home/individuals/college-savings/"
+    ],
+    "verifiedOn": "2026-11-10",
+    "confidence": "medium",
+    "catches": "Claim before the child's 10th birthday, while opening an account or at brightstart.com/first-steps/claim/. Grandparents cannot claim unless legal guardian.",
+    "notes": "Claim page URL was named in results; signupUrl is the Bright Start home.",
+    "states": [
+      "IL"
+    ],
+    "costToClaim": "free",
+    "costDetail": "No extra contribution needed.",
+    "freeStuff": "$50 deposit into a 529 account.",
+    "whenNote": "Claim before the child's 10th birthday.",
+    "category": "money",
+    "id": "il-first-steps",
+    "name": "Illinois First Steps",
+    "brand": "Illinois State Treasurer",
+    "whatYouGet": "A one-time $50 seed deposit into a Bright Start or Bright Directions 529 account.",
+    "signupUrl": "https://www.brightstartsavings.com/",
+    "offers": [
+      "cash"
+    ],
+    "certainty": "guaranteed",
+    "valueLow": 50,
+    "valueHigh": 50,
+    "valueSource": "official",
+    "valueBasis": "$50 seed deposit stated by the Treasurer",
+    "effort": "quick",
+    "when": "after-birth"
+  },
+  {
+    "requirements": [
+      "eligibility"
+    ],
+    "eligibility": "Child born on or after July 1, 2023 whose birth was covered by HUSKY (Connecticut Medicaid). Parent immigration status does not matter.",
+    "region": "Connecticut",
+    "sourceUrls": [
+      "https://portal.ct.gov/OTT/Debt-Management/CT-Baby-Bonds",
+      "https://portal.ct.gov/ott/ct-baby-bonds/faq"
+    ],
+    "verifiedOn": "2026-11-10",
+    "confidence": "medium",
+    "catches": "Money is used later, for a Connecticut home, business, education or retirement, after financial literacy training. Pages differ on flat $3,200 vs up to $3,200.",
+    "notes": "The state projects growth to $11,000 to $24,000; not used as the value.",
+    "states": [
+      "CT"
+    ],
+    "costToClaim": "free",
+    "costDetail": "No application; enrolled automatically.",
+    "freeStuff": "$3,200 invested by the state for the child.",
+    "whenNote": "Automatic after a HUSKY-covered birth.",
+    "category": "money",
+    "id": "ct-baby-bonds",
+    "name": "CT Baby Bonds",
+    "brand": "Connecticut Office of the Treasurer",
+    "whatYouGet": "A state-funded investment of $3,200 (the state says up to) for babies whose birth was covered by HUSKY, for use at ages 18 to 30.",
+    "signupUrl": "https://portal.ct.gov/OTT/Debt-Management/CT-Baby-Bonds",
+    "offers": [
+      "cash"
+    ],
+    "certainty": "if-eligible",
+    "valueLow": 3200,
+    "valueHigh": 3200,
+    "valueSource": "official",
+    "valueBasis": "$3,200 investment stated by the state; paid out only at ages 18 to 30",
+    "effort": "quick",
+    "when": "after-birth"
+  },
+  {
+    "requirements": [
+      "eligibility"
+    ],
+    "eligibility": "Child born in Nebraska in 2020 or later.",
+    "region": "Nebraska",
+    "sourceUrls": [
+      "https://nest529.com/meadowlark/",
+      "https://treasurer.nebraska.gov/csp/"
+    ],
+    "verifiedOn": "2026-11-10",
+    "confidence": "medium",
+    "catches": "Funds must be used for qualified higher education costs in Nebraska before age 30. Parents may opt out. The family does not own the account.",
+    "notes": "Result text said births in 2025 get the deposit in spring; confirm for 2027 births.",
+    "states": [
+      "NE"
+    ],
+    "costToClaim": "free",
+    "costDetail": "No cost or paperwork.",
+    "freeStuff": "$50 deposit set up automatically.",
+    "whenNote": "Automatic after the birth is registered.",
+    "category": "money",
+    "id": "ne-meadowlark",
+    "name": "Meadowlark savings program",
+    "brand": "Nebraska State Treasurer / NEST 529",
+    "whatYouGet": "An automatic one-time $50 deposit into a state-managed account for Nebraska children born in 2020 or later.",
+    "signupUrl": "https://nest529.com/meadowlark/",
+    "offers": [
+      "cash"
+    ],
+    "certainty": "guaranteed",
+    "valueLow": 50,
+    "valueHigh": 50,
+    "valueSource": "official",
+    "valueBasis": "$50 seed deposit stated by the state",
+    "effort": "quick",
+    "when": "after-birth"
+  },
+  {
+    "requirements": [
+      "eligibility"
+    ],
+    "eligibility": "Newborn up to 12 months old living in North Dakota; one match per child; no income limit; anyone can apply.",
+    "region": "North Dakota",
+    "sourceUrls": [
+      "https://www.collegesave4u.com/home/more-ways-to-save/match-programs/newbabymatch.html"
+    ],
+    "verifiedOn": "2026-11-10",
+    "confidence": "medium",
+    "catches": "Not free: you must contribute $200 first. Subject to available funds; BND may change or stop it. Grant returns to BND if the account sits at zero for six months.",
+    "notes": "Left value empty because the family has to put in $200 to get $200.",
+    "states": [
+      "ND"
+    ],
+    "costToClaim": "purchase-required",
+    "costDetail": "The match needs a $200 contribution within 12 months.",
+    "freeStuff": "",
+    "whenNote": "Contribute within 12 months of enrolling.",
+    "category": "money",
+    "id": "nd-college-save-new-baby-match",
+    "name": "New Baby Match (College SAVE)",
+    "brand": "Bank of North Dakota",
+    "whatYouGet": "A $200 dollar-for-dollar match when someone puts $200 into a College SAVE account for a North Dakota newborn.",
+    "signupUrl": "https://www.collegesave4u.com/home/more-ways-to-save/match-programs/newbabymatch.html",
+    "offers": [
+      "cash"
+    ],
+    "certainty": "likely",
+    "valueLow": null,
+    "valueHigh": null,
+    "valueSource": "none",
+    "valueBasis": "",
+    "effort": "some",
+    "when": "after-birth"
+  }
+]

@@ -1,0 +1,152 @@
+[
+ {
+  "id": "imagination-library-free-books",
+  "name": "Dolly Parton's Imagination Library",
+  "brand": "Dolly Parton's Imagination Library (The Dollywood Foundation)",
+  "category": "baby-care",
+  "whatYouGet": "A high-quality, age-appropriate book mailed each month to registered children at no cost to the family.",
+  "costToClaim": "free",
+  "costDetail": "Books are 100% free to enrolled children; local program partners cover book and shipping costs.",
+  "requirements": [
+   "address",
+   "due-date",
+   "eligibility"
+  ],
+  "eligibility": "Children (the US page refers to ages 0-5) living in an area covered by a local program partner; the check-availability page lets you register online or by mail where offered.",
+  "region": "Varies by area",
+  "signupUrl": "https://imaginationlibrary.com/check-availability/",
+  "sourceUrls": [
+   "https://imaginationlibrary.com/check-availability/",
+   "https://imaginationlibrary.com/usa/"
+  ],
+  "verifiedOn": "2026-11-10",
+  "confidence": "medium",
+  "catches": "Only available where a local program partner serves your address. Per official-domain search results, online registration is blocked for a child not yet born, so you register after the birth. Some local programs use a different age range (for example newborn to 4.5 years). One local program reported 8-10 weeks for the first book.",
+  "notes": "Check availability by location first. The search-result snippet about 8-10 weeks came from a local program page.",
+  "offers": [
+   "product"
+  ],
+  "certainty": "if-eligible",
+  "freeStuff": "One age-matched book is mailed to your child each month at no cost, where a local program covers your address.",
+  "valueLow": 40,
+  "valueHigh": 60,
+  "valueSource": "estimate",
+  "valueBasis": "About 8 to 12 board books in the first year at about $5 each",
+  "effort": "quick",
+  "when": "after-birth",
+  "whenNote": "Official results say a child must be born before online registration; books start about 8 to 10 weeks after sign-up per a local program page.",
+  "states": []
+ },
+ {
+  "id": "huggies-rewards",
+  "name": "Huggies Rewards",
+  "brand": "Huggies",
+  "category": "diapers-wipes",
+  "whatYouGet": "Free rewards program and app where purchases of Huggies products earn points that can be redeemed for rewards such as gift cards.",
+  "costToClaim": "purchase-required",
+  "costDetail": "Free to join; earning points requires buying Huggies products.",
+  "requirements": [
+   "email",
+   "app",
+   "purchase"
+  ],
+  "eligibility": "",
+  "region": "US",
+  "signupUrl": "https://www.huggies.com/en-us/rewards/rewardsapp",
+  "sourceUrls": [
+   "https://www.huggies.com/en-us/rewards/rewardsapp"
+  ],
+  "verifiedOn": "2026-11-10",
+  "confidence": "medium",
+  "catches": "Points require buying Huggies products. Search snippets disagree on the sign-up bonus amount, so none is listed. Older Rewards+ (Fetch) earning ended per a Huggies page. Huggies pages disagree on whether the program runs in the Huggies app or as Huggies Rewards+ inside the Fetch app; check the app page before you buy anything for points.",
+  "notes": "huggies.com blocks automated reading, so details come from huggies.com search results only and may be incomplete. On 2026-11-10 the sign-up link was moved to the Rewards app page on www.huggies.com, and an older www1.huggies.com source page was removed because that host no longer resolves.",
+  "offers": [
+   "points"
+  ],
+  "certainty": "likely",
+  "freeStuff": "",
+  "valueLow": null,
+  "valueHigh": null,
+  "valueSource": "none",
+  "valueBasis": "",
+  "effort": "some",
+  "when": "after-birth",
+  "whenNote": "",
+  "states": []
+ },
+ {
+  "id": "pampers-rewards",
+  "name": "Pampers Rewards",
+  "brand": "Pampers",
+  "category": "diapers-wipes",
+  "whatYouGet": "Free loyalty app: scan the QR code inside Pampers diaper or wipe packs to earn Pampers Cash; the page says $10 Pampers Cash for every 10 diaper scans (most boxes have 2 scans), redeemable for discounts on Pampers at retailers.",
+  "costToClaim": "purchase-required",
+  "costDetail": "Free to download and join (page says no subscription or hidden fees). No sign-up gift or bonus is stated on the page; earning Pampers Cash requires buying Pampers products, and rewards are discounts on Pampers purchases.",
+  "requirements": [
+   "email",
+   "app",
+   "purchase"
+  ],
+  "eligibility": "",
+  "region": "US",
+  "signupUrl": "https://www.pampers.com/en-us/rewards",
+  "sourceUrls": [
+   "https://www.pampers.com/en-us/rewards",
+   "https://support.pampers.com/hc/en-us/articles/21676841189533-How-can-I-get-Pampers-samples-or-coupons"
+  ],
+  "verifiedOn": "2026-11-08",
+  "confidence": "high",
+  "catches": "Earning needs Pampers purchases. Pampers Cash expires 6 months after being added or if the account is inactive 6 months. App works on one device at a time. Page also promotes a 7-day free trial of a separate Baby Sleep app.",
+  "notes": "Formerly called Pampers Club. Page says extra bonuses at milestones and a referral: invite up to 5 friends for $2 each for them and up to $10 for you. Rate checked on pampers.com today: $10 per 10 diaper scans is what the page states.",
+  "offers": [
+   "points",
+   "coupons"
+  ],
+  "certainty": "likely",
+  "freeStuff": "",
+  "valueLow": 40,
+  "valueHigh": 60,
+  "valueSource": "estimate",
+  "valueBasis": "Page says $10 Pampers Cash per 10 diaper scans, most boxes have 2 scans; about 20 to 30 boxes in year one",
+  "effort": "some",
+  "when": "after-birth",
+  "whenNote": "",
+  "states": []
+ },
+ {
+  "id": "reach-out-and-read-free-books",
+  "name": "Reach Out and Read",
+  "brand": "Reach Out and Read",
+  "category": "baby-care",
+  "whatYouGet": "Your child's doctor or nurse gives a new, age-matched book at well-child visits, with tips on reading aloud.",
+  "costToClaim": "free",
+  "costDetail": "Books are given at the visit; no fee is mentioned in the official results.",
+  "requirements": [
+   "eligibility"
+  ],
+  "eligibility": "Children from birth to age 5 who go to a participating clinic. The official results give no income rules for families.",
+  "region": "Participating clinics in all 50 states",
+  "signupUrl": "https://reachoutandread.org/find-a-site/",
+  "sourceUrls": [
+   "https://reachoutandread.org/find-a-site/",
+   "https://reachoutandread.org/books/"
+  ],
+  "verifiedOn": "2026-11-10",
+  "confidence": "medium",
+  "catches": "Only at clinics that take part; ask your child's doctor. Program rules start books at the 6-month visit, and books for earlier visits are encouraged but not required.",
+  "notes": "Official-domain search results only. No sign-up form: you find a participating clinic with the Find a Site map and get the book at visits.",
+  "offers": [
+   "product"
+  ],
+  "certainty": "likely",
+  "freeStuff": "A new children's book is given to your child at well-child visits at a participating clinic.",
+  "valueLow": 10,
+  "valueHigh": 20,
+  "valueSource": "estimate",
+  "valueBasis": "2 to 4 board books in year one at about $5 each",
+  "effort": "some",
+  "when": "after-birth",
+  "whenNote": "Official results say books are required from the 6-month well-child visit and encouraged from birth.",
+  "states": []
+ }
+]

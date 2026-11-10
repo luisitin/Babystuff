@@ -10,10 +10,10 @@ const FM = require('../src/js/fieldmatch.js');
 const PROGRAMS = JSON.parse(readFileSync(new URL('../data/programs.json', import.meta.url), 'utf8'));
 
 const progs = [
-  { id: 'similac-strongmoms', name: 'Similac StrongMoms', signupUrl: 'https://www.similac.com/strongmoms/' },
-  { id: 'enfamil-family-beginnings', name: 'Enfamil Family Beginnings', signupUrl: 'https://www.enfamil.com/family-beginnings/' },
-  { id: 'gerber-a', name: 'Gerber A', signupUrl: 'https://www.gerber.com/a' },
-  { id: 'gerber-b', name: 'Gerber B', signupUrl: 'https://www.gerber.com/b' },
+  { id: 'similac-strongmoms', name: 'Similac StrongMoms', requirements: ['email'], signupUrl: 'https://www.similac.com/strongmoms/' },
+  { id: 'enfamil-family-beginnings', name: 'Enfamil Family Beginnings', requirements: ['email'], signupUrl: 'https://www.enfamil.com/family-beginnings/' },
+  { id: 'gerber-a', name: 'Gerber A', requirements: ['email'], signupUrl: 'https://www.gerber.com/a' },
+  { id: 'gerber-b', name: 'Gerber B', requirements: ['email'], signupUrl: 'https://www.gerber.com/b' },
 ];
 const PROFILE = {
   firstName: 'Alex', lastName: 'Sample', email: 'alex.sample@gmail.com', phone: '555-0100',
@@ -341,6 +341,20 @@ test('plus address: used for a unique domain, plain email when a domain is share
   assert.equal(yahoo.els.e._v, 'alex.sample@yahoo.com');
 });
 
+test('plus address: only programs in the email features get a tag', () => {
+  const list = [
+    ...progs,
+    { id: 'gov-benefit', name: 'Gov Benefit', requirements: ['email'], signupUrl: 'https://benefits.example.gov/start' },
+    { id: 'no-email', name: 'No Email', requirements: ['address'], signupUrl: 'https://www.noemail.com/start' },
+  ];
+  const tagMap = { 'similac-strongmoms': 'similac', 'gov-benefit': 'govtag', 'no-email': 'noemailtag' };
+  const prog = F.build({ profile: { ...PROFILE, usePlusTags: true }, programs: list, tagMap });
+  const at = (href) => run(prog, { href, setup: (w) => ({ e: field(w, { type: 'email', label: 'Email' }) }) }).els.e._v;
+  assert.equal(at('https://www.similac.com/'), 'alex.sample+similac@gmail.com');
+  assert.equal(at('https://benefits.example.gov/'), 'alex.sample@gmail.com');
+  assert.equal(at('https://www.noemail.com/'), 'alex.sample@gmail.com');
+});
+
 test('the real program list builds, every domain is https and registrable', () => {
   const s = F.build({ profile: PROFILE, programs: PROGRAMS });
   const data = JSON.parse(s.slice(s.indexOf('var D=') + 6, s.indexOf(';var FM=')));
@@ -375,6 +389,8 @@ test('fieldmatch: one source, same API as the helper wrapper', async () => {
   }
   assert.equal(FM.registrableDomain('https://register.gerber.com/x'), 'gerber.com');
   assert.equal(FM.registrableDomain('shop.example.co.uk'), 'example.co.uk');
+  assert.equal(FM.registrableDomain('https://www.revenue.state.mn.us/child-tax-credit'), 'state.mn.us');
+  assert.equal(FM.registrableDomain('www.medela.us'), 'medela.us');
   assert.equal(FM.sameSite('https://a.similac.com', 'https://similac.com.evil.example'), false);
   assert.equal(FM.classifyField({ type: 'text', autocomplete: 'cc-number' }), null);
   assert.ok(!FM.factory.toString().includes('\n//'), 'no line comments in the embedded factory');

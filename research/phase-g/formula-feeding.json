@@ -1,0 +1,276 @@
+[
+ {
+  "id": "enfamil-family-beginnings",
+  "name": "Enfamil Family Beginnings",
+  "brand": "Enfamil (Mead Johnson / Reckitt)",
+  "category": "formula",
+  "whatYouGet": "Joining gives access to the Enfamil Wonder Box, with sample cans of Enfamil NeuroPro Infant and NeuroPro Gentlease, plus Belly Badges, formula checks, app cash-back rebates and weekly tips. Joining also enters you in a drawing for a year of free formula. Enfamil advertises up to $400 in gifts.",
+  "costToClaim": "free",
+  "costDetail": "Free to join; no purchase necessary for the sweepstakes",
+  "requirements": [
+   "email",
+   "due-date"
+  ],
+  "eligibility": "Sweepstakes entry is for legal US residents 18+ who join in 2026; benefits vary by the details you give",
+  "region": "US",
+  "signupUrl": "https://www.enfamil.com/baby-formula-coupons-samples/",
+  "sourceUrls": [
+   "https://www.enfamil.com/baby-formula-coupons-samples/",
+   "https://www.enfamil.com/help-center/enfamil-family-beginnings/",
+   "https://www.enfamil.com/free-formula-sweepstakes/",
+   "https://www.enfamil.com/free-gift/",
+   "https://www.enfamil.com/wonderbox-gift/"
+  ],
+  "verifiedOn": "2026-11-10",
+  "confidence": "medium",
+  "catches": "Samples are not guaranteed: the help center says samples are not always available and often come through the hospital or a doctor. Mailed samples arrive in about 3 to 5 weeks. The Wonder Box page and the sweepstakes say the promotion ends Dec 31, 2026, so whether it continues for 2027 births is unconfirmed. Joining agrees to receive offers from Enfamil and affiliated Reckitt brands.",
+  "notes": "Quick form asks first and last name, email and due or birth date. Enfamil Rewards points (100 for joining, 1,000 for first app login) are part of the same sign-up.",
+  "offers": [
+   "product",
+   "coupons",
+   "points",
+   "sweepstakes"
+  ],
+  "certainty": "likely",
+  "freeStuff": "Wonder Box with sample cans of Enfamil NeuroPro Infant and Gentlease, mailed to you.",
+  "valueLow": 10,
+  "valueHigh": 20,
+  "valueSource": "estimate",
+  "valueBasis": "2 sample cans at about $5 to $10 each (the $400 is the brand's maximum, not counted)",
+  "effort": "quick",
+  "when": "pregnancy",
+  "whenNote": "Official pages say the promotion ends Dec 31, 2026, so join soon.",
+  "states": []
+ },
+ {
+  "id": "gerber-mygerber-baby",
+  "name": "MyGerber Baby account (formula sample opt-in)",
+  "brand": "Gerber",
+  "category": "formula",
+  "whatYouGet": "Free MyGerber account with perks such as expert advice and order tracking; sign-up includes an optional checkbox to receive infant formula samples and offers if they become available.",
+  "costToClaim": "free",
+  "costDetail": "Creating an account is free",
+  "requirements": [
+   "email",
+   "due-date"
+  ],
+  "eligibility": "Parents with a child's birthday or due date",
+  "region": "US",
+  "signupUrl": "https://www.gerber.com/about-mygerber",
+  "sourceUrls": [
+   "https://www.gerber.com/about-mygerber",
+   "https://www.gerber.com/gerberr-good-startr-soothepro-powder-infant-formula"
+  ],
+  "verifiedOn": "2026-11-10",
+  "confidence": "medium",
+  "catches": "Samples are only 'if they become available' and an address is required only if you tick the sample box. Gerber also markets a new-member sample box, but no published schedule or sample eligibility was found. Good Start formula has moved to Perrigo, so the current sample offer is unconfirmed. Results only mention samples 'when available'; the offer of a free product is unconfirmed, so product is listed second.",
+  "notes": "gerber.com blocks automated reading, so details come from gerber.com search results only and may be incomplete. On 2026-11-10 the sign-up link was moved to the \"Join MyGerber Membership\" page on www.gerber.com because the older register.gerber.com address did not resolve in our link check.",
+  "offers": [
+   "coupons",
+   "product"
+  ],
+  "certainty": "likely",
+  "freeStuff": "",
+  "valueLow": null,
+  "valueHigh": null,
+  "valueSource": "none",
+  "valueBasis": "",
+  "effort": "quick",
+  "when": "pregnancy",
+  "whenNote": "",
+  "states": []
+ },
+ {
+  "id": "similac-mysimilac-rewards",
+  "name": "MySimilac Rewards",
+  "brand": "Similac (Abbott)",
+  "category": "formula",
+  "whatYouGet": "Formula coupons, points toward a bonus coupon, nutrition guidance and partner perks. The welcome kit may include formula samples.",
+  "costToClaim": "free",
+  "costDetail": "Free to join",
+  "requirements": [
+   "email",
+   "address",
+   "due-date"
+  ],
+  "eligibility": "Legal residents of the 50 states and DC, 18+; enrollment is per eligible child up to 9 months; one account per household per child",
+  "region": "US (50 states and DC)",
+  "signupUrl": "https://www.similac.com/rewards.html",
+  "sourceUrls": [
+   "https://www.similac.com/rewards.html",
+   "https://www.similac.com/rewards/admin/terms-conditions.html"
+  ],
+  "verifiedOn": "2026-11-08",
+  "confidence": "high",
+  "catches": "Samples are not guaranteed ('may'). The Shutterfly free photo book shown on the page carried an offer expiry of July 31, 2026, so it is not listed. Optional SMS opt-in; email and postal marketing continue even if you decline texts. Points are earned only when a coupon is redeemed (5 points each); a special coupon comes at 35 points. Some offers may need a visit to a participating healthcare facility. Program can change or end at any time.",
+  "notes": "Registration asks for name, home address, email and baby's birth or due date, plus a password. Coupons may arrive by mail, in your account or by email.",
+  "offers": [
+   "product",
+   "coupons",
+   "points"
+  ],
+  "certainty": "likely",
+  "freeStuff": "A welcome kit that may include formula samples, mailed to you.",
+  "valueLow": 5,
+  "valueHigh": 9,
+  "valueSource": "estimate",
+  "valueBasis": "1 small sample at about $5 to $9 (Similac's sample terms list a 7 oz can at $9)",
+  "effort": "quick",
+  "when": "pregnancy",
+  "whenNote": "",
+  "states": []
+ },
+ {
+  "id": "enfamil-nutramigen-support-program",
+  "name": "Nutramigen Support Program (within Enfamil Family Beginnings)",
+  "brand": "Enfamil (Mead Johnson / Reckitt)",
+  "category": "formula",
+  "whatYouGet": "Specialized track within Enfamil Family Beginnings for families managing cow's milk allergy: emails with articles and expert tips on cow's milk protein allergy, plus free samples and offers (the form says 'tips and samples to fit your needs'). Members also get an entry in the free-formula-for-a-year sweepstakes.",
+  "costToClaim": "free",
+  "costDetail": "Free to join",
+  "requirements": [
+   "email",
+   "address",
+   "due-date"
+  ],
+  "eligibility": "Families managing cow's milk allergy; also joins you to Enfamil Family Beginnings",
+  "region": "US",
+  "signupUrl": "https://www.enfamil.com/nutramigen-savings-and-support-program/",
+  "sourceUrls": [
+   "https://www.enfamil.com/nutramigen-savings-and-support-program/"
+  ],
+  "verifiedOn": "2026-11-08",
+  "confidence": "high",
+  "catches": "Sample contents and timing are not specified on the page; some gifts may arrive closer to your due date. Form includes an optional mobile number for text messages. Agrees to receive offers from Mead Johnson affiliated companies and shares your information with them.",
+  "notes": "Form asks name, email, address, due or birth date and relationship to baby. Talk to your pediatrician before choosing a hypoallergenic formula. Page no longer mentions insurance support.",
+  "offers": [
+   "product",
+   "sweepstakes"
+  ],
+  "certainty": "likely",
+  "freeStuff": "Samples 'to fit your needs' may be mailed; contents are not stated.",
+  "valueLow": 5,
+  "valueHigh": 20,
+  "valueSource": "estimate",
+  "valueBasis": "1 sample can of specialty formula at about $5 to $20",
+  "effort": "quick",
+  "when": "late-pregnancy",
+  "whenNote": "The page says some gifts may arrive closer to your due date.",
+  "states": []
+ },
+ {
+  "id": "mam-club",
+  "name": "MAM Club",
+  "brand": "MAM",
+  "category": "feeding",
+  "whatYouGet": "10% welcome voucher and 10% member discount on the MAM US online shop, plus a pregnancy newsletter, invitations to product tests and prize giveaways.",
+  "costToClaim": "free",
+  "costDetail": "Free to join; discounts apply to purchases in the MAM online shop",
+  "requirements": [
+   "email"
+  ],
+  "eligibility": "Not stated; open to anyone registering on the MAM US shop",
+  "region": "US",
+  "signupUrl": "https://www.mambaby.com/en-us/mam-club/",
+  "sourceUrls": [
+   "https://www.mambaby.com/en-us/",
+   "https://www.mambaby.com/en-us/mam-club/"
+  ],
+  "verifiedOn": "2026-11-08",
+  "confidence": "high",
+  "catches": "Main perks are discounts on MAM shop orders (a coupon, not a free item); product tests and giveaways are not guaranteed. Regular newsletter emails.",
+  "notes": "Registration form was not opened, so exact fields are unconfirmed. Welcome voucher terms were not shown on the club page. Welcome voucher is 10% on the US page (20% on UK and other country pages).",
+  "offers": [
+   "coupons",
+   "testing",
+   "sweepstakes"
+  ],
+  "certainty": "guaranteed",
+  "freeStuff": "",
+  "valueLow": 3,
+  "valueHigh": 10,
+  "valueSource": "estimate",
+  "valueBasis": "10% off a first MAM shop order of about $30 to $100",
+  "effort": "quick",
+  "when": "anytime",
+  "whenNote": "",
+  "states": []
+ },
+ {
+  "id": "medela-moms-room",
+  "name": "Medela Moms' Room",
+  "brand": "Medela",
+  "category": "feeding",
+  "whatYouGet": "Free account with breastfeeding tips and exclusive offers. The sign-up page advertises a free gift; what the gift is was not shown.",
+  "costToClaim": "free",
+  "costDetail": "Free to join",
+  "requirements": [
+   "email",
+   "due-date"
+  ],
+  "eligibility": "Not stated",
+  "region": "US",
+  "signupUrl": "https://www.medela.us/breastfeeding/the-moms-room",
+  "sourceUrls": [
+   "https://www.medela.us/breastfeeding/the-moms-room",
+   "https://www.medela.us/mbus/the-moms-room"
+  ],
+  "verifiedOn": "2026-11-10",
+  "confidence": "low",
+  "catches": "Gift contents, size and terms are unconfirmed. Form offers an opt-in for promotional messages. Medela also asks insurance-pump customers whether to receive free samples, a separate step.",
+  "notes": "Seen only as official-domain search results; the form asks email, password and baby's due or birth date.",
+  "offers": [
+   "product",
+   "coupons"
+  ],
+  "certainty": "likely",
+  "freeStuff": "A free gift for joining, contents not stated.",
+  "valueLow": null,
+  "valueHigh": null,
+  "valueSource": "none",
+  "valueBasis": "",
+  "effort": "quick",
+  "when": "pregnancy",
+  "whenNote": "",
+  "states": []
+ },
+ {
+  "id": "similac-alimentum-rewards",
+  "name": "Similac Alimentum Rewards (MySimilac)",
+  "brand": "Similac (Abbott)",
+  "category": "formula",
+  "whatYouGet": "Digital coupons for Similac Alimentum or NeoSure specialty formula, and points toward a bonus offer when you scan the MySimilac code on select products. Samples may come in the welcome kit.",
+  "costToClaim": "free",
+  "costDetail": "Free to join",
+  "requirements": [
+   "email",
+   "due-date"
+  ],
+  "eligibility": "Same MySimilac Rewards terms as the main program",
+  "region": "US (50 states and DC)",
+  "signupUrl": "https://www.similac.com/rewards/alimentum/welcome.html",
+  "sourceUrls": [
+   "https://www.similac.com/rewards/alimentum/welcome.html",
+   "https://www.similac.com/rewards.html"
+  ],
+  "verifiedOn": "2026-11-10",
+  "confidence": "low",
+  "catches": "Results do not confirm what is sent. The photo book on the welcome page has expired. Samples are 'may', not promised. Likely overlaps with MySimilac Rewards; one account per household per child.",
+  "notes": "Seen only as official-domain search results. Join the main MySimilac Rewards program first and use this only if your baby needs a specialty formula.",
+  "offers": [
+   "coupons",
+   "product",
+   "points"
+  ],
+  "certainty": "likely",
+  "freeStuff": "",
+  "valueLow": null,
+  "valueHigh": null,
+  "valueSource": "none",
+  "valueBasis": "",
+  "effort": "quick",
+  "when": "after-birth",
+  "whenNote": "Useful once a specialty formula is recommended.",
+  "states": []
+ }
+]

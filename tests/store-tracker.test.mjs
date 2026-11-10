@@ -142,3 +142,34 @@ test('failed write: reads stay in memory, persistent flips, event fires, set ret
   assert.equal(r.saved, false);
   assert.equal(BFF.tracker.getStatus('b'), 'received');
 });
+
+test('valueLine: nothing without signed-up programs, estimate with a count of unvalued ones', () => {
+  const { BFF } = load([{ id: 'a' }, { id: 'b' }, { id: 'c' }]);
+  const t = BFF.tracker;
+  const mod = { exports: {} };
+  new Function('module', fs.readFileSync(new URL('../src/js/logic.js', import.meta.url), 'utf8'))(mod);
+  BFF.logic = mod.exports;
+  BFF.programs[0].valueLow = 100; BFF.programs[0].valueHigh = 200;
+  BFF.programs[1].valueLow = 20; BFF.programs[1].valueHigh = 110;
+  assert.equal(t.valueLine(), null);
+  t.setStatus('a', 'skipped');
+  assert.equal(t.valueLine(), null);
+  t.setStatus('a', 'signed-up'); t.setStatus('b', 'received');
+  assert.equal(t.valueLine(), 'Estimated value of what you have signed up for: about $120 to $310 (our estimate)');
+  t.setStatus('c', 'signed-up');
+  assert.match(t.valueLine(), /about \$120 to \$310 \(our estimate; 1 program with no known value is not counted\)$/);
+});
+
+test('tracker source: plus address and Gmail search follow the email-scope rule', () => {
+  const src = fs.readFileSync(new URL('../src/js/tracker.js', import.meta.url), 'utf8');
+  assert.match(src, /E\.inEmailFeatures\(p\)/);
+  assert.match(src, /gmailSearchUrl\(\{[^}]*program: p \}\)/);
+  assert.ok(src.includes('Government and benefit programs are left out of the filters and searches.'));
+});
+
+test('guided and phone source: plus tags follow the email-scope rule', () => {
+  const g = fs.readFileSync(new URL('../src/js/guided.js', import.meta.url), 'utf8');
+  assert.match(g, /E\.inEmailFeatures && !E\.inEmailFeatures\(prog\)\) return ''/);
+  const ph = fs.readFileSync(new URL('../src/js/phone.js', import.meta.url), 'utf8');
+  assert.match(ph, /E\.inEmailFeatures\(q\)/);
+});

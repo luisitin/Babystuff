@@ -224,7 +224,7 @@
       var domain = fm.registrableDomain(p.signupUrl);
       if (!domain || !p.id || seen[p.id] || SHARED_HOSTS.test(domain)) return;
       seen[p.id] = true;
-      var email = usePlus && typeof map[p.id] === 'string' && map[p.id] ? em.plusAddress(profile.email, map[p.id]) : '';
+      var email = usePlus && (!em.inEmailFeatures || em.inEmailFeatures(p)) && typeof map[p.id] === 'string' && map[p.id] ? em.plusAddress(profile.email, map[p.id]) : '';
       out.push({ domain: domain, id: String(p.id), name: String(p.name || ''), email: email });
     });
     out.sort(function (a, b) { return a.domain < b.domain ? -1 : a.domain > b.domain ? 1 : a.id < b.id ? -1 : a.id > b.id ? 1 : 0; });

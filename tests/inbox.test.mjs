@@ -9,12 +9,12 @@ const E = require('../src/js/email.js');
 
 const ME = 'alex.sample@gmail.com';
 const P = [
-  { id: 'alpha-box', name: 'Alpha Box', brand: 'Alpha', signupUrl: 'https://www.alphabox.com/join' },
-  { id: 'beta-club', name: 'Beta Club', brand: 'Beta', signupUrl: 'https://register.betaclub.org/x' },
-  { id: 'gamma-one', name: 'Gamma One', brand: 'Gamma', signupUrl: 'https://shared-site.net/a' },
-  { id: 'gamma-two', name: 'Gamma Two', brand: 'Gamma', signupUrl: 'https://shared-site.net/b' },
-  { id: 'big-store', name: 'Big Store', brand: 'Target', signupUrl: 'https://www.target.com/registry' },
-  { id: 'agency', name: 'Agency', brand: 'Agency', signupUrl: 'https://www.hrsa.gov/x' }
+  { id: 'alpha-box', name: 'Alpha Box', brand: 'Alpha', requirements: ['email'], signupUrl: 'https://www.alphabox.com/join' },
+  { id: 'beta-club', name: 'Beta Club', brand: 'Beta', requirements: ['email'], signupUrl: 'https://register.betaclub.org/x' },
+  { id: 'gamma-one', name: 'Gamma One', brand: 'Gamma', requirements: ['email'], signupUrl: 'https://shared-site.net/a' },
+  { id: 'gamma-two', name: 'Gamma Two', brand: 'Gamma', requirements: ['email'], signupUrl: 'https://shared-site.net/b' },
+  { id: 'big-store', name: 'Big Store', brand: 'Target', requirements: ['email'], signupUrl: 'https://www.target.com/registry' },
+  { id: 'agency', name: 'Agency', brand: 'Agency', requirements: ['email'], signupUrl: 'https://www.hrsa.gov/x' }
 ];
 const TAGS = E.tagMap(P);
 
@@ -54,15 +54,16 @@ test('buildQueries: from terms only for single-owner, non-broad domains; determi
   assert.doesNotMatch(text, /to:/);
   assert.match(text, /newer_than:120d/);
   assert.deepEqual(I.buildQueries({ programs: P.slice().reverse(), email: ME, tagMap: TAGS, usePlus: false }), q);
-  assert.deepEqual(I.unsearchable({ programs: P, email: ME, tagMap: TAGS, usePlus: false }), ['agency', 'big-store', 'gamma-one', 'gamma-two']);
+  assert.deepEqual(I.unsearchable({ programs: P, email: ME, tagMap: TAGS, usePlus: false }), ['big-store', 'gamma-one', 'gamma-two']);
 });
 
 test('buildQueries: plus tags add to: terms for every program, braces and days', () => {
   const q = I.buildQueries({ programs: P, email: ME, tagMap: TAGS, usePlus: true, days: 30 });
   assert.equal(q.length, 1);
   assert.match(q[0].query, /^\{.*\} newer_than:30d$/);
-  for (const p of P) assert.ok(q[0].query.includes('to:' + E.plusAddress(ME, TAGS[p.id])), p.id);
-  assert.deepEqual(q[0].programIds, P.map((p) => p.id).sort());
+  for (const p of P.filter((x) => x.id !== 'agency')) assert.ok(q[0].query.includes('to:' + E.plusAddress(ME, TAGS[p.id])), p.id);
+  assert.ok(!q[0].query.includes('to:' + E.plusAddress(ME, TAGS.agency)), 'a .gov program is not in the email features');
+  assert.deepEqual(q[0].programIds, P.filter((x) => x.id !== 'agency').map((p) => p.id).sort());
   assert.deepEqual(I.unsearchable({ programs: P, email: ME, tagMap: TAGS, usePlus: true }), []);
 });
 
@@ -78,10 +79,10 @@ test('buildQueries: Yahoo or bad email never gets plus terms; bad days fall back
 
 test('buildQueries: hostile input is skipped, never quoted into the query', () => {
   const evil = [
-    { id: 'e1', signupUrl: 'https://evil.example.com"} OR {from:victim.com/x' },
-    { id: 'e2', signupUrl: 'https://a b.example.com/' },
-    { id: 'e3', signupUrl: 'javascript:alert(1)' },
-    { id: 'e4' }, null, 'x', { id: '' }, { id: 'e5', signupUrl: 'https://ok-site.com/' }
+    { id: 'e1', requirements: ['email'], signupUrl: 'https://evil.example.com"} OR {from:victim.com/x' },
+    { id: 'e2', requirements: ['email'], signupUrl: 'https://a b.example.com/' },
+    { id: 'e3', requirements: ['email'], signupUrl: 'javascript:alert(1)' },
+    { id: 'e4' }, null, 'x', { id: '' }, { id: 'e5', requirements: ['email'], signupUrl: 'https://ok-site.com/' }
   ];
   const q = I.buildQueries({ programs: evil, email: 'a"b@x.com\nfrom:evil.com', tagMap: { e5: 'x" OR a' }, usePlus: true });
   const text = q.map((x) => x.query).join('\n');
@@ -89,7 +90,7 @@ test('buildQueries: hostile input is skipped, never quoted into the query', () =
   assert.doesNotMatch(text, /victim|a b|javascript/);
   assert.match(text, /from:ok-site\.com/);
   assert.doesNotMatch(text, /to:/);
-  const q2 = I.buildQueries({ programs: [{ id: 'z', signupUrl: 'https://ok.example.com' }], email: ME, tagMap: { z: 'x" OR "y' }, usePlus: true });
+  const q2 = I.buildQueries({ programs: [{ id: 'z', requirements: ['email'], signupUrl: 'https://ok.example.com' }], email: ME, tagMap: { z: 'x" OR "y' }, usePlus: true });
   assert.doesNotMatch(q2[0].query, /"/);
   assert.equal(I.buildQueries({ programs: [], email: ME }).length, 0);
   assert.equal(I.buildQueries({}).length, 0);
@@ -97,7 +98,7 @@ test('buildQueries: hostile input is skipped, never quoted into the query', () =
 });
 
 test('buildQueries: many programs split into short queries that cover everything', () => {
-  const many = Array.from({ length: 300 }, (_, i) => ({ id: 'prog-' + String(i).padStart(3, '0'), brand: 'Brand' + i, name: 'P' + i, signupUrl: 'https://site' + i + '.example.com/' }));
+  const many = Array.from({ length: 300 }, (_, i) => ({ id: 'prog-' + String(i).padStart(3, '0'), brand: 'Brand' + i, name: 'P' + i, requirements: ['email'], signupUrl: 'https://site' + i + '.example.com/' }));
   const tm = E.tagMap(many);
   const q = I.buildQueries({ programs: many, email: ME, tagMap: tm, usePlus: true });
   assert.ok(q.length > 1);
@@ -449,7 +450,7 @@ test('errorGroup: a page that was switched off for this view reads as not allowe
 
 test('copy never promises that labels or drafts work, and never says mail was sent', () => {
   const src = readFileSync(new URL('../src/js/inboxview.js', import.meta.url), 'utf8') + readFileSync(new URL('../src/js/inbox.js', import.meta.url), 'utf8');
-  assert.doesNotMatch(src, /\bwas sent\b|\bhas been sent\b|\bwe sent\b|\bsent to you\b/i);
+  assert.doesNotMatch(src.replace('Nothing was sent.', ''), /\bwas sent\b|\bhas been sent\b|\bwe sent\b|\bsent to you\b/i);
   assert.match(readFileSync(new URL('../src/js/inboxview.js', import.meta.url), 'utf8'), /THREAD_VIEW_SUMMARY/);
 });
 
@@ -460,4 +461,48 @@ test('buildQueries: a +tag already on the address is not stacked, and a Yahoo ad
   const y = I.buildQueries({ programs: P, email: 'sam.rivera@yahoo.com', tagMap: E.tagMap(P), usePlus: true });
   y.forEach((q) => assert.doesNotMatch(q.query, /to:/));
   assert.deepEqual(I.buildQueries({ programs: [], email: ME, tagMap: {}, usePlus: true }), []);
+});
+
+// ---- the email-features rule at scale ----
+function synth(n) {
+  return Array.from({ length: n }, (_, i) => {
+    const id = 'prog-' + String(i).padStart(3, '0');
+    const kind = i % 5; // 0,1,2: brand with email; 3: .gov with email; 4: brand, no email (a phone or insurer program)
+    const host = kind === 3 ? 'office' + i + '.example-agency.gov' : 'long-brand-name-number-' + i + '.com';
+    return { id, brand: 'Brand' + i, name: 'Program ' + i, requirements: kind === 4 ? ['phone', 'insurance'] : ['email', 'address'], signupUrl: 'https://www.' + host + '/join' };
+  });
+}
+
+test('150 programs: only email brand sign-ups are searched, in short chunks, none lost', () => {
+  const many = synth(150), inc = many.filter(E.inEmailFeatures);
+  assert.equal(inc.length, 90);
+  const tm = E.tagMap(many);
+  for (const usePlus of [true, false]) {
+    const q = I.buildQueries({ programs: many, email: ME, tagMap: tm, usePlus });
+    assert.ok(q.length >= 2);
+    q.forEach((x) => {
+      assert.ok(x.query.length <= 1400, 'query length ' + x.query.length);
+      assert.ok((x.query.match(/(?:to|from):/g) || []).length <= 25);
+    });
+    const covered = new Set(q.flatMap((x) => x.programIds));
+    assert.deepEqual([...covered].sort(), inc.map((p) => p.id).sort());
+    const text = q.map((x) => x.query).join(' ');
+    assert.doesNotMatch(text, /example-agency\.gov/);
+    assert.equal(usePlus ? /to:/.test(text) : /to:/.test(text), usePlus);
+    assert.deepEqual(I.unsearchable({ programs: many, email: ME, tagMap: tm, usePlus }), []);
+  }
+});
+
+test('matchThreads ignores a program that is outside the email features, even by plus address or sender', () => {
+  const gov = { id: 'gov-prog', name: 'Gov', brand: 'Gov', requirements: ['email'], signupUrl: 'https://www.benefit.gov/x' };
+  const noMail = { id: 'no-mail', name: 'No mail', brand: 'Nomail', requirements: ['phone'], signupUrl: 'https://www.nomail.com/x' };
+  const progs = [P[0], gov, noMail];
+  const tm = E.tagMap(progs);
+  const th = [
+    thread('t-gov', [msg({ id: 'a', threadId: 't-gov', sender: 'x@benefit.gov', toRecipients: [E.plusAddress(ME, tm['gov-prog'])] })]),
+    thread('t-nm', [msg({ id: 'b', threadId: 't-nm', sender: 'x@nomail.com', toRecipients: [E.plusAddress(ME, tm['no-mail'])] })]),
+    thread('t-ok', [msg({ id: 'c', threadId: 't-ok' })])
+  ];
+  const m = I.matchThreads(th, { programs: progs, email: ME, tagMap: tm });
+  assert.deepEqual(m.map((x) => x.programId), ['alpha-box']);
 });

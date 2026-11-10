@@ -212,7 +212,7 @@ A card titled "Gmail connection" in the tracker.
   1. **Check my Gmail**: runs the `buildQueries` searches one at a time, read-only, and lists matches grouped by program with subject, sender, date, a "needs you to confirm" badge for `confirm`, and an "Open in Gmail" link. Suggestions appear as "Mark Similac as Signed up" buttons plus one "Apply all N"; statuses change only when tapped, through `BFF.tracker.setStatus`, with the tracker's normal Undo-free flow (a line says what changed).
   2. **Use this address**: when My info has no email and a result reveals the account address, offer to fill it in. Only on tap.
   3. **Label these in Gmail**: `list_labels`, then `create_label` "Baby Freebies" if it is missing, then `label_thread` for each exact or likely match. Shows a count first and asks with the inline `BFF.ui.confirm` panel. A write is never retried automatically.
-  4. **Draft my checklist** and **Draft my setup kit**: `create_draft` to the person's own address. The message says "Draft created in your Gmail. Nothing was sent." with a link when `viewUrl` is safe.
+  4. **Draft my checklist** and **Draft my setup kit**: `create_draft` to the person's own address. The message says "Draft saved in your Gmail. Nothing was sent." (only after the connector confirmed the draft) with a link when `viewUrl` is safe.
 - Nothing from the mailbox is stored. Only `prefs.v1.inboxCheckedAt` (ISO time) is saved. Results live in memory and are cleared on any authorization-type error.
 - A live region announces progress and results. Buttons are disabled while a call runs.
 
@@ -237,3 +237,144 @@ A card titled "Gmail connection" in the tracker.
 ### Tests
 - `node --test` (CI): all existing tests, plus `host`, `inbox`, `fillscript`, and build tests for both outputs (fresh-build match, no external resources, no network APIs, URL allowlist; `artifact.html` has no doctype, `<html>`, `<head>`, `<body>` or CSP meta and starts with `<title>`).
 - `node tests/e2e/run.mjs` (local, needs the preinstalled Playwright; not part of CI): phone-size checks of both outputs, every link and route, the mocked `window.claude` flows for downloads and Gmail (mock built from the type files and the shapes above, synthetic values only), and the fill script against fixture forms served by request interception for official program URLs.
+
+## Phase G: what is really free, ranking, and a plan by due date (contract)
+
+Why: the person using the app is expecting a baby and wants to claim every offer worth claiming. Their feedback on the live app: the "Truly free" filter showed sweepstakes, coupons and points instead of things where real free samples arrive, and there was no way to see which offers are the good ones. Phase G fixes the filter, ranks every program by what it is worth, and widens the research to money and benefit programs.
+
+Nothing in the product rules changes: no network calls, no form submission, personal details only in localStorage.
+
+### New program fields (all required on every entry in `data/programs.json`)
+| Field | Type | Rules |
+|---|---|---|
+| `offers` | string[] | Not empty. What the program gives, most important first. Only from: `product`, `coupons`, `points`, `sweepstakes`, `service`, `coverage`, `cash`, `testing` |
+| `certainty` | string | How sure the first `offers` entry is: `guaranteed`, `likely`, `if-eligible`, `chance` |
+| `freeStuff` | string | One short sentence: what arrives at no cost and with no purchase. `""` when nothing does |
+| `valueLow`, `valueHigh` | integer or null | Rough US dollar value to one family in the baby's first year. Both null when no fair figure exists. `valueLow <= valueHigh` |
+| `valueSource` | string | `official` (the official page states a dollar figure), `estimate` (worked out from what the official page lists), `none` (both values null) |
+| `valueBasis` | string | How the figure was reached, in a few words. `""` only when `valueSource` is `none` |
+| `effort` | string | `quick` (a short form, about 5 minutes), `some` (a registry, an app, a phone call), `involved` (an application, documents or an appointment) |
+| `when` | string | Best time to do it: `pregnancy` (now, while pregnant), `late-pregnancy` (the last 4 to 8 weeks), `after-birth`, `anytime` |
+| `whenNote` | string | The official reason for the timing, or `""` |
+| `states` | string[] | USPS codes when the program is only for some states (include `DC`). `[]` when it is nationwide or varies by local office |
+
+Meaning of `offers` values:
+- `product`: physical things you keep. Samples, full-size items, welcome boxes, gear (pump, crib, car seat), books, food packages.
+- `coupons`: coupons, formula checks, percent-off or completion discounts, free-with-purchase offers.
+- `points`: reward points earned by buying or scanning receipts.
+- `sweepstakes`: prize draws.
+- `service`: free help from a person (lactation visit, car seat check, helpline, home visits, classes).
+- `coverage`: health coverage or a benefit that pays bills (Medicaid, CHIP, marketplace plans).
+- `cash`: money for the family or the child (account deposits, tax credits, paid leave).
+- `testing`: product-testing panels where you may be picked.
+
+Rule for the order: if a real product is sent with no purchase, `product` comes first, even when the brand talks more about its coupons or its sweepstakes.
+
+Meaning of `certainty` values:
+- `guaranteed`: everyone who signs up and meets the plain conditions gets it.
+- `likely`: most people get it, but the official page says "while supplies last", "may include" or "varies".
+- `if-eligible`: certain once you meet income, insurance, state or similar rules.
+- `chance`: a draw or a selection. Most people get nothing.
+
+Value rules: count only what a family gets without buying something just to get it. For coupons and points, count the saving on things they would buy anyway. Use `official` only when the official page gives the figure. An `estimate` uses ordinary US shelf prices, and `valueBasis` shows the sum (for example "2 sample cans at about $20 each"). Never present an estimate as the brand's own figure. For `coverage` and `cash`, estimate the bills paid or the money received and say what the figure rests on; a free service with no usual price keeps null values.
+
+New category: `money` ("Money and savings"), for cash programs such as account deposits for newborns, tax credits and paid leave. It goes after `assistance` in `CATEGORIES`.
+
+### `BFF.logic` additions and changes
+- `OFFER_LABELS`: product → "Free product", coupons → "Coupons and discounts", points → "Reward points", sweepstakes → "Prize draw", service → "Free service", coverage → "Health coverage", cash → "Cash", testing → "Product testing".
+- `CERTAINTY_LABELS`: guaranteed → "Everyone who signs up gets it", likely → "Most people get it, supplies vary", if-eligible → "Only if you qualify", chance → "Only if you are picked or win".
+- `EFFORT_LABELS`: quick → "About 5 minutes", some → "Takes some setup", involved → "Application or appointment".
+- `WHEN_LABELS`: pregnancy → "Now, while pregnant", late-pregnancy → "In the last weeks before the due date", after-birth → "After the baby arrives", anytime → "Any time". `WHEN_ORDER` is that order.
+- `VERDICTS`: ordered list of `{id, label}`: top → "Top pick", good → "Worth doing", small → "Also free", conditional → "Only if you would buy anyway", longshot → "Long shot".
+- `isTrulyFree(p)` (changed): `costToClaim === 'free'`, requirements include neither `purchase` nor `membership`, `offers[0] === 'product'`, and `certainty` is not `chance`. A program with no `offers` is not truly free.
+- `isOpenToAll(p)`: `certainty !== 'if-eligible'` and `!isEligibilityBased(p)`.
+- `guidedDefault(p)` keeps its formula (`isTrulyFree(p) && !isEligibilityBased(p)`), so it narrows with `isTrulyFree`.
+- `valueMid(p)`: the mean of `valueLow` and `valueHigh`, or null.
+- `expectedValue(p)`: `valueMid(p)` times a weight (guaranteed 1, if-eligible 1, likely 0.7, chance 0.1), or null.
+- `verdict(p)`, first match wins:
+  1. `longshot` when `certainty === 'chance'` or `offers[0]` is `sweepstakes` or `testing`
+  2. `conditional` when `costToClaim !== 'free'`, or requirements include `purchase` or `membership`, or `offers[0]` is `coupons` or `points`
+  3. `top` when `expectedValue(p) >= 100`
+  4. `good` when `expectedValue(p) >= 20`
+  5. `small` otherwise (including unknown value)
+- `rankPrograms(list)`: a new array sorted by verdict order, then `expectedValue` high to low (null last), then effort (quick, some, involved), then confidence, then name. `rankMap(list)` returns `{id: position}` starting at 1.
+- `sortPrograms(list, key)`: new key `best` (uses `rankPrograms`) and new key `when` (`WHEN_ORDER`, then rank). `recommended` stays as an alias of `best` so saved preferences keep working.
+- `filterPrograms(list, opts)`: new options `offer` (keep programs whose `offers` include it), `openToAll` (keep `isOpenToAll`), `state` with `hideOtherStates` (drop programs whose `states` is not empty and does not include `state`). The text query also searches `freeStuff`.
+- `valueText(p)`: "Worth about $40 to $60 (our estimate)", "Worth about $400 (the program's figure)", "Worth about $25 (our estimate)" when low equals high, or "Value not known".
+- `totalValue(list)`: `{low, high, count}` over programs with a value.
+- `weeksUntil(dueDate, today)`: whole weeks from `today` to an ISO `YYYY-MM-DD` date, negative after it, null when the date cannot be read.
+
+### Directory (`src/js/directory.js`, `src/css/`)
+- Sort options: "Best value first" (`best`, the default), "When to do it" (`when`), then the existing Name, Recently verified, Category, Confidence. A saved `recommended` loads as `best`.
+- With `best`, the list is grouped under the verdict labels. With `when`, it is grouped under the `WHEN_LABELS`. Other sorts have no groups. Heading levels must not skip.
+- New select "What you get": "Anything", then the eight `OFFER_LABELS`.
+- Chips: "Truly free" (new meaning), "Open to everyone" (`openToAll`), "Email only", "Needs a registry". When "Truly free" is on, one line under the chips says: "Truly free: real products or samples at no cost. No purchase, no fee, not a prize draw."
+- When My info has a state and some programs are for other states only, those are hidden and a line says "N programs for other states are hidden." with a "Show them" button (stored in prefs).
+- Each card gains: its rank ("#3", from `rankMap` over all programs), the verdict badge, the offer kinds, a "Free with no purchase" line (`freeStuff`, or "Nothing arrives free without a purchase or a win."), the value line with `valueBasis`, the certainty label, the effort label, and "Best time" with `whenNote`.
+- A summary above the list: how many truly free programs there are and their combined value (labelled as an estimate), and, when My info has a due date, the weeks left and how many programs are best done now, in the last weeks, and after the birth. Without a due date it says to add one in My info. The due date is read from `profile.v1` and never leaves the page.
+
+### Guided run, tracker and helper
+- `guided.js`: the default selection is still `guidedDefault`; the queue follows `rankPrograms`. The "Truly free only" button uses the new meaning.
+- `tracker.js`: the summary shows the combined value of programs marked Signed up or Received, labelled as an estimate. No stored data changes shape.
+- `tools/autofill`: `--all-free` still follows `guidedDefault`.
+
+### Research (`research/phase-g/`)
+Seven lanes, each owning the existing programs in its categories (adding the new fields and correcting anything that changed) and looking for programs the list lacks: `formula-feeding`, `diapers-babycare`, `registry`, `health-benefits`, `assistance`, `rewards-testing`, `money`. Each writes `<lane>.json` (full program objects) and `<lane>-notes.md`. The shared brief is `research/phase-g/BRIEF.md`. A merge step writes `data/programs.json`; a fact-check step re-reads the highest-ranked entries.
+
+### Tests
+- `tests/data.test.mjs`: the new fields, their enums, `valueLow <= valueHigh`, `valueSource` agreeing with the values, `states` as USPS codes, and the `money` category.
+- `tests/logic.test.mjs`: the new truly-free rule (a sweepstakes-first or coupons-first program is not truly free), verdicts, ranking order, new filters, `valueText`, `totalValue`, `weeksUntil`.
+- A data test pins the user's complaint: no program whose first offer is `sweepstakes`, `coupons`, `points` or `testing` passes `isTrulyFree`.
+- `tests/e2e/run.mjs`: the new sort, groups, select, chips, card lines and summary in both outputs.
+
+### Phase G, round 2 (after the second research wave)
+
+The second wave added many programs for single states and many "if you qualify" benefits. Round 2 keeps them from crowding the list for people they do not apply to, and makes the totals honest.
+
+New optional field `sameAs` (string, `""` when none): the `id` of the main program when this entry is only another door to the very same benefit, so one family can get it once (for example four suppliers of the one insurance-covered breast pump). It must name an existing program, not itself, and the main program's own `sameAs` is `""`.
+
+`BFF.logic`:
+- `money(n)`: whole dollars with thousands separators ("$3,200"). Exported. `valueText` uses it.
+- `roundTotal(n)`: for combined figures only. Under 1,000 it rounds to the nearest 10, otherwise to the nearest 100.
+- `hiddenByState(p, state)`: true when `p.states` is not empty and `state` is empty or not in the list. `filterPrograms` uses it for `hideOtherStates` (so with no state, every state-limited program is dropped). `otherStateCount(list, state)` counts by the same rule.
+- `verdict(p)`: one change. A free program with unknown value whose first offer is `coverage` is `good`, not `small`.
+- `totalValue(list)`: programs are grouped by `sameAs || id`; each group counts once, with its largest `valueHigh` (and that program's `valueLow`). `count` is the number of groups with a value.
+- `needsQualifying(p)`: `!isOpenToAll(p)`.
+
+Directory:
+- State: programs hidden by state are left out unless the person taps "Show them" (`prefs.showOtherStates`). With no state in My info the line reads "N programs are only for some states. Add your state in My info to see the ones for you." (with a link to My info and the "Show them" button). With a state it reads "N programs for other states are hidden." Ranks (`rankMap`) and the summary are worked out over the programs left after this step, so the numbers have no gaps.
+- Summary, first line: the count of programs that are truly free and open to everyone, with their combined value (through `roundTotal`, labelled as our estimate). Second line: "N more are free if you qualify (income, insurance or where you live)." with no sum, because several of them are alternatives. The due-date lines stay.
+- Card: an "If you qualify" tag beside the verdict when `certainty` is `if-eligible`; an "In your state" tag when `states` includes the person's state; when `sameAs` is set, a line "Another way to get the same thing as <main program name>. You only need one."
+- Card layout: always visible are rank, verdict, name, brand, the free line, the value line, the offer chips, How sure, Effort, Best time, Catches, the sign-up button and My status. Everything else (what you get in full, cost, what you need, who, where, notes, sources, verified date) sits in one "More details" disclosure.
+- The filter chips wrap onto more lines at phone width. Nothing scrolls sideways.
+
+Guided run and helper: programs hidden by state are not in the guided list or its default selection (same rule and same `showOtherStates` preference). `tools/autofill --all-free` skips them by the profile's state.
+
+Tracker: the value line uses `totalValue`, so two doors to one benefit count once.
+
+Data rules added in the second merge:
+- A completion discount is valued on one scale: the discount percent times $200 (low) and times $600 (high) of registry items the family would buy anyway, under any official cap. `valueBasis` says so.
+- Pregnancy coverage (Medicaid, CHIP, marketplace) keeps null values. No fair single figure exists.
+- A tax credit that pays back part of a cost (dependent care) is `purchase-required` with `purchase` in `requirements`.
+
+### Phase G, round 3 (Directory refinements)
+
+- `freeNote(p)` (logic): the sentence on a card whose `freeStuff` is empty. Order: chance, sweepstakes or testing; purchase; membership; shipping fee; then by first offer (cash, coverage, service, coupons, points); else "What arrives is not stated."
+- Same-thing groups: `groupKey(p)` = `sameAs || id`. `rankMap` gives every member of a group the same rank number (groups numbered in `rankPrograms` order, no gaps). `collapseGroups(sorted)` returns `[{ lead, others }]` in order of first appearance. The Directory shows the lead as a card and the others inside a native `<details class="same-group">` ("N more ways to get the same thing") right after it, in the same grid (it spans the full row). The section is decided by the lead. Section "(N)" counts leads; "Showing X of Y programs" still counts programs; the summary figures count distinct group keys. Open groups are remembered in memory only, and restored after a re-render.
+- Summary: a "Show these" button turns on "Truly free" and "Open to everyone", then focuses the result count. Hidden when both are already on or the figure is 0.
+- Guided and tracker use only `rankPrograms`, so they needed no change.
+
+### Phase G, round 4 (review fixes)
+
+- `totalValue(list)` also returns `missing`: the number of group keys (`sameAs || id`) where no member has a value. The tracker note "N programs with no known value are not counted" uses it, so doors to one benefit count once.
+- `rankCmp` ends on `id`, so order never depends on data order. `isOtherState` is removed (`hiddenByState` is the one rule).
+- Directory due-date buttons count the lead cards in the matching `when` section under the current filters, the state rule and `collapseGroups`. A button with a count of 0 is not shown, so the section it jumps to always exists. After the due date has passed only "after the birth" is offered. The accessible name starts with the visible text ("3 do now, show these programs").
+- "Show these" also clears the search text, Category, "What you get", Email only and Needs a registry (the sort stays), so the list matches the summary figure.
+- A saved `offer` and the label lookups use own-property checks.
+- Plus-address tagging follows `BFF.email.inEmailFeatures(p)` everywhere: guided run, fill script (`programList`) and the phone view. Other programs get the plain address. When several listed programs share the page's domain and their addresses differ, the fill script still uses the plain address.
+- `tools/autofill`: `hiddenByState(p, state)` lives in `field-matcher.mjs`. `--all-free` and `--from-backup` (`selectTodo`, option `state`) both use it. The backup's own profile state is used when the backup has My info, else `profile.json`.
+
+### Phase G, round 5 (phone layout)
+
+- Directory due-date buttons: on phones the buttons are equal-width tiles in one row (number on top, label under it, at least 44px tall). A single button keeps a capped width. From 640px wide they go back to inline buttons in a wrapping row. CSS only; the button markup is unchanged.
+- My info plus-address preview: the address sits in its own `span.fx-plus-addr` (block, `overflow-wrap: anywhere`), so it breaks only when it cannot fit. The paragraph text still reads "Preview: address (for program)".

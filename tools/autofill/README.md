@@ -29,7 +29,7 @@ Edit `profile.json` with your own details. Keys: `firstName`, `lastName`, `email
 node autofill.mjs --list                  # ids, names, domains
 node autofill.mjs enfamil-family-beginnings
 node autofill.mjs id-one id-two id-three  # one after another, you press Enter between
-node autofill.mjs --all-free              # same rule as the app's guided run: free, no purchase/membership/insurance/eligibility, not health-benefits or assistance
+node autofill.mjs --all-free              # same rule as the app's guided run: free, no purchase/membership/insurance/eligibility, not health-benefits or assistance, the first thing offered is a real product (not coupons, points, a prize draw or product testing), and not a draw or selection (`certainty` is not `chance`); programs with no `offers` field are left out; programs limited to some states (`states`) are also left out unless the `state` in `profile.json` is one of them
 ```
 
 (`npm start -- <id>` and `npm run list` also work.) For each site it prints what it filled (and outlines those fields in green in the browser), what it left alone, and a reminder. Then review, handle any CAPTCHA, submit by hand, and press Enter in the terminal to move on. Type `q` and Enter to quit; the browser closes at the end.

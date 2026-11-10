@@ -2,6 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { createRequire } from 'node:module';
 import { readFileSync } from 'node:fs';
+import { isGuidedDefault as isGuidedDefaultFor } from '../tools/autofill/field-matcher.mjs';
 import { parseBackup, selectTodo, profileForProgram, parseAnswer, applyAnswers, defaultOutPath } from '../tools/autofill/backup.mjs';
 
 const email = createRequire(import.meta.url)('../src/js/email.js');
@@ -48,6 +49,18 @@ test('selectTodo: missing counts as todo, guided rule, include-all, only, data o
   assert.ok(selectTodo(programs, {}, { includeAllTodo: true }).length > all.length);
   assert.deepEqual(selectTodo(programs, {}, { only: [all[2].id] }).map((p) => p.id), [all[2].id]);
   assert.deepEqual(selectTodo(programs, {}, { only: ['not-an-id'] }), []);
+});
+
+test('selectTodo hides programs for other states like the app does', () => {
+  const limited = programs.filter((p) => Array.isArray(p.states) && p.states.length && isGuidedDefaultFor(p));
+  assert.ok(limited.length > 0, 'data has guided-eligible state programs');
+  const p = limited[0];
+  const own = p.states[0];
+  const other = ['TX', 'CA', 'NY', 'AL'].find((s) => !p.states.includes(s));
+  assert.ok(selectTodo(programs, {}, { state: own }).some((x) => x.id === p.id));
+  assert.ok(!selectTodo(programs, {}, { state: other }).some((x) => x.id === p.id));
+  assert.ok(!selectTodo(programs, {}).some((x) => x.id === p.id), 'no state: hidden');
+  assert.ok(!selectTodo(programs, {}, { state: other, includeAllTodo: true }).some((x) => x.id === p.id));
 });
 
 test('profileForProgram matches email.js', () => {

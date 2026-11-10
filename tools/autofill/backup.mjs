@@ -2,7 +2,7 @@
 // Validation mirrors importJSON in src/js/tracker.js.
 import { createRequire } from 'node:module';
 import path from 'node:path';
-import { isGuidedDefault } from './field-matcher.mjs';
+import { isGuidedDefault, hiddenByState } from './field-matcher.mjs';
 
 const email = createRequire(import.meta.url)('../../src/js/email.js');
 
@@ -65,11 +65,12 @@ export function toIsoDate(s) {
   return m ? `${m[3]}-${m[1].padStart(2, '0')}-${m[2].padStart(2, '0')}` : v;
 }
 
-/** Programs still to do (missing entry counts as todo), in data order. */
-export function selectTodo(programs, tracker, { includeAllTodo = false, only = null } = {}) {
+/** Programs still to do (missing entry counts as todo), in data order. Programs for other states are left out (no state: all state-limited ones). */
+export function selectTodo(programs, tracker, { includeAllTodo = false, only = null, state = '' } = {}) {
   const onlySet = only ? new Set(only) : null;
   return programs.filter((p) => {
     if (onlySet && !onlySet.has(p.id)) return false;
+    if (hiddenByState(p, state)) return false;
     const st = tracker && tracker[p.id] ? tracker[p.id].status : 'todo';
     if (st !== 'todo') return false;
     return includeAllTodo || isGuidedDefault(p);

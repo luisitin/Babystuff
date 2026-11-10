@@ -7,6 +7,8 @@ test('registrableDomain', () => {
   assert.equal(registrableDomain('help.babylist.com'), 'babylist.com');
   assert.equal(registrableDomain('cert.safekids.org'), 'safekids.org');
   assert.equal(registrableDomain('www.example.co.uk'), 'example.co.uk');
+  assert.equal(registrableDomain('www.revenue.state.mn.us'), 'state.mn.us');
+  assert.equal(registrableDomain('www.medela.us'), 'medela.us');
   assert.equal(registrableDomain('shop.example.com.au'), 'example.com.au');
   assert.equal(registrableDomain('211.org'), '211.org');
   assert.equal(registrableDomain('WWW.Pampers.COM'), 'pampers.com');

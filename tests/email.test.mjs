@@ -8,41 +8,146 @@ const programs = JSON.parse(readFileSync(new URL('../data/programs.json', import
 const SNAPSHOT = {
   "1-natural-way-breast-pump-insurance": "natural",
   "211-org-community-help": "united",
-  "aeroflow-breastpumps-insurance": "aeroflow",
-  "amazon-baby-registry-welcome-box": "amazon",
+  "aeroflow-breast-pump-resupply-insurance": "aeroflow",
+  "aeroflow-breastpumps-insurance": "aeroflow-breastpumps",
+  "aeroflow-maternity-compression": "aeroflow-maternity",
+  "aeroflow-prenatal-breastfeeding-classes": "aeroflow-prenatal",
+  "aetna-better-health-pregnancy-rewards": "aetna",
+  "aetna-enhanced-maternity-program": "aetna-enhanced",
+  "al-dhr-baby-box-initiative": "alabama",
+  "amazon-baby-registry-completion-discount": "amazon",
+  "amazon-baby-registry-welcome-box": "amazon-baby",
+  "amazon-family-diaper-savings": "amazon-family",
+  "ambetter-start-smart-for-your-baby": "ambetter",
+  "amerihealth-caritas-bright-start": "amerihealth",
+  "anthem-future-moms": "anthem",
+  "baby2baby-golden-state-start": "baby2baby",
   "babylist-hello-baby-box": "babylist",
+  "babylist-registry-completion-discount": "babylist-registry",
+  "babys-only-free-sample-shipping": "baby",
+  "bloomingdales-baby-registry-completion-discount": "bloomingdale",
+  "blue-cross-special-beginnings": "blue",
   "buybuy-baby-registry-welcome-bag": "buybuy",
   "byram-healthcare-breast-pumps-insurance": "byram",
   "bzzagent-campaigns": "bzzagent",
+  "ca-paid-family-leave-sdi": "california",
+  "ca-young-child-tax-credit": "california-ca",
+  "calkids-newborn-account": "calkids",
+  "caresource-babies-first-rewards": "caresource",
+  "cdc-vaccines-for-children": "cdc",
+  "cigna-healthy-pregnancies-healthy-babies": "cigna",
+  "co-famli-paid-leave": "colorado",
+  "co-first-step": "collegeinvest",
+  "count-the-kicks-app": "healthy",
+  "crate-and-kids-registry-completion-discount": "crate",
   "cribs-for-kids-find-a-crib": "cribs",
+  "ct-baby-bonds": "connecticut",
+  "ct-chet-baby-scholars": "connecticut-ct",
+  "ct-paid-leave": "connecticut-ct-2",
+  "dc-paid-family-leave": "dcdepartment",
+  "de-paid-leave": "delaware",
+  "delaware-medicaid-postpartum-diapers-meals": "delaware-medicaid",
   "early-head-start-pregnant-women": "head",
   "edgepark-breast-pump-insurance": "edgepark",
   "enfamil-family-beginnings": "enfamil",
   "enfamil-nutramigen-support-program": "enfamil-nutramigen",
+  "family-connects-nurse-home-visit": "family",
+  "first5california-kit-for-new-parents": "first",
   "gerber-mygerber-baby": "gerber",
-  "healthcare-gov-insurance-covered-breast-pump": "healthcare",
-  "healthcare-gov-pregnancy-coverage": "healthcare-gov",
+  "healthcare-gov-add-newborn-special-enrollment": "healthcare",
+  "healthcare-gov-insurance-covered-breast-pump": "healthcare-gov",
+  "healthcare-gov-pregnancy-coverage": "healthcare-gov-2",
+  "healthcare-gov-preventive-care-women": "healthcare-gov-3",
+  "highmark-mom-options-mom-matters": "highmark",
   "home-tester-club-us-product-tests": "home",
   "hrsa-healthy-start": "hrsa",
-  "huggies-rewards": "huggies",
+  "hrsa-national-maternal-mental-health-hotline": "hrsa-national",
+  "huggies-free-newborn-diapers-wipes-signup": "huggies",
+  "huggies-rewards": "huggies-rewards",
+  "humana-humanabeginnings": "humana",
+  "il-child-tax-credit": "illinois",
+  "il-first-steps": "illinois-il",
   "imagination-library-free-books": "dolly",
   "influenster-voxbox": "influenster",
+  "irs-child-dependent-care-credit-fsa": "irs",
+  "irs-child-tax-credit": "irs-child",
+  "irs-earned-income-tax-credit": "irs-earned",
+  "irs-hsa-fsa-breast-pump-lactation": "irs-hsa",
+  "kaiser-permanente-prenatal-classes": "kaiser",
+  "kohls-babies-r-us-welcome-box": "kohl",
   "lactation-network-insurance-covered-lactation-support": "lactation",
+  "ma-babysteps-savings-plan": "massachusetts",
+  "ma-child-family-tax-credit": "massachusetts-ma",
+  "ma-paid-family-medical-leave": "massachusetts-ma-2",
   "macrobaby-gift-box": "macrobaby",
+  "macys-baby-registry-completion-discount": "macy",
   "mam-club": "mam",
+  "march-of-dimes-mom-baby-mobile-health-centers": "march",
+  "masshealth-free-prenatal-vitamins": "masshealth",
+  "me-alfond-grant": "alfond",
+  "me-dependent-exemption-tax-credit": "maine",
+  "me-paid-family-medical-leave": "maine-me",
   "medicaid-chip-pregnancy-coverage": "medicaid",
+  "medicaid-doula-coverage": "state",
+  "meijer-free-prenatal-vitamins": "meijer",
+  "mi-rx-kids": "rxkids",
+  "mississippi-safe-riders-magnolia": "mississippi",
+  "mn-child-tax-credit": "minnesota",
+  "mn-paid-leave": "minnesota-mn",
+  "molina-pregnancy-rewards": "molina",
+  "moms-meet-sampling-programs": "moms",
+  "my-health-pays-prenatal-rewards": "sunshine",
   "national-diaper-bank-network-get-help": "national",
-  "pampers-rewards": "pampers",
+  "nd-college-save-new-baby-match": "bank",
+  "ne-meadowlark": "nebraska",
+  "nest-collaborative-lactation": "nest",
+  "nj-child-tax-credit": "newjersey",
+  "nj-family-leave-insurance": "newjersey-nj",
+  "nm-child-tax-credit": "newmexico",
+  "nurse-family-partnership-home-visits": "nurse",
+  "ny-empire-state-child-credit": "newyork",
+  "ny-free-portable-crib-safe-sleep": "newyork-ny",
+  "ny-paid-family-leave": "newyork-ny-2",
+  "or-bridge-project-multnomah": "bridge",
+  "or-kids-credit": "oregon",
+  "or-paid-leave-oregon": "oregon-or",
+  "pa-keystone-scholars": "pennsylvania",
+  "pampers-free-online-childbirth-classes": "pampers",
+  "pampers-rewards": "pampers-rewards",
   "pg-brandsaver-rewards": "procter",
   "pinchme-samples": "pinchme",
   "postpartum-support-international-helpline": "postpartum",
+  "postpartum-support-international-online-groups": "postpartum-support",
+  "pottery-barn-kids-registry-completion-discount": "pottery",
+  "price-chopper-free-prenatal-vitamins": "price",
+  "ptpa-parent-tested-parent-approved": "ptpa",
+  "reach-out-and-read-free-books": "reach",
+  "ri-collegebound-starter": "collegebound",
+  "ri-temporary-caregiver-insurance": "rhode",
   "safe-kids-car-seat-check": "safe",
-  "similac-mysimilac-rewards": "similac",
-  "target-registry-welcome-kit": "target",
+  "safe-kids-good-neighbor-car-seat-events": "safe-kids",
+  "similac-alimentum-rewards": "similac",
+  "similac-mysimilac-rewards": "similac-mysimilac",
+  "simplifed-lactation-support": "simplifed",
+  "ssa-newborn-social-security-number": "social",
+  "target-registry-completion-discount": "target",
+  "target-registry-welcome-kit": "target-registry",
+  "tenncare-diaper-benefit": "tenncare",
+  "texas-safe-riders-car-seats": "texas",
+  "treasury-trump-account-pilot-deposit": "us",
+  "tricare-breast-pump-and-supplies": "tricare",
   "tryazon-tryabox-parties": "tryazon",
+  "uhc-healthy-first-steps": "unitedhealthcare",
+  "upmc-for-you-baby-steps-gift": "upmc",
   "usda-wic": "usda",
+  "virginia-low-income-car-seat-program": "virginia",
+  "vt-child-tax-credit": "vermont",
+  "wa-paid-family-medical-leave": "washington",
   "walmart-baby-registry-free-home-cleaning": "walmart",
-  "walmart-baby-registry-welcome-box": "walmart-baby"
+  "walmart-baby-registry-welcome-box": "walmart-baby",
+  "wellpoint-medicaid-baby-essentials": "wellpoint",
+  "wic-breastfeeding-support-food-package": "usda-wic",
+  "wic-farmers-market-nutrition-program": "usda-wic-2"
 };
 
 test('tagFor is unique, deterministic and well formed across the real data', () => {
@@ -129,8 +234,8 @@ test('gmailSearchUrl encoding', () => {
 });
 
 const prog = [
-  { id: 'a-1', name: 'Tom & Jerry <"Box"> \'s', brand: 'Acme', signupUrl: 'https://www.acme.com/signup?x=1&y=2' },
-  { id: 'b-1', name: 'Path/Name', brand: 'Bravo', signupUrl: 'https://bravo.example/x' }
+  { id: 'a-1', name: 'Tom & Jerry <"Box"> \'s', brand: 'Acme', requirements: ['email'], signupUrl: 'https://www.acme.com/signup?x=1&y=2' },
+  { id: 'b-1', name: 'Path/Name', brand: 'Bravo', requirements: ['email'], signupUrl: 'https://bravo.example/x' }
 ];
 function props(xml) {
   return [...xml.matchAll(/<entry>([\s\S]*?)<\/entry>/g)].map((m) =>
@@ -141,17 +246,19 @@ test('registrableDomain and broad domains', () => {
   assert.equal(E.registrableDomain('www.similac.com'), 'similac.com');
   assert.equal(E.registrableDomain('cert.safekids.org'), 'safekids.org');
   assert.equal(E.registrableDomain('shop.example.co.uk'), 'example.co.uk');
+  assert.equal(E.registrableDomain('revenue.state.mn.us'), 'state.mn.us');
+  assert.equal(E.registrableDomain('www.medela.us'), 'medela.us');
   for (const d of ['amazon.com', 'target.com', 'walmart.com', 'healthcare.gov', 'usda.gov', 'x.mil', '']) assert.equal(E.isBroadDomain(d), true, d);
   assert.equal(E.isBroadDomain('gerber.com'), false);
 });
 
 test('gmailFiltersXml without plus: from filters on registrable domains, deduped, never archived', () => {
   const list = [
-    { id: 'a-1', name: 'Tom & Jerry <"Box"> \'s', brand: 'Acme', signupUrl: 'https://register.acme.com/signup?x=1&y=2' },
-    { id: 'a-2', name: 'Acme two', brand: 'Acme', signupUrl: 'https://www.acme.com/two' },
-    { id: 'b-1', name: 'Path/Name', brand: 'Bravo', signupUrl: 'https://bravo.example/x' },
-    { id: 'z-1', name: 'Shop', brand: 'Amazon', signupUrl: 'https://www.amazon.com/x' },
-    { id: 'g-1', name: 'Gov', brand: 'HC', signupUrl: 'https://www.healthcare.gov/x' }
+    { id: 'a-1', name: 'Tom & Jerry <"Box"> \'s', brand: 'Acme', requirements: ['email'], signupUrl: 'https://register.acme.com/signup?x=1&y=2' },
+    { id: 'a-2', name: 'Acme two', brand: 'Acme', requirements: ['email'], signupUrl: 'https://www.acme.com/two' },
+    { id: 'b-1', name: 'Path/Name', brand: 'Bravo', requirements: ['email'], signupUrl: 'https://bravo.example/x' },
+    { id: 'z-1', name: 'Shop', brand: 'Amazon', requirements: ['email'], signupUrl: 'https://www.amazon.com/x' },
+    { id: 'g-1', name: 'Gov', brand: 'HC', requirements: ['email'], signupUrl: 'https://www.healthcare.gov/x' }
   ];
   const xml = E.gmailFiltersXml(list, { email: 'jane@gmail.com', usePlus: false, archive: true });
   assert.match(xml, /^<\?xml version="1\.0" encoding="UTF-8"\?>\n<feed xmlns="http:\/\/www\.w3\.org\/2005\/Atom" xmlns:apps="http:\/\/schemas\.google\.com\/apps\/2006">/);
@@ -170,8 +277,8 @@ test('gmailFiltersXml without plus: from filters on registrable domains, deduped
 
 test('gmailFiltersXml with plus: to filters, archive only here', () => {
   const list = [
-    { id: 'a-1', name: 'A', brand: 'Acme', signupUrl: 'https://acme.com/' },
-    { id: 'z-1', name: 'Z', brand: 'Amazon', signupUrl: 'https://www.amazon.com/x' }
+    { id: 'a-1', name: 'A', brand: 'Acme', requirements: ['email'], signupUrl: 'https://acme.com/' },
+    { id: 'z-1', name: 'Z', brand: 'Amazon', requirements: ['email'], signupUrl: 'https://www.amazon.com/x' }
   ];
   const o = { email: 'jane@gmail.com', usePlus: true };
   const off = props(E.gmailFiltersXml(list, o));
@@ -246,4 +353,50 @@ test('icsReminders folds long lines at 75 octets', () => {
   const unfolded = ics.replace(/\r\n /g, '');
   assert.ok(unfolded.includes('SUMMARY:Check for ' + name + ' mail or box'));
   assert.ok(!unfolded.includes(String.fromCharCode(0xFFFD)));
+});
+
+// ---- which programs belong in the email features ----
+test('inEmailFeatures: email requirement and no government domain, in one place', () => {
+  const mk = (requirements, url) => ({ id: 'x', requirements, signupUrl: url });
+  assert.equal(E.inEmailFeatures(mk(['email'], 'https://www.similac.com/')), true);
+  assert.equal(E.inEmailFeatures(mk(['email', 'address'], 'https://www.target.com/gift-registry')), true);
+  assert.equal(E.inEmailFeatures(mk(['address'], 'https://www.similac.com/')), false, 'no email requirement');
+  assert.equal(E.inEmailFeatures(mk(['insurance', 'phone'], 'https://www.aeroflow.com/')), false);
+  for (const u of ['https://www.irs.gov/x', 'https://www.ssa.gov/', 'https://www.healthcare.gov/a', 'https://dhs.state.tx.us/x', 'https://x.army.mil/']) {
+    assert.equal(E.inEmailFeatures(mk(['email'], u)), false, u);
+  }
+  assert.equal(E.inEmailFeatures(mk('email', 'https://a.com/')), false);
+  assert.equal(E.inEmailFeatures(mk(['email'], 'not a url')), false);
+  assert.equal(E.inEmailFeatures(null), false);
+  assert.equal(E.emailPrograms(null).length, 0);
+});
+
+test('current data: no government program is in the email features, and brand sign-ups with email are', () => {
+  const inc = E.emailPrograms(programs), out = programs.filter((p) => !E.inEmailFeatures(p));
+  assert.ok(inc.length > 0 && out.length > 0);
+  for (const p of inc) { assert.ok(p.requirements.includes('email')); assert.doesNotMatch(E.domainOfUrl(p.signupUrl), /\.(gov|mil)$/); }
+  for (const p of programs.filter((q) => /\.gov\//.test(q.signupUrl))) assert.ok(out.includes(p), p.id);
+});
+
+test('gmailFiltersXml with 150 programs: only included programs, one entry per filter, bounded size', () => {
+  const many = Array.from({ length: 150 }, (_, i) => ({
+    id: 'p-' + String(i).padStart(3, '0'), brand: 'Brand' + i, name: 'Program ' + i,
+    requirements: i % 5 === 3 ? ['email'] : i % 5 === 4 ? ['phone'] : ['email'],
+    signupUrl: i % 5 === 3 ? 'https://www.agency' + i + '.gov/x' : 'https://www.brand' + i + '.com/x'
+  }));
+  const inc = many.filter(E.inEmailFeatures);
+  assert.equal(inc.length, 90);
+  for (const usePlus of [false, true]) {
+    const xml = E.gmailFiltersXml(many, { email: 'jane@gmail.com', usePlus, archive: false, allPrograms: many });
+    assert.equal((xml.match(/<entry>/g) || []).length, 90);
+    assert.doesNotMatch(xml, /\.gov/);
+    assert.ok(xml.length < 60000, String(xml.length));
+  }
+});
+
+test('gmailSearchUrl gives no link for a program outside the email features', () => {
+  const gov = { id: 'g', requirements: ['email'], signupUrl: 'https://www.benefit.gov/x' };
+  assert.equal(E.gmailSearchUrl({ email: 'jane@gmail.com', tag: 'benefit', domain: 'benefit.gov', program: gov }), '');
+  const ok = { id: 'o', requirements: ['email'], signupUrl: 'https://www.acme.com/x' };
+  assert.match(E.gmailSearchUrl({ email: 'jane@gmail.com', tag: 'acme', domain: 'acme.com', program: ok }), /^https:\/\/mail\.google\.com\//);
 });

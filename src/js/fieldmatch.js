@@ -106,6 +106,7 @@
       if (/^[0-9]+$/.test(labels[labels.length - 1])) return labels.join('.');
       var tld = labels[labels.length - 1];
       var take = tld.length === 2 && SECOND_LEVEL[labels[labels.length - 2]] === 1 ? 3 : 2;
+      if (tld === 'us' && labels[labels.length - 2].length === 2) take = 3;
       return labels.slice(-take).join('.');
     }
     function sameSite(a, b) {
@@ -118,6 +119,7 @@
       var r = Array.isArray(p.requirements) ? p.requirements : [];
       if (r.indexOf('purchase') >= 0 || r.indexOf('membership') >= 0) return false;
       if (p.category === 'health-benefits' || p.category === 'assistance') return false;
+      if (!Array.isArray(p.offers) || p.offers[0] !== 'product' || p.certainty === 'chance') return false;
       return !(r.indexOf('eligibility') >= 0 || r.indexOf('insurance') >= 0);
     }
 

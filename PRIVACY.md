@@ -12,12 +12,12 @@ Everything is stored only in your browser's localStorage, under keys that start 
 
 | Key | What it holds |
 |---|---|
-| `bff.profile.v1` | My info: your name, email, phone, address and due date |
+| `bff.profile.v1` | My info: your name, email, phone, address, state and due date |
 | `bff.tracker.v1` | Your tracker statuses and notes |
-| `bff.prefs.v1` | Preferences such as theme and directory filters, and the time of your last Gmail check |
+| `bff.prefs.v1` | Preferences such as theme and directory filters, whether programs for other states are shown, and the time of your last Gmail check |
 | `bff.guided.v1` | The current guided run, until you finish or stop it |
 
-Nothing is sent anywhere.
+Nothing is sent anywhere. Your state hides programs for other states, and your due date builds the plan by due date. Both happen on your device, in the page, and send nothing.
 
 **Safari can clear saved data.** Safari can delete a website's stored data after about a week of Safari use without a visit to it. A copy of the app saved to your Home Screen is not affected by that, but it has its own separate storage. Save a backup from the Tracker now and then (see Backups below).
 

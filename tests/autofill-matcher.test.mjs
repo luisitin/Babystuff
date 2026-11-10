@@ -1,5 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
 import { classifyField, valueFor, cleanText, registrableDomain, sameSite, isGuidedDefault } from '../tools/autofill/field-matcher.mjs';
 
 const c = (o) => classifyField({ type: 'text', ...o });
@@ -144,13 +145,14 @@ test('registrable domain check for redirects', () => {
   assert.equal(registrableDomain('https://www.enfamil.com/x'), 'enfamil.com');
   assert.equal(registrableDomain('https://register.gerber.com/'), 'gerber.com');
   assert.equal(registrableDomain('https://shop.example.co.uk/'), 'example.co.uk');
+  assert.equal(registrableDomain('https://www.revenue.state.mn.us/x'), 'state.mn.us');
   assert.ok(sameSite('https://www.similac.com/a', 'https://similac.com/b'));
   assert.ok(!sameSite('https://similac.com/', 'https://evil-similac.com/'));
   assert.ok(!sameSite('https://similac.com.evil.net/', 'https://similac.com/'));
 });
 
 test('--all-free uses the guidedDefault rule', () => {
-  const base = { costToClaim: 'free', category: 'formula', requirements: ['email'] };
+  const base = { costToClaim: 'free', category: 'formula', requirements: ['email'], offers: ['product', 'coupons'], certainty: 'likely' };
   assert.ok(isGuidedDefault(base));
   assert.ok(!isGuidedDefault({ ...base, costToClaim: 'shipping-fee' }));
   assert.ok(!isGuidedDefault({ ...base, requirements: ['email', 'purchase'] }));
@@ -160,4 +162,25 @@ test('--all-free uses the guidedDefault rule', () => {
   assert.ok(!isGuidedDefault({ ...base, category: 'health-benefits' }));
   assert.ok(!isGuidedDefault({ ...base, category: 'assistance' }));
   assert.ok(!isGuidedDefault(null));
+});
+
+test('--all-free leaves out draws, coupons, points, testing and programs without offers', () => {
+  const base = { costToClaim: 'free', category: 'formula', requirements: ['email'], offers: ['product'], certainty: 'guaranteed' };
+  assert.ok(isGuidedDefault(base));
+  for (const first of ['sweepstakes', 'coupons', 'points', 'testing', 'service']) {
+    assert.ok(!isGuidedDefault({ ...base, offers: [first, 'product'] }), first);
+  }
+  assert.ok(!isGuidedDefault({ ...base, certainty: 'chance' }));
+  const { offers, ...none } = base;
+  assert.ok(!isGuidedDefault(none));
+  assert.ok(!isGuidedDefault({ ...base, offers: [] }));
+});
+
+test('isGuidedDefault agrees with BFF.logic.guidedDefault on every program', async () => {
+  const mod = { exports: {} };
+  new Function('module', readFileSync(new URL('../src/js/logic.js', import.meta.url), 'utf8'))(mod);
+  const logic = mod.exports;
+  assert.ok(logic && logic.guidedDefault, 'logic.js exposes guidedDefault');
+  const programs = JSON.parse(readFileSync(new URL('../data/programs.json', import.meta.url), 'utf8'));
+  for (const p of programs) assert.equal(isGuidedDefault(p), !!logic.guidedDefault(p), p.id);
 });

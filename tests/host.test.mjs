@@ -233,3 +233,20 @@ test('allowedExtension follows the downloads capability list', () => {
   for (const n of ['a.json', 'a.TXT', 'a.csv', 'a.zip', 'a.pdf', 'a.md']) assert.equal(h.allowedExtension(n), true, n);
   for (const n of ['a.xml', 'a.ics', 'a.vcf', 'noext', '']) assert.equal(h.allowedExtension(n), false, n);
 });
+
+test('showText focuses and selects the text box so it is ready to copy', () => {
+  const made = [];
+  const el = (tag) => {
+    const e = { tag, style: {}, children: [], calls: [], setAttribute() {}, addEventListener() {}, remove() {}, appendChild(c) { e.children.push(c); },
+      focus() { e.calls.push('focus'); }, select() { e.calls.push('select'); } };
+    made.push(e);
+    return e;
+  };
+  const parent = { querySelectorAll: () => [], insertBefore() {} };
+  setGlobals({ document: { createElement: el } });
+  const panel = freshHost().showText({ after: { parentNode: parent, nextSibling: null }, label: 'Text', text: 'hello' });
+  assert.ok(panel);
+  const ta = made.find((e) => e.tag === 'textarea');
+  assert.deepEqual(ta.calls, ['focus', 'select']);
+  assert.equal(ta.value, 'hello');
+});

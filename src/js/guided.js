@@ -32,6 +32,24 @@
     var r = p.requirements || [];
     return trulyFree(p) && p.category !== 'health-benefits' && p.category !== 'assistance' && r.indexOf('eligibility') < 0 && r.indexOf('insurance') < 0;
   }
+  var NO_FREE = 'Nothing arrives free without a purchase or a win.';
+  // Best first. Falls back to the data order when the shared logic is missing.
+  function ranked(list) {
+    return BFF.logic && BFF.logic.rankPrograms ? BFF.logic.rankPrograms(list) : list.slice();
+  }
+  function verdictLabel(p) {
+    var L = BFF.logic;
+    if (!L || !L.verdict || !L.VERDICTS) return '';
+    var v = L.verdict(p);
+    for (var i = 0; i < L.VERDICTS.length; i++) if (L.VERDICTS[i].id === v) return L.VERDICTS[i].label;
+    return '';
+  }
+  function worthLine(p) {
+    var vl = verdictLabel(p);
+    var vt = BFF.logic && BFF.logic.valueText ? BFF.logic.valueText(p) : '';
+    return [vl, vt].filter(Boolean).join(' \u00b7 ');
+  }
+  function freeLine(p) { return p.freeStuff ? p.freeStuff : NO_FREE; }
   function handled(p) { return T().getStatus(p.id) !== 'todo'; }
   function profile() {
     var p = store.get('profile.v1', {});
@@ -47,6 +65,7 @@
   function taggedEmail(pr, prog) {
     var E = BFF.email;
     if (!E || !pr.usePlusTags || !prog || E.supportsPlus(pr.email) === false) return '';
+    if (E.inEmailFeatures && !E.inEmailFeatures(prog)) return '';
     return E.plusAddress(pr.email, BFF.plusTags ? BFF.plusTags.forProgram(prog) : E.tagFor(prog, progs()));
   }
   function detailList(p, prog) {
@@ -115,6 +134,7 @@
   // ---- state ----
   var el, body, selected = null, run = null, focusHeading = false, focusOpen = false;
   var actions = null; // buttons of the program on screen, for keyboard shortcuts
+  var preorder = null; // ids in the order the Directory gave them; null means best first
   var undoInfo = null; // {id, entry, index, text}: lets the last Done or Skip be taken back
   var saved0 = store.get(KEY, null);
   var autoOpen = !(saved0 && saved0.autoOpenNext === false); // only used where canPopup() is true
@@ -172,9 +192,23 @@
     return h('div', { class: 'fx-check' }, [cb, h('label', { 'for': id, text: 'When I tap Done or Skip, open the next sign-up page' })]);
   }
 
+  // Programs for other states are left out of the list unless the person chose to show them.
+  function hiddenByState(p) {
+    var L = BFF.logic;
+    if (!L || !L.hiddenByState) return false;
+    var prefs = store.get('prefs.v1', {});
+    if (prefs && typeof prefs === 'object' && prefs.showOtherStates) return false;
+    var st = profile().state;
+    return L.hiddenByState(p, typeof st === 'string' ? st : '');
+  }
+  function setupProgs() {
+    return progs().filter(function (p) { return !hiddenByState(p) || !!(selected && selected[p.id]); });
+  }
+
   function initSelection() {
     selected = {};
-    progs().forEach(function (p) { if (!handled(p) && defaultOn(p)) selected[p.id] = true; });
+    preorder = null;
+    progs().forEach(function (p) { if (!handled(p) && !hiddenByState(p) && defaultOn(p)) selected[p.id] = true; });
   }
 
   // ---- views ----
@@ -190,15 +224,16 @@
     var count = h('p', { class: 'fx-count', role: 'status', 'aria-live': 'polite' });
     var start = h('button', { type: 'button', class: 'fx-btn fx-btn--primary' });
     var boxes = [];
+    var shownList = ranked(setupProgs());
     function refresh() {
       var n = Object.keys(selected).length;
-      count.textContent = n + ' of ' + progs().length + ' selected';
+      count.textContent = n + ' of ' + shownList.length + ' selected';
       start.textContent = 'Start (' + n + ' program' + (n === 1 ? '' : 's') + ')';
       start.disabled = n === 0;
     }
     function setAll(fn) {
       selected = {};
-      progs().forEach(function (p, i) { var on = fn(p); boxes[i].checked = on; if (on) selected[p.id] = true; });
+      shownList.forEach(function (p, i) { var on = fn(p); boxes[i].checked = on; if (on) selected[p.id] = true; });
       refresh();
     }
     var bar = h('div', { class: 'fx-actions' });
@@ -213,7 +248,7 @@
     if (at) body.appendChild(at);
     body.appendChild(count);
     var list = h('ul', { class: 'fx-pick' });
-    progs().forEach(function (p, i) {
+    shownList.forEach(function (p, i) {
       var id = 'gd-pick-' + p.id;
       var cb = h('input', { type: 'checkbox', id: id });
       cb.checked = !!selected[p.id];
@@ -227,12 +262,21 @@
       var cost = BFF.logic && BFF.logic.COST_LABELS ? BFF.logic.COST_LABELS[p.costToClaim] || p.costToClaim : p.costToClaim;
       list.appendChild(h('li', { class: 'fx-pick-item' }, [cb, h('label', { 'for': id }, [
         h('strong', { text: p.name }),
-        h('span', { class: 'fx-muted', text: (p.brand || '') + ' · ' + cost + extra })
+        h('span', { class: 'fx-muted', text: (p.brand || '') + ' · ' + cost + extra }),
+        h('span', { class: 'fx-small', text: worthLine(p) }),
+        h('span', { class: 'fx-small', text: freeLine(p) })
       ])]));
     });
     body.appendChild(list);
     start.addEventListener('click', function () {
-      var ids = progs().filter(function (p) { return selected[p.id]; }).map(function (p) { return p.id; });
+      var chosen = ranked(progs().filter(function (p) { return selected[p.id]; })).map(function (p) { return p.id; });
+      var ids = chosen;
+      if (preorder) {
+        var first = preorder.filter(function (id) { return selected[id]; });
+        var seen = {};
+        first.forEach(function (id) { seen[id] = true; });
+        ids = first.concat(chosen.filter(function (id) { return !seen[id]; }));
+      }
       if (!ids.length) return;
       run = { ids: ids, index: 0, step: 'run' };
       saveRun();
@@ -314,6 +358,9 @@
     var title = h('h3', { class: 'fx-run-title', tabindex: '-1', text: p.name });
     body.appendChild(title);
     body.appendChild(h('p', { class: 'fx-muted fx-tight', text: p.brand + ' · Status: ' + T().LABELS[st] }));
+    var wl = worthLine(p);
+    if (wl) body.appendChild(h('p', { class: 'fx-small fx-tight', text: wl }));
+    body.appendChild(h('p', { class: 'fx-small fx-tight', text: freeLine(p) }));
 
     // (b) open link: a real anchor, so it works wherever links work (no window.open)
     var open = h('a', { class: 'fx-btn fx-btn--primary fx-btn--big', href: p.signupUrl, target: '_blank', rel: 'noopener noreferrer', text: 'Open sign-up page \u2197' });
@@ -373,7 +420,14 @@
       }))
     ]));
     var so = h('button', { type: 'button', class: 'fx-btn fx-btn--link', text: 'Start over' });
-    so.addEventListener('click', startOver);
+    so.addEventListener('click', function () {
+      if (!BFF.ui || !BFF.ui.confirm) { startOver(); return; }
+      BFF.ui.confirm({
+        after: so.parentNode, returnTo: so, confirmLabel: 'Start over',
+        message: 'Start over? Your place in this run is lost. Statuses you already set are kept.',
+        onConfirm: startOver
+      });
+    });
     body.appendChild(so);
 
     // (e) sticky action bar
@@ -496,6 +550,7 @@
       var valid = {};
       (Array.isArray(ids) ? ids : []).forEach(function (id) { if (byId(id)) valid[id] = true; });
       selected = valid;
+      preorder = (Array.isArray(ids) ? ids : []).filter(function (id, i, a) { return valid[id] && a.indexOf(id) === i; });
       undoInfo = null;
       if (run) { run = null; saveRun(); }
       if (body) render();
