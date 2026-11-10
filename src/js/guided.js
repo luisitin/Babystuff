@@ -55,6 +55,15 @@
   }
   function gkey(p) { return BFF.logic && BFF.logic.groupKey ? BFF.logic.groupKey(p) : (p.sameAs || p.id); }
   function isSide(p) { var v = BFF.logic && BFF.logic.verdict ? BFF.logic.verdict(p) : ''; return v === 'conditional' || v === 'longshot'; }
+  function missingCounts() {
+    var L = BFF.logic;
+    return L && L.missingInfoCounts ? L.missingInfoCounts(progs(), profile(), function (id) { return T().getStatus(id); }) : null;
+  }
+  // The shared "My info is missing ..." line for a program that is still to do.
+  function missLine(p) {
+    if (!BFF.missing || T().getStatus(p.id) !== 'todo') return null;
+    return BFF.missing.line(p, profile());
+  }
   function handled(p) { return T().getStatus(p.id) !== 'todo'; }
   function profile() {
     var p = store.get('profile.v1', {});
@@ -222,9 +231,35 @@
 
   // At most one program per group of the same thing (the best ranked one that qualifies),
   // and none in a group where another member is already signed up or received.
+  var seen = null; // ids that were listed the last time the selection was looked at
+  function visibleNow() {
+    var v = {};
+    progs().forEach(function (p) { if (!hiddenHere(p)) v[p.id] = true; });
+    return v;
+  }
+  // Programs that became visible since then (the person added their state, say) get the normal default.
+  // Boxes the person could already see are not touched. Never used after preselect(), which resets `seen`.
+  function applyNewDefaults() {
+    var now = visibleNow();
+    if (!seen) { seen = now; return; }
+    var done = {}, taken = {};
+    progs().forEach(function (p) {
+      var st = T().getStatus(p.id);
+      if (st === 'signed-up' || st === 'received') done[gkey(p)] = true;
+      if (selected[p.id]) taken[gkey(p)] = true;
+    });
+    ranked(progs()).forEach(function (p) {
+      if (!now[p.id] || seen[p.id]) return;
+      var k = gkey(p);
+      if (done[k] || taken[k]) return;
+      if (!handled(p) && defaultOn(p)) { selected[p.id] = true; taken[k] = true; }
+    });
+    seen = now;
+  }
   function initSelection() {
     selected = {};
     preorder = null;
+    seen = visibleNow();
     var done = {}, taken = {};
     progs().forEach(function (p) {
       var st = T().getStatus(p.id);
@@ -247,6 +282,9 @@
       var w = h('p', { class: 'fx-warn' }, [document.createTextNode('My info is empty, so there is nothing to copy yet. '), h('a', { href: '#info', text: 'Fill in My info' }), document.createTextNode(' first.')]);
       body.appendChild(w);
     }
+    var counts = missingCounts();
+    var mn = BFF.missing && counts ? BFF.missing.notice(counts, { compact: true }) : null;
+    if (mn) body.appendChild(h('div', { class: 'gd-miss-box' }, [mn]));
     var count = h('p', { class: 'fx-count', role: 'status', 'aria-live': 'polite' });
     var start = h('button', { type: 'button', class: 'fx-btn fx-btn--primary' });
     var boxes = {};
@@ -304,19 +342,22 @@
       boxes[p.id] = cb;
       var st = T().getStatus(p.id);
       var muted = [p.brand, verdictLabel(p), BFF.logic.valueText ? BFF.logic.valueText(p) : '', st !== 'todo' ? T().LABELS[st] : ''].filter(Boolean).join(' · ');
-      return h('div', { class: cls }, [cb, h('label', { 'for': id }, [
+      var row = h('div', { class: cls }, [cb, h('label', { 'for': id }, [
         h('strong', { text: p.name }),
         h('span', { class: 'fx-small fx-pick-free', text: freeLine(p) }),
         h('span', { class: 'fx-muted fx-pick-meta', text: muted })
       ])]);
+      var ml = missLine(p);
+      // A sibling of the row, never inside the label (it holds a link).
+      return ml ? [row, h('div', { class: 'gd-miss' }, [ml])] : [row];
     }
     function groupItem(g) {
-      var kids = [pickRow(g.lead, 'fx-pick-row')];
+      var kids = pickRow(g.lead, 'fx-pick-row');
       if (g.others.length) {
         var n = g.others.length;
         var det = h('details', { class: 'fx-alt' }, [
           h('summary', { text: n === 1 ? '1 more way to get the same thing' : n + ' more ways to get the same thing' }),
-          h('div', { class: 'fx-alt-list' }, g.others.map(function (o) { return pickRow(o, 'fx-pick-row fx-pick-alt'); }))
+          h('div', { class: 'fx-alt-list' }, g.others.reduce(function (acc, o) { return acc.concat(pickRow(o, 'fx-pick-row fx-pick-alt')); }, []))
         ]);
         altDets.push({ g: g, det: det });
         kids.push(det);
@@ -429,6 +470,8 @@
     var wl = worthLine(p);
     if (wl) body.appendChild(h('p', { class: 'fx-small fx-tight', text: wl }));
     body.appendChild(h('p', { class: 'fx-small fx-tight', text: freeLine(p) }));
+    var rml = missLine(p);
+    if (rml) body.appendChild(rml);
 
     // (b) open link: a real anchor, so it works wherever links work (no window.open)
     var open = h('a', { class: 'fx-btn fx-btn--primary fx-btn--big', href: p.signupUrl, target: '_blank', rel: 'noopener noreferrer', text: 'Open sign-up page \u2197' });
@@ -587,7 +630,7 @@
     if (!body) return;
     if (run && run.step === 'run') renderRun();
     else if (run && run.step === 'finish') renderFinish();
-    else { actions = null; if (!selected) initSelection(); renderSetup(); }
+    else { actions = null; if (!selected) initSelection(); else applyNewDefaults(); renderSetup(); }
     focusHeading = false;
   }
 
@@ -618,6 +661,7 @@
       var valid = {};
       (Array.isArray(ids) ? ids : []).forEach(function (id) { if (byId(id)) valid[id] = true; });
       selected = valid;
+      seen = visibleNow();
       preorder = (Array.isArray(ids) ? ids : []).filter(function (id, i, a) { return valid[id] && a.indexOf(id) === i; });
       undoInfo = null;
       if (run) { run = null; saveRun(); }
@@ -638,6 +682,8 @@
       if (run && run.autoOpenNext === false) autoOpen = false;
       if (run && run.shortcuts === true) shortcutsOn = true;
       document.addEventListener('keydown', onKey);
+      // A save that lands late: draw again with the selection kept. When hidden, show() draws it.
+      document.addEventListener('bff:profile-changed', function () { if (el && !el.hidden) render(); });
       render();
     },
     show: function () {

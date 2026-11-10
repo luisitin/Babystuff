@@ -376,7 +376,7 @@
     function noun(n) { var t = first ? plural(n, 'program') : String(n); first = false; return t; }
     if (l.otherState) {
       if (hasState) out.push([document.createTextNode(noun(l.otherState) + ' for other states')]);
-      else out.push([document.createTextNode(noun(l.otherState) + ' only for some states (add your state in '), h('a', { href: '#info', text: 'My info' }), document.createTextNode(')')]);
+      else out.push([document.createTextNode(noun(l.otherState) + ' only for some states (add your state in '), h('a', { href: '#info', 'data-info-key': 'state', text: 'My info' }), document.createTextNode(')')]);
     }
     if (l.noFit) out.push([document.createTextNode(noun(l.noFit) + ' that your answers in My info rule out')]);
     if (l.covered) out.push([document.createTextNode(l.covered + ' other ' + (l.covered === 1 ? 'way' : 'ways') + ' to get something you already signed up for')]);
@@ -719,6 +719,15 @@
       r.more.appendChild(h('span', { class: 'fx-sr', text: ' (has a note)' }));
     }
   }
+  // "My info is missing ..." under a to-do row; it goes away when the status leaves to-do and returns with it.
+  function setMiss(r) {
+    var want = tracker.getStatus(r.p.id) === 'todo' && !!(BFF.missing && BFF.missing.line);
+    var n = want ? BFF.missing.line(r.p, profileOf()) : null;
+    if (!!n === !!r.missShown) return;
+    r.miss.textContent = '';
+    if (n) r.miss.appendChild(n);
+    r.missShown = !!n;
+  }
   // The row restyles in place; it only moves at the next full render.
   function syncRowLocal(r) {
     var st = tracker.getStatus(r.p.id);
@@ -727,6 +736,7 @@
     r.el.classList.toggle('fx-moved', st !== r.rendered);
     setLine3(r);
     setMore(r);
+    setMiss(r);
   }
   function setOpen(r, open) {
     if (open && !r.built) buildPanel(r);
@@ -789,12 +799,15 @@
     r.more = h('button', { type: 'button', id: 'trk-d-' + id, class: 'fx-btn fx-trk-more', 'aria-expanded': 'false', 'aria-controls': pid });
     r.panel = h('div', { id: pid, class: 'fx-trk-panel', hidden: '' });
     r.line3 = h('p', { class: 'fx-muted fx-trk-line3', hidden: '' });
+    r.miss = h('div', { class: 'fx-trk-miss' });
+    r.missShown = false;
     var meta = [p.brand, verdictLabel(p), L.valueText(p)].filter(Boolean).join(' ' + CTX + ' ');
     r.el = h('li', { class: 'fx-trk-row', 'data-id': id, 'data-status': st }, [
       h('div', { class: 'fx-trk-main' }, [
         h('strong', { class: 'fx-trk-title', text: p.name }),
         h('p', { class: 'fx-muted fx-trk-meta', text: meta }),
-        r.line3
+        r.line3,
+        r.miss
       ]),
       h('div', { class: 'fx-trk-actions' }, [
         link,
@@ -805,6 +818,7 @@
     ]);
     setLine3(r);
     setMore(r);
+    setMiss(r);
     r.more.addEventListener('click', function () { setOpen(r, r.more.getAttribute('aria-expanded') !== 'true'); });
     select.addEventListener('change', function () {
       var ok;
@@ -929,6 +943,20 @@
     }
   }
 
+  // The notice under the summary: how many to-do programs depend on missing My info answers.
+  function refreshMissing() {
+    if (!view.missBox) return;
+    var L = BFF.logic, M = BFF.missing;
+    var counts = L && L.missingInfoCounts ? L.missingInfoCounts(BFF.programs || [], profileOf(), function (id) { return tracker.getStatus(id); }) : null;
+    var sig = counts ? counts.total + ':' + L.MISSING_KEYS.map(function (k) { return counts.keys[k]; }).join(',') : '';
+    if (sig === view.missSig) return;
+    view.missSig = sig;
+    view.missBox.textContent = '';
+    var n = M && M.notice && counts ? M.notice(counts) : null;
+    if (n) view.missBox.appendChild(n);
+    view.missBox.hidden = !n;
+  }
+
   function flushAll() { view.flushers.forEach(function (f) { f(); }); }
 
   // A full render: scope, summary, tab counts, list. Tool folds and the Gmail panel are never touched.
@@ -938,6 +966,7 @@
     var sc = computeScope();
     view.scope = sc;
     updateSummary(sc);
+    refreshMissing();
     renderList(sc);
     updateLeft(sc);
     syncEmailBits();
@@ -948,6 +977,7 @@
     if (r) syncRowLocal(r);
     var sc = computeScope();
     updateSummary(sc);
+    refreshMissing();
     updateLeft(sc);
     refreshMailto();
   }
@@ -967,6 +997,8 @@
     view.live = h('div', { class: 'fx-sr', role: 'status', 'aria-live': 'polite' });
     view.msg = h('p', { class: 'fx-hint fx-trk-alert', role: 'alert' });
     el.appendChild(h('div', { class: 'fx-card fx-trk-summary' }, [view.barText, view.bar, view.claimEl, view.claimNote, view.valueEl, view.empty]));
+    view.missBox = h('div', { class: 'fx-trk-miss-notice', hidden: '' });
+    el.appendChild(view.missBox);
     el.appendChild(view.storeWarn);
     el.appendChild(view.msg);
     el.appendChild(view.live);

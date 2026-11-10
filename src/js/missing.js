@@ -21,7 +21,16 @@
   }
   function plural(n, w) { return n + ' ' + w + (n === 1 ? '' : 's'); }
 
+  function sp() { return document.createTextNode(' '); }
+  function addLink(many) {
+    var a = el('a', 'miss-add', many ? 'Add them' : 'Add it');
+    a.setAttribute('href', '#info');
+    a.appendChild(srText(' in My info'));
+    return a;
+  }
+
   // One line for a program: what My info is missing, with a link to add it. null when nothing is missing.
+  // It reads as one sentence: the mark, the text, then the link.
   function line(p, profile, opts) {
     var L = BFF.logic;
     opts = opts || {};
@@ -35,35 +44,54 @@
     var n = el(opts.tag || 'p', 'miss-line');
     n.setAttribute('data-missing', keys.join(' '));
     n.appendChild(mark());
+    n.appendChild(sp());
     n.appendChild(el('span', 'miss-text', lead + 'My info is missing ' + L.missingInfoText(keys) + '.'));
-    var a = el('a', 'miss-add', keys.length === 1 ? 'Add it' : 'Add them');
-    a.setAttribute('href', '#info');
+    n.appendChild(sp());
+    var a = addLink(keys.length > 1);
     a.setAttribute('data-info-key', keys[0]);
-    a.appendChild(srText(' in My info'));
     n.appendChild(a);
     return n;
   }
 
-  // A box for a page header: how many programs depend on what, one chip per missing answer.
+  // A box for a page header. Full form: one chip per missing answer. One missing answer, or opts.compact:
+  // a single sentence and one link. null when nothing is missing.
   function notice(counts, opts) {
     var L = BFF.logic;
     if (!counts || !counts.total || !L) return null;
-    var box = el('div', 'miss-box');
+    opts = opts || {};
+    var keys = L.MISSING_KEYS.filter(function (k) { return counts.keys && counts.keys[k] > 0; });
+    if (!keys.length) return null;
+    var one = keys.length === 1 || opts.compact === true;
+    var box = el('div', 'miss-box' + (one ? ' miss-box--one' : ''));
     box.setAttribute('data-missing-total', String(counts.total));
+    box.setAttribute('data-missing-keys', keys.join(' '));
     var lead = el('p', 'miss-lead');
     lead.appendChild(mark());
-    lead.appendChild(document.createTextNode(' My info is missing details that '));
-    lead.appendChild(el('strong', '', plural(counts.total, 'program')));
-    lead.appendChild(document.createTextNode(counts.total === 1 ? ' depends on.' : ' depend on.'));
+    var pr = el('strong', '', plural(counts.total, 'program'));
+    if (keys.length === 1) {
+      lead.appendChild(document.createTextNode(' My info is missing ' + L.MISSING_LABELS[keys[0]] + '. '));
+      lead.appendChild(pr);
+      lead.appendChild(document.createTextNode(counts.total === 1 ? ' depends on it. ' : ' depend on it. '));
+    } else {
+      lead.appendChild(document.createTextNode(' My info is missing details that '));
+      lead.appendChild(pr);
+      lead.appendChild(document.createTextNode(counts.total === 1 ? ' depends on. ' : ' depend on. '));
+    }
+    if (one) {
+      var add = addLink(keys.length > 1);
+      add.setAttribute('data-info-key', keys[0]);
+      lead.appendChild(add);
+      box.appendChild(lead);
+      return box;
+    }
     box.appendChild(lead);
     var ul = el('ul', 'miss-chips');
-    L.MISSING_KEYS.forEach(function (k) {
-      var c = counts.keys && counts.keys[k];
-      if (!(c > 0)) return;
+    keys.forEach(function (k) {
+      var c = counts.keys[k];
       var a = el('a', 'miss-chip');
       a.setAttribute('href', '#info');
       a.setAttribute('data-info-key', k);
-      a.appendChild(document.createTextNode(L.MISSING_SHORT[k] + ' '));
+      a.appendChild(el('span', 'miss-label', L.MISSING_SHORT[k]));
       var n = el('span', 'miss-n', String(c));
       n.appendChild(srText(c === 1 ? ' program' : ' programs'));
       a.appendChild(n);

@@ -784,7 +784,7 @@ test('missingInfoCounts, missingInfoText, onlyInText', () => {
   assert.equal(L.missingInfoText([]), '');
   assert.equal(L.missingInfoText(['state']), 'your state');
   assert.equal(L.missingInfoText(['state', 'insurer']), 'your state and your health plan');
-  assert.equal(L.missingInfoText(['state', 'cover', 'lowIncome']), 'your state, your health cover and the income question');
+  assert.equal(L.missingInfoText(['state', 'cover', 'lowIncome']), 'your state, your health cover and your income answer');
   assert.equal(L.onlyInText({}), '');
   assert.equal(L.onlyInText({ states: ['DE'] }), 'Only in DE');
   assert.equal(L.onlyInText({ states: ['IL', 'TX'] }), 'Only in IL and TX');
@@ -821,4 +821,64 @@ test('missingInfo invariants over the real data and a grid of profiles', () => {
   for (const insurer of insurerNames.concat(['other']))
     for (const cover of ['private', 'marketplace', 'medicaid', 'tricare', 'none'])
       for (const p of DATA) assert.deepEqual(L.missingInfo(p, { state: 'TX', cover, insurer, lowIncome: 'no', job: 'yes' }), [], p.id);
+});
+
+// ---- BFF.missing: markup of line() and notice() on a tiny fake DOM ----
+async function loadMissing() {
+  const vm = await import('node:vm');
+  class Node_ {
+    constructor(tag) { this.tag = tag; this.kids = []; this.attrs = {}; this.className = ''; this.nodeType = 1; }
+    appendChild(c) { this.kids.push(c); return c; }
+    setAttribute(k, v) { this.attrs[k] = String(v); }
+    getAttribute(k) { return k in this.attrs ? this.attrs[k] : null; }
+    set textContent(t) { this.kids = [{ nodeType: 3, text: String(t) }]; }
+    get text() { return this.kids.map((k) => (k.nodeType === 3 ? k.text : k.text)).join(''); }
+  }
+  Object.defineProperty(Node_.prototype, 'text', { get() { return this.kids.map((k) => (k.nodeType === 3 ? k.text : k.text)).join(''); } });
+  const document = { createElement: (t) => new Node_(t), createTextNode: (t) => ({ nodeType: 3, text: t }), addEventListener() {} };
+  const sandbox = { document, location: { hash: '' }, BFF: { logic: L } };
+  sandbox.window = sandbox;
+  vm.createContext(sandbox);
+  vm.runInContext(readData(new URL('../src/js/missing.js', import.meta.url), 'utf8'), sandbox);
+  return sandbox.BFF.missing;
+}
+const find = (n, cls) => (n.className.split(' ').includes(cls) ? [n] : []).concat(...(n.kids || []).filter((k) => k.kids).map((k) => find(k, cls)));
+
+test('BFF.missing.line: one sentence, link last, first key on the link', async () => {
+  const M = await loadMissing();
+  assert.equal(M.line(P({ id: 'x' }), {}), null);
+  const one = M.line(P({ id: 'x', states: ['TX'] }), {});
+  assert.equal(one.getAttribute('data-missing'), 'state');
+  assert.equal(find(one, 'miss-text')[0].text, 'Only in TX. My info is missing your state.');
+  const a = find(one, 'miss-add')[0];
+  assert.equal(a.getAttribute('data-info-key'), 'state');
+  assert.ok(a.text.startsWith('Add it'));
+  const three = M.line(P({ id: 'y', states: ['IL', 'TX'], audience: ['insured', 'worker'] }), {});
+  assert.equal(three.getAttribute('data-missing'), 'state cover job');
+  assert.equal(find(three, 'miss-text')[0].text, 'Only in IL and TX. My info is missing your state, your health cover and your paid job answer.');
+  assert.ok(find(three, 'miss-add')[0].text.startsWith('Add them'));
+  assert.equal(M.line(P({ id: 'y', states: ['IL'], audience: ['insured'] }), {}, { states: false }).kids.map((k) => k.text || '').join('').includes('Only in'), false);
+});
+
+test('BFF.missing.notice: full, one-key and compact forms', async () => {
+  const M = await loadMissing();
+  const counts = (keys, total) => ({ total, keys: Object.assign({ state: 0, cover: 0, insurer: 0, lowIncome: 0, job: 0 }, keys) });
+  assert.equal(M.notice(counts({}, 0)), null);
+  assert.equal(M.notice(null), null);
+  const full = M.notice(counts({ state: 60, cover: 29, job: 1 }, 92));
+  assert.equal(full.className, 'miss-box');
+  assert.equal(full.getAttribute('data-missing-total'), '92');
+  assert.equal(full.getAttribute('data-missing-keys'), 'state cover job');
+  assert.deepEqual(find(full, 'miss-chip').map((c) => c.getAttribute('data-info-key')), ['state', 'cover', 'job']);
+  const one = M.notice(counts({ insurer: 5 }, 5));
+  assert.equal(one.className, 'miss-box miss-box--one');
+  assert.equal(find(one, 'miss-chip').length, 0);
+  assert.equal(find(one, 'miss-lead')[0].text, '! My info is missing your health plan. 5 programs depend on it. Add it in My info');
+  assert.equal(find(M.notice(counts({ insurer: 1 }, 1)), 'miss-lead')[0].text, '! My info is missing your health plan. 1 program depends on it. Add it in My info');
+  const compact = M.notice(counts({ cover: 29, state: 60 }, 92), { compact: true });
+  assert.equal(compact.className, 'miss-box miss-box--one');
+  assert.equal(find(compact, 'miss-chip').length, 0);
+  assert.equal(find(compact, 'miss-add')[0].getAttribute('data-info-key'), 'state');
+  assert.equal(find(compact, 'miss-lead')[0].text, '! My info is missing details that 92 programs depend on. Add them in My info');
+  assert.equal(compact.getAttribute('data-missing-keys'), 'state cover');
 });

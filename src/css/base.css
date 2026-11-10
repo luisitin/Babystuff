@@ -418,8 +418,7 @@ details.dir-filters { display: block; background: var(--surface); border: 1px so
 .tag-fit { background: var(--success-bg); color: var(--success); border-color: var(--success); }
 .tag-certainty { background: var(--surface-2); color: var(--text); border-color: var(--border); }
 .tag-nomatch { background: var(--warning-bg); color: var(--warning-text); border-color: var(--warning-border); }
-.sum-money, .sum-situation { font-size: .9375rem; }
-.dir-note a, .sum-situation a { color: var(--primary); }
+.dir-note a { color: var(--primary); }
 /* Phase H: tighter collapsed cards */
 .dir-groups { gap: var(--space-4); }
 .dir-group { gap: var(--space-1); }
@@ -472,3 +471,18 @@ details.dir-filters { margin: 0 0 var(--space-1); }
 @media (min-width: 640px) {
   .sum-due .when-buttons .btn { width: auto; display: inline-flex; align-items: center; padding: 0 var(--space-3); font-size: .9375rem; }
 }
+
+/* ===== Phase I part 3: what My info is missing (profile.js, directory.js, guided.js) ===== */
+.fx-need { margin: var(--space-1) 0 0; font-size: .875rem; color: var(--muted); }
+.fx-need[hidden] { display: none; }
+.fx-field.fx-ask { background: var(--warning-bg); color: var(--warning-text); border: 2px solid var(--warning-border); border-radius: var(--radius-sm); padding: var(--space-3); margin-left: calc(-1 * var(--space-3)); margin-right: calc(-1 * var(--space-3)); }
+.fx-field.fx-ask .fx-need { color: var(--warning-text); }
+.fx-ask-back { display: inline-flex; align-items: center; min-height: 44px; margin-top: var(--space-2); font-weight: 600; color: var(--primary); }
+.fx-ask-back:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+.fx-field.fx-ask .fx-ask-back { color: var(--warning-text); text-decoration: underline; }
+.dir-miss { margin: 0 0 var(--space-2); }
+.dir-miss[hidden] { display: none; }
+.gd-miss-box { margin: var(--space-3) 0; }
+.gd-miss { margin: 0 0 var(--space-1) calc(24px + var(--space-3)); }
+.fx-alt-list .gd-miss { margin-left: calc(24px + var(--space-3)); }
+.gd-miss .miss-line { margin: 0; }

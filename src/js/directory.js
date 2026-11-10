@@ -171,6 +171,7 @@
     els.stateBox = h('div', { class: 'dir-state', hidden: true });
     els.fitBox = h('div', { class: 'dir-state dir-fit', hidden: true });
     els.summary = h('section', { class: 'dir-summary', 'aria-label': 'Summary' });
+    els.missBox = h('div', { class: 'dir-miss', hidden: true });
 
     els.count = h('p', { class: 'result-count', tabindex: '-1', 'aria-live': 'polite', 'aria-atomic': 'true' });
     var resultRow = h('div', { class: 'result-row' }, [els.count, els.clear]);
@@ -197,6 +198,7 @@
     });
 
     root.appendChild(els.summary);
+    root.appendChild(els.missBox);
     root.appendChild(search);
     root.appendChild(els.tabs);
     root.appendChild(els.filterBox);
@@ -262,6 +264,24 @@
     return null;
   }
 
+  // What My info is missing for this program, only while it is still to do.
+  function missLine(p) {
+    if (!BFF.missing || statusOf(p.id) !== 'todo') return null;
+    return BFF.missing.line(p, profile);
+  }
+  function byProgramId(id) {
+    var l = programs();
+    for (var i = 0; i < l.length; i++) if (l[i].id === id) return l[i];
+    return null;
+  }
+  function renderMissBox() {
+    if (!els.missBox) return;
+    els.missBox.textContent = '';
+    var n = BFF.missing && L.missingInfoCounts ? BFF.missing.notice(L.missingInfoCounts(programs(), profile, statusOf)) : null;
+    if (n) els.missBox.appendChild(n);
+    els.missBox.hidden = !n;
+  }
+
   function card(p, level, rank, ctx) {
     var cost = p.costToClaim;
     var open = !!openCards[p.id];
@@ -289,6 +309,8 @@
         : h('p', { class: 'free-line free-none', text: L.freeNote(p) }));
     }
     kids.push(h('p', { class: 'value-line' }, [h('strong', { text: L.valueText(p) })]));
+    var ml = missLine(p);
+    if (ml) kids.push(ml);
 
     var link = h('a', { class: 'btn btn-primary', href: p.signupUrl, target: '_blank', rel: 'noopener noreferrer' }, [
       document.createTextNode('Sign up on ' + L.domainOf(p.signupUrl) + ' '),
@@ -413,11 +435,11 @@
       var kids = [document.createTextNode(t)];
       if (info.hide) {
         kids.push(document.createTextNode('Add your state in '));
-        kids.push(h('a', { href: '#info', text: 'My info' }));
+        kids.push(h('a', { href: '#info', 'data-info-key': 'state', text: 'My info' }));
         kids.push(document.createTextNode(' to see the ones for you.'));
       } else {
         kids.push(document.createTextNode('Add your state in '));
-        kids.push(h('a', { href: '#info', text: 'My info' }));
+        kids.push(h('a', { href: '#info', 'data-info-key': 'state', text: 'My info' }));
         kids.push(document.createTextNode(' to narrow them.'));
       }
       els.stateBox.appendChild(h('p', null, kids));
@@ -508,14 +530,6 @@
     }
     box.appendChild(top);
     box.appendChild(h('p', { class: 'sum-more', text: more + ' more ' + (more === 1 ? 'is' : 'are') + ' free if you qualify.' }));
-    // With answers given, the fit box below says how many programs they hide, so only the prompt is shown here.
-    if (!L.hasSituation(profile)) {
-      box.appendChild(h('p', { class: 'sum-situation' }, [
-        document.createTextNode('Answer four quick questions in '),
-        h('a', { href: '#info', text: 'My info' }),
-        document.createTextNode(' to hide programs that cannot apply to you.')
-      ]));
-    }
 
     var due = typeof profile.dueDate === 'string' ? profile.dueDate.trim() : '';
     var wk = due ? L.weeksUntil(due) : null;
@@ -607,6 +621,7 @@
     renderFitBox(fInfo);
     renderStateBox(info);
     renderSummary(pool, fInfo);
+    renderMissBox();
     els.count.textContent = 'Showing ' + shown.length + ' of ' + pool.length + ' programs';
     els.empty.hidden = shown.length !== 0;
     shownIds = shown.map(function (p) { return p.id; });
@@ -654,6 +669,17 @@
       var stv = statusOf(badges[j].getAttribute('data-program-id'));
       if (sb) { sb.hidden = stv === 'todo'; sb.textContent = stv === 'todo' ? '' : statusLabel(stv); }
     }
+    for (var m = 0; m < badges.length; m++) {
+      var pid = badges[m].getAttribute('data-program-id');
+      var oldLine = badges[m].querySelector('.miss-line');
+      var prog = byProgramId(pid);
+      var want = prog ? missLine(prog) : null;
+      if (!oldLine && !want) continue;
+      if (oldLine && want && oldLine.getAttribute('data-missing') === want.getAttribute('data-missing')) continue;
+      if (oldLine) oldLine.parentNode.removeChild(oldLine);
+      if (want) { var foot = badges[m].querySelector('.card-foot'); badges[m].insertBefore(want, foot); }
+    }
+    renderMissBox();
     var sels = els.list.querySelectorAll('select[data-program-id]');
     for (var i = 0; i < sels.length; i++) {
       var s = BFF.tracker.getStatus(sels[i].getAttribute('data-program-id')) || 'todo';

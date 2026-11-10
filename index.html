@@ -430,8 +430,7 @@ details.dir-filters { display: block; background: var(--surface); border: 1px so
 .tag-fit { background: var(--success-bg); color: var(--success); border-color: var(--success); }
 .tag-certainty { background: var(--surface-2); color: var(--text); border-color: var(--border); }
 .tag-nomatch { background: var(--warning-bg); color: var(--warning-text); border-color: var(--warning-border); }
-.sum-money, .sum-situation { font-size: .9375rem; }
-.dir-note a, .sum-situation a { color: var(--primary); }
+.dir-note a { color: var(--primary); }
 /* Phase H: tighter collapsed cards */
 .dir-groups { gap: var(--space-4); }
 .dir-group { gap: var(--space-1); }
@@ -484,6 +483,21 @@ details.dir-filters { margin: 0 0 var(--space-1); }
 @media (min-width: 640px) {
   .sum-due .when-buttons .btn { width: auto; display: inline-flex; align-items: center; padding: 0 var(--space-3); font-size: .9375rem; }
 }
+
+/* ===== Phase I part 3: what My info is missing (profile.js, directory.js, guided.js) ===== */
+.fx-need { margin: var(--space-1) 0 0; font-size: .875rem; color: var(--muted); }
+.fx-need[hidden] { display: none; }
+.fx-field.fx-ask { background: var(--warning-bg); color: var(--warning-text); border: 2px solid var(--warning-border); border-radius: var(--radius-sm); padding: var(--space-3); margin-left: calc(-1 * var(--space-3)); margin-right: calc(-1 * var(--space-3)); }
+.fx-field.fx-ask .fx-need { color: var(--warning-text); }
+.fx-ask-back { display: inline-flex; align-items: center; min-height: 44px; margin-top: var(--space-2); font-weight: 600; color: var(--primary); }
+.fx-ask-back:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+.fx-field.fx-ask .fx-ask-back { color: var(--warning-text); text-decoration: underline; }
+.dir-miss { margin: 0 0 var(--space-2); }
+.dir-miss[hidden] { display: none; }
+.gd-miss-box { margin: var(--space-3) 0; }
+.gd-miss { margin: 0 0 var(--space-1) calc(24px + var(--space-3)); }
+.fx-alt-list .gd-miss { margin-left: calc(24px + var(--space-3)); }
+.gd-miss .miss-line { margin: 0; }
 /* Styles for My info, Tracker and Do it for me. Uses base.css tokens, with fallbacks. */
 .fx-view, .fx-confirm { --fx-bg: var(--bg, #fff); --fx-surface: var(--surface, #f6f7f9); --fx-text: var(--text, #1c2430); --fx-muted: var(--muted, #5b6676);
   --fx-primary: var(--primary, #2457c5); --fx-pc: var(--primary-contrast, #fff); --fx-border: var(--border, #cfd6e0);
@@ -637,17 +651,22 @@ details.dir-filters { margin: 0 0 var(--space-1); }
 .fx-confirm { box-sizing: border-box; }
 
 /* Phase I part 3: "My info is missing ..." line and notice */
-.miss-line { display: flex; flex-wrap: wrap; align-items: center; gap: 0 var(--fx-s2, 8px); margin: var(--fx-s1, 4px) 0; font-size: .9em; color: var(--text, #1c2430); }
-.miss-mark { flex: none; display: inline-flex; align-items: center; justify-content: center; width: 1.35em; height: 1.35em; border-radius: 50%; border: 2px solid var(--warning-text, #6b4a00); background: var(--warning-bg, #fff4d6); color: var(--warning-text, #6b4a00); font-weight: 800; font-size: .85em; line-height: 1; }
-.miss-text { flex: 1 1 12rem; min-width: 0; overflow-wrap: anywhere; }
-.miss-add, .miss-chip { display: inline-flex; align-items: center; min-height: 44px; padding: 0 var(--fx-s3, 12px); font-weight: 600; color: var(--primary, #2457c5); text-decoration: underline; }
+.miss-line { display: block; margin: var(--fx-s1, 4px) 0; font-size: .9em; line-height: 1.5; color: var(--text, #1c2430); overflow-wrap: anywhere; }
+.miss-mark { display: inline-block; width: 1.35em; height: 1.35em; border-radius: 50%; border: 2px solid var(--warning-text, #6b4a00); background: var(--warning-bg, #fff4d6); color: var(--warning-text, #6b4a00); font-weight: 800; font-size: .85em; line-height: 1.1em; text-align: center; vertical-align: text-bottom; box-sizing: border-box; }
+.miss-text { overflow-wrap: anywhere; }
+/* The link is a 44px target without making the line taller: padding is cancelled by a negative margin. */
+.miss-add { display: inline-block; padding: 12px 8px; margin: -12px 0; font-weight: 600; color: var(--primary, #2457c5); text-decoration: underline; }
+.miss-chip { display: flex; align-items: center; justify-content: space-between; gap: var(--fx-s2, 8px); min-height: 44px; padding: 0 10px; font-weight: 600; font-size: .9em; color: var(--primary, #2457c5); background: var(--bg, #fff); border: 1px solid var(--border, #cfd6e0); border-radius: var(--radius, 10px); text-decoration: none; }
 .miss-add:focus-visible, .miss-chip:focus-visible { outline: 3px solid var(--primary, #2457c5); outline-offset: 2px; }
-.miss-box { background: var(--warning-bg, #fff4d6); color: var(--warning-text, #6b4a00); border: 1px solid var(--warning-text, #6b4a00); border-radius: var(--radius, 10px); padding: var(--fx-s2, 8px) var(--fx-s3, 12px); margin: var(--fx-s2, 8px) 0; max-width: 100%; }
-.miss-box .miss-mark { margin-right: var(--fx-s1, 4px); }
-.miss-lead { margin: 0; font-size: .95em; }
-.miss-chips { display: flex; flex-wrap: wrap; gap: var(--fx-s1, 4px) var(--fx-s2, 8px); list-style: none; margin: var(--fx-s1, 4px) 0 0; padding: 0; }
-.miss-chip { padding: 0 var(--fx-s3, 12px); background: var(--bg, #fff); color: var(--primary, #2457c5); border: 1px solid var(--border, #cfd6e0); border-radius: 999px; text-decoration: none; max-width: 100%; }
-.miss-n { margin-left: var(--fx-s2, 8px); font-weight: 700; color: var(--text, #1c2430); }
+.miss-box { background: var(--warning-bg, #fff4d6); color: var(--warning-text, #6b4a00); border: 1px solid var(--warning-text, #6b4a00); border-radius: var(--radius, 10px); padding: 6px 12px; margin: var(--fx-s2, 8px) 0; max-width: 100%; }
+.miss-box .miss-add { color: inherit; }
+.miss-box .miss-mark { margin-right: 2px; }
+.miss-box .miss-lead { margin: 0; font-size: .9em; line-height: 1.45; }
+.miss-box--one { padding-top: 10px; padding-bottom: 10px; }
+.miss-chips { display: grid; grid-template-columns: repeat(auto-fit, minmax(7.5rem, 1fr)); gap: var(--fx-s1, 4px) var(--fx-s2, 8px); list-style: none; margin: var(--fx-s1, 4px) 0 0; padding: 0; }
+.miss-chips li { min-width: 0; }
+.miss-n { font-weight: 700; color: var(--text, #1c2430); }
+.fx-trk-miss .miss-line { margin: 2px 0 13px; }
 /* inbox.css: the "Gmail connection" card. Tokens come from base.css. */
 .ib-card [hidden] { display: none !important; }
 .ib-card { overflow-wrap: anywhere; }
@@ -1103,8 +1122,8 @@ details.dir-filters { margin: 0 0 var(--space-1); }
 
   // ---- what My info is missing for a program ----
   var MISSING_KEYS = ['state', 'cover', 'insurer', 'lowIncome', 'job'];
-  var MISSING_LABELS = { state: 'your state', cover: 'your health cover', insurer: 'your health plan', lowIncome: 'the income question', job: 'the paid job question' };
-  var MISSING_SHORT = { state: 'Your state', cover: 'Health cover', insurer: 'Health plan', lowIncome: 'Income question', job: 'Paid job question' };
+  var MISSING_LABELS = { state: 'your state', cover: 'your health cover', insurer: 'your health plan', lowIncome: 'your income answer', job: 'your paid job answer' };
+  var MISSING_SHORT = { state: 'Your state', cover: 'Health cover', insurer: 'Health plan', lowIncome: 'Income', job: 'Paid job' };
   // Keys (in MISSING_KEYS order) of the My info answers that would settle whether the program applies.
   // [] when nothing is missing or the program is already ruled out.
   function missingInfo(p, profile) {
@@ -1590,7 +1609,16 @@ details.dir-filters { margin: 0 0 var(--space-1); }
   }
   function plural(n, w) { return n + ' ' + w + (n === 1 ? '' : 's'); }
 
+  function sp() { return document.createTextNode(' '); }
+  function addLink(many) {
+    var a = el('a', 'miss-add', many ? 'Add them' : 'Add it');
+    a.setAttribute('href', '#info');
+    a.appendChild(srText(' in My info'));
+    return a;
+  }
+
   // One line for a program: what My info is missing, with a link to add it. null when nothing is missing.
+  // It reads as one sentence: the mark, the text, then the link.
   function line(p, profile, opts) {
     var L = BFF.logic;
     opts = opts || {};
@@ -1604,35 +1632,54 @@ details.dir-filters { margin: 0 0 var(--space-1); }
     var n = el(opts.tag || 'p', 'miss-line');
     n.setAttribute('data-missing', keys.join(' '));
     n.appendChild(mark());
+    n.appendChild(sp());
     n.appendChild(el('span', 'miss-text', lead + 'My info is missing ' + L.missingInfoText(keys) + '.'));
-    var a = el('a', 'miss-add', keys.length === 1 ? 'Add it' : 'Add them');
-    a.setAttribute('href', '#info');
+    n.appendChild(sp());
+    var a = addLink(keys.length > 1);
     a.setAttribute('data-info-key', keys[0]);
-    a.appendChild(srText(' in My info'));
     n.appendChild(a);
     return n;
   }
 
-  // A box for a page header: how many programs depend on what, one chip per missing answer.
+  // A box for a page header. Full form: one chip per missing answer. One missing answer, or opts.compact:
+  // a single sentence and one link. null when nothing is missing.
   function notice(counts, opts) {
     var L = BFF.logic;
     if (!counts || !counts.total || !L) return null;
-    var box = el('div', 'miss-box');
+    opts = opts || {};
+    var keys = L.MISSING_KEYS.filter(function (k) { return counts.keys && counts.keys[k] > 0; });
+    if (!keys.length) return null;
+    var one = keys.length === 1 || opts.compact === true;
+    var box = el('div', 'miss-box' + (one ? ' miss-box--one' : ''));
     box.setAttribute('data-missing-total', String(counts.total));
+    box.setAttribute('data-missing-keys', keys.join(' '));
     var lead = el('p', 'miss-lead');
     lead.appendChild(mark());
-    lead.appendChild(document.createTextNode(' My info is missing details that '));
-    lead.appendChild(el('strong', '', plural(counts.total, 'program')));
-    lead.appendChild(document.createTextNode(counts.total === 1 ? ' depends on.' : ' depend on.'));
+    var pr = el('strong', '', plural(counts.total, 'program'));
+    if (keys.length === 1) {
+      lead.appendChild(document.createTextNode(' My info is missing ' + L.MISSING_LABELS[keys[0]] + '. '));
+      lead.appendChild(pr);
+      lead.appendChild(document.createTextNode(counts.total === 1 ? ' depends on it. ' : ' depend on it. '));
+    } else {
+      lead.appendChild(document.createTextNode(' My info is missing details that '));
+      lead.appendChild(pr);
+      lead.appendChild(document.createTextNode(counts.total === 1 ? ' depends on. ' : ' depend on. '));
+    }
+    if (one) {
+      var add = addLink(keys.length > 1);
+      add.setAttribute('data-info-key', keys[0]);
+      lead.appendChild(add);
+      box.appendChild(lead);
+      return box;
+    }
     box.appendChild(lead);
     var ul = el('ul', 'miss-chips');
-    L.MISSING_KEYS.forEach(function (k) {
-      var c = counts.keys && counts.keys[k];
-      if (!(c > 0)) return;
+    keys.forEach(function (k) {
+      var c = counts.keys[k];
       var a = el('a', 'miss-chip');
       a.setAttribute('href', '#info');
       a.setAttribute('data-info-key', k);
-      a.appendChild(document.createTextNode(L.MISSING_SHORT[k] + ' '));
+      a.appendChild(el('span', 'miss-label', L.MISSING_SHORT[k]));
       var n = el('span', 'miss-n', String(c));
       n.appendChild(srText(c === 1 ? ' program' : ' programs'));
       a.appendChild(n);
@@ -3556,7 +3603,7 @@ details.dir-filters { margin: 0 0 var(--space-1); }
     function noun(n) { var t = first ? plural(n, 'program') : String(n); first = false; return t; }
     if (l.otherState) {
       if (hasState) out.push([document.createTextNode(noun(l.otherState) + ' for other states')]);
-      else out.push([document.createTextNode(noun(l.otherState) + ' only for some states (add your state in '), h('a', { href: '#info', text: 'My info' }), document.createTextNode(')')]);
+      else out.push([document.createTextNode(noun(l.otherState) + ' only for some states (add your state in '), h('a', { href: '#info', 'data-info-key': 'state', text: 'My info' }), document.createTextNode(')')]);
     }
     if (l.noFit) out.push([document.createTextNode(noun(l.noFit) + ' that your answers in My info rule out')]);
     if (l.covered) out.push([document.createTextNode(l.covered + ' other ' + (l.covered === 1 ? 'way' : 'ways') + ' to get something you already signed up for')]);
@@ -3899,6 +3946,15 @@ details.dir-filters { margin: 0 0 var(--space-1); }
       r.more.appendChild(h('span', { class: 'fx-sr', text: ' (has a note)' }));
     }
   }
+  // "My info is missing ..." under a to-do row; it goes away when the status leaves to-do and returns with it.
+  function setMiss(r) {
+    var want = tracker.getStatus(r.p.id) === 'todo' && !!(BFF.missing && BFF.missing.line);
+    var n = want ? BFF.missing.line(r.p, profileOf()) : null;
+    if (!!n === !!r.missShown) return;
+    r.miss.textContent = '';
+    if (n) r.miss.appendChild(n);
+    r.missShown = !!n;
+  }
   // The row restyles in place; it only moves at the next full render.
   function syncRowLocal(r) {
     var st = tracker.getStatus(r.p.id);
@@ -3907,6 +3963,7 @@ details.dir-filters { margin: 0 0 var(--space-1); }
     r.el.classList.toggle('fx-moved', st !== r.rendered);
     setLine3(r);
     setMore(r);
+    setMiss(r);
   }
   function setOpen(r, open) {
     if (open && !r.built) buildPanel(r);
@@ -3969,12 +4026,15 @@ details.dir-filters { margin: 0 0 var(--space-1); }
     r.more = h('button', { type: 'button', id: 'trk-d-' + id, class: 'fx-btn fx-trk-more', 'aria-expanded': 'false', 'aria-controls': pid });
     r.panel = h('div', { id: pid, class: 'fx-trk-panel', hidden: '' });
     r.line3 = h('p', { class: 'fx-muted fx-trk-line3', hidden: '' });
+    r.miss = h('div', { class: 'fx-trk-miss' });
+    r.missShown = false;
     var meta = [p.brand, verdictLabel(p), L.valueText(p)].filter(Boolean).join(' ' + CTX + ' ');
     r.el = h('li', { class: 'fx-trk-row', 'data-id': id, 'data-status': st }, [
       h('div', { class: 'fx-trk-main' }, [
         h('strong', { class: 'fx-trk-title', text: p.name }),
         h('p', { class: 'fx-muted fx-trk-meta', text: meta }),
-        r.line3
+        r.line3,
+        r.miss
       ]),
       h('div', { class: 'fx-trk-actions' }, [
         link,
@@ -3985,6 +4045,7 @@ details.dir-filters { margin: 0 0 var(--space-1); }
     ]);
     setLine3(r);
     setMore(r);
+    setMiss(r);
     r.more.addEventListener('click', function () { setOpen(r, r.more.getAttribute('aria-expanded') !== 'true'); });
     select.addEventListener('change', function () {
       var ok;
@@ -4109,6 +4170,20 @@ details.dir-filters { margin: 0 0 var(--space-1); }
     }
   }
 
+  // The notice under the summary: how many to-do programs depend on missing My info answers.
+  function refreshMissing() {
+    if (!view.missBox) return;
+    var L = BFF.logic, M = BFF.missing;
+    var counts = L && L.missingInfoCounts ? L.missingInfoCounts(BFF.programs || [], profileOf(), function (id) { return tracker.getStatus(id); }) : null;
+    var sig = counts ? counts.total + ':' + L.MISSING_KEYS.map(function (k) { return counts.keys[k]; }).join(',') : '';
+    if (sig === view.missSig) return;
+    view.missSig = sig;
+    view.missBox.textContent = '';
+    var n = M && M.notice && counts ? M.notice(counts) : null;
+    if (n) view.missBox.appendChild(n);
+    view.missBox.hidden = !n;
+  }
+
   function flushAll() { view.flushers.forEach(function (f) { f(); }); }
 
   // A full render: scope, summary, tab counts, list. Tool folds and the Gmail panel are never touched.
@@ -4118,6 +4193,7 @@ details.dir-filters { margin: 0 0 var(--space-1); }
     var sc = computeScope();
     view.scope = sc;
     updateSummary(sc);
+    refreshMissing();
     renderList(sc);
     updateLeft(sc);
     syncEmailBits();
@@ -4128,6 +4204,7 @@ details.dir-filters { margin: 0 0 var(--space-1); }
     if (r) syncRowLocal(r);
     var sc = computeScope();
     updateSummary(sc);
+    refreshMissing();
     updateLeft(sc);
     refreshMailto();
   }
@@ -4147,6 +4224,8 @@ details.dir-filters { margin: 0 0 var(--space-1); }
     view.live = h('div', { class: 'fx-sr', role: 'status', 'aria-live': 'polite' });
     view.msg = h('p', { class: 'fx-hint fx-trk-alert', role: 'alert' });
     el.appendChild(h('div', { class: 'fx-card fx-trk-summary' }, [view.barText, view.bar, view.claimEl, view.claimNote, view.valueEl, view.empty]));
+    view.missBox = h('div', { class: 'fx-trk-miss-notice', hidden: '' });
+    el.appendChild(view.missBox);
     el.appendChild(view.storeWarn);
     el.appendChild(view.msg);
     el.appendChild(view.live);
@@ -4239,6 +4318,82 @@ details.dir-filters { margin: 0 0 var(--space-1); }
   ];
   var sitSel = {}, sitField = {};
   var phoneFold = null;
+  var root = null;
+  var needEls = {};      // key -> the "N programs depend on this." line under each of the five fields
+  var ask = null;        // { key, from, wrap, back } while a field is marked as the one asked for
+  var NEED_KEYS = ['state', 'cover', 'insurer', 'lowIncome', 'job'];
+
+  function statusLookup() {
+    return BFF.tracker && BFF.tracker.getStatus ? function (id) { return BFF.tracker.getStatus(id); } : undefined;
+  }
+  function controlFor(key) { return key === 'state' ? inputs.state : sitSel[key]; }
+  function wrapFor(key) { return key === 'state' ? (inputs.state && inputs.state.parentNode) : sitField[key]; }
+  // Under each unanswered field: how many programs still to do depend on it. Neutral, not an error.
+  function refreshNeeds() {
+    var L = BFF.logic;
+    if (!L || !L.missingInfoCounts || !needEls.state) return;
+    var pr = read();
+    var counts = L.missingInfoCounts(BFF.programs || [], pr, statusLookup());
+    NEED_KEYS.forEach(function (k) {
+      var n = counts.keys && counts.keys[k] > 0 ? counts.keys[k] : 0;
+      var answered = typeof pr[k] === 'string' && pr[k] !== '';
+      var el = needEls[k];
+      if (!el) return;
+      if (answered || !n) { el.textContent = ''; el.hidden = true; }
+      else { el.textContent = n === 1 ? '1 program depends on this.' : n + ' programs depend on this.'; el.hidden = false; }
+    });
+    if (ask) {
+      var c = controlFor(ask.key);
+      if (c && c.value) ask.wrap.classList.remove('fx-ask');
+    }
+  }
+  function needLine(key, control) {
+    var id = 'info-' + key + '-need';
+    var el = h('p', { id: id, class: 'fx-need', hidden: '' });
+    el.hidden = true;
+    var cur = control.getAttribute('aria-describedby');
+    control.setAttribute('aria-describedby', cur ? cur + ' ' + id : id);
+    needEls[key] = el;
+    return el;
+  }
+  function clearAsk() {
+    if (!ask) return;
+    ask.wrap.classList.remove('fx-ask');
+    if (ask.back && ask.back.parentNode) ask.back.parentNode.removeChild(ask.back);
+    ask = null;
+  }
+  var BACK = { directory: 'Back to Programs', tracker: 'Back to Tracker', guided: 'Back to Do it for me' };
+  function applyAsk(w) {
+    var key = w && w.key;
+    if (NEED_KEYS.indexOf(key) === -1) return;
+    if (key === 'insurer' && sitField.insurer.hidden) key = 'cover';
+    var wrap = wrapFor(key), control = controlFor(key);
+    if (!wrap || !control) return;
+    ask = { key: key, from: w.from, wrap: wrap, back: null };
+    wrap.classList.add('fx-ask');
+    if (BACK[w.from]) {
+      ask.back = h('a', { class: 'fx-ask-back', href: '#' + w.from, text: BACK[w.from] });
+      wrap.appendChild(ask.back);
+    }
+    var reduce = false;
+    try { reduce = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches); } catch (e) {}
+    setTimeout(function () {
+      try { wrap.scrollIntoView({ block: 'center', behavior: reduce ? 'auto' : 'smooth' }); } catch (e) { wrap.scrollIntoView(); }
+      control.focus({ preventScroll: true });
+    }, 0);
+  }
+  // A pending save is written when the person leaves My info, so the next page shows the new answer at once.
+  function flushPending() { if (timer) { clearTimeout(timer); saveNow(); } }
+  function visible() { return !!root && !root.hidden && root.offsetParent !== null; }
+  document.addEventListener('click', function (e) {
+    var t = e.target;
+    if (t && t.nodeType === 3) t = t.parentNode;
+    if (!timer || !visible() || !t || !t.closest) return;
+    if (t.closest('a[href^="#"]')) flushPending();
+  }, true);
+  window.addEventListener('hashchange', flushPending);
+  document.addEventListener('bff:profile-changed', refreshNeeds);
+  document.addEventListener('bff:tracker-changed', refreshNeeds);
 
   // bff.prefs.v1.infoFillOpen: whether the phone fold is open. Read the object, change the key, write it back.
   function readFillOpen() {
@@ -4384,6 +4539,7 @@ details.dir-filters { margin: 0 0 var(--space-1); }
   BFF.views.info = {
     init: function (el) {
       el.classList.add('fx-view');
+      root = el;
       if (!el.querySelector('h2')) el.appendChild(h('h2', { tabindex: '-1', text: 'My info' }));
       el.appendChild(h('p', { class: 'fx-note', text: 'Stored only in this browser on this device. This app has no server and makes no network requests, so your details never leave your device. Clearing your browser data deletes them.' }));
       el.appendChild(h('p', { class: 'fx-tip', text: 'Tip: Use a dedicated inbox or a plus address like yourname+baby@gmail.com. Sign-up mail is easy to filter, and you can see who shares your address.' }));
@@ -4417,13 +4573,14 @@ details.dir-filters { margin: 0 0 var(--space-1); }
         });
         if (f.check) input.addEventListener('blur', function () { validate(f); });
         if (f.key === 'email') { input.addEventListener('change', updatePlus); input.addEventListener('blur', updatePlus); }
-        form.appendChild(h('div', { class: 'fx-field' }, [h('label', { 'for': id, text: f.label }), input, hint]));
+        form.appendChild(h('div', { class: 'fx-field' }, [h('label', { 'for': id, text: f.label }), input, hint, f.key === 'state' ? needLine('state', input) : null]));
+        if (f.key === 'state') input.addEventListener('change', function () { if (input.value && ask && ask.key === 'state') ask.wrap.classList.remove('fx-ask'); });
       });
       el.appendChild(form);
 
       var sit = h('section', { class: 'fx-card fx-form fx-situation', 'aria-labelledby': 'info-sit-h' }, [
         h('h3', { id: 'info-sit-h', text: 'Your situation (optional)' }),
-        h('p', { class: 'fx-muted', text: 'Used only to hide programs that cannot apply to you. Stays on this device.' })
+        h('p', { class: 'fx-muted', text: 'Used only to work out which programs can apply to you. Stays on this device.' })
       ]);
       SITUATION.forEach(function (d) {
         var id = 'info-' + d.key;
@@ -4433,6 +4590,7 @@ details.dir-filters { margin: 0 0 var(--space-1); }
           sel.appendChild(h('option', { value: o[0], text: o[1] }));
         });
         sel.addEventListener('change', function () {
+          if (sel.value && ask && ask.key === d.key) ask.wrap.classList.remove('fx-ask');
           if (d.key === 'cover') syncSituation(read());
           statusEl.className = 'fx-saved fx-saved--block';
           statusEl.textContent = 'Saving…';
@@ -4440,7 +4598,7 @@ details.dir-filters { margin: 0 0 var(--space-1); }
           timer = setTimeout(saveNow, 400);
         });
         sitSel[d.key] = sel;
-        var fld = h('div', { class: 'fx-field', 'data-situation': d.key }, [h('label', { 'for': id, text: d.label }), sel]);
+        var fld = h('div', { class: 'fx-field', 'data-situation': d.key }, [h('label', { 'for': id, text: d.label }), sel, needLine(d.key, sel)]);
         sitField[d.key] = fld;
         sit.appendChild(fld);
       });
@@ -4498,12 +4656,16 @@ details.dir-filters { margin: 0 0 var(--space-1); }
       el.appendChild(phoneFold);
       if (BFF.phoneView && BFF.phoneView.mount) BFF.phoneView.mount(phoneNode);
       fill();
-      function flush() { if (timer) { clearTimeout(timer); saveNow(); } }
+      function flush() { flushPending(); }
       window.addEventListener('pagehide', flush);
       document.addEventListener('visibilitychange', function () { if (document.visibilityState === 'hidden') flush(); });
     },
     show: function () {
       if (!timer) fill();
+      clearAsk();
+      refreshNeeds();
+      var want = BFF.missing && BFF.missing.take ? BFF.missing.take() : null;
+      if (want) applyAsk(want);
       // Arrived through the guided page's "Set up the fill script" link: open the fold, scroll to it, focus its summary.
       // Done after the router has moved focus and scrolled to the top.
       if (BFF.openInfoFill) {
@@ -4694,6 +4856,7 @@ details.dir-filters { margin: 0 0 var(--space-1); }
     els.stateBox = h('div', { class: 'dir-state', hidden: true });
     els.fitBox = h('div', { class: 'dir-state dir-fit', hidden: true });
     els.summary = h('section', { class: 'dir-summary', 'aria-label': 'Summary' });
+    els.missBox = h('div', { class: 'dir-miss', hidden: true });
 
     els.count = h('p', { class: 'result-count', tabindex: '-1', 'aria-live': 'polite', 'aria-atomic': 'true' });
     var resultRow = h('div', { class: 'result-row' }, [els.count, els.clear]);
@@ -4720,6 +4883,7 @@ details.dir-filters { margin: 0 0 var(--space-1); }
     });
 
     root.appendChild(els.summary);
+    root.appendChild(els.missBox);
     root.appendChild(search);
     root.appendChild(els.tabs);
     root.appendChild(els.filterBox);
@@ -4785,6 +4949,24 @@ details.dir-filters { margin: 0 0 var(--space-1); }
     return null;
   }
 
+  // What My info is missing for this program, only while it is still to do.
+  function missLine(p) {
+    if (!BFF.missing || statusOf(p.id) !== 'todo') return null;
+    return BFF.missing.line(p, profile);
+  }
+  function byProgramId(id) {
+    var l = programs();
+    for (var i = 0; i < l.length; i++) if (l[i].id === id) return l[i];
+    return null;
+  }
+  function renderMissBox() {
+    if (!els.missBox) return;
+    els.missBox.textContent = '';
+    var n = BFF.missing && L.missingInfoCounts ? BFF.missing.notice(L.missingInfoCounts(programs(), profile, statusOf)) : null;
+    if (n) els.missBox.appendChild(n);
+    els.missBox.hidden = !n;
+  }
+
   function card(p, level, rank, ctx) {
     var cost = p.costToClaim;
     var open = !!openCards[p.id];
@@ -4812,6 +4994,8 @@ details.dir-filters { margin: 0 0 var(--space-1); }
         : h('p', { class: 'free-line free-none', text: L.freeNote(p) }));
     }
     kids.push(h('p', { class: 'value-line' }, [h('strong', { text: L.valueText(p) })]));
+    var ml = missLine(p);
+    if (ml) kids.push(ml);
 
     var link = h('a', { class: 'btn btn-primary', href: p.signupUrl, target: '_blank', rel: 'noopener noreferrer' }, [
       document.createTextNode('Sign up on ' + L.domainOf(p.signupUrl) + ' '),
@@ -4936,11 +5120,11 @@ details.dir-filters { margin: 0 0 var(--space-1); }
       var kids = [document.createTextNode(t)];
       if (info.hide) {
         kids.push(document.createTextNode('Add your state in '));
-        kids.push(h('a', { href: '#info', text: 'My info' }));
+        kids.push(h('a', { href: '#info', 'data-info-key': 'state', text: 'My info' }));
         kids.push(document.createTextNode(' to see the ones for you.'));
       } else {
         kids.push(document.createTextNode('Add your state in '));
-        kids.push(h('a', { href: '#info', text: 'My info' }));
+        kids.push(h('a', { href: '#info', 'data-info-key': 'state', text: 'My info' }));
         kids.push(document.createTextNode(' to narrow them.'));
       }
       els.stateBox.appendChild(h('p', null, kids));
@@ -5031,14 +5215,6 @@ details.dir-filters { margin: 0 0 var(--space-1); }
     }
     box.appendChild(top);
     box.appendChild(h('p', { class: 'sum-more', text: more + ' more ' + (more === 1 ? 'is' : 'are') + ' free if you qualify.' }));
-    // With answers given, the fit box below says how many programs they hide, so only the prompt is shown here.
-    if (!L.hasSituation(profile)) {
-      box.appendChild(h('p', { class: 'sum-situation' }, [
-        document.createTextNode('Answer four quick questions in '),
-        h('a', { href: '#info', text: 'My info' }),
-        document.createTextNode(' to hide programs that cannot apply to you.')
-      ]));
-    }
 
     var due = typeof profile.dueDate === 'string' ? profile.dueDate.trim() : '';
     var wk = due ? L.weeksUntil(due) : null;
@@ -5130,6 +5306,7 @@ details.dir-filters { margin: 0 0 var(--space-1); }
     renderFitBox(fInfo);
     renderStateBox(info);
     renderSummary(pool, fInfo);
+    renderMissBox();
     els.count.textContent = 'Showing ' + shown.length + ' of ' + pool.length + ' programs';
     els.empty.hidden = shown.length !== 0;
     shownIds = shown.map(function (p) { return p.id; });
@@ -5177,6 +5354,17 @@ details.dir-filters { margin: 0 0 var(--space-1); }
       var stv = statusOf(badges[j].getAttribute('data-program-id'));
       if (sb) { sb.hidden = stv === 'todo'; sb.textContent = stv === 'todo' ? '' : statusLabel(stv); }
     }
+    for (var m = 0; m < badges.length; m++) {
+      var pid = badges[m].getAttribute('data-program-id');
+      var oldLine = badges[m].querySelector('.miss-line');
+      var prog = byProgramId(pid);
+      var want = prog ? missLine(prog) : null;
+      if (!oldLine && !want) continue;
+      if (oldLine && want && oldLine.getAttribute('data-missing') === want.getAttribute('data-missing')) continue;
+      if (oldLine) oldLine.parentNode.removeChild(oldLine);
+      if (want) { var foot = badges[m].querySelector('.card-foot'); badges[m].insertBefore(want, foot); }
+    }
+    renderMissBox();
     var sels = els.list.querySelectorAll('select[data-program-id]');
     for (var i = 0; i < sels.length; i++) {
       var s = BFF.tracker.getStatus(sels[i].getAttribute('data-program-id')) || 'todo';
@@ -5254,6 +5442,15 @@ details.dir-filters { margin: 0 0 var(--space-1); }
   }
   function gkey(p) { return BFF.logic && BFF.logic.groupKey ? BFF.logic.groupKey(p) : (p.sameAs || p.id); }
   function isSide(p) { var v = BFF.logic && BFF.logic.verdict ? BFF.logic.verdict(p) : ''; return v === 'conditional' || v === 'longshot'; }
+  function missingCounts() {
+    var L = BFF.logic;
+    return L && L.missingInfoCounts ? L.missingInfoCounts(progs(), profile(), function (id) { return T().getStatus(id); }) : null;
+  }
+  // The shared "My info is missing ..." line for a program that is still to do.
+  function missLine(p) {
+    if (!BFF.missing || T().getStatus(p.id) !== 'todo') return null;
+    return BFF.missing.line(p, profile());
+  }
   function handled(p) { return T().getStatus(p.id) !== 'todo'; }
   function profile() {
     var p = store.get('profile.v1', {});
@@ -5421,9 +5618,35 @@ details.dir-filters { margin: 0 0 var(--space-1); }
 
   // At most one program per group of the same thing (the best ranked one that qualifies),
   // and none in a group where another member is already signed up or received.
+  var seen = null; // ids that were listed the last time the selection was looked at
+  function visibleNow() {
+    var v = {};
+    progs().forEach(function (p) { if (!hiddenHere(p)) v[p.id] = true; });
+    return v;
+  }
+  // Programs that became visible since then (the person added their state, say) get the normal default.
+  // Boxes the person could already see are not touched. Never used after preselect(), which resets `seen`.
+  function applyNewDefaults() {
+    var now = visibleNow();
+    if (!seen) { seen = now; return; }
+    var done = {}, taken = {};
+    progs().forEach(function (p) {
+      var st = T().getStatus(p.id);
+      if (st === 'signed-up' || st === 'received') done[gkey(p)] = true;
+      if (selected[p.id]) taken[gkey(p)] = true;
+    });
+    ranked(progs()).forEach(function (p) {
+      if (!now[p.id] || seen[p.id]) return;
+      var k = gkey(p);
+      if (done[k] || taken[k]) return;
+      if (!handled(p) && defaultOn(p)) { selected[p.id] = true; taken[k] = true; }
+    });
+    seen = now;
+  }
   function initSelection() {
     selected = {};
     preorder = null;
+    seen = visibleNow();
     var done = {}, taken = {};
     progs().forEach(function (p) {
       var st = T().getStatus(p.id);
@@ -5446,6 +5669,9 @@ details.dir-filters { margin: 0 0 var(--space-1); }
       var w = h('p', { class: 'fx-warn' }, [document.createTextNode('My info is empty, so there is nothing to copy yet. '), h('a', { href: '#info', text: 'Fill in My info' }), document.createTextNode(' first.')]);
       body.appendChild(w);
     }
+    var counts = missingCounts();
+    var mn = BFF.missing && counts ? BFF.missing.notice(counts, { compact: true }) : null;
+    if (mn) body.appendChild(h('div', { class: 'gd-miss-box' }, [mn]));
     var count = h('p', { class: 'fx-count', role: 'status', 'aria-live': 'polite' });
     var start = h('button', { type: 'button', class: 'fx-btn fx-btn--primary' });
     var boxes = {};
@@ -5503,19 +5729,22 @@ details.dir-filters { margin: 0 0 var(--space-1); }
       boxes[p.id] = cb;
       var st = T().getStatus(p.id);
       var muted = [p.brand, verdictLabel(p), BFF.logic.valueText ? BFF.logic.valueText(p) : '', st !== 'todo' ? T().LABELS[st] : ''].filter(Boolean).join(' · ');
-      return h('div', { class: cls }, [cb, h('label', { 'for': id }, [
+      var row = h('div', { class: cls }, [cb, h('label', { 'for': id }, [
         h('strong', { text: p.name }),
         h('span', { class: 'fx-small fx-pick-free', text: freeLine(p) }),
         h('span', { class: 'fx-muted fx-pick-meta', text: muted })
       ])]);
+      var ml = missLine(p);
+      // A sibling of the row, never inside the label (it holds a link).
+      return ml ? [row, h('div', { class: 'gd-miss' }, [ml])] : [row];
     }
     function groupItem(g) {
-      var kids = [pickRow(g.lead, 'fx-pick-row')];
+      var kids = pickRow(g.lead, 'fx-pick-row');
       if (g.others.length) {
         var n = g.others.length;
         var det = h('details', { class: 'fx-alt' }, [
           h('summary', { text: n === 1 ? '1 more way to get the same thing' : n + ' more ways to get the same thing' }),
-          h('div', { class: 'fx-alt-list' }, g.others.map(function (o) { return pickRow(o, 'fx-pick-row fx-pick-alt'); }))
+          h('div', { class: 'fx-alt-list' }, g.others.reduce(function (acc, o) { return acc.concat(pickRow(o, 'fx-pick-row fx-pick-alt')); }, []))
         ]);
         altDets.push({ g: g, det: det });
         kids.push(det);
@@ -5628,6 +5857,8 @@ details.dir-filters { margin: 0 0 var(--space-1); }
     var wl = worthLine(p);
     if (wl) body.appendChild(h('p', { class: 'fx-small fx-tight', text: wl }));
     body.appendChild(h('p', { class: 'fx-small fx-tight', text: freeLine(p) }));
+    var rml = missLine(p);
+    if (rml) body.appendChild(rml);
 
     // (b) open link: a real anchor, so it works wherever links work (no window.open)
     var open = h('a', { class: 'fx-btn fx-btn--primary fx-btn--big', href: p.signupUrl, target: '_blank', rel: 'noopener noreferrer', text: 'Open sign-up page \u2197' });
@@ -5786,7 +6017,7 @@ details.dir-filters { margin: 0 0 var(--space-1); }
     if (!body) return;
     if (run && run.step === 'run') renderRun();
     else if (run && run.step === 'finish') renderFinish();
-    else { actions = null; if (!selected) initSelection(); renderSetup(); }
+    else { actions = null; if (!selected) initSelection(); else applyNewDefaults(); renderSetup(); }
     focusHeading = false;
   }
 
@@ -5817,6 +6048,7 @@ details.dir-filters { margin: 0 0 var(--space-1); }
       var valid = {};
       (Array.isArray(ids) ? ids : []).forEach(function (id) { if (byId(id)) valid[id] = true; });
       selected = valid;
+      seen = visibleNow();
       preorder = (Array.isArray(ids) ? ids : []).filter(function (id, i, a) { return valid[id] && a.indexOf(id) === i; });
       undoInfo = null;
       if (run) { run = null; saveRun(); }
@@ -5837,6 +6069,8 @@ details.dir-filters { margin: 0 0 var(--space-1); }
       if (run && run.autoOpenNext === false) autoOpen = false;
       if (run && run.shortcuts === true) shortcutsOn = true;
       document.addEventListener('keydown', onKey);
+      // A save that lands late: draw again with the selection kept. When hidden, show() draws it.
+      document.addEventListener('bff:profile-changed', function () { if (el && !el.hidden) render(); });
       render();
     },
     show: function () {

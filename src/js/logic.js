@@ -302,8 +302,8 @@
 
   // ---- what My info is missing for a program ----
   var MISSING_KEYS = ['state', 'cover', 'insurer', 'lowIncome', 'job'];
-  var MISSING_LABELS = { state: 'your state', cover: 'your health cover', insurer: 'your health plan', lowIncome: 'the income question', job: 'the paid job question' };
-  var MISSING_SHORT = { state: 'Your state', cover: 'Health cover', insurer: 'Health plan', lowIncome: 'Income question', job: 'Paid job question' };
+  var MISSING_LABELS = { state: 'your state', cover: 'your health cover', insurer: 'your health plan', lowIncome: 'your income answer', job: 'your paid job answer' };
+  var MISSING_SHORT = { state: 'Your state', cover: 'Health cover', insurer: 'Health plan', lowIncome: 'Income', job: 'Paid job' };
   // Keys (in MISSING_KEYS order) of the My info answers that would settle whether the program applies.
   // [] when nothing is missing or the program is already ruled out.
   function missingInfo(p, profile) {
