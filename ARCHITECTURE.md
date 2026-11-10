@@ -276,7 +276,7 @@ Meaning of `certainty` values:
 - `if-eligible`: certain once you meet income, insurance, state or similar rules.
 - `chance`: a draw or a selection. Most people get nothing.
 
-Value rules: count only what a family gets without buying something just to get it. For coupons and points, count the saving on things they would buy anyway. Use `official` only when the official page gives the figure. An `estimate` uses ordinary US shelf prices, and `valueBasis` shows the sum (for example "2 sample cans at about $20 each"). Never present an estimate as the brand's own figure.
+Value rules: count only what a family gets without buying something just to get it. For coupons and points, count the saving on things they would buy anyway. Use `official` only when the official page gives the figure. An `estimate` uses ordinary US shelf prices, and `valueBasis` shows the sum (for example "2 sample cans at about $20 each"). Never present an estimate as the brand's own figure. For `coverage` and `cash`, estimate the bills paid or the money received and say what the figure rests on; a free service with no usual price keeps null values.
 
 New category: `money` ("Money and savings"), for cash programs such as account deposits for newborns, tax credits and paid leave. It goes after `assistance` in `CATEGORIES`.
 
@@ -285,7 +285,7 @@ New category: `money` ("Money and savings"), for cash programs such as account d
 - `CERTAINTY_LABELS`: guaranteed → "Everyone who signs up gets it", likely → "Most people get it, supplies vary", if-eligible → "Only if you qualify", chance → "Only if you are picked or win".
 - `EFFORT_LABELS`: quick → "About 5 minutes", some → "Takes some setup", involved → "Application or appointment".
 - `WHEN_LABELS`: pregnancy → "Now, while pregnant", late-pregnancy → "In the last weeks before the due date", after-birth → "After the baby arrives", anytime → "Any time". `WHEN_ORDER` is that order.
-- `VERDICTS`: ordered list of `{id, label}`: top → "Top pick", good → "Worth doing", small → "Small extra", conditional → "Only if you would buy anyway", longshot → "Long shot".
+- `VERDICTS`: ordered list of `{id, label}`: top → "Top pick", good → "Worth doing", small → "Also free", conditional → "Only if you would buy anyway", longshot → "Long shot".
 - `isTrulyFree(p)` (changed): `costToClaim === 'free'`, requirements include neither `purchase` nor `membership`, `offers[0] === 'product'`, and `certainty` is not `chance`. A program with no `offers` is not truly free.
 - `isOpenToAll(p)`: `certainty !== 'if-eligible'` and `!isEligibilityBased(p)`.
 - `guidedDefault(p)` keeps its formula (`isTrulyFree(p) && !isEligibilityBased(p)`), so it narrows with `isTrulyFree`.
