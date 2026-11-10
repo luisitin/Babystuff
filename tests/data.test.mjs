@@ -13,7 +13,7 @@ const EXPECTED_KEYS = [
   'id', 'name', 'brand', 'category', 'whatYouGet', 'offers', 'certainty', 'freeStuff',
   'valueLow', 'valueHigh', 'valueSource', 'valueBasis', 'costToClaim', 'costDetail',
   'requirements', 'eligibility', 'region', 'states', 'effort', 'when', 'whenNote',
-  'signupUrl', 'sourceUrls', 'verifiedOn', 'confidence', 'catches', 'notes',
+  'signupUrl', 'sourceUrls', 'verifiedOn', 'confidence', 'catches', 'notes', 'sameAs',
 ];
 const ARRAY_KEYS = ['offers', 'requirements', 'states', 'sourceUrls'];
 const NUMBER_KEYS = ['valueLow', 'valueHigh'];
@@ -35,7 +35,8 @@ const SLD_LABELS = new Set(['gov', 'org', 'com', 'co', 'net', 'edu', 'ac']);
 function registrableDomain(hostname) {
   const labels = hostname.toLowerCase().split('.');
   const n = labels.length;
-  if (n >= 3 && labels[n - 1].length === 2 && SLD_LABELS.has(labels[n - 2])) {
+  const stateUs = n >= 3 && labels[n - 1] === 'us' && labels[n - 2].length === 2;
+  if (stateUs || (n >= 3 && labels[n - 1].length === 2 && SLD_LABELS.has(labels[n - 2]))) {
     return labels.slice(-3).join('.');
   }
   return labels.slice(-2).join('.');
@@ -297,4 +298,52 @@ test('no program whose first offer is sweepstakes, coupons, points or testing is
 test('every program that is truly free has a non-empty freeStuff', () => {
   check('freeStuff', (p) => L.isTrulyFree(p) && p.freeStuff.trim() === '' ? 'truly free but freeStuff is empty' : null);
   assert.ok(programs.filter((p) => L.isTrulyFree(p)).length > 0, 'no truly free programs at all');
+});
+
+test('sameAs is a string; when set it names another main program', () => {
+  const byId = new Map(programs.map((p) => [p.id, p]));
+  check('sameAs', (p) => {
+    if (typeof p.sameAs !== 'string') return 'sameAs must be a string';
+    if (p.sameAs === '') return null;
+    if (p.sameAs === p.id) return 'sameAs names itself';
+    const main = byId.get(p.sameAs);
+    if (!main) return `sameAs names a missing id "${p.sameAs}"`;
+    if (main.sameAs !== '') return `main program "${main.id}" has its own sameAs`;
+    return null;
+  });
+});
+
+test('the insurance-covered breast pump suppliers point to the one main benefit', () => {
+  const ids = ['edgepark-breast-pump-insurance', 'byram-healthcare-breast-pumps-insurance',
+    '1-natural-way-breast-pump-insurance', 'aeroflow-breastpumps-insurance', 'tricare-breast-pump-and-supplies'];
+  for (const id of ids) {
+    assert.equal(programs.find((p) => p.id === id).sameAs, 'healthcare-gov-insurance-covered-breast-pump', id);
+  }
+});
+
+test('every registry completion discount is valued as an estimate', () => {
+  const ids = ['amazon-baby-registry-completion-discount', 'macys-baby-registry-completion-discount',
+    'babylist-registry-completion-discount', 'crate-and-kids-registry-completion-discount',
+    'pottery-barn-kids-registry-completion-discount', 'target-registry-completion-discount',
+    'bloomingdales-baby-registry-completion-discount'];
+  for (const id of ids) {
+    const p = programs.find((x) => x.id === id);
+    assert.ok(p, `missing ${id}`);
+    assert.equal(p.valueSource, 'estimate', id);
+    assert.ok(/\$200 to \$600/.test(p.valueBasis), `${id} valueBasis should name the $200 to $600 scale`);
+  }
+});
+
+test('a program whose only value is a partial refund of a cost needs a purchase', () => {
+  const p = programs.find((x) => x.id === 'irs-child-dependent-care-credit-fsa');
+  assert.equal(p.costToClaim, 'purchase-required');
+  assert.ok(p.requirements.includes('purchase'));
+});
+
+test('merged-out ids are gone and the per-state paid leave entries exist', () => {
+  const ids = new Set(programs.map((p) => p.id));
+  assert.ok(!ids.has('state-paid-family-leave-programs'));
+  assert.ok(!ids.has('baby-dove-newsletter-samples'));
+  for (const id of ['ca-paid-family-leave-sdi', 'ny-paid-family-leave', 'wa-paid-family-medical-leave']) assert.ok(ids.has(id), id);
+  assert.ok(!programs.find((p) => p.id === 'caresource-babies-first-rewards').states.includes('GA'));
 });

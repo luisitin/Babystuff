@@ -1,5 +1,43 @@
 [
   {
+    "id": "babys-only-free-sample-shipping",
+    "name": "Baby's Only A2 organic formula free sample",
+    "brand": "Baby's Only (Nature's One)",
+    "category": "formula",
+    "whatYouGet": "The A2 Organic Milk infant formula page says you can get a free sample and pay only shipping. Nature's One also has a free-sample-program page.",
+    "offers": [
+      "product"
+    ],
+    "certainty": "likely",
+    "freeStuff": "",
+    "valueLow": null,
+    "valueHigh": null,
+    "valueSource": "none",
+    "valueBasis": "",
+    "costToClaim": "shipping-fee",
+    "costDetail": "Page says \"just pay for shipping\"; the shipping amount and sample size were not shown in search results",
+    "requirements": [
+      "email",
+      "address"
+    ],
+    "eligibility": "Not stated. Limits, if any, were not visible.",
+    "region": "US",
+    "states": [],
+    "effort": "quick",
+    "when": "late-pregnancy",
+    "whenNote": "",
+    "signupUrl": "https://babysonly.com/products/organic-gentle-infant-formula",
+    "sourceUrls": [
+      "https://babysonly.com/products/organic-gentle-infant-formula",
+      "https://naturesone.com/free-sample-program"
+    ],
+    "verifiedOn": "2026-11-10",
+    "confidence": "low",
+    "catches": "Search snippets of the offer text may be old (one page showed as indexed years ago). The sample size, shipping cost and whether it is still offered are unconfirmed, and checkout may add a subscription; read the cart before paying. A full can is listed at about $186, so this is a try-before-you-buy route, not free formula.",
+    "notes": "A separate Baby's Only toddler page links to a USDA Organic sample offer with no terms shown. Nature's One blog says it would send a free full-size sample (blog is a lead only).",
+    "sameAs": ""
+  },
+  {
     "id": "enfamil-family-beginnings",
     "name": "Enfamil Family Beginnings",
     "brand": "Enfamil (Mead Johnson / Reckitt)",
@@ -40,7 +78,8 @@
     "verifiedOn": "2026-11-10",
     "confidence": "medium",
     "catches": "Samples are not guaranteed: the help center says samples are not always available and often come through the hospital or a doctor. Mailed samples arrive in about 3 to 5 weeks. The Wonder Box page and the sweepstakes say the promotion ends Dec 31, 2026, so whether it continues for 2027 births is unconfirmed. Joining agrees to receive offers from Enfamil and affiliated Reckitt brands.",
-    "notes": "Quick form asks first and last name, email and due or birth date. Enfamil Rewards points (100 for joining, 1,000 for first app login) are part of the same sign-up."
+    "notes": "Quick form asks first and last name, email and due or birth date. Enfamil Rewards points (100 for joining, 1,000 for first app login) are part of the same sign-up.",
+    "sameAs": ""
   },
   {
     "id": "gerber-mygerber-baby",
@@ -78,7 +117,8 @@
     "verifiedOn": "2026-11-10",
     "confidence": "medium",
     "catches": "Samples are only 'if they become available' and an address is required only if you tick the sample box. Gerber also markets a new-member sample box, but no published schedule or sample eligibility was found. Good Start formula has moved to Perrigo, so the current sample offer is unconfirmed. Results only mention samples 'when available'; the offer of a free product is unconfirmed, so product is listed second.",
-    "notes": "gerber.com blocks automated reading, so details come from gerber.com search results only and may be incomplete. On 2026-11-10 the sign-up link was moved to the \"Join MyGerber Membership\" page on www.gerber.com because the older register.gerber.com address did not resolve in our link check."
+    "notes": "gerber.com blocks automated reading, so details come from gerber.com search results only and may be incomplete. On 2026-11-10 the sign-up link was moved to the \"Join MyGerber Membership\" page on www.gerber.com because the older register.gerber.com address did not resolve in our link check.",
+    "sameAs": ""
   },
   {
     "id": "similac-mysimilac-rewards",
@@ -118,7 +158,8 @@
     "verifiedOn": "2026-11-08",
     "confidence": "high",
     "catches": "Samples are not guaranteed ('may'). The Shutterfly free photo book shown on the page carried an offer expiry of July 31, 2026, so it is not listed. Optional SMS opt-in; email and postal marketing continue even if you decline texts. Points are earned only when a coupon is redeemed (5 points each); a special coupon comes at 35 points. Some offers may need a visit to a participating healthcare facility. Program can change or end at any time.",
-    "notes": "Registration asks for name, home address, email and baby's birth or due date, plus a password. Coupons may arrive by mail, in your account or by email."
+    "notes": "Registration asks for name, home address, email and baby's birth or due date, plus a password. Coupons may arrive by mail, in your account or by email.",
+    "sameAs": ""
   },
   {
     "id": "enfamil-nutramigen-support-program",
@@ -156,7 +197,8 @@
     "verifiedOn": "2026-11-08",
     "confidence": "high",
     "catches": "Sample contents and timing are not specified on the page; some gifts may arrive closer to your due date. Form includes an optional mobile number for text messages. Agrees to receive offers from Mead Johnson affiliated companies and shares your information with them.",
-    "notes": "Form asks name, email, address, due or birth date and relationship to baby. Talk to your pediatrician before choosing a hypoallergenic formula. Page no longer mentions insurance support."
+    "notes": "Form asks name, email, address, due or birth date and relationship to baby. Talk to your pediatrician before choosing a hypoallergenic formula. Page no longer mentions insurance support.",
+    "sameAs": ""
   },
   {
     "id": "similac-alimentum-rewards",
@@ -195,7 +237,8 @@
     "verifiedOn": "2026-11-10",
     "confidence": "low",
     "catches": "Results do not confirm what is sent. The photo book on the welcome page has expired. Samples are 'may', not promised. Likely overlaps with MySimilac Rewards; one account per household per child.",
-    "notes": "Seen only as official-domain search results. Join the main MySimilac Rewards program first and use this only if your baby needs a specialty formula."
+    "notes": "Seen only as official-domain search results. Join the main MySimilac Rewards program first and use this only if your baby needs a specialty formula.",
+    "sameAs": ""
   },
   {
     "id": "amazon-family-diaper-savings",
@@ -232,7 +275,48 @@
     "verifiedOn": "2026-11-10",
     "confidence": "medium",
     "catches": "Discount varies by item (listings showed 15% to 25%). The Prime fee is not counted in the value. Amazon may change the terms.",
-    "notes": "Seen only as official-domain search results."
+    "notes": "Seen only as official-domain search results.",
+    "sameAs": ""
+  },
+  {
+    "id": "delaware-medicaid-postpartum-diapers-meals",
+    "name": "Delaware Medicaid postpartum diapers, wipes and meals",
+    "brand": "Delaware Health and Social Services (Diamond State Health Plan)",
+    "category": "diapers-wipes",
+    "whatYouGet": "For 12 weeks after birth, Medicaid covers up to 80 diapers and a pack of wipes a week, plus home-delivered meals or a shelf-stable food box.",
+    "offers": [
+      "product"
+    ],
+    "certainty": "if-eligible",
+    "freeStuff": "Free diapers, wipes and meals for 12 weeks after birth for Delaware Medicaid members.",
+    "valueLow": 250,
+    "valueHigh": 325,
+    "valueSource": "estimate",
+    "valueBasis": "80 diapers a week for 12 weeks at about $0.30 plus 12 packs of wipes at about $3; meals not counted",
+    "costToClaim": "free",
+    "costDetail": "Covered by Delaware Medicaid for postpartum members.",
+    "requirements": [
+      "insurance",
+      "eligibility"
+    ],
+    "eligibility": "Low-income postpartum members of the Diamond State Health Plan (Delaware Medicaid).",
+    "region": "Delaware",
+    "states": [
+      "DE"
+    ],
+    "effort": "some",
+    "when": "after-birth",
+    "whenNote": "Benefit runs for the first 12 weeks after birth.",
+    "signupUrl": "https://dhss.delaware.gov/dmma/home/medicaid/waiver-programs/",
+    "sourceUrls": [
+      "https://dhss.delaware.gov/dmma/home/medicaid/waiver-programs/",
+      "https://news.delaware.gov/2024/06/03/delaware-first-to-focus-on-healthier-start-for-new-moms-with-12-weeks-of-free-diapers-home-delivered-meals/"
+    ],
+    "verifiedOn": "2026-11-10",
+    "confidence": "low",
+    "catches": "This is a Medicaid waiver pilot; I found no 2026 page confirming it still runs. The state has warned of possible cuts. How to claim (through the Medicaid plan) is not spelled out in the results.",
+    "notes": "Terms from the June 2024 state announcement and the waiver page.",
+    "sameAs": ""
   },
   {
     "id": "baby2baby-golden-state-start",
@@ -269,7 +353,46 @@
     "verifiedOn": "2026-11-10",
     "confidence": "medium",
     "catches": "Only at participating hospitals, which are still being added; the first year prioritizes hospitals with many Medi-Cal patients. One batch of 400 per baby, no more.",
-    "notes": "Official-domain search results only. Participating hospital counts differ between pages; check the hospital list on the Baby2Baby page."
+    "notes": "Official-domain search results only. Participating hospital counts differ between pages; check the hospital list on the Baby2Baby page.",
+    "sameAs": ""
+  },
+  {
+    "id": "huggies-free-newborn-diapers-wipes-signup",
+    "name": "Huggies free newborn diapers and wipes sign-up",
+    "brand": "Huggies (Kimberly-Clark)",
+    "category": "diapers-wipes",
+    "whatYouGet": "Huggies' US sign-up page says signing up gets free newborn diapers and wipes for babies up to 4 weeks old. Older babies get coupons instead.",
+    "offers": [
+      "product",
+      "coupons"
+    ],
+    "certainty": "likely",
+    "freeStuff": "A pack of newborn Huggies diapers and wipes, for babies up to 4 weeks old.",
+    "valueLow": 5,
+    "valueHigh": 10,
+    "valueSource": "estimate",
+    "valueBasis": "One small pack of newborn diapers and one wipes pack at the low end; pack size not stated",
+    "costToClaim": "free",
+    "costDetail": "Free to sign up; the page shows no fee, but US terms were not visible in search results",
+    "requirements": [
+      "email",
+      "address"
+    ],
+    "eligibility": "Baby up to 4 weeks old (the page's wording); babies over 18 lb get coupons instead. US terms not confirmed.",
+    "region": "US",
+    "states": [],
+    "effort": "quick",
+    "when": "after-birth",
+    "whenNote": "The page says the free newborn pack is for babies up to 4 weeks old.",
+    "signupUrl": "https://www.huggies.com/en-us/safesleep",
+    "sourceUrls": [
+      "https://www.huggies.com/en-us/safesleep"
+    ],
+    "verifiedOn": "2026-11-10",
+    "confidence": "low",
+    "catches": "The page is framed around Safe Sleep Awareness (October), so the offer may have ended or may be seasonal. The US terms, offer dates and supply limits could not be read. Whether it can be claimed before the birth is unclear (the Canadian Hug Box allows 20 weeks pregnant, but that is a different country). Pack size is not stated.",
+    "notes": "A separate No Baby Unhugged page offers a free pack of diapers and wipes for sharing a hug photo; its US terms were not confirmed either. Huggies also has an insurer-mailer sample box (10-digit code from a mailer), which most people cannot use. Check the page before relying on it.",
+    "sameAs": ""
   },
   {
     "id": "huggies-rewards",
@@ -306,7 +429,8 @@
     "verifiedOn": "2026-11-10",
     "confidence": "medium",
     "catches": "Points require buying Huggies products. Search snippets disagree on the sign-up bonus amount, so none is listed. Older Rewards+ (Fetch) earning ended per a Huggies page. Huggies pages disagree on whether the program runs in the Huggies app or as Huggies Rewards+ inside the Fetch app; check the app page before you buy anything for points.",
-    "notes": "huggies.com blocks automated reading, so details come from huggies.com search results only and may be incomplete. On 2026-11-10 the sign-up link was moved to the Rewards app page on www.huggies.com, and an older www1.huggies.com source page was removed because that host no longer resolves."
+    "notes": "huggies.com blocks automated reading, so details come from huggies.com search results only and may be incomplete. On 2026-11-10 the sign-up link was moved to the Rewards app page on www.huggies.com, and an older www1.huggies.com source page was removed because that host no longer resolves.",
+    "sameAs": ""
   },
   {
     "id": "pampers-rewards",
@@ -345,7 +469,48 @@
     "verifiedOn": "2026-11-08",
     "confidence": "high",
     "catches": "Earning needs Pampers purchases. Pampers Cash expires 6 months after being added or if the account is inactive 6 months. App works on one device at a time. Page also promotes a 7-day free trial of a separate Baby Sleep app.",
-    "notes": "Formerly called Pampers Club. Page says extra bonuses at milestones and a referral: invite up to 5 friends for $2 each for them and up to $10 for you. Rate checked on pampers.com today: $10 per 10 diaper scans is what the page states."
+    "notes": "Formerly called Pampers Club. Page says extra bonuses at milestones and a referral: invite up to 5 friends for $2 each for them and up to $10 for you. Rate checked on pampers.com today: $10 per 10 diaper scans is what the page states.",
+    "sameAs": ""
+  },
+  {
+    "id": "tenncare-diaper-benefit",
+    "name": "TennCare diaper benefit",
+    "brand": "TennCare (Tennessee)",
+    "category": "diapers-wipes",
+    "whatYouGet": "Up to 100 diapers a month for TennCare and CoverKids members under age 2, picked up at a participating pharmacy.",
+    "offers": [
+      "product"
+    ],
+    "certainty": "if-eligible",
+    "freeStuff": "Free diapers from a participating pharmacy for TennCare or CoverKids babies.",
+    "valueLow": 200,
+    "valueHigh": 360,
+    "valueSource": "estimate",
+    "valueBasis": "Up to 100 newborn diapers a month at about $0.30 each, for 6 to 12 months",
+    "costToClaim": "free",
+    "costDetail": "No cost or copay; no prescription needed.",
+    "requirements": [
+      "eligibility",
+      "insurance"
+    ],
+    "eligibility": "Babies under age 2 enrolled in TennCare or CoverKids; the baby is eligible only after birth.",
+    "region": "Tennessee",
+    "states": [
+      "TN"
+    ],
+    "effort": "some",
+    "when": "after-birth",
+    "whenNote": "The baby becomes eligible only after birth.",
+    "signupUrl": "https://www.tn.gov/tenncare/members-applicants/benefits-services/diapers.html",
+    "sourceUrls": [
+      "https://www.tn.gov/tenncare/members-applicants/benefits-services/diapers.html",
+      "https://www.tn.gov/tenncare/members-applicants/benefits-services/tenncare-healthy-moms-babies.html"
+    ],
+    "verifiedOn": "2026-11-10",
+    "confidence": "medium",
+    "catches": "Limit of 100 diapers per 30 days and 200 per 60 days from an approved brand list. Only after the baby is born. Pharmacy must participate.",
+    "notes": "Newborns waiting on an ID can use the parent's TennCare pharmacy ID. Update TennCare Connect after birth.",
+    "sameAs": ""
   },
   {
     "id": "amazon-baby-registry-completion-discount",
@@ -359,9 +524,9 @@
     "certainty": "guaranteed",
     "freeStuff": "",
     "valueLow": 30,
-    "valueHigh": 100,
+    "valueHigh": 90,
     "valueSource": "estimate",
-    "valueBasis": "15% off about $200 to $700 of registry items, under the $300 cap",
+    "valueBasis": "15% off about $200 to $600 of registry items you would buy anyway, under the official $300 cap",
     "costToClaim": "free",
     "costDetail": "Free to use. Baby registry active at least 14 days; primary registrant only.",
     "requirements": [
@@ -381,7 +546,8 @@
     "verifiedOn": "2026-11-10",
     "confidence": "medium",
     "catches": "Cannot be combined with Lightning Deals or Prime Day deals; returned items do not restore the discount; terms can change. Orders are capped at a combined $2,000. Some Amazon pages are over a year old.",
-    "notes": "Seen only as Amazon help-page search results. The registry benefits page also mentions free gift returns for a year."
+    "notes": "Seen only as Amazon help-page search results. The registry benefits page also mentions free gift returns for a year. Value restated in the second merge on one scale (15% of $200 to $600; was $30 to $100).",
+    "sameAs": ""
   },
   {
     "id": "kohls-babies-r-us-welcome-box",
@@ -400,12 +566,12 @@
     "valueSource": "estimate",
     "valueBasis": "Box listed at $20; contents not itemized, so the low end is taken",
     "costToClaim": "free",
-    "costDetail": "Box is free when you apply the coupon from your digital wallet; shipping and tax not stated in the results.",
+    "costDetail": "Box is listed at $20 and free once you add the coupon from your Kohl's digital wallet at checkout. The product page lists standard shipping rates ($8.95, or free at $49) and does not say whether the box adds shipping, so ask before checkout.",
     "requirements": [
       "email",
       "registry"
     ],
-    "eligibility": "Primary registry owner with a free Kohl's Rewards account; one box per customer per year.",
+    "eligibility": "Primary registry owner with a free Kohl's Rewards account; one box per customer per year; coupon expires after 365 days.",
     "region": "US",
     "states": [],
     "effort": "some",
@@ -417,9 +583,10 @@
       "https://www.kohls.com/babyregistry"
     ],
     "verifiedOn": "2026-11-10",
-    "confidence": "low",
-    "catches": "Time-limited; box cannot be returned. One Kohl's page says the baby registry program may be discontinued, so check before relying on it. Contents not itemized.",
-    "notes": "Kohl's pages conflict on whether the registry program still runs, so this entry is low confidence."
+    "confidence": "medium",
+    "catches": "Limited time, while supplies last. Not returnable or refundable, and not eligible for other coupons. Box contents are not itemized. Shipping on the box is not stated. An old Kohl's mobile page says the registry may be discontinued, but the registry page, FAQ and product page all describe it as active.",
+    "notes": "Today's Kohl's results (registry page, FAQ 4278, product page) all describe the welcome box with a registry; only a stale mobile page says the registry may end. Registry also gives 15% off remaining items after the shower.",
+    "sameAs": ""
   },
   {
     "id": "macys-baby-registry-completion-discount",
@@ -432,10 +599,10 @@
     ],
     "certainty": "guaranteed",
     "freeStuff": "",
-    "valueLow": 10,
-    "valueHigh": 50,
+    "valueLow": 20,
+    "valueHigh": 60,
     "valueSource": "estimate",
-    "valueBasis": "10% of about $100 to $500 of eligible brands; baby gear is excluded",
+    "valueBasis": "10% off about $200 to $600 of registry items you would buy anyway",
     "costToClaim": "free",
     "costDetail": "Free to use.",
     "requirements": [
@@ -455,7 +622,46 @@
     "verifiedOn": "2026-11-10",
     "confidence": "medium",
     "catches": "Select brands only; cannot be combined with other coupons. Macy's help says its Baby Box ended in February 2026.",
-    "notes": "Macy's older welcome box product page still shows up in search but help says it ended."
+    "notes": "Macy's older welcome box product page still shows up in search but help says it ended. Value restated in the second merge on one scale (10% of $200 to $600; was $10 to $50).",
+    "sameAs": ""
+  },
+  {
+    "id": "bloomingdales-baby-registry-completion-discount",
+    "name": "Baby Registry Completion Discount (20%)",
+    "brand": "Bloomingdale's",
+    "category": "registry-box",
+    "whatYouGet": "20% off eligible items still on your baby registry, plus a registry expert; some brand partners add a bonus gift at a spending threshold.",
+    "offers": [
+      "coupons"
+    ],
+    "certainty": "guaranteed",
+    "freeStuff": "",
+    "valueLow": 40,
+    "valueHigh": 120,
+    "valueSource": "estimate",
+    "valueBasis": "20% off about $200 to $600 of registry items you would buy anyway",
+    "costToClaim": "free",
+    "costDetail": "Free to use; baby gear, strollers and some designer and leased brands are excluded.",
+    "requirements": [
+      "registry"
+    ],
+    "eligibility": "Registry owner.",
+    "region": "US",
+    "states": [],
+    "effort": "some",
+    "when": "late-pregnancy",
+    "whenNote": "Starts two months before the arrival date and runs six months after",
+    "signupUrl": "https://www.bloomingdales.com/registry/baby",
+    "sourceUrls": [
+      "https://www.bloomingdales.com/customer-service/articles/general-baby-gift-registry-information",
+      "https://www.bloomingdales.com/registry/baby",
+      "https://www.bloomingdales.com/c/editorial/registry/baby-bonus-gifts/"
+    ],
+    "verifiedOn": "2026-11-10",
+    "confidence": "medium",
+    "catches": "Cannot be combined with other promotions and does not apply to earlier purchases. Brand bonus gifts need a spend (one listing asks $750 for a UPPAbaby blanket), so they are not free. Terms read from search results only.",
+    "notes": "Results also mention 20% off maternity clothing and fine jewelry for registrants. Value restated in the second merge on one scale (20% of $200 to $600; was $20 to $100).",
+    "sameAs": ""
   },
   {
     "id": "amazon-baby-registry-welcome-box",
@@ -494,7 +700,8 @@
     "verifiedOn": "2026-11-08",
     "confidence": "medium",
     "catches": "Amazon's help page (read via domain search snippet; the page itself did not fetch cleanly) says tax, shipping, Prime and gift card purchases don't count toward the $10, the box shows $35 until a $35 promotional balance is applied, it ships to the contiguous US only, and a new box needs an 8-month wait. Limited-time and subject to change. Needs a paid Prime membership and a purchase from the registry, so nothing arrives with no purchase. Contents are a surprise and past reviews vary from useful samples to mostly coupons.",
-    "notes": "The same registry page also advertises a 15% completion discount, up to $300 in savings, and free 1-year returns. Older Q&A mentions a 60% checklist rule; the current page says 10 items."
+    "notes": "The same registry page also advertises a 15% completion discount, up to $300 in savings, and free 1-year returns. Older Q&A mentions a 60% checklist rule; the current page says 10 items.",
+    "sameAs": ""
   },
   {
     "id": "walmart-baby-registry-welcome-box",
@@ -534,7 +741,8 @@
     "verifiedOn": "2026-11-08",
     "confidence": "medium",
     "catches": "While supplies last, first come first served; not guaranteed even after meeting requirements and Walmart need not notify you if supplies run out; contents may be substituted; allow 10-12 weeks by US mail to the registry address (no P.O. boxes). The box is free, but only after over $25 is purchased through the registry.",
-    "notes": "Claim via the banner on your registry page; you get a confirmation email. Support: support@walmartbabywelcomebox.com. The page shows no separate free postpartum or mom box."
+    "notes": "Claim via the banner on your registry page; you get a confirmation email. Support: support@walmartbabywelcomebox.com. The page shows no separate free postpartum or mom box.",
+    "sameAs": ""
   },
   {
     "id": "babylist-registry-completion-discount",
@@ -547,10 +755,10 @@
     ],
     "certainty": "guaranteed",
     "freeStuff": "",
-    "valueLow": 45,
-    "valueHigh": 225,
+    "valueLow": 30,
+    "valueHigh": 90,
     "valueSource": "estimate",
-    "valueBasis": "15% of about $300 to $1,500 bought in the Babylist Shop",
+    "valueBasis": "15% off about $200 to $600 of registry items you would buy anyway, under the official $600 cap",
     "costToClaim": "free",
     "costDetail": "Free to use. Registry must be at least 30 days old.",
     "requirements": [
@@ -570,7 +778,8 @@
     "verifiedOn": "2026-11-10",
     "confidence": "medium",
     "catches": "Applies only to Babylist Shop items, not other stores added to the registry.",
-    "notes": "Window length differs between Babylist pages; the shorter, newer one is used."
+    "notes": "Window length differs between Babylist pages; the shorter, newer one is used. Value restated in the second merge on one scale (15% of $200 to $600; was $45 to $225).",
+    "sameAs": ""
   },
   {
     "id": "crate-and-kids-registry-completion-discount",
@@ -583,10 +792,10 @@
     ],
     "certainty": "guaranteed",
     "freeStuff": "",
-    "valueLow": 20,
-    "valueHigh": 100,
+    "valueLow": 30,
+    "valueHigh": 90,
     "valueSource": "estimate",
-    "valueBasis": "15% of about $130 to $650 bought for the nursery; excludes books and gift cards",
+    "valueBasis": "15% off about $200 to $600 of registry items you would buy anyway",
     "costToClaim": "free",
     "costDetail": "Free; used in US stores, on crateandkids.com or by phone.",
     "requirements": [
@@ -607,7 +816,8 @@
     "verifiedOn": "2026-11-10",
     "confidence": "medium",
     "catches": "Not for kids books, gift cards or certain brands; cannot be combined with other offers except free shipping; terms can change. Some pages say 10%.",
-    "notes": "The terms page says 15%; other pages differ."
+    "notes": "The terms page says 15%; other pages differ. Value restated in the second merge on one scale (15% of $200 to $600; was $20 to $100).",
+    "sameAs": ""
   },
   {
     "id": "walmart-baby-registry-free-home-cleaning",
@@ -645,7 +855,8 @@
     "verifiedOn": "2026-11-08",
     "confidence": "high",
     "catches": "Available while supplies last; fulfilled by an unaffiliated service provider with its own terms; must redeem no later than 90 days after your registry event date; merchandise total excludes taxes, shipping and fees, and items marked purchased don't count.",
-    "notes": "Walmart calls this a Tier 2 registry reward alongside the Baby Box."
+    "notes": "Walmart calls this a Tier 2 registry reward alongside the Baby Box.",
+    "sameAs": ""
   },
   {
     "id": "babylist-hello-baby-box",
@@ -686,7 +897,8 @@
     "verifiedOn": "2026-11-10",
     "confidence": "medium",
     "catches": "Shipping fee is non-refundable and orders can't be changed; AK/HI total shipping $18.95; gift cards and return credit can't pay the fee; Babylist Health and other retailer orders don't count toward the $30.",
-    "notes": "Babylist's help center blocks automated reading, so these terms come from official-domain search results and may be incomplete. Babylist's marketing FAQ says one box per household per year; the help center says per household and per registry. The sign-up link opens Babylist's \"Create a Baby Registry\" page because a registry is needed first; the help center says to claim the box from the For You tile on your registry dashboard or in the app. The older /hello-baby/box address only redirects to the help center."
+    "notes": "Babylist's help center blocks automated reading, so these terms come from official-domain search results and may be incomplete. Babylist's marketing FAQ says one box per household per year; the help center says per household and per registry. The sign-up link opens Babylist's \"Create a Baby Registry\" page because a registry is needed first; the help center says to claim the box from the For You tile on your registry dashboard or in the app. The older /hello-baby/box address only redirects to the help center.",
+    "sameAs": ""
   },
   {
     "id": "macrobaby-gift-box",
@@ -705,7 +917,7 @@
     "valueSource": "official",
     "valueBasis": "MacroBaby gives an est. value of $80+; contents are random and seasonal",
     "costToClaim": "purchase-required",
-    "costDetail": "Add at least 20 items to a registry and make a first qualifying purchase of $15 or more from it.",
+    "costDetail": "Box is added at no extra cost, but you must add at least 20 items to a registry and make a first qualifying purchase of $15 or more from it.",
     "requirements": [
       "registry",
       "purchase"
@@ -724,7 +936,8 @@
     "verifiedOn": "2026-11-08",
     "confidence": "high",
     "catches": "Contents can't be requested; if the qualifying items are returned the box must be returned or an $80 fee applies; program can change or end without notice.",
-    "notes": "Gift box page confirmed directly: add at least 20 items to your registry and make a first qualifying purchase of $15.00 or more from it. The Baby Registry page also advertises 5% cash back on registry purchases."
+    "notes": "Re-checked with macrobaby.com results today: terms unchanged (20 items on a registry, first qualifying purchase of $15 or more, one box per registry, contents random, $80 fee if qualifying items are returned without the box, program can end without notice). Not in-store: MacroBaby is online. Registry also advertises 5% back as store credit 30 days after the shower.",
+    "sameAs": ""
   },
   {
     "id": "pottery-barn-kids-registry-completion-discount",
@@ -737,10 +950,10 @@
     ],
     "certainty": "guaranteed",
     "freeStuff": "",
-    "valueLow": 20,
-    "valueHigh": 100,
+    "valueLow": 30,
+    "valueHigh": 90,
     "valueSource": "estimate",
-    "valueBasis": "15% of about $130 to $650 of non-excluded items; baby gear is excluded",
+    "valueBasis": "15% off about $200 to $600 of registry items you would buy anyway",
     "costToClaim": "free",
     "costDetail": "Free to use; click Redeem in your registry before each online purchase.",
     "requirements": [
@@ -760,7 +973,8 @@
     "verifiedOn": "2026-11-10",
     "confidence": "medium",
     "catches": "Excludes all baby gear, MSRP items and select clearance items.",
-    "notes": "Older pages show shorter windows; the current page says 60 days before to 180 days after."
+    "notes": "Older pages show shorter windows; the current page says 60 days before to 180 days after. Value restated in the second merge on one scale (15% of $200 to $600; was $20 to $100).",
+    "sameAs": ""
   },
   {
     "id": "buybuy-baby-registry-welcome-bag",
@@ -779,11 +993,11 @@
     "valueSource": "estimate",
     "valueBasis": "A few samples and a guide; the contents are not listed",
     "costToClaim": "free",
-    "costDetail": "Free with registry; no purchase stated in the search results; available for pickup in stores only.",
+    "costDetail": "Free with a registry; store pickup only. No purchase is stated, but a store personal-shop appointment is mentioned.",
     "requirements": [
       "registry"
     ],
-    "eligibility": "Baby registrants; details of eligibility not confirmed.",
+    "eligibility": "Baby registrants who ask for it in a participating store; details not confirmed.",
     "region": "US",
     "states": [],
     "effort": "some",
@@ -793,10 +1007,11 @@
     "sourceUrls": [
       "https://www.buybuybaby.com/store/page/BabyRegistry"
     ],
-    "verifiedOn": "2026-11-08",
-    "confidence": "medium",
-    "catches": "Pickup in stores only; ask for the bag when registering in person per store pages. Eligibility and any purchase conditions were not stated in the results.",
-    "notes": "Checked from the official site's search results; the site blocks automated reading, so details may be incomplete. buybuy BABY pages refused or failed to fetch; store-page search snippets still describe a free goody bag with samples, coupons and a registry guide. Snippets also mention a 15% completion discount and free first-year shipping after $1,500 of registry gifts."
+    "verifiedOn": "2026-11-10",
+    "confidence": "low",
+    "catches": "Official pages disagree: older registry and store pages offer a free goody bag with samples, coupons and a Registry Guide (ask in store or get it at an in-store personal shop), while the newer registry page lists other perks and does not mention the bag. A buybuy BABY FAQ says the old stores and site were liquidated after bankruptcy and a new owner was relaunching. Call a store first.",
+    "notes": "Today's official-domain results (buybuybaby.com and stores.buybuybaby.com) show the bag only on older and store pages; the current registry page lists group gifting, a percentage off remaining items, price match and 365-day returns. Cannot fetch, so left at low confidence.",
+    "sameAs": ""
   },
   {
     "id": "target-registry-welcome-kit",
@@ -815,7 +1030,7 @@
     "valueSource": "estimate",
     "valueBasis": "Target labels it a $100 value, but that mixes samples with a Circle Bonus; samples at low end, bonus counted as a saving",
     "costToClaim": "purchase-required",
-    "costDetail": "Kit is free of charge but shipping and handling fees apply. Needs a free Target Circle account, a baby registry with 10 unique items, and a purchase over $10 from the registry (by you or others).",
+    "costDetail": "Free kit, but shipping and handling fees apply (amount not stated). Needs a free Target Circle account, a baby registry with 10 unique items, and over $10 purchased from the registry by you or a guest.",
     "requirements": [
       "email",
       "registry",
@@ -834,7 +1049,8 @@
     "verifiedOn": "2026-11-10",
     "confidence": "medium",
     "catches": "Online only, as a Target Circle Bonus that must be accepted; shipping and handling fees apply; limit one kit per year; registries that claimed a previous kit aren't eligible. Allow 24-48 hours for the bonus to be issued.",
-    "notes": "Active registries created after 08/15/2023 are eligible. The bonus shows on the registry dashboard. Target's registry sign-up page and product page did not mention the kit in readable text, so only the help article confirms it."
+    "notes": "Confirmed purchase-required on today's Target help article: join Target Circle, create a registry, add 10 unique items, and have over $10 purchased from it. The bonus shows after 24 to 48 hours and must be accepted. Not an in-store item. Kit page and help article both say shipping and handling fees apply; amount not stated.",
+    "sameAs": ""
   },
   {
     "id": "target-registry-completion-discount",
@@ -847,10 +1063,10 @@
     ],
     "certainty": "guaranteed",
     "freeStuff": "",
-    "valueLow": 15,
-    "valueHigh": 45,
+    "valueLow": 30,
+    "valueHigh": 90,
     "valueSource": "estimate",
-    "valueBasis": "15% off about $100 to $300 of remaining registry items",
+    "valueBasis": "15% off about $200 to $600 of registry items you would buy anyway",
     "costToClaim": "free",
     "costDetail": "Free. Registry must be active at least 14 days.",
     "requirements": [
@@ -872,7 +1088,82 @@
     "verifiedOn": "2026-11-10",
     "confidence": "medium",
     "catches": "Redeemable twice (one in-store, one online per one help page); expires in 6 months; once per 12 months; cannot be combined with price match. One offer per Target Circle member. It is a discount, not a free item.",
-    "notes": "Search results from different Target pages differ slightly on the use limits."
+    "notes": "Search results from different Target pages differ slightly on the use limits. Value restated in the second merge on one scale (15% of $200 to $600; was $15 to $45).",
+    "sameAs": ""
+  },
+  {
+    "id": "aeroflow-breast-pump-resupply-insurance",
+    "name": "Aeroflow breast pump resupply through insurance",
+    "brand": "Aeroflow Breastpumps",
+    "category": "feeding",
+    "whatYouGet": "Replacement pump parts and milk storage bags shipped on a schedule when your plan covers them, even if the pump came from elsewhere.",
+    "offers": [
+      "product"
+    ],
+    "certainty": "if-eligible",
+    "freeStuff": "Free replacement pump parts and milk storage bags through insurance.",
+    "valueLow": null,
+    "valueHigh": null,
+    "valueSource": "none",
+    "valueBasis": "",
+    "costToClaim": "free",
+    "costDetail": "Many plans cover in full; some have a small copay or deductible.",
+    "requirements": [
+      "insurance"
+    ],
+    "eligibility": "Members of plans that cover pump supplies.",
+    "region": "US",
+    "states": [],
+    "effort": "some",
+    "when": "after-birth",
+    "whenNote": "Resupply usually starts after the baby is born.",
+    "signupUrl": "https://aeroflowbreastpumps.com/replacing-breast-pump-parts",
+    "sourceUrls": [
+      "https://aeroflowbreastpumps.com/replacing-breast-pump-parts",
+      "https://aeroflowbreastpumps.com/breast-milk-storage-bags-through-insurance"
+    ],
+    "verifiedOn": "2026-11-10",
+    "confidence": "medium",
+    "catches": "Coverage varies by plan; some pages are old or show items out of stock. Babylist says many plans reimburse parts from 30 days after birth for up to a year.",
+    "notes": "Babylist Health and Pumping Essentials only route pumps (Pumping Essentials works through Aeroflow), so not added.",
+    "sameAs": ""
+  },
+  {
+    "id": "aeroflow-prenatal-breastfeeding-classes",
+    "name": "Aeroflow prenatal and breastfeeding classes",
+    "brand": "Aeroflow Breastpumps",
+    "category": "feeding",
+    "whatYouGet": "Live classes on pregnancy, pumping and breastfeeding billed to your insurance as a preventive lactation benefit.",
+    "offers": [
+      "service"
+    ],
+    "certainty": "if-eligible",
+    "freeStuff": "Insurance-paid prenatal and breastfeeding classes.",
+    "valueLow": null,
+    "valueHigh": null,
+    "valueSource": "none",
+    "valueBasis": "",
+    "costToClaim": "free",
+    "costDetail": "Aeroflow says many plans cover them in full; some list a small copay or deductible.",
+    "requirements": [
+      "insurance"
+    ],
+    "eligibility": "Members of plans that cover preventive lactation benefits.",
+    "region": "US",
+    "states": [],
+    "effort": "some",
+    "when": "pregnancy",
+    "whenNote": "Aeroflow suggests 2 to 3 classes during pregnancy and saving the rest for after birth.",
+    "signupUrl": "https://aeroflowbreastpumps.com/pregnancy-breastfeeding-classes",
+    "sourceUrls": [
+      "https://aeroflowbreastpumps.com/pregnancy-breastfeeding-classes",
+      "https://aeroflowbreastpumps.com/lactation-know-your-benefits"
+    ],
+    "verifiedOn": "2026-11-10",
+    "confidence": "medium",
+    "catches": "Aetna and TRICARE cap combined preventive lactation visits at 6 a year, so classes use up visits. Aeroflow pages conflict on cost-sharing.",
+    "notes": "Backed by Aeroflow pages only, not by insurers.",
+    "sameAs": ""
   },
   {
     "id": "mam-club",
@@ -910,7 +1201,8 @@
     "verifiedOn": "2026-11-08",
     "confidence": "medium",
     "catches": "Main perks are discounts on MAM shop orders (a coupon, not a free item); product tests and giveaways are not guaranteed. Regular newsletter emails.",
-    "notes": "Registration form was not opened, so exact fields are unconfirmed. Welcome voucher terms were not shown on the club page. Welcome voucher is 10% on the US page (20% on UK and other country pages)."
+    "notes": "Registration form was not opened, so exact fields are unconfirmed. Welcome voucher terms were not shown on the club page. Welcome voucher is 10% on the US page (20% on UK and other country pages).",
+    "sameAs": ""
   },
   {
     "id": "medela-moms-room",
@@ -948,7 +1240,46 @@
     "verifiedOn": "2026-11-10",
     "confidence": "low",
     "catches": "Gift contents, size and terms are unconfirmed. Form offers an opt-in for promotional messages. Medela also asks insurance-pump customers whether to receive free samples, a separate step.",
-    "notes": "Seen only as official-domain search results; the form asks email, password and baby's due or birth date."
+    "notes": "Seen only as official-domain search results; the form asks email, password and baby's due or birth date.",
+    "sameAs": ""
+  },
+  {
+    "id": "al-dhr-baby-box-initiative",
+    "name": "Alabama Baby Box Initiative",
+    "brand": "Alabama Department of Human Resources",
+    "category": "baby-care",
+    "whatYouGet": "Expecting and new parents can pick up a free Baby Box with safe sleep education from a local DHR office.",
+    "offers": [
+      "product"
+    ],
+    "certainty": "likely",
+    "freeStuff": "A free Baby Box (safe sleep space).",
+    "valueLow": null,
+    "valueHigh": null,
+    "valueSource": "none",
+    "valueBasis": "",
+    "costToClaim": "free",
+    "costDetail": "Free.",
+    "requirements": [
+      "address"
+    ],
+    "eligibility": "Expecting and new parents in Alabama.",
+    "region": "Alabama",
+    "states": [
+      "AL"
+    ],
+    "effort": "some",
+    "when": "late-pregnancy",
+    "whenNote": "Offered to expecting and new parents.",
+    "signupUrl": "https://dhr.alabama.gov/child-protective-services/baby-box-initiative/",
+    "sourceUrls": [
+      "https://dhr.alabama.gov/child-protective-services/baby-box-initiative/"
+    ],
+    "verifiedOn": "2026-11-10",
+    "confidence": "medium",
+    "catches": "Pick up in person at the county DHR office; supplies may vary.",
+    "notes": "Current stock not confirmed.",
+    "sameAs": ""
   },
   {
     "id": "imagination-library-free-books",
@@ -985,7 +1316,8 @@
     "verifiedOn": "2026-11-10",
     "confidence": "medium",
     "catches": "Only available where a local program partner serves your address. Per official-domain search results, online registration is blocked for a child not yet born, so you register after the birth. Some local programs use a different age range (for example newborn to 4.5 years). One local program reported 8-10 weeks for the first book.",
-    "notes": "Check availability by location first. The search-result snippet about 8-10 weeks came from a local program page."
+    "notes": "Check availability by location first. The search-result snippet about 8-10 weeks came from a local program page.",
+    "sameAs": ""
   },
   {
     "id": "first5california-kit-for-new-parents",
@@ -1023,7 +1355,82 @@
     "verifiedOn": "2026-11-10",
     "confidence": "medium",
     "catches": "Delivery takes about 30 to 45 days. Results disagree on the languages offered and on the contact email.",
-    "notes": "Official-domain search results only. Contents listed: Parent Guide, a Numbers touch-and-feel book, a What To Do When Your Child Gets Sick book, and more."
+    "notes": "Official-domain search results only. Contents listed: Parent Guide, a Numbers touch-and-feel book, a What To Do When Your Child Gets Sick book, and more.",
+    "sameAs": ""
+  },
+  {
+    "id": "ny-free-portable-crib-safe-sleep",
+    "name": "New York free portable crib",
+    "brand": "New York State Department of Health",
+    "category": "baby-care",
+    "whatYouGet": "Families with no safe place for baby to sleep may get a free portable crib and sheet through their local social services office.",
+    "offers": [
+      "product"
+    ],
+    "certainty": "if-eligible",
+    "freeStuff": "A free portable crib and sheet for families in need.",
+    "valueLow": 80,
+    "valueHigh": 80,
+    "valueSource": "estimate",
+    "valueBasis": "One portable crib at about $80",
+    "costToClaim": "free",
+    "costDetail": "Free.",
+    "requirements": [
+      "eligibility"
+    ],
+    "eligibility": "Households on public assistance or with limited resources.",
+    "region": "New York",
+    "states": [
+      "NY"
+    ],
+    "effort": "involved",
+    "when": "late-pregnancy",
+    "whenNote": "Needed before the baby comes home.",
+    "signupUrl": "https://www.health.ny.gov/diseases/conditions/safesleep/",
+    "sourceUrls": [
+      "https://www.health.ny.gov/diseases/conditions/safesleep/"
+    ],
+    "verifiedOn": "2026-11-10",
+    "confidence": "medium",
+    "catches": "Apply through the local department of social services. Hospitals and home visiting programs also give safe sleep kits.",
+    "notes": "Check CPSC recalls on any donated crib.",
+    "sameAs": ""
+  },
+  {
+    "id": "pampers-free-online-childbirth-classes",
+    "name": "Pampers free online childbirth classes",
+    "brand": "Pampers",
+    "category": "baby-care",
+    "whatYouGet": "A free online series of childbirth classes led by clinical experts, from labor to postpartum care.",
+    "offers": [
+      "service"
+    ],
+    "certainty": "guaranteed",
+    "freeStuff": "Free online childbirth classes.",
+    "valueLow": null,
+    "valueHigh": null,
+    "valueSource": "none",
+    "valueBasis": "",
+    "costToClaim": "free",
+    "costDetail": "Free; registration required.",
+    "requirements": [
+      "email"
+    ],
+    "eligibility": "Anyone expecting a baby.",
+    "region": "US",
+    "states": [],
+    "effort": "quick",
+    "when": "late-pregnancy",
+    "whenNote": "Classes cover labor and birth, so most useful before the due date.",
+    "signupUrl": "https://www.pampers.com/en-us/pregnancy/birthing-classes",
+    "sourceUrls": [
+      "https://www.pampers.com/en-us/pregnancy/birthing-classes"
+    ],
+    "verifiedOn": "2026-11-10",
+    "confidence": "medium",
+    "catches": "Pages are undated; one says 10 parts, another 9. Confirm that it is still offered.",
+    "notes": "",
+    "sameAs": ""
   },
   {
     "id": "reach-out-and-read-free-books",
@@ -1059,7 +1466,45 @@
     "verifiedOn": "2026-11-10",
     "confidence": "medium",
     "catches": "Only at clinics that take part; ask your child's doctor. Program rules start books at the 6-month visit, and books for earlier visits are encouraged but not required.",
-    "notes": "Official-domain search results only. No sign-up form: you find a participating clinic with the Find a Site map and get the book at visits."
+    "notes": "Official-domain search results only. No sign-up form: you find a participating clinic with the Find a Site map and get the book at visits.",
+    "sameAs": ""
+  },
+  {
+    "id": "text4baby-free-text-messages",
+    "name": "Text4baby free text messages",
+    "brand": "Text4baby (Wellpass)",
+    "category": "baby-care",
+    "whatYouGet": "Three free texts a week with pregnancy and baby health tips, timed to the due date, until the baby turns one.",
+    "offers": [
+      "service"
+    ],
+    "certainty": "guaranteed",
+    "freeStuff": "Free health text messages.",
+    "valueLow": null,
+    "valueHigh": null,
+    "valueSource": "none",
+    "valueBasis": "",
+    "costToClaim": "free",
+    "costDetail": "Free, even without a text plan.",
+    "requirements": [
+      "phone"
+    ],
+    "eligibility": "Pregnant women and parents of babies under one.",
+    "region": "US",
+    "states": [],
+    "effort": "quick",
+    "when": "pregnancy",
+    "whenNote": "Messages timed to the due date.",
+    "signupUrl": "https://partners.text4baby.org/index.php/sign-up",
+    "sourceUrls": [
+      "https://partners.text4baby.org/index.php/about",
+      "https://partners.text4baby.org/index.php/sign-up"
+    ],
+    "verifiedOn": "2026-11-10",
+    "confidence": "low",
+    "catches": "Undated pages; sponsor details differ, so confirm the service is still active.",
+    "notes": "Text BABY (or BEBE) to 511411.",
+    "sameAs": ""
   },
   {
     "id": "pg-brandsaver-rewards",
@@ -1099,7 +1544,8 @@
     "verifiedOn": "2026-11-08",
     "confidence": "medium",
     "catches": "Points come from surveys and receipt scans of P&G purchases (50 points per product); 750 points buys one $5-off digital reward and 25 points buys one prize-draw entry. Points have no cash value and lapse after a year with none earned. No free product arrives. Privacy policy says P&G discloses personal data to third-party partners where it has a lawful basis, receives data from other companies, and may share hashed email identifiers with ad platforms (Google, Meta, Microsoft, Pinterest, Reddit, Snap, TikTok) for interest-based ads. Its FAQ says it does not sell personal data for monetary compensation, but the site footer says 'We may sell your sensitive personal data.' Marketing email/text with opt-out. Points come from surveys and receipt scans.",
-    "notes": "The former pgeveryday.com now leads to P&G brandSAVER. No baby-specific offer is listed on the rewards page. Eligibility rules are not on the pages read (see Offer Rules page)."
+    "notes": "The former pgeveryday.com now leads to P&G brandSAVER. No baby-specific offer is listed on the rewards page. Eligibility rules are not on the pages read (see Offer Rules page).",
+    "sameAs": ""
   },
   {
     "id": "healthcare-gov-add-newborn-special-enrollment",
@@ -1136,7 +1582,55 @@
     "verifiedOn": "2026-11-10",
     "confidence": "medium",
     "catches": "Missing the 60 days means waiting for Open Enrollment. Medicaid and CHIP can be joined any time.",
-    "notes": "Overlaps the pregnancy coverage entry; this one is the after-birth deadline."
+    "notes": "Overlaps the pregnancy coverage entry; this one is the after-birth deadline.",
+    "sameAs": ""
+  },
+  {
+    "id": "aetna-better-health-pregnancy-rewards",
+    "name": "Aetna Better Health pregnancy rewards and baby items",
+    "brand": "Aetna Better Health (Medicaid)",
+    "category": "health-benefits",
+    "whatYouGet": "Medicaid members earn a gift card, or in Illinois a car seat, highchair or play yard, for prenatal visits; amounts depend on the state plan.",
+    "offers": [
+      "cash",
+      "product"
+    ],
+    "certainty": "if-eligible",
+    "freeStuff": "Gift card (or in Illinois a car seat, highchair or play yard) for plan members who keep prenatal visits.",
+    "valueLow": 50,
+    "valueHigh": 150,
+    "valueSource": "official",
+    "valueBasis": "Plan pages state $50 (LA), $90 (KY), $100 (OK) and $150 (FL)",
+    "costToClaim": "free",
+    "costDetail": "Members of the plan only; earned by attending visits.",
+    "requirements": [
+      "insurance",
+      "eligibility"
+    ],
+    "eligibility": "Members of an Aetna Better Health Medicaid plan in the listed states.",
+    "region": "KY, IL, LA, OK, FL",
+    "states": [
+      "KY",
+      "IL",
+      "LA",
+      "OK",
+      "FL"
+    ],
+    "effort": "some",
+    "when": "late-pregnancy",
+    "whenNote": "Kentucky and Oklahoma reward is earned at 37 weeks or later.",
+    "signupUrl": "https://www.aetnabetterhealth.com/kentucky/pregnancy-care.html",
+    "sourceUrls": [
+      "https://www.aetnabetterhealth.com/kentucky/pregnancy-care.html",
+      "https://www.aetnabetterhealth.com/illinois-medicaid/pregnancy-care.html",
+      "https://www.aetnabetterhealth.com/oklahoma/extra-benefits.html",
+      "https://ch.aetnabetterhealth.com/louisiana/rewards-program.html"
+    ],
+    "verifiedOn": "2026-11-10",
+    "confidence": "medium",
+    "catches": "Only for members of that plan. Kentucky and Oklahoma need 7 prenatal visits and 37+ weeks; Illinois needs a health risk screening and a prenatal visit; Florida and Louisiana give a $150 or $50 baby-items stipend. Page dates vary.",
+    "notes": "Amounts seen: KY up to $90, OK $100, FL $150, LA $50.",
+    "sameAs": ""
   },
   {
     "id": "aetna-enhanced-maternity-program",
@@ -1173,7 +1667,97 @@
     "verifiedOn": "2026-11-10",
     "confidence": "low",
     "catches": "One source mentions a reward for signing up by week 16; the amount and current terms were not confirmed. Search results include only a guide PDF.",
-    "notes": "Enroll by phone or text per the guide. Adding the baby to the plan is allowed within 60 days of birth per Aetna materials."
+    "notes": "Enroll by phone or text per the guide. Adding the baby to the plan is allowed within 60 days of birth per Aetna materials.",
+    "sameAs": ""
+  },
+  {
+    "id": "amerihealth-caritas-bright-start",
+    "name": "AmeriHealth Caritas Bright Start rewards",
+    "brand": "AmeriHealth Caritas",
+    "category": "health-benefits",
+    "whatYouGet": "Plan members who join Bright Start can earn CARE Card or gift card rewards, a breast pump, and a portable crib or car seat for prenatal visits.",
+    "offers": [
+      "cash",
+      "product"
+    ],
+    "certainty": "if-eligible",
+    "freeStuff": "Gift cards plus a portable crib or car seat for members who complete prenatal visits.",
+    "valueLow": 75,
+    "valueHigh": 175,
+    "valueSource": "estimate",
+    "valueBasis": "$15 + $30 + $30 in cards, plus a portable crib or car seat at about $80 to $100 at the high end",
+    "costToClaim": "free",
+    "costDetail": "Members of the plan only.",
+    "requirements": [
+      "insurance",
+      "eligibility",
+      "phone"
+    ],
+    "eligibility": "Pregnant members of AmeriHealth Caritas Delaware (reward list seen); Florida and Ohio pages describe care management without amounts.",
+    "region": "DE (rewards listed); FL, OH care management",
+    "states": [
+      "DE",
+      "FL",
+      "OH"
+    ],
+    "effort": "some",
+    "when": "pregnancy",
+    "whenNote": "Rewards are tied to visits by set weeks; enroll as early as possible.",
+    "signupUrl": "https://www.amerihealthcaritasde.com/member/benefits/bright-start",
+    "sourceUrls": [
+      "https://www.amerihealthcaritasde.com/member/benefits/bright-start",
+      "https://www.amerihealthcaritasnext.com/fl/members/care-coordination/pregnancy",
+      "https://www.amerihealthcaritasnext.com/oh/members/care-coordination/pregnancy"
+    ],
+    "verifiedOn": "2026-11-10",
+    "confidence": "low",
+    "catches": "Delaware figures come from pages up to a year old. Must enroll (1-833-669-7672) and complete visits (for example eight prenatal visits by 38 weeks for the crib or car seat). A 2027 page mentions changed extras.",
+    "notes": "Delaware list: $15 for reporting pregnancy early, $30 for four visits by week 26, $30 postpartum visit.",
+    "sameAs": ""
+  },
+  {
+    "id": "blue-cross-special-beginnings",
+    "name": "Blue Cross Special Beginnings maternity rewards",
+    "brand": "Blue Cross Community Health Plans (Illinois) and Blue Cross Blue Shield of Texas",
+    "category": "health-benefits",
+    "whatYouGet": "Medicaid members who join Special Beginnings can get a car seat or portable crib or gift cards for prenatal and postpartum visits.",
+    "offers": [
+      "product",
+      "cash"
+    ],
+    "certainty": "if-eligible",
+    "freeStuff": "A car seat or portable crib (Illinois) or gift cards (Texas) for plan members who enroll and attend visits.",
+    "valueLow": 75,
+    "valueHigh": 130,
+    "valueSource": "estimate",
+    "valueBasis": "Texas $50 + $25 cards, or an Illinois crib or car seat at about $80 to $100 plus a $30 card",
+    "costToClaim": "free",
+    "costDetail": "Members of those plans only.",
+    "requirements": [
+      "insurance",
+      "eligibility",
+      "phone"
+    ],
+    "eligibility": "Pregnant members of Blue Cross Community Health Plans (IL) or BCBSTX Medicaid/CHIP; join by phone 1-888-421-7781.",
+    "region": "IL, TX",
+    "states": [
+      "IL",
+      "TX"
+    ],
+    "effort": "some",
+    "when": "pregnancy",
+    "whenNote": "Join early in pregnancy; first-trimester visit earns the reward.",
+    "signupUrl": "https://www.bcbsil.com/bcchp/resources/maternal-and-infant-health",
+    "sourceUrls": [
+      "https://www.bcbsil.com/bcchp/resources/maternal-and-infant-health",
+      "https://www.bcbsil.com/medicaid/pdf/bcchp-special-beginnings.pdf",
+      "https://www.bcbstx.com/medicaid/member-resources/maternal-and-infant-health"
+    ],
+    "verifiedOn": "2026-11-10",
+    "confidence": "low",
+    "catches": "Sources disagree on exact rewards ($30 cards vs a car seat or crib in IL; $50 and $25 cards in TX). Enrolling is generally required.",
+    "notes": "Plan name and Baby Yourself program not found in results.",
+    "sameAs": ""
   },
   {
     "id": "edgepark-breast-pump-insurance",
@@ -1209,7 +1793,8 @@
     "verifiedOn": "2026-11-10",
     "confidence": "medium",
     "catches": "Edgepark says verification is never a guarantee of coverage; out-of-pocket cost depends on your plan and deductible; some models have restricted access and plans may only ship closer to the due date.",
-    "notes": "Checked from the official site's search results; the site blocks automated reading, so details may be incomplete. Search results say you can order during pregnancy and up to one year after birth, and that Edgepark works with 1,400+ plans. On 2026-11-10 the link was changed to the www address, which is the one official search results list."
+    "notes": "Checked from the official site's search results; the site blocks automated reading, so details may be incomplete. Search results say you can order during pregnancy and up to one year after birth, and that Edgepark works with 1,400+ plans. On 2026-11-10 the link was changed to the www address, which is the one official search results list.",
+    "sameAs": "healthcare-gov-insurance-covered-breast-pump"
   },
   {
     "id": "healthcare-gov-insurance-covered-breast-pump",
@@ -1245,7 +1830,8 @@
     "verifiedOn": "2026-11-08",
     "confidence": "high",
     "catches": "Plans may set guidelines on manual vs. electric, rental length and timing; some require doctor pre-authorization. Grandfathered plans are exempt.",
-    "notes": "How to claim (from HealthCare.gov and suppliers' own pages): 1) Contact your plan to ask about pump type (manual/electric), rental vs. purchase, timing and whether your doctor must pre-authorize. 2) Pick an in-network supplier and use its online coverage check (have your insurance card and due date ready). 3) The supplier verifies benefits and, where required, contacts your doctor for a prescription. 4) Choose a covered pump; the order ships per your plan's timing (Aeroflow notes many plans ship no sooner than 30 days before the due date). Contact your insurance plan with questions."
+    "notes": "How to claim (from HealthCare.gov and suppliers' own pages): 1) Contact your plan to ask about pump type (manual/electric), rental vs. purchase, timing and whether your doctor must pre-authorize. 2) Pick an in-network supplier and use its online coverage check (have your insurance card and due date ready). 3) The supplier verifies benefits and, where required, contacts your doctor for a prescription. 4) Choose a covered pump; the order ships per your plan's timing (Aeroflow notes many plans ship no sooner than 30 days before the due date). Contact your insurance plan with questions.",
+    "sameAs": ""
   },
   {
     "id": "byram-healthcare-breast-pumps-insurance",
@@ -1283,7 +1869,249 @@
     "verifiedOn": "2026-11-08",
     "confidence": "high",
     "catches": "An account is required to see covered pumps. Most insurers require a prescription; Byram contacts your doctor. Some pumps are partially covered (upgrade cost).",
-    "notes": "Steps per Byram: 1) Select your insurance and create an account. 2) Choose a pump. 3) Place your order and Byram verifies with your insurer. 4) Pump ships (timing depends on insurance; page says within 4-5 days of order or of the due date window). Have your prescription and insurance card ready. byramhealthcare.com redirects to byrambaby.com."
+    "notes": "Steps per Byram: 1) Select your insurance and create an account. 2) Choose a pump. 3) Place your order and Byram verifies with your insurer. 4) Pump ships (timing depends on insurance; page says within 4-5 days of order or of the due date window). Have your prescription and insurance card ready. byramhealthcare.com redirects to byrambaby.com.",
+    "sameAs": "healthcare-gov-insurance-covered-breast-pump"
+  },
+  {
+    "id": "caresource-babies-first-rewards",
+    "name": "CareSource Babies First rewards",
+    "brand": "CareSource",
+    "category": "health-benefits",
+    "whatYouGet": "Medicaid members who enroll can earn rewards on a prepaid card for prenatal, postpartum and well-baby visits.",
+    "offers": [
+      "cash"
+    ],
+    "certainty": "if-eligible",
+    "freeStuff": "Prepaid-card rewards for prenatal, postpartum and well-baby visits.",
+    "valueLow": 75,
+    "valueHigh": 200,
+    "valueSource": "official",
+    "valueBasis": "Plan materials say Ohio $75 first visit, Kentucky up to $150, Indiana up to $200",
+    "costToClaim": "free",
+    "costDetail": "Members of the plan only; must enroll each pregnancy.",
+    "requirements": [
+      "insurance",
+      "eligibility"
+    ],
+    "eligibility": "CareSource Medicaid members in the states with the program (Indiana, Kentucky and Ohio on the pages seen).",
+    "region": "IN, KY, OH",
+    "states": [
+      "IN",
+      "KY",
+      "OH"
+    ],
+    "effort": "some",
+    "when": "pregnancy",
+    "whenNote": "Re-enroll with each pregnancy; earn from early prenatal visits.",
+    "signupUrl": "https://www.caresource.com/plans/medicaid/benefits-services/additional-services/babies-first/",
+    "sourceUrls": [
+      "https://www.caresource.com/plans/medicaid/benefits-services/additional-services/babies-first/",
+      "https://www.caresource.com/documents/babies-first-rewards-program-ky-med/"
+    ],
+    "verifiedOn": "2026-11-10",
+    "confidence": "low",
+    "catches": "Rewards post only after the claim is processed (up to 45 to 60 days). Amounts differ by state and some brochures are old.",
+    "notes": "Seen: Indiana up to $200, Kentucky up to $150, Ohio $75 for the first prenatal visit. Georgia was removed from the state list in the second merge because it rested on a page title only.",
+    "sameAs": ""
+  },
+  {
+    "id": "count-the-kicks-app",
+    "name": "Count the Kicks free app",
+    "brand": "Healthy Birth Day, Inc.",
+    "category": "health-benefits",
+    "whatYouGet": "A free app and paper charts to count baby movements in the third trimester and spot changes early.",
+    "offers": [
+      "service"
+    ],
+    "certainty": "guaranteed",
+    "freeStuff": "A free kick-counting app.",
+    "valueLow": null,
+    "valueHigh": null,
+    "valueSource": "none",
+    "valueBasis": "",
+    "costToClaim": "free",
+    "costDetail": "Free app in 20+ languages.",
+    "requirements": [
+      "app"
+    ],
+    "eligibility": "Anyone pregnant; starting at 28 weeks (26 if high risk).",
+    "region": "US",
+    "states": [],
+    "effort": "quick",
+    "when": "late-pregnancy",
+    "whenNote": "Counting starts at 28 weeks, or 26 weeks for high-risk pregnancies.",
+    "signupUrl": "https://countthekicks.org/",
+    "sourceUrls": [
+      "https://countthekicks.org/",
+      "https://countthekicks.org/faq/"
+    ],
+    "verifiedOn": "2026-11-10",
+    "confidence": "medium",
+    "catches": "Not medical advice; call your provider if movements change.",
+    "notes": "",
+    "sameAs": ""
+  },
+  {
+    "id": "family-connects-nurse-home-visit",
+    "name": "Family Connects nurse home visit",
+    "brand": "Family Connects International",
+    "category": "health-benefits",
+    "whatYouGet": "A free nurse home visit about 3 weeks after birth to check mother and baby and link families to help.",
+    "offers": [
+      "service"
+    ],
+    "certainty": "if-eligible",
+    "freeStuff": "A free nurse visit at home after birth.",
+    "valueLow": null,
+    "valueHigh": null,
+    "valueSource": "none",
+    "valueBasis": "",
+    "costToClaim": "free",
+    "costDetail": "Free and voluntary.",
+    "requirements": [
+      "address"
+    ],
+    "eligibility": "All families with newborns in participating communities.",
+    "region": "Participating communities in about 18 states",
+    "states": [],
+    "effort": "some",
+    "when": "after-birth",
+    "whenNote": "Visit usually about 3 weeks after birth.",
+    "signupUrl": "https://familyconnects.org/",
+    "sourceUrls": [
+      "https://familyconnects.org/",
+      "https://familyconnects.org/our-work/"
+    ],
+    "verifiedOn": "2026-11-10",
+    "confidence": "medium",
+    "catches": "Only in communities that run it. Oregon and New Jersey have statewide versions.",
+    "notes": "Ask the birth hospital or health department.",
+    "sameAs": ""
+  },
+  {
+    "id": "price-chopper-free-prenatal-vitamins",
+    "name": "Free prenatal and children's vitamins",
+    "brand": "Price Chopper / Market 32",
+    "category": "health-benefits",
+    "whatYouGet": "A Price Chopper blog post lists free prenatal and children's vitamins among its pharmacy savings programs.",
+    "offers": [
+      "product"
+    ],
+    "certainty": "likely",
+    "freeStuff": "Free prenatal vitamins at a Price Chopper or Market 32 pharmacy, if the program still runs.",
+    "valueLow": 10,
+    "valueHigh": 20,
+    "valueSource": "estimate",
+    "valueBasis": "One to two bottles of store-brand prenatal vitamins at about $10 each; the program's terms are not stated",
+    "costToClaim": "free",
+    "costDetail": "Listed as free; the post gives no sign-up steps, covered products or limits.",
+    "requirements": [
+      "eligibility"
+    ],
+    "eligibility": "Not stated; likely needs a prescription filled at a Price Chopper or Market 32 pharmacy. Ask the pharmacist.",
+    "region": "Price Chopper and Market 32 pharmacies in Connecticut, Massachusetts, New Hampshire, New York, Pennsylvania and Vermont",
+    "states": [
+      "CT",
+      "MA",
+      "NH",
+      "NY",
+      "PA",
+      "VT"
+    ],
+    "effort": "some",
+    "when": "pregnancy",
+    "whenNote": "",
+    "signupUrl": "https://www.pricechopper.com/blog/tag/flu-shot/",
+    "sourceUrls": [
+      "https://www.pricechopper.com/blog/tag/flu-shot/"
+    ],
+    "verifiedOn": "2026-11-10",
+    "confidence": "low",
+    "catches": "Only one undated blog post (found under a flu-shot tag) mentions it; no eligibility rules or product list were found, and store pages do not mention it. Confirm with the pharmacy before relying on it.",
+    "notes": "Official-domain search only. Left at low confidence because the program is mentioned in one place.",
+    "sameAs": ""
+  },
+  {
+    "id": "meijer-free-prenatal-vitamins",
+    "name": "Free prenatal vitamin prescriptions",
+    "brand": "Meijer",
+    "category": "health-benefits",
+    "whatYouGet": "Meijer pharmacies list prenatal vitamins in their free prescription program, so an eligible prenatal prescription is filled at no cost, with or without insurance.",
+    "offers": [
+      "product"
+    ],
+    "certainty": "likely",
+    "freeStuff": "Covered prenatal vitamin prescriptions filled at no cost at a Meijer pharmacy.",
+    "valueLow": 13,
+    "valueHigh": 26,
+    "valueSource": "estimate",
+    "valueBasis": "One to two bottles at Meijer's about $13 for 100 prenatal tablets; covered brands may differ",
+    "costToClaim": "free",
+    "costDetail": "Free for covered prenatal vitamin prescriptions; the covered list and any quantity limit are not stated on the pages found.",
+    "requirements": [
+      "eligibility"
+    ],
+    "eligibility": "Needs a prescription for a covered prenatal vitamin; a 2011 Meijer release says any customer qualifies regardless of insurance or co-pay.",
+    "region": "Meijer stores in Illinois, Indiana, Kentucky, Michigan, Ohio and Wisconsin",
+    "states": [
+      "IL",
+      "IN",
+      "KY",
+      "MI",
+      "OH",
+      "WI"
+    ],
+    "effort": "some",
+    "when": "pregnancy",
+    "whenNote": "",
+    "signupUrl": "https://newsroom.meijer.com/specialty-teams",
+    "sourceUrls": [
+      "https://newsroom.meijer.com/specialty-teams",
+      "https://community.meijer.com/meijer/b/mediarelations/posts/june-29-2011-meijer-delivers-one-million-free-pre-natal-vitamin-prescriptions-to-women-throughout-the-midwest",
+      "https://www.meijer.com/shopping/services/pharmacy/pharmacy-services"
+    ],
+    "verifiedOn": "2026-11-10",
+    "confidence": "low",
+    "catches": "The newsroom page is undated and the detailed terms are from a 2011 release, so the covered brands may have changed (the 2011 list named TriAdvance, Trinatal GT, Trinatal Ultra, Vol-Nate, Vol-Plus, Vol-Tab). Meijer's current quality page only says to ask the pharmacist about free select prescriptions. Needs a prescription from a clinician. Call the pharmacy first.",
+    "notes": "Not fetchable; based on official-domain search results only.",
+    "sameAs": ""
+  },
+  {
+    "id": "healthcare-gov-preventive-care-women",
+    "name": "Free preventive care for women under the ACA",
+    "brand": "HealthCare.gov",
+    "category": "health-benefits",
+    "whatYouGet": "Most plans cover contraception, breastfeeding support and supplies and folic acid at no cost, including after birth.",
+    "offers": [
+      "coverage"
+    ],
+    "certainty": "if-eligible",
+    "freeStuff": "Contraception, lactation support and folic acid at no cost.",
+    "valueLow": null,
+    "valueHigh": null,
+    "valueSource": "none",
+    "valueBasis": "",
+    "costToClaim": "free",
+    "costDetail": "No cost sharing when from an in-network provider.",
+    "requirements": [
+      "insurance"
+    ],
+    "eligibility": "People with ACA-compliant plans; some religious employers are exempt.",
+    "region": "US",
+    "states": [],
+    "effort": "some",
+    "when": "anytime",
+    "whenNote": "Postpartum contraception and lactation support are used after birth.",
+    "signupUrl": "https://www.healthcare.gov/preventive-care-women/",
+    "sourceUrls": [
+      "https://www.healthcare.gov/preventive-care-women/",
+      "https://www.healthcare.gov/coverage/preventive-care-benefits/"
+    ],
+    "verifiedOn": "2026-11-10",
+    "confidence": "low",
+    "catches": "Pages are old. $0 is not guaranteed in every case. Tdap and flu in pregnancy and RSV were not confirmed here.",
+    "notes": "",
+    "sameAs": ""
   },
   {
     "id": "anthem-future-moms",
@@ -1321,7 +2149,8 @@
     "verifiedOn": "2026-11-10",
     "confidence": "low",
     "catches": "Ohio Medicaid page says up to $80 for prenatal and postpartum visits; dual Medicare and Medicaid members may not qualify. Many sources are old.",
-    "notes": "Call 888-990-8681 or use the Benefit Reward Hub per the Ohio page."
+    "notes": "Call 888-990-8681 or use the Benefit Reward Hub per the Ohio page.",
+    "sameAs": ""
   },
   {
     "id": "healthcare-gov-pregnancy-coverage",
@@ -1357,7 +2186,8 @@
     "verifiedOn": "2026-11-08",
     "confidence": "high",
     "catches": "Pregnancy alone does not open a Special Enrollment Period; the birth of a child does (apply within 60 days of birth). Open Enrollment runs Nov 1 - Jan 15. Marketplace plans can have premiums, deductibles and copays.",
-    "notes": "Medicaid or CHIP coverage can begin any time if you are eligible."
+    "notes": "Medicaid or CHIP coverage can begin any time if you are eligible.",
+    "sameAs": ""
   },
   {
     "id": "uhc-healthy-first-steps",
@@ -1395,7 +2225,8 @@
     "verifiedOn": "2026-11-10",
     "confidence": "medium",
     "catches": "Medicaid plan members only; rewards differ by state and may change. Kansas document lists $100 for a first-trimester exam, $100 postpartum, $100 for case management and $50 for an in-home visit; Maryland, Ohio and Louisiana list $20 for signing up.",
-    "notes": "From official-domain search results only."
+    "notes": "From official-domain search results only.",
+    "sameAs": ""
   },
   {
     "id": "cigna-healthy-pregnancies-healthy-babies",
@@ -1433,7 +2264,52 @@
     "verifiedOn": "2026-11-10",
     "confidence": "medium",
     "catches": "The incentive amount is not stated in the results; some pages are older.",
-    "notes": "Enroll by calling the number on the member ID card or through the Cigna Healthy Pregnancy app."
+    "notes": "Enroll by calling the number on the member ID card or through the Cigna Healthy Pregnancy app.",
+    "sameAs": ""
+  },
+  {
+    "id": "highmark-mom-options-mom-matters",
+    "name": "Highmark MOM Options and MOM Matters",
+    "brand": "Highmark Health Options and Highmark Wholecare",
+    "category": "health-benefits",
+    "whatYouGet": "Medicaid members who keep prenatal visits can choose an infant car seat, stroller, Pack n Play or baby shower box; Wholecare pays money for visits and offers free classes and rides.",
+    "offers": [
+      "product",
+      "cash"
+    ],
+    "certainty": "if-eligible",
+    "freeStuff": "A choice of car seat, stroller or Pack n Play for plan members who keep prenatal visits.",
+    "valueLow": 80,
+    "valueHigh": 100,
+    "valueSource": "estimate",
+    "valueBasis": "One baby item such as a portable crib at about $80 to $100",
+    "costToClaim": "free",
+    "costDetail": "Members of those plans only.",
+    "requirements": [
+      "insurance",
+      "eligibility"
+    ],
+    "eligibility": "Highmark Health Options (DE, WV) or Highmark Wholecare (PA) Medicaid members.",
+    "region": "DE, WV, PA",
+    "states": [
+      "DE",
+      "WV",
+      "PA"
+    ],
+    "effort": "some",
+    "when": "pregnancy",
+    "whenNote": "Rewards tied to regular prenatal visits.",
+    "signupUrl": "https://www.highmark.com/wholecare/medicaid/coverage-benefits/pregnancy-pediatrics/mom-matters",
+    "sourceUrls": [
+      "https://www.highmark.com/wholecare/medicaid/coverage-benefits/pregnancy-pediatrics/mom-matters",
+      "https://www.highmark.com/health-options-de/medicaid/benefits-programs/pregnancy-newborn-benefits",
+      "https://www.highmark.com/health-options-wv/medicaid-chip/benefits-services/maternity-coverage"
+    ],
+    "verifiedOn": "2026-11-10",
+    "confidence": "low",
+    "catches": "Search summaries only; the exact amounts and visit rules were not shown.",
+    "notes": "Highmark Baby Blocks not found. Baby Blueprints is a commercial-plan coaching program.",
+    "sameAs": ""
   },
   {
     "id": "humana-humanabeginnings",
@@ -1479,7 +2355,8 @@
     "verifiedOn": "2026-11-10",
     "confidence": "medium",
     "catches": "Gift cards cannot buy prescription drugs or other covered medical services. Some state pages are 1 to 4 years old.",
-    "notes": "Ohio 2025 guide: $25 for notifying of pregnancy, $10 per prenatal visit up to $100, $50 postpartum, $10 per well-baby visit up to 6. Oklahoma: car seat or portable crib per infant after enrollment steps. Kentucky: doula help at no cost. Some states list a free pump with an OB referral."
+    "notes": "Ohio 2025 guide: $25 for notifying of pregnancy, $10 per prenatal visit up to $100, $50 postpartum, $10 per well-baby visit up to 6. Oklahoma: car seat or portable crib per infant after enrollment steps. Kentucky: doula help at no cost. Some states list a free pump with an OB referral.",
+    "sameAs": ""
   },
   {
     "id": "1-natural-way-breast-pump-insurance",
@@ -1516,7 +2393,51 @@
     "verifiedOn": "2026-11-08",
     "confidence": "high",
     "catches": "Site says most moms are fully covered; shipping follows insurance guidelines, so start the check around week 20. Breast pumps cannot be returned or exchanged once shipped. If your plan is not covered, the site offers 20% off retail instead. Other paid products (e.g. gender test, $169) are separate.",
-    "notes": "Steps per 1NW: 1) Check coverage (about 2 minutes). 2) Choose a covered pump and accessories. 3) Pump ships free, timed to your insurance guidelines. Sign-up page is /register."
+    "notes": "Steps per 1NW: 1) Check coverage (about 2 minutes). 2) Choose a covered pump and accessories. 3) Pump ships free, timed to your insurance guidelines. Sign-up page is /register.",
+    "sameAs": "healthcare-gov-insurance-covered-breast-pump"
+  },
+  {
+    "id": "kaiser-permanente-prenatal-classes",
+    "name": "Kaiser Permanente prenatal and childbirth classes",
+    "brand": "Kaiser Permanente",
+    "category": "health-benefits",
+    "whatYouGet": "Members can take childbirth preparation and newborn classes at no fee at most regions.",
+    "offers": [
+      "service"
+    ],
+    "certainty": "if-eligible",
+    "freeStuff": "Free childbirth preparation classes for Kaiser members.",
+    "valueLow": 150,
+    "valueHigh": 150,
+    "valueSource": "estimate",
+    "valueBasis": "One site lists $150 per couple for nonmembers",
+    "costToClaim": "free",
+    "costDetail": "No fee for members; one site lists $150 per couple for nonmembers.",
+    "requirements": [
+      "insurance"
+    ],
+    "eligibility": "Kaiser Permanente members; some regions open some classes to nonmembers.",
+    "region": "CA, GA, MD, VA, DC",
+    "states": [
+      "CA",
+      "GA",
+      "MD",
+      "VA",
+      "DC"
+    ],
+    "effort": "some",
+    "when": "pregnancy",
+    "whenNote": "Classes are usually taken in the third trimester; register weeks ahead.",
+    "signupUrl": "https://healthy.kaiserpermanente.org/northern-california/health-wellness/maternity/find-hospital/san-jose/classes-resources",
+    "sourceUrls": [
+      "https://healthy.kaiserpermanente.org/northern-california/health-wellness/maternity/find-hospital/san-jose/classes-resources",
+      "https://georgia.kaiserpermanente.org/healthyliving/classes/pregnancy-newborn-care/"
+    ],
+    "verifiedOn": "2026-11-10",
+    "confidence": "medium",
+    "catches": "Fees and formats differ by region; register 3 to 4 weeks ahead at some sites.",
+    "notes": "Only for people with Kaiser coverage.",
+    "sameAs": ""
   },
   {
     "id": "lactation-network-insurance-covered-lactation-support",
@@ -1555,7 +2476,90 @@
     "verifiedOn": "2026-11-08",
     "confidence": "high",
     "catches": "Coverage check is not a guarantee; eligibility is confirmed after you register. Babies cannot be added to insurance before birth, so baby insurance details are added after the birth.",
-    "notes": "Fetched directly: home page says see an IBCLC in-home, in-office or online, all covered by insurance; Check eligibility goes to the registration form. FAQ says registration asks for demographics, email, phone and insurance card. Pump supply is not part of this offer on the pages read."
+    "notes": "Fetched directly: home page says see an IBCLC in-home, in-office or online, all covered by insurance; Check eligibility goes to the registration form. FAQ says registration asks for demographics, email, phone and insurance card. Pump supply is not part of this offer on the pages read.",
+    "sameAs": ""
+  },
+  {
+    "id": "march-of-dimes-mom-baby-mobile-health-centers",
+    "name": "March of Dimes Mom & Baby Mobile Health Centers",
+    "brand": "March of Dimes",
+    "category": "health-benefits",
+    "whatYouGet": "Mobile clinics giving prenatal and postpartum care, free or regardless of ability to pay, in selected communities.",
+    "offers": [
+      "service"
+    ],
+    "certainty": "if-eligible",
+    "freeStuff": "Prenatal and postpartum care in a mobile clinic.",
+    "valueLow": null,
+    "valueHigh": null,
+    "valueSource": "none",
+    "valueBasis": "",
+    "costToClaim": "free",
+    "costDetail": "Free or pay-what-you-can at some sites; confirm per site.",
+    "requirements": [
+      "eligibility"
+    ],
+    "eligibility": "People in underserved areas, including the uninsured and underinsured.",
+    "region": "Columbus and Southeast OH, Tucson and Phoenix AZ, DC area, New York City, Houston",
+    "states": [
+      "OH",
+      "AZ",
+      "DC",
+      "MD",
+      "NY",
+      "TX"
+    ],
+    "effort": "some",
+    "when": "pregnancy",
+    "whenNote": "Prenatal care is best started early.",
+    "signupUrl": "https://www.marchofdimes.org/our-work/programs/mobile-health-centers",
+    "sourceUrls": [
+      "https://www.marchofdimes.org/our-work/programs/mobile-health-centers",
+      "https://www.marchofdimes.org/find-support/support-your-area"
+    ],
+    "verifiedOn": "2026-11-10",
+    "confidence": "low",
+    "catches": "Limited locations. Whether every site is free was not confirmed.",
+    "notes": "New centers planned in AZ and AL in 2026.",
+    "sameAs": ""
+  },
+  {
+    "id": "masshealth-free-prenatal-vitamins",
+    "name": "MassHealth free prenatal vitamins",
+    "brand": "MassHealth",
+    "category": "health-benefits",
+    "whatYouGet": "MassHealth members can get prenatal vitamins free at a local pharmacy without a prescription.",
+    "offers": [
+      "product"
+    ],
+    "certainty": "if-eligible",
+    "freeStuff": "Free prenatal vitamins from the pharmacy.",
+    "valueLow": null,
+    "valueHigh": null,
+    "valueSource": "none",
+    "valueBasis": "",
+    "costToClaim": "free",
+    "costDetail": "Free for MassHealth members.",
+    "requirements": [
+      "insurance"
+    ],
+    "eligibility": "MassHealth members who are pregnant or lactating.",
+    "region": "Massachusetts",
+    "states": [
+      "MA"
+    ],
+    "effort": "quick",
+    "when": "pregnancy",
+    "whenNote": "Used during pregnancy.",
+    "signupUrl": "https://www.mass.gov/info-details/providers-caring-for-pregnant-and-postpartum-masshealth-members",
+    "sourceUrls": [
+      "https://www.mass.gov/info-details/providers-caring-for-pregnant-and-postpartum-masshealth-members"
+    ],
+    "verifiedOn": "2026-11-10",
+    "confidence": "low",
+    "catches": "Based on one search result from a provider page; confirm with the pharmacy.",
+    "notes": "",
+    "sameAs": ""
   },
   {
     "id": "aeroflow-maternity-compression",
@@ -1594,7 +2598,8 @@
     "verifiedOn": "2026-11-10",
     "confidence": "low",
     "catches": "Compression socks showed as out of stock on one page; coverage varies; copays apply.",
-    "notes": "Garments are for use up to four months after birth; socks for roughly months 3 to 9 of pregnancy."
+    "notes": "Garments are for use up to four months after birth; socks for roughly months 3 to 9 of pregnancy.",
+    "sameAs": ""
   },
   {
     "id": "medicaid-chip-pregnancy-coverage",
@@ -1631,7 +2636,8 @@
     "verifiedOn": "2026-11-08",
     "confidence": "high",
     "catches": "Details such as income limits differ by state.",
-    "notes": "You can apply any time of year. When a pregnant woman is enrolled in Medicaid or CHIP, her newborn is automatically enrolled (InsureKidsNow.gov)."
+    "notes": "You can apply any time of year. When a pregnant woman is enrolled in Medicaid or CHIP, her newborn is automatically enrolled (InsureKidsNow.gov).",
+    "sameAs": ""
   },
   {
     "id": "medicaid-doula-coverage",
@@ -1667,7 +2673,89 @@
     "verifiedOn": "2026-11-10",
     "confidence": "low",
     "catches": "No single current state list was found on an official page; counts conflict across sources. Check your state Medicaid agency.",
-    "notes": "Named in results: NJ, NY, MA, DE, PA, LA, VA, OR, SD (CHIP), MD, NM. A CMS brief counts 15 states and DC as of October 2024."
+    "notes": "Named in results: NJ, NY, MA, DE, PA, LA, VA, OR, SD (CHIP), MD, NM. A CMS brief counts 15 states and DC as of October 2024.",
+    "sameAs": ""
+  },
+  {
+    "id": "my-health-pays-prenatal-rewards",
+    "name": "My Health Pays prenatal rewards (Centene Medicaid plans)",
+    "brand": "Sunshine Health, Superior HealthPlan, Coordinated Care, Peach State Health Plan",
+    "category": "health-benefits",
+    "whatYouGet": "Medicaid members earn money on a prepaid card for early prenatal visits and a postpartum visit.",
+    "offers": [
+      "cash"
+    ],
+    "certainty": "if-eligible",
+    "freeStuff": "Prepaid-card rewards for early prenatal visits and a postpartum visit.",
+    "valueLow": 25,
+    "valueHigh": 150,
+    "valueSource": "official",
+    "valueBasis": "Plan pages state $25 to $100 per visit and a $150 yearly cap at Superior",
+    "costToClaim": "free",
+    "costDetail": "Members of those plans only.",
+    "requirements": [
+      "insurance",
+      "eligibility"
+    ],
+    "eligibility": "Medicaid or CHIP members of the listed plans.",
+    "region": "FL, TX, WA, GA",
+    "states": [
+      "FL",
+      "TX",
+      "WA",
+      "GA"
+    ],
+    "effort": "some",
+    "when": "pregnancy",
+    "whenNote": "First-trimester visits (or within 42 days of enrolling) earn the most.",
+    "signupUrl": "https://www.superiorhealthplan.com/members/medicaid/value-added-services/healthy-rewards-program.html",
+    "sourceUrls": [
+      "https://www.sunshinehealth.com/members/smi/benefits-services/pregnancy-and-newborn-services/pregnancy-services/my-health-pays-rewards.html",
+      "https://www.superiorhealthplan.com/members/medicaid/value-added-services/healthy-rewards-program.html",
+      "https://www.coordinatedcarehealth.com/members/medicaid/benefits-services/healthy-rewards-program.html"
+    ],
+    "verifiedOn": "2026-11-10",
+    "confidence": "medium",
+    "catches": "Superior requires enrollment from Jan 1, 2027 and caps rewards at $150 a year; Coordinated Care 2027 requires a Notification of Pregnancy. Amounts differ by plan and year.",
+    "notes": "Superior TX $75 to $100 first-trimester visit; Sunshine FL up to $100; Coordinated WA $25 (2026) rising to $30; Peach State GA up to $90 for pregnancy items.",
+    "sameAs": ""
+  },
+  {
+    "id": "postpartum-support-international-online-groups",
+    "name": "Postpartum Support International online support groups",
+    "brand": "Postpartum Support International",
+    "category": "health-benefits",
+    "whatYouGet": "Free weekly online support groups for pregnant and postpartum parents on Zoom, including first-time moms and loss support.",
+    "offers": [
+      "service"
+    ],
+    "certainty": "guaranteed",
+    "freeStuff": "Free online peer support groups.",
+    "valueLow": null,
+    "valueHigh": null,
+    "valueSource": "none",
+    "valueBasis": "",
+    "costToClaim": "free",
+    "costDetail": "Free; skip the paid upgrade offered at sign-up.",
+    "requirements": [
+      "email"
+    ],
+    "eligibility": "Pregnant and postpartum people and partners.",
+    "region": "US",
+    "states": [],
+    "effort": "quick",
+    "when": "anytime",
+    "whenNote": "Open during pregnancy and up to two years postpartum for the main group.",
+    "signupUrl": "https://postpartum.net/get-help/psi-online-support-meetings/",
+    "sourceUrls": [
+      "https://postpartum.net/get-help/psi-online-support-meetings/",
+      "https://postpartum.net/get-help/"
+    ],
+    "verifiedOn": "2026-11-10",
+    "confidence": "medium",
+    "catches": "Groups cap at 16 to 25 people; arrive early. The helpline is a separate listed entry.",
+    "notes": "",
+    "sameAs": ""
   },
   {
     "id": "molina-pregnancy-rewards",
@@ -1713,7 +2801,8 @@
     "verifiedOn": "2026-11-10",
     "confidence": "medium",
     "catches": "Rewards can take up to 120 days to process (Florida) and need an enrolled member at the time of the visit. Other states may differ; the list is only the states seen.",
-    "notes": "Examples from results: Texas $25 to $50 early exam plus a car seat, $50 postpartum; Ohio up to $225 to $250; Illinois $50 or a Bump Box or car seat; Florida $25, $50, $50; South Carolina up to $100; Wisconsin car seat or Pack n Play after 6 prenatal visits."
+    "notes": "Examples from results: Texas $25 to $50 early exam plus a car seat, $50 postpartum; Ohio up to $225 to $250; Illinois $50 or a Bump Box or car seat; Florida $25, $50, $50; South Carolina up to $100; Wisconsin car seat or Pack n Play after 6 prenatal visits.",
+    "sameAs": ""
   },
   {
     "id": "aeroflow-breastpumps-insurance",
@@ -1754,7 +2843,8 @@
     "verifiedOn": "2026-11-08",
     "confidence": "high",
     "catches": "Form asks for email, due date, name, date of birth, phone, state and insurance details; includes optional marketing opt-in. Most insurers require a prescription (Aeroflow contacts your doctor). Shipping follows insurer rules.",
-    "notes": "Steps per Aeroflow: 1) Fill out the form with due date and insurance info (during pregnancy or up to one year postpartum). 2) Aeroflow verifies benefits and shows covered items. 3) Add your covered pump to the cart; Aeroflow handles the prescription and paperwork. Free shipping on covered items. Pumping Essentials (pumpingessentials.com) says it is part of the Aeroflow family and uses Aeroflow's form, terms and optional marketing opt-in, so it is covered by this entry."
+    "notes": "Steps per Aeroflow: 1) Fill out the form with due date and insurance info (during pregnancy or up to one year postpartum). 2) Aeroflow verifies benefits and shows covered items. 3) Add your covered pump to the cart; Aeroflow handles the prescription and paperwork. Free shipping on covered items. Pumping Essentials (pumpingessentials.com) says it is part of the Aeroflow family and uses Aeroflow's form, terms and optional marketing opt-in, so it is covered by this entry.",
+    "sameAs": "healthcare-gov-insurance-covered-breast-pump"
   },
   {
     "id": "ambetter-start-smart-for-your-baby",
@@ -1791,7 +2881,8 @@
     "verifiedOn": "2026-11-10",
     "confidence": "medium",
     "catches": "Search results show no reward or free item tied to Start Smart itself; a separate My Health Pays program is listed.",
-    "notes": "Enroll by calling the number on the ID card or submitting a Notification of Pregnancy in the member account."
+    "notes": "Enroll by calling the number on the ID card or submitting a Notification of Pregnancy in the member account.",
+    "sameAs": ""
   },
   {
     "id": "tricare-breast-pump-and-supplies",
@@ -1828,7 +2919,87 @@
     "verifiedOn": "2026-11-10",
     "confidence": "medium",
     "catches": "Batteries, travel bags, cleaning supplies, nursing bras and warranties are not covered. Hospital-grade rentals need a referral and authorization.",
-    "notes": "Supply limits listed: 100 storage bags per 30 days, 2 bottles and 2 locking rings per 12 months, 1 valve set per month for 12 months."
+    "notes": "Supply limits listed: 100 storage bags per 30 days, 2 bottles and 2 locking rings per 12 months, 1 valve set per month for 12 months.",
+    "sameAs": "healthcare-gov-insurance-covered-breast-pump"
+  },
+  {
+    "id": "upmc-for-you-baby-steps-gift",
+    "name": "UPMC for You Baby Steps baby gift",
+    "brand": "UPMC Health Plan",
+    "category": "health-benefits",
+    "whatYouGet": "Medicaid members who finish the Baby Steps program can pick a free baby gift bundle.",
+    "offers": [
+      "product"
+    ],
+    "certainty": "if-eligible",
+    "freeStuff": "A baby gift bundle for members who complete Baby Steps.",
+    "valueLow": 80,
+    "valueHigh": 100,
+    "valueSource": "estimate",
+    "valueBasis": "One portable crib or car seat equivalent at about $80 to $100",
+    "costToClaim": "free",
+    "costDetail": "Members of UPMC for You only.",
+    "requirements": [
+      "insurance",
+      "eligibility",
+      "phone"
+    ],
+    "eligibility": "UPMC for You members who join Baby Steps before 34 weeks and start prenatal care before 13 weeks.",
+    "region": "Pennsylvania",
+    "states": [
+      "PA"
+    ],
+    "effort": "some",
+    "when": "pregnancy",
+    "whenNote": "Join before 34 weeks of pregnancy.",
+    "signupUrl": "https://medicaid.upmchealthplan.com/learn/additional-benefits/",
+    "sourceUrls": [
+      "https://medicaid.upmchealthplan.com/learn/additional-benefits/",
+      "https://www.upmchealthplan.com/maternity/maternity-care-management"
+    ],
+    "verifiedOn": "2026-11-10",
+    "confidence": "medium",
+    "catches": "Must join by 34 weeks, keep calls and prenatal tests. Gift format changed over the years (car seat, stroller, play yard, now an online bundle).",
+    "notes": "Eligibility set by the Baby Steps health coach.",
+    "sameAs": ""
+  },
+  {
+    "id": "cdc-vaccines-for-children",
+    "name": "Vaccines for Children program",
+    "brand": "CDC",
+    "category": "health-benefits",
+    "whatYouGet": "Free childhood vaccines, including RSV antibody nirsevimab, for children who are Medicaid-eligible, uninsured, underinsured or American Indian/Alaska Native.",
+    "offers": [
+      "service"
+    ],
+    "certainty": "if-eligible",
+    "freeStuff": "Free childhood vaccines for eligible babies.",
+    "valueLow": null,
+    "valueHigh": null,
+    "valueSource": "none",
+    "valueBasis": "",
+    "costToClaim": "free",
+    "costDetail": "Vaccine is free; the office may charge a visit fee.",
+    "requirements": [
+      "eligibility"
+    ],
+    "eligibility": "Children 18 and under in the listed groups.",
+    "region": "US",
+    "states": [],
+    "effort": "some",
+    "when": "after-birth",
+    "whenNote": "Vaccines begin at birth and through childhood.",
+    "signupUrl": "https://www.cdc.gov/vaccines-for-children/vfc-information-for-parents/index.html",
+    "sourceUrls": [
+      "https://www.cdc.gov/vaccines-for-children/vfc-information-for-parents/index.html",
+      "https://www.cdc.gov/vaccines-for-children/hcp/program-eligibility/index.html",
+      "https://www.cdc.gov/rsv/vaccines/protect-infants.html"
+    ],
+    "verifiedOn": "2026-11-10",
+    "confidence": "medium",
+    "catches": "Underinsured children only get it at community health centers; CHIP-only children do not qualify. Ask the doctor to confirm they take VFC.",
+    "notes": "",
+    "sameAs": ""
   },
   {
     "id": "simplifed-lactation-support",
@@ -1865,7 +3036,8 @@
     "verifiedOn": "2026-11-10",
     "confidence": "medium",
     "catches": "Coverage is not guaranteed; Medicaid and out-of-network rules vary.",
-    "notes": "Seen only in official-domain search results."
+    "notes": "Seen only in official-domain search results.",
+    "sameAs": ""
   },
   {
     "id": "nest-collaborative-lactation",
@@ -1902,7 +3074,90 @@
     "verifiedOn": "2026-11-10",
     "confidence": "medium",
     "catches": "Coverage is not guaranteed; some plans need prior authorization or a referral.",
-    "notes": "Coverage claim comes from the provider, not an insurer."
+    "notes": "Coverage claim comes from the provider, not an insurer.",
+    "sameAs": ""
+  },
+  {
+    "id": "wellcare-nc-better-beginnings",
+    "name": "WellCare of North Carolina Better Beginnings rewards",
+    "brand": "WellCare of North Carolina (Medicaid)",
+    "category": "health-benefits",
+    "whatYouGet": "Medicaid members who notify the plan of pregnancy earn $25 for a prenatal visit and $25 for a postpartum visit, plus a choice of stroller, play yard, car seat or diapers.",
+    "offers": [
+      "cash",
+      "product"
+    ],
+    "certainty": "if-eligible",
+    "freeStuff": "Rewards plus a stroller, play yard, car seat or diapers for members who attend a prenatal visit.",
+    "valueLow": 100,
+    "valueHigh": 150,
+    "valueSource": "estimate",
+    "valueBasis": "$25 to $50 in rewards plus one item such as a play yard at about $80 to $100",
+    "costToClaim": "free",
+    "costDetail": "Members of the plan only.",
+    "requirements": [
+      "insurance",
+      "eligibility"
+    ],
+    "eligibility": "WellCare of NC Medicaid members who submit a Notification of Pregnancy.",
+    "region": "North Carolina",
+    "states": [
+      "NC"
+    ],
+    "effort": "some",
+    "when": "pregnancy",
+    "whenNote": "Notify the plan during pregnancy; reward follows a prenatal visit.",
+    "signupUrl": "https://www.wellcarenc.com/members/medicaid/healthy-moms-and-babies/better-beginnings.html",
+    "sourceUrls": [
+      "https://www.wellcarenc.com/members/medicaid/healthy-moms-and-babies/better-beginnings.html",
+      "https://www.wellcarenc.com/members/medicaid/benefits/my-health-pays.html"
+    ],
+    "verifiedOn": "2026-11-10",
+    "confidence": "medium",
+    "catches": "Must notify the plan before the birth. Up to $75 a year in rewards. A New Parent package and free pump are also mentioned; confirm with the plan.",
+    "notes": "South Carolina and Georgia WellCare pages exist but are older and not included.",
+    "sameAs": ""
+  },
+  {
+    "id": "wellpoint-medicaid-baby-essentials",
+    "name": "Wellpoint Medicaid baby essentials gift card",
+    "brand": "Wellpoint (Elevance Health)",
+    "category": "health-benefits",
+    "whatYouGet": "Washington members can get a $100 gift card for baby items, and West Virginia members up to $170 after six prenatal visits.",
+    "offers": [
+      "cash"
+    ],
+    "certainty": "if-eligible",
+    "freeStuff": "A gift card for baby items for Wellpoint Medicaid members.",
+    "valueLow": 100,
+    "valueHigh": 170,
+    "valueSource": "official",
+    "valueBasis": "Plan pages state $100 (WA) and up to $170 (WV)",
+    "costToClaim": "free",
+    "costDetail": "Members of the plan only.",
+    "requirements": [
+      "insurance",
+      "eligibility"
+    ],
+    "eligibility": "Wellpoint Medicaid members in WA or WV who complete required visits.",
+    "region": "WA, WV",
+    "states": [
+      "WA",
+      "WV"
+    ],
+    "effort": "some",
+    "when": "pregnancy",
+    "whenNote": "Card is earned through prenatal visits.",
+    "signupUrl": "https://www.wellpoint.com/wa/medicaid/extras",
+    "sourceUrls": [
+      "https://www.wellpoint.com/wa/medicaid/extras",
+      "https://www.wellpoint.com/wv/medicaid/extras"
+    ],
+    "verifiedOn": "2026-11-10",
+    "confidence": "medium",
+    "catches": "One card per pregnancy. Anthem Ohio offers a choice of two items; amounts on some Anthem pages are old.",
+    "notes": "Healthy Rewards line seen: 888-990-8681.",
+    "sameAs": ""
   },
   {
     "id": "211-org-community-help",
@@ -1935,7 +3190,8 @@
     "verifiedOn": "2026-11-08",
     "confidence": "medium",
     "catches": "Resources and what they offer vary by local 211 service; 2-1-1 refers you to programs rather than providing items itself.",
-    "notes": "Fetched directly: home page says every call is completely confidential and links to local 211 lookup. Not baby-specific."
+    "notes": "Fetched directly: home page says every call is completely confidential and links to local 211 lookup. Not baby-specific.",
+    "sameAs": ""
   },
   {
     "id": "early-head-start-pregnant-women",
@@ -1971,7 +3227,8 @@
     "verifiedOn": "2026-11-10",
     "confidence": "medium",
     "catches": "Not every program serves pregnant women; waiting lists possible.",
-    "notes": "Checked from the official site's search results; the site blocks automated reading, so details may be incomplete. headstart.gov returned 403 to automated fetching; official-domain search results say apply by contacting a local program (Head Start Center Locator or toll-free line 1-866-763-6481) and that waitlists are common."
+    "notes": "Checked from the official site's search results; the site blocks automated reading, so details may be incomplete. headstart.gov returned 403 to automated fetching; official-domain search results say apply by contacting a local program (Head Start Center Locator or toll-free line 1-866-763-6481) and that waitlists are common.",
+    "sameAs": ""
   },
   {
     "id": "ohio-every-baby-sleeps-safe",
@@ -2010,7 +3267,8 @@
     "verifiedOn": "2026-11-10",
     "confidence": "medium",
     "catches": "While quantities last. Partner list in the results dates from 2023, so confirm with a county partner.",
-    "notes": "Official-domain search results only."
+    "notes": "Official-domain search results only.",
+    "sameAs": ""
   },
   {
     "id": "cribs-for-kids-find-a-crib",
@@ -2045,7 +3303,8 @@
     "verifiedOn": "2026-11-10",
     "confidence": "medium",
     "catches": "Some partners provide education only; availability varies. One Cribs for Kids partner document says the program is not a free crib giveaway, so local partners set the terms.",
-    "notes": "Checked from the official site's search results; the site blocks automated reading, so details may be incomplete. Site returned 403 to automated fetching, so this rests on official-domain search results. Search results say you find the nearest partner on the site map and call to apply; if you are not eligible the site suggests Healthy Start or local health departments."
+    "notes": "Checked from the official site's search results; the site blocks automated reading, so details may be incomplete. Site returned 403 to automated fetching, so this rests on official-domain search results. Search results say you find the nearest partner on the site map and call to apply; if you are not eligible the site suggests Healthy Start or local health departments.",
+    "sameAs": ""
   },
   {
     "id": "safe-kids-car-seat-check",
@@ -2078,7 +3337,8 @@
     "verifiedOn": "2026-11-08",
     "confidence": "high",
     "catches": "Inspection and education only; not a free car seat. The page says events are free but does not say whether individual technicians or inspection stations charge. Availability depends on local events and technicians.",
-    "notes": "Fetched directly: page says Safe Kids coalitions host more than 8,000 free car seat inspection events and lists three ways to find a certified technician (events, the technician search, NHTSA's directory). Bring the car seat and vehicle manuals; you install the seat yourself with guidance."
+    "notes": "Fetched directly: page says Safe Kids coalitions host more than 8,000 free car seat inspection events and lists three ways to find a certified technician (events, the technician search, NHTSA's directory). Bring the car seat and vehicle manuals; you install the seat yourself with guidance.",
+    "sameAs": ""
   },
   {
     "id": "national-diaper-bank-network-get-help",
@@ -2114,7 +3374,8 @@
     "verifiedOn": "2026-11-08",
     "confidence": "high",
     "catches": "Availability varies by community; NDBN does not distribute diapers directly.",
-    "notes": "Fetched directly. Per the page: call 2-1-1 or search 211.org for diapers or basic needs, check listings under children, try faith-based groups and food pantries, or use the member diaper bank directory at /member-directory/."
+    "notes": "Fetched directly. Per the page: call 2-1-1 or search 211.org for diapers or basic needs, check listings under children, try faith-based groups and food pantries, or use the member diaper bank directory at /member-directory/.",
+    "sameAs": ""
   },
   {
     "id": "safe-kids-good-neighbor-car-seat-events",
@@ -2150,7 +3411,8 @@
     "verifiedOn": "2026-11-10",
     "confidence": "low",
     "catches": "Event dates and cities are limited. Safe Kids says a local coalition may charge a fee for a seat.",
-    "notes": "Official-domain search results only; no rules for who gets a seat were shown."
+    "notes": "Official-domain search results only; no rules for who gets a seat were shown.",
+    "sameAs": ""
   },
   {
     "id": "hrsa-healthy-start",
@@ -2187,7 +3449,46 @@
     "verifiedOn": "2026-11-08",
     "confidence": "medium",
     "catches": "Only in funded communities.",
-    "notes": "Checked from the official site's search results; the site blocks automated reading, so details may be incomplete. hrsa.gov and mchb.hrsa.gov returned 403; official-domain search results say projects have different enrollment guidelines, you must live in a served area, and the HRSA page lists a site finder."
+    "notes": "Checked from the official site's search results; the site blocks automated reading, so details may be incomplete. hrsa.gov and mchb.hrsa.gov returned 403; official-domain search results say projects have different enrollment guidelines, you must live in a served area, and the HRSA page lists a site finder.",
+    "sameAs": ""
+  },
+  {
+    "id": "mississippi-safe-riders-magnolia",
+    "name": "Mississippi Safe Riders Magnolia",
+    "brand": "Mississippi State Department of Health",
+    "category": "assistance",
+    "whatYouGet": "Car seat distribution for low-income households applied for through an online form.",
+    "offers": [
+      "product"
+    ],
+    "certainty": "if-eligible",
+    "freeStuff": "A car seat for qualifying Mississippi families.",
+    "valueLow": 100,
+    "valueHigh": 100,
+    "valueSource": "estimate",
+    "valueBasis": "One infant car seat at about $100",
+    "costToClaim": "free",
+    "costDetail": "Free for qualifying households.",
+    "requirements": [
+      "eligibility"
+    ],
+    "eligibility": "Low-income households or those receiving federal aid.",
+    "region": "Mississippi",
+    "states": [
+      "MS"
+    ],
+    "effort": "involved",
+    "when": "late-pregnancy",
+    "whenNote": "Apply before the baby arrives.",
+    "signupUrl": "https://msdh.ms.gov/page/43,0,98,1074.html",
+    "sourceUrls": [
+      "https://msdh.ms.gov/page/43,0,98,1074.html"
+    ],
+    "verifiedOn": "2026-11-10",
+    "confidence": "low",
+    "catches": "Details thinly shown; confirm with injuryprevention@msdh.ms.gov.",
+    "notes": "",
+    "sameAs": ""
   },
   {
     "id": "hrsa-national-maternal-mental-health-hotline",
@@ -2221,7 +3522,8 @@
     "verifiedOn": "2026-11-10",
     "confidence": "medium",
     "catches": "Some HRSA pages in the results are old. Counselors are not all licensed clinicians.",
-    "notes": "Official-domain search results only. TTY: dial 711 then the number."
+    "notes": "Official-domain search results only. TTY: dial 711 then the number.",
+    "sameAs": ""
   },
   {
     "id": "nurse-family-partnership-home-visits",
@@ -2257,7 +3559,8 @@
     "verifiedOn": "2026-11-10",
     "confidence": "medium",
     "catches": "Only where a local agency serves your area. The income figure was not in the results. The site is now branded Changent.",
-    "notes": "Official-domain search results only; pages are several years old."
+    "notes": "Official-domain search results only; pages are several years old.",
+    "sameAs": ""
   },
   {
     "id": "postpartum-support-international-helpline",
@@ -2291,7 +3594,86 @@
     "verifiedOn": "2026-11-08",
     "confidence": "medium",
     "catches": "Not for emergencies; response times vary (search results cite business-hours return, and up to about 48 hours on the Spanish page).",
-    "notes": "Checked from the official site's search results; the site blocks automated reading, so details may be incomplete. postpartum.net returned 403 to automated fetching; details from official-domain search results. In crisis call or text 988."
+    "notes": "Checked from the official site's search results; the site blocks automated reading, so details may be incomplete. postpartum.net returned 403 to automated fetching; details from official-domain search results. In crisis call or text 988.",
+    "sameAs": ""
+  },
+  {
+    "id": "texas-safe-riders-car-seats",
+    "name": "Texas Safe Riders child safety seats",
+    "brand": "Texas Department of State Health Services",
+    "category": "assistance",
+    "whatYouGet": "Free or low-cost car seats for low-income families after an education session.",
+    "offers": [
+      "product"
+    ],
+    "certainty": "if-eligible",
+    "freeStuff": "A free car seat for qualifying Texas families.",
+    "valueLow": 100,
+    "valueHigh": 100,
+    "valueSource": "estimate",
+    "valueBasis": "One infant car seat at about $100",
+    "costToClaim": "free",
+    "costDetail": "Free for qualifying families.",
+    "requirements": [
+      "eligibility",
+      "phone"
+    ],
+    "eligibility": "Low-income families or those with financial hardship; caregivers attend a class.",
+    "region": "Texas",
+    "states": [
+      "TX"
+    ],
+    "effort": "involved",
+    "when": "late-pregnancy",
+    "whenNote": "Get the seat before the baby is born.",
+    "signupUrl": "https://www.dshs.texas.gov/injury-prevention/safe-riders/child-safety-seat-distribution",
+    "sourceUrls": [
+      "https://www.dshs.texas.gov/injury-prevention/safe-riders/child-safety-seat-distribution"
+    ],
+    "verifiedOn": "2026-11-10",
+    "confidence": "medium",
+    "catches": "Call 800-252-8255 for a site; seat supply depends on the site.",
+    "notes": "",
+    "sameAs": ""
+  },
+  {
+    "id": "virginia-low-income-car-seat-program",
+    "name": "Virginia seat distribution program",
+    "brand": "Virginia Department of Health",
+    "category": "assistance",
+    "whatYouGet": "Free child car seats for families that qualify by income, given out at local sites.",
+    "offers": [
+      "product"
+    ],
+    "certainty": "if-eligible",
+    "freeStuff": "A free car seat for income-eligible Virginia families.",
+    "valueLow": 100,
+    "valueHigh": 100,
+    "valueSource": "estimate",
+    "valueBasis": "One infant car seat at about $100",
+    "costToClaim": "free",
+    "costDetail": "Free; class may be required.",
+    "requirements": [
+      "eligibility",
+      "phone"
+    ],
+    "eligibility": "Parents eligible for WIC, SNAP, Medicaid, TANF or FAMIS with a child 7 or younger.",
+    "region": "Virginia",
+    "states": [
+      "VA"
+    ],
+    "effort": "involved",
+    "when": "late-pregnancy",
+    "whenNote": "Get the seat before the hospital trip home.",
+    "signupUrl": "https://www.vdh.virginia.gov/child-passenger-safety/low-income-safety-seat-program/",
+    "sourceUrls": [
+      "https://www.vdh.virginia.gov/child-passenger-safety/low-income-safety-seat-program/"
+    ],
+    "verifiedOn": "2026-11-10",
+    "confidence": "medium",
+    "catches": "Call 1-800-732-8333 to find a local site.",
+    "notes": "",
+    "sameAs": ""
   },
   {
     "id": "usda-wic",
@@ -2329,7 +3711,84 @@
     "verifiedOn": "2026-11-10",
     "confidence": "medium",
     "catches": "Requires an appointment with a local WIC agency; bring ID, proof of address and proof of income or program enrollment as the agency instructs.",
-    "notes": "Steps: 1) Use the Eligibility Tool. 2) Contact your local WIC agency by phone or online to start. 3) Attend an in-person or virtual appointment. fns.usda.gov now redirects to fna.usda.gov (Food and Nutrition Administration)."
+    "notes": "Steps: 1) Use the Eligibility Tool. 2) Contact your local WIC agency by phone or online to start. 3) Attend an in-person or virtual appointment. fns.usda.gov now redirects to fna.usda.gov (Food and Nutrition Administration).",
+    "sameAs": ""
+  },
+  {
+    "id": "wic-breastfeeding-support-food-package",
+    "name": "WIC breastfeeding support and enhanced food package",
+    "brand": "USDA Food and Nutrition Service",
+    "category": "assistance",
+    "whatYouGet": "WIC breastfeeding mothers can get a peer counselor and an enhanced food package, and many WIC offices lend or give breast pumps.",
+    "offers": [
+      "product",
+      "service"
+    ],
+    "certainty": "if-eligible",
+    "freeStuff": "Extra WIC food, a peer counselor and often a breast pump for breastfeeding mothers.",
+    "valueLow": null,
+    "valueHigh": null,
+    "valueSource": "none",
+    "valueBasis": "",
+    "costToClaim": "free",
+    "costDetail": "Free for WIC participants.",
+    "requirements": [
+      "eligibility"
+    ],
+    "eligibility": "WIC participants who breastfeed; pump rules and peer counselor access vary by state.",
+    "region": "US",
+    "states": [],
+    "effort": "some",
+    "when": "after-birth",
+    "whenNote": "Fully breastfeeding mothers can keep the package until the baby is 12 months old.",
+    "signupUrl": "https://wicbreastfeeding.fns.usda.gov/breastfeeding-benefits",
+    "sourceUrls": [
+      "https://wicbreastfeeding.fns.usda.gov/breastfeeding-benefits",
+      "https://wicworks.fns.usda.gov/topic/wic-food-packages/food-package-vii-fully-breastfeeding",
+      "https://www.fns.usda.gov/wic/breastfeeding-promotion-wic-current-federal-requirements"
+    ],
+    "verifiedOn": "2026-11-10",
+    "confidence": "medium",
+    "catches": "63% of state agencies set conditions for a single-user electric pump; peer counselors are not available everywhere. Food amounts differ between two USDA pages.",
+    "notes": "Extra to the usda-wic entry; fully breastfeeding mothers get more food for up to 12 months.",
+    "sameAs": ""
+  },
+  {
+    "id": "wic-farmers-market-nutrition-program",
+    "name": "WIC Farmers Market Nutrition Program",
+    "brand": "USDA Food and Nutrition Service",
+    "category": "assistance",
+    "whatYouGet": "Coupons for fresh fruits, vegetables and herbs at approved farmers markets, issued on top of regular WIC benefits.",
+    "offers": [
+      "product"
+    ],
+    "certainty": "if-eligible",
+    "freeStuff": "Farmers market produce coupons for WIC participants.",
+    "valueLow": 10,
+    "valueHigh": 30,
+    "valueSource": "official",
+    "valueBasis": "USDA says $10 to $30 a year per person federally",
+    "costToClaim": "free",
+    "costDetail": "Free for WIC participants.",
+    "requirements": [
+      "eligibility"
+    ],
+    "eligibility": "WIC-certified women, infants over 4 months and children; offered only by participating states.",
+    "region": "Participating states only",
+    "states": [],
+    "effort": "some",
+    "when": "pregnancy",
+    "whenNote": "Issued to certified WIC participants, including pregnant women.",
+    "signupUrl": "https://www.fns.usda.gov/fmnp/wic-farmers-market-nutrition-program",
+    "sourceUrls": [
+      "https://www.fns.usda.gov/fmnp/wic-farmers-market-nutrition-program",
+      "https://www.fns.usda.gov/fmnp/overview"
+    ],
+    "verifiedOn": "2026-11-10",
+    "confidence": "medium",
+    "catches": "Not every state or local agency runs it. Federal benefit is $10 to $30 a year; states may add more.",
+    "notes": "Ask the local WIC office.",
+    "sameAs": ""
   },
   {
     "id": "ma-babysteps-savings-plan",
@@ -2367,7 +3826,125 @@
     "verifiedOn": "2026-11-10",
     "confidence": "medium",
     "catches": "Must open a new account; it cannot be added to an existing 529. Deposit arrives about 6 weeks later. SNAP families get an extra $120 for a child under 1 (separate program, not entered here).",
-    "notes": "Opt-out window of 30 days after opening."
+    "notes": "Opt-out window of 30 days after opening.",
+    "sameAs": ""
+  },
+  {
+    "id": "or-bridge-project-multnomah",
+    "name": "Bridge Project cash stipend (Multnomah County)",
+    "brand": "The Bridge Project",
+    "category": "money",
+    "whatYouGet": "A $1,125 prenatal stipend, then $750 a month for 15 months and $375 a month for 21 months, for people selected by lottery.",
+    "offers": [
+      "cash"
+    ],
+    "certainty": "chance",
+    "freeStuff": "",
+    "valueLow": null,
+    "valueHigh": null,
+    "valueSource": "none",
+    "valueBasis": "",
+    "costToClaim": "free",
+    "costDetail": "Free; research study with a lottery.",
+    "requirements": [
+      "eligibility"
+    ],
+    "eligibility": "Pregnant, 27 weeks or fewer (priority for 20 to 27 weeks), household income under $39,000, living in Multnomah County. 100 slots.",
+    "region": "Multnomah County, Oregon only",
+    "states": [
+      "OR"
+    ],
+    "effort": "some",
+    "when": "pregnancy",
+    "whenNote": "Must apply at 27 weeks of pregnancy or earlier.",
+    "signupUrl": "https://www.bridgeproject.org/apply",
+    "sourceUrls": [
+      "https://www.bridgeproject.org/press/cash-stipend-program-for-pregnant-moms-expands-to-multnomah-county"
+    ],
+    "verifiedOn": "2026-11-10",
+    "confidence": "low",
+    "catches": "Applications were set to open February 4, 2026; the results did not say whether slots remain. A lottery, so most applicants may get nothing.",
+    "notes": "Left value null because selection is a draw. NYC Bridge Project phase has no current application; Philadelphia Joy Bank only seen on a news site.",
+    "sameAs": ""
+  },
+  {
+    "id": "ca-paid-family-leave-sdi",
+    "name": "California Paid Family Leave and SDI pregnancy disability",
+    "brand": "California EDD",
+    "category": "money",
+    "whatYouGet": "Partial pay for up to 8 weeks to bond with a new child (Paid Family Leave), plus State Disability Insurance pay for the pregnancy and recovery period.",
+    "offers": [
+      "cash"
+    ],
+    "certainty": "if-eligible",
+    "freeStuff": "",
+    "valueLow": 7060,
+    "valueHigh": 7060,
+    "valueSource": "estimate",
+    "valueBasis": "8 weeks of bonding at half the $1,765 weekly maximum; actual pay depends on wages",
+    "costToClaim": "free",
+    "costDetail": "Funded by payroll contributions; no sign-up fee.",
+    "requirements": [
+      "eligibility"
+    ],
+    "eligibility": "Worked in California and paid into State Disability Insurance in the base period (about 5 to 18 months before the claim). Pay is about 70% to 90% of wages depending on income, up to the maximum.",
+    "region": "California",
+    "states": [
+      "CA"
+    ],
+    "effort": "involved",
+    "when": "late-pregnancy",
+    "whenNote": "Disability claims can start up to 4 weeks before the due date; bonding leave must fall within 1 year of birth.",
+    "signupUrl": "https://edd.ca.gov/en/disability/paid-family-leave/",
+    "sourceUrls": [
+      "https://edd.ca.gov/en/disability/paid-family-leave/",
+      "https://edd.ca.gov/en/disability/Calculating_PFL_Benefit_Payment_Amounts/",
+      "https://edd.ca.gov/Mothers"
+    ],
+    "verifiedOn": "2026-11-10",
+    "confidence": "medium",
+    "catches": "Weekly maximum shown by EDD is $1,765 (minimum $50), but one result did not say which year it starts. The first 7 days of a disability claim are unpaid. Bonding benefits are only in the first year after birth. Some results gave 4 weeks before and 6 to 8 weeks after birth for pregnancy disability.",
+    "notes": "Pregnancy disability value is not counted in the estimate.",
+    "sameAs": ""
+  },
+  {
+    "id": "ca-young-child-tax-credit",
+    "name": "California Young Child Tax Credit",
+    "brand": "California Franchise Tax Board",
+    "category": "money",
+    "whatYouGet": "A refundable state tax credit of up to $1,189 per return (tax year 2025) for filers with a child under 6, on top of the CalEITC.",
+    "offers": [
+      "cash"
+    ],
+    "certainty": "if-eligible",
+    "freeStuff": "",
+    "valueLow": 0,
+    "valueHigh": 1189,
+    "valueSource": "official",
+    "valueBasis": "Up to $1,189 per return for tax year 2025; $0 above the income limit",
+    "costToClaim": "free",
+    "costDetail": "No cost; claimed on the California return with form FTB 3514.",
+    "requirements": [
+      "eligibility"
+    ],
+    "eligibility": "Qualify for CalEITC with a child younger than 6 on Dec 31; earned income generally $32,900 or less (phase-out starts at $27,425). The child may have an ITIN instead of an SSN.",
+    "region": "California",
+    "states": [
+      "CA"
+    ],
+    "effort": "some",
+    "when": "after-birth",
+    "whenNote": "Claimed on the state return for the year of the birth.",
+    "signupUrl": "https://www.ftb.ca.gov/file/personal/credits/young-child-tax-credit.html",
+    "sourceUrls": [
+      "https://www.ftb.ca.gov/file/personal/credits/young-child-tax-credit.html",
+      "https://www.ftb.ca.gov/forms/2025/2025-3514-booklet.html"
+    ],
+    "verifiedOn": "2026-11-10",
+    "confidence": "medium",
+    "catches": "The amount is per return, not per child, and shrinks as earnings pass $27,425.",
+    "notes": "Latest year shown is 2025 ($1,154 in 2024).",
+    "sameAs": ""
   },
   {
     "id": "calkids-newborn-account",
@@ -2406,7 +3983,47 @@
     "verifiedOn": "2026-11-10",
     "confidence": "medium",
     "catches": "Claim at calkids.org with the birth-certificate Local Registration Number or letter code. Wait up to 90 days after birth. Extra $25 for claiming online and $50 for linking a ScholarShare 529 (up to $175 total).",
-    "notes": "Results disagreed on whether newborns get $500; the program FAQ and annual report say $500 is for eligible students, so I used $100."
+    "notes": "Results disagreed on whether newborns get $500; the program FAQ and annual report say $500 is for eligible students, so I used $100.",
+    "sameAs": ""
+  },
+  {
+    "id": "ct-chet-baby-scholars",
+    "name": "CHET Baby Scholars (Connecticut)",
+    "brand": "Connecticut Office of the Treasurer",
+    "category": "money",
+    "whatYouGet": "A one-time $100 contribution into a CHET Direct 529 account opened by the child's first birthday.",
+    "offers": [
+      "cash"
+    ],
+    "certainty": "likely",
+    "freeStuff": "$100 deposit into a 529 account.",
+    "valueLow": 100,
+    "valueHigh": 100,
+    "valueSource": "official",
+    "valueBasis": "$100 contribution stated by the Treasurer",
+    "costToClaim": "free",
+    "costDetail": "No cost; no deposit stated as needed.",
+    "requirements": [
+      "eligibility"
+    ],
+    "eligibility": "Connecticut resident; one $100 per child regardless of the number of accounts.",
+    "region": "Connecticut",
+    "states": [
+      "CT"
+    ],
+    "effort": "some",
+    "when": "after-birth",
+    "whenNote": "Open the account by the first birthday or within a year of adoption.",
+    "signupUrl": "https://www.aboutchet.com/buzz/baby.shtml",
+    "sourceUrls": [
+      "https://www.aboutchet.com/buzz/baby.shtml",
+      "https://portal.ct.gov/ott/financial-wellness/chet/connecticut-higher-education-trust---chet"
+    ],
+    "verifiedOn": "2026-11-10",
+    "confidence": "low",
+    "catches": "A 2025 bill (SB 1462) would have ended the program, and the results did not show whether it passed. The older $150 second payment is no longer offered per a 2025 bill summary.",
+    "notes": "Confirm with the Treasurer's office.",
+    "sameAs": ""
   },
   {
     "id": "irs-child-dependent-care-credit-fsa",
@@ -2423,9 +4040,10 @@
     "valueHigh": 1500,
     "valueSource": "estimate",
     "valueBasis": "20% to 50% of the $3,000 expense cap for one child, only if you pay for care",
-    "costToClaim": "free",
-    "costDetail": "No cost; the credit is claimed on Form 2441, the FSA is offered by some employers.",
+    "costToClaim": "purchase-required",
+    "costDetail": "No fee to claim, but it only pays back part of the child care you pay for. The credit is claimed on Form 2441; the FSA is offered by some employers.",
     "requirements": [
+      "purchase",
       "eligibility"
     ],
     "eligibility": "Work-related care for a child under 13; credit is 20% to 50% of up to $3,000 of expenses for one child, depending on income. FSA is only if your employer offers it.",
@@ -2443,14 +4061,15 @@
     "verifiedOn": "2026-11-10",
     "confidence": "medium",
     "catches": "Employer FSA exclusion is $7,500 for 2026 ($3,750 if married filing separately), which uses up the amount for the credit. Only applies if you pay for child care.",
-    "notes": "Max credit $600 to $1,500 for one child is my estimate from the IRS rate and cap; IRS states the $3,000 cap and the 20% to 50% range."
+    "notes": "Max credit $600 to $1,500 for one child is my estimate from the IRS rate and cap; IRS states the $3,000 cap and the 20% to 50% range.",
+    "sameAs": ""
   },
   {
     "id": "irs-child-tax-credit",
     "name": "Child Tax Credit",
     "brand": "IRS",
     "category": "money",
-    "whatYouGet": "A federal tax credit for each qualifying child under 17, partly refundable.",
+    "whatYouGet": "A federal tax credit of $2,200 per qualifying child under 17 for tax year 2026, partly refundable.",
     "offers": [
       "cash"
     ],
@@ -2459,27 +4078,29 @@
     "valueLow": 1700,
     "valueHigh": 2200,
     "valueSource": "official",
-    "valueBasis": "$2,200 per child for tax year 2025; refundable part up to $1,700 per child in 2026",
+    "valueBasis": "$2,200 per child for tax year 2026, of which up to $1,700 is refundable",
     "costToClaim": "free",
     "costDetail": "No cost; claimed on the federal tax return (Schedule 8812).",
     "requirements": [
       "eligibility"
     ],
-    "eligibility": "Child under 17 at year end, a US citizen, national or resident, with a Social Security number valid for work issued by the return due date. Full credit up to $200,000 income ($400,000 joint); refundable part needs $2,500 earned income.",
+    "eligibility": "Child under 17 at year end with a Social Security number valid for work, issued by the return due date (including extensions). Full credit up to $200,000 income ($400,000 joint); refundable part needs $2,500 earned income. A child without the SSN can still bring the $500 Credit for Other Dependents.",
     "region": "US",
     "states": [],
     "effort": "some",
     "when": "after-birth",
-    "whenNote": "Claimed on the tax return for the year the child is born; the child needs a Social Security number.",
+    "whenNote": "A baby born in late 2026 is first claimed on the 2026 return filed in 2027. A baby born in early 2027 is first claimed on the 2027 return, filed in 2028. The baby needs a Social Security number by the filing due date.",
     "signupUrl": "https://www.irs.gov/credits-deductions/individuals/child-tax-credit",
     "sourceUrls": [
       "https://www.irs.gov/credits-deductions/individuals/child-tax-credit",
-      "https://www.irs.gov/instructions/i1040s8"
+      "https://www.irs.gov/pub/irs-prior/f1040s8--2026.pdf",
+      "https://www.irs.gov/pub/irs-pdf/f1040es.pdf"
     ],
     "verifiedOn": "2026-11-10",
     "confidence": "medium",
-    "catches": "Amount shown is for tax year 2025 ($2,200 per child, indexed for inflation from 2026; the 2026 figure was not confirmed). Refundable part is capped ($1,700 per child in 2026 per IRS Form 1040-ES). A baby born in 2027 is claimed on the 2027 return.",
-    "notes": "Not tax advice. Describes the program only."
+    "catches": "The $2,200 figure is for tax year 2026; the 2027 amount is not known yet. The refundable part is capped at $1,700 per child. Not tax advice.",
+    "notes": "Updated from 2025 ($2,200) to the 2026 figure shown in IRS Schedule 8812 and Form 1040-ES search results.",
+    "sameAs": ""
   },
   {
     "id": "ri-collegebound-starter",
@@ -2516,7 +4137,87 @@
     "verifiedOn": "2026-11-10",
     "confidence": "low",
     "catches": "Replaced the older CollegeBoundbaby grant on July 1, 2021. Deposit about 45 to 60 days after opening. Results described it as a chance to receive the bonus; confirm terms.",
-    "notes": "Not the old $100 CollegeBoundbaby, which covered 2015 to mid-2021 births."
+    "notes": "Not the old $100 CollegeBoundbaby, which covered 2015 to mid-2021 births.",
+    "sameAs": ""
+  },
+  {
+    "id": "co-famli-paid-leave",
+    "name": "Colorado FAMLI paid family leave",
+    "brand": "Colorado FAMLI",
+    "category": "money",
+    "whatYouGet": "Up to 12 weeks of pay to bond with a new child (up to 4 more with pregnancy or birth complications), and up to 12 weeks of neonatal care leave for a baby in a NICU.",
+    "offers": [
+      "cash"
+    ],
+    "certainty": "if-eligible",
+    "freeStuff": "",
+    "valueLow": 8688,
+    "valueHigh": 8688,
+    "valueSource": "estimate",
+    "valueBasis": "12 weeks at half the $1,448.02 weekly maximum",
+    "costToClaim": "free",
+    "costDetail": "Funded by payroll contributions; no sign-up fee.",
+    "requirements": [
+      "eligibility"
+    ],
+    "eligibility": "Earned at least $2,500 in Colorado in the past year. From July 1, 2026 the maximum is $1,448.02 a week: 90% of the first $804.46 of weekly wage, 50% above that.",
+    "region": "Colorado",
+    "states": [
+      "CO"
+    ],
+    "effort": "involved",
+    "when": "late-pregnancy",
+    "whenNote": "Give 30 days' notice when possible; the application can start up to 30 days before leave.",
+    "signupUrl": "https://famli.colorado.gov/individuals-and-families/reasons-to-take-famli-leave/parental-bonding-leave",
+    "sourceUrls": [
+      "https://famli.colorado.gov/individuals-and-families/reasons-to-take-famli-leave/parental-bonding-leave",
+      "https://famli.colorado.gov/individuals-and-families/reasons-to-take-famli-leave/neonatal-care-leave",
+      "https://famli.colorado.gov/individuals-and-families/how-famli-works/premium-and-benefits-calculator"
+    ],
+    "verifiedOn": "2026-11-10",
+    "confidence": "medium",
+    "catches": "Apply on the My FAMLI+ portal. A claim started before the birth stays a draft until proof of birth is uploaded. Bonding leave cannot start until a neonatal claim ends.",
+    "notes": "",
+    "sameAs": ""
+  },
+  {
+    "id": "ct-paid-leave",
+    "name": "Connecticut Paid Leave",
+    "brand": "Connecticut Paid Leave Authority",
+    "category": "money",
+    "whatYouGet": "Up to 12 weeks of pay in 12 months to bond with a new child: 95% of weekly wage up to $677.60, plus 60% of the excess, capped at $1,016.40 a week (2026).",
+    "offers": [
+      "cash"
+    ],
+    "certainty": "if-eligible",
+    "freeStuff": "",
+    "valueLow": 6098,
+    "valueHigh": 6098,
+    "valueSource": "estimate",
+    "valueBasis": "12 weeks at half the $1,016.40 weekly cap",
+    "costToClaim": "free",
+    "costDetail": "Funded by payroll contributions; no sign-up fee.",
+    "requirements": [
+      "eligibility"
+    ],
+    "eligibility": "Connecticut workers who paid into the program. Pay is based on the two highest quarters of the base period.",
+    "region": "Connecticut",
+    "states": [
+      "CT"
+    ],
+    "effort": "involved",
+    "when": "after-birth",
+    "whenNote": "Leave must be used within 12 months of the birth.",
+    "signupUrl": "https://www.ctpaidleave.org/how-ct-paid-leave-works/qualifying-reasons/i-m-starting-or-expanding-my-family",
+    "sourceUrls": [
+      "https://www.ctpaidleave.org/how-ct-paid-leave-works/qualifying-reasons/i-m-starting-or-expanding-my-family",
+      "https://www.ctpaidleave.org/claims/before-you-apply"
+    ],
+    "verifiedOn": "2026-11-10",
+    "confidence": "medium",
+    "catches": "Pays money but does not give job protection (that comes from FMLA). Apply online or by phone; proof such as a hospital discharge paper or birth certificate is needed.",
+    "notes": "",
+    "sameAs": ""
   },
   {
     "id": "ct-baby-bonds",
@@ -2554,7 +4255,86 @@
     "verifiedOn": "2026-11-10",
     "confidence": "medium",
     "catches": "Money is used later, for a Connecticut home, business, education or retirement, after financial literacy training. Pages differ on flat $3,200 vs up to $3,200.",
-    "notes": "The state projects growth to $11,000 to $24,000; not used as the value."
+    "notes": "The state projects growth to $11,000 to $24,000; not used as the value.",
+    "sameAs": ""
+  },
+  {
+    "id": "dc-paid-family-leave",
+    "name": "DC Paid Family Leave",
+    "brand": "DC Department of Employment Services",
+    "category": "money",
+    "whatYouGet": "Paid parental leave to bond with a new child: 90% of wages up to 1.5 times DC minimum wage and 50% above that, with a $1,100 weekly maximum.",
+    "offers": [
+      "cash"
+    ],
+    "certainty": "if-eligible",
+    "freeStuff": "",
+    "valueLow": 4400,
+    "valueHigh": 4400,
+    "valueSource": "estimate",
+    "valueBasis": "8 weeks (lower of 8 or 12) at half the $1,100 weekly maximum",
+    "costToClaim": "free",
+    "costDetail": "Funded by payroll contributions; no sign-up fee.",
+    "requirements": [
+      "eligibility"
+    ],
+    "eligibility": "Workers covered by a DC employer under the Paid Family Leave Act and meeting its earnings rules.",
+    "region": "District of Columbia",
+    "states": [
+      "DC"
+    ],
+    "effort": "involved",
+    "when": "after-birth",
+    "whenNote": "",
+    "signupUrl": "https://does.dc.gov/page/dc-paid-family-leave",
+    "sourceUrls": [
+      "https://does.dc.gov/page/dc-paid-family-leave",
+      "https://dcpaidfamilyleave.dc.gov/frequently-asked-questions/"
+    ],
+    "verifiedOn": "2026-11-10",
+    "confidence": "low",
+    "catches": "Official DC pages say 12 weeks of parental leave; an older DOES one-pager says 8. The lower figure (8) is used for the estimate. Medical and family-caregiving leave were cut on Oct. 1, 2026, not parental leave.",
+    "notes": "Application timing was not in the results.",
+    "sameAs": ""
+  },
+  {
+    "id": "de-paid-leave",
+    "name": "Delaware Paid Leave",
+    "brand": "Delaware Department of Labor",
+    "category": "money",
+    "whatYouGet": "Up to 12 weeks of parental leave pay at 80% of average weekly wage, capped at $900 a week; benefits began January 1, 2026.",
+    "offers": [
+      "cash"
+    ],
+    "certainty": "if-eligible",
+    "freeStuff": "",
+    "valueLow": 5400,
+    "valueHigh": 5400,
+    "valueSource": "estimate",
+    "valueBasis": "12 weeks at half the $900 weekly maximum",
+    "costToClaim": "free",
+    "costDetail": "Funded by payroll contributions; no sign-up fee.",
+    "requirements": [
+      "eligibility"
+    ],
+    "eligibility": "Employer with 10 or more employees (employers with 10 to 24 may offer a minimum of 6 weeks until 2031), 12 months with the employer, 1,250 hours in the past year, and mostly working in Delaware.",
+    "region": "Delaware",
+    "states": [
+      "DE"
+    ],
+    "effort": "involved",
+    "when": "late-pregnancy",
+    "whenNote": "Apply as soon as you know you need leave; if unforeseen, within 30 days after the first day of leave.",
+    "signupUrl": "https://laborfiles.delaware.gov/main/pfl/FAQ_DelawarePaidLeave_ClaimsProcess_R1.pdf",
+    "sourceUrls": [
+      "https://laborfiles.delaware.gov/main/pfl/FAQ_DelawarePaidLeave_ClaimsProcess_R1.pdf",
+      "https://laborfiles.delaware.gov/main/pfl/Employer_and_TPAs_Guide_to_DPL.pdf"
+    ],
+    "verifiedOn": "2026-11-10",
+    "confidence": "medium",
+    "catches": "The first payment takes about 2 weeks to process. The signup URL is the state claims guide; the apply page was not named in the results.",
+    "notes": "",
+    "sameAs": ""
   },
   {
     "id": "irs-earned-income-tax-credit",
@@ -2570,28 +4350,69 @@
     "valueLow": 0,
     "valueHigh": 4427,
     "valueSource": "official",
-    "valueBasis": "IRS maximum for one qualifying child, tax year 2026; actual amount depends on income",
+    "valueBasis": "$0 above the income limit; up to the $4,427 IRS maximum for one child in tax year 2026 for lower earners",
     "costToClaim": "free",
     "costDetail": "No cost; claimed on the federal tax return.",
     "requirements": [
       "eligibility"
     ],
-    "eligibility": "Earned income under the limits for filing status and number of children; each qualifying child needs a valid Social Security number. Investment income and other limits apply.",
+    "eligibility": "Earned income and AGI under the limit for filing status and children. For tax year 2026 with one child: $51,593 ($58,863 married filing jointly); investment income up to $12,200. The child and the filer need valid Social Security numbers.",
     "region": "US",
     "states": [],
     "effort": "some",
     "when": "after-birth",
-    "whenNote": "Claimed on the return for the year the child is born or lives with you.",
+    "whenNote": "Claimed on the return for the year the child is born or lives with you; a baby born in 2027 counts on the 2027 return filed in 2028.",
     "signupUrl": "https://www.irs.gov/credits-deductions/individuals/earned-income-tax-credit-eitc",
     "sourceUrls": [
-      "https://www.irs.gov/publications/p596",
+      "https://www.irs.gov/pub/irs-access/p3524_accessible.pdf",
       "https://www.irs.gov/pub/irs-pdf/n797.pdf",
-      "https://www.irs.gov/tax-professionals/eitc-central/eitc-facts-to-share"
+      "https://www.irs.gov/publications/p596"
     ],
     "verifiedOn": "2026-11-10",
     "confidence": "medium",
-    "catches": "Maximum for 2026 is $4,427 with one child and $7,316 with two (IRS Notice 797); many families get less or nothing depending on income. 2026 income limits were not confirmed; 2025 limits start near $50,434 ($57,554 joint) with one child. Form 8862 may be needed after a past denial.",
-    "notes": "Signup URL is the standard IRS EITC page; the search showed the Publication 596 and Notice 797 pages directly."
+    "catches": "Maximum for 2026 is $4,427 with one child; the actual amount shrinks as income rises and many families get less. The 2026 limits come from an IRS eligibility questionnaire and Notice 797 (shown as Rev. December 2026), not the main 2026 tables page. Form 8862 may be needed after a past denial.",
+    "notes": "valueLow of 0 is deliberate: the credit is 0 for families over the limit. 2025 limit was $50,434 ($57,554 joint) per Publication 596.",
+    "sameAs": ""
+  },
+  {
+    "id": "ny-empire-state-child-credit",
+    "name": "Empire State Child Credit (New York)",
+    "brand": "New York State Tax Department",
+    "category": "money",
+    "whatYouGet": "A refundable state credit of $1,000 per child under 4 for tax years 2025 through 2027.",
+    "offers": [
+      "cash"
+    ],
+    "certainty": "if-eligible",
+    "freeStuff": "",
+    "valueLow": 0,
+    "valueHigh": 1000,
+    "valueSource": "official",
+    "valueBasis": "$1,000 per child under 4; reduced to $0 at higher incomes",
+    "costToClaim": "free",
+    "costDetail": "No cost; claimed on the New York return with form IT-213.",
+    "requirements": [
+      "eligibility"
+    ],
+    "eligibility": "New York resident with a child under 17 at year end; reduced by $16.50 per $1,000 of federal AGI above $75,000 (single or head of household), $110,000 (joint) or $55,000 (married filing separately).",
+    "region": "New York",
+    "states": [
+      "NY"
+    ],
+    "effort": "some",
+    "when": "after-birth",
+    "whenNote": "A baby born in 2027 counts under 4 on the 2027 return filed in 2028.",
+    "signupUrl": "https://www.tax.ny.gov/pit/credits/empire_state_child_credit.htm",
+    "sourceUrls": [
+      "https://www.tax.ny.gov/pit/credits/empire_state_child_credit.htm",
+      "https://www.tax.ny.gov/forms/current-forms/it/it213i.htm",
+      "https://otda.ny.gov/programs/empire-state-child-credit/"
+    ],
+    "verifiedOn": "2026-11-10",
+    "confidence": "medium",
+    "catches": "File a New York return to get it. The credit for children 4 to 16 is $330 in 2025 and $500 in 2026 and 2027.",
+    "notes": "One page snippet gave $500 for 2025 ages 4 to 16, others $330; not relevant to newborns.",
+    "sameAs": ""
   },
   {
     "id": "co-first-step",
@@ -2629,7 +4450,8 @@
     "verifiedOn": "2026-11-10",
     "confidence": "low",
     "catches": "Official materials show different amounts ($100, $115, $118, $121); confirm on collegeinvest.org. Award arrives within about 30 days of applying.",
-    "notes": "Amount conflict across official documents, so confidence is low."
+    "notes": "Amount conflict across official documents, so confidence is low.",
+    "sameAs": ""
   },
   {
     "id": "irs-hsa-fsa-breast-pump-lactation",
@@ -2666,7 +4488,47 @@
     "verifiedOn": "2026-11-10",
     "confidence": "low",
     "catches": "The saving is the tax you would have paid, not a free item. Check your plan's own rules before buying.",
-    "notes": "Pub 502 text confirmed in search results; HSA/FSA use is the IRS reading of Announcement 2011-14 via a secondary summary."
+    "notes": "Pub 502 text confirmed in search results; HSA/FSA use is the IRS reading of Announcement 2011-14 via a secondary summary.",
+    "sameAs": ""
+  },
+  {
+    "id": "il-child-tax-credit",
+    "name": "Illinois Child Tax Credit",
+    "brand": "Illinois Department of Revenue",
+    "category": "money",
+    "whatYouGet": "A state credit equal to 40% of your Illinois EITC when you have a child under 12 (tax year 2025).",
+    "offers": [
+      "cash"
+    ],
+    "certainty": "if-eligible",
+    "freeStuff": "",
+    "valueLow": null,
+    "valueHigh": null,
+    "valueSource": "none",
+    "valueBasis": "",
+    "costToClaim": "free",
+    "costDetail": "No cost; worked out on Schedule IL-E/EITC.",
+    "requirements": [
+      "eligibility"
+    ],
+    "eligibility": "You must qualify for the Illinois EITC and have a dependent under 12 on Dec 31.",
+    "region": "Illinois",
+    "states": [
+      "IL"
+    ],
+    "effort": "some",
+    "when": "after-birth",
+    "whenNote": "Claimed on the return for the year the child is born.",
+    "signupUrl": "https://tax.illinois.gov/individuals/credits/child-tax-credit.html",
+    "sourceUrls": [
+      "https://tax.illinois.gov/individuals/credits/child-tax-credit.html",
+      "https://tax.illinois.gov/content/dam/soi/en/web/tax/forms/incometax/documents/currentyear/individual/il-1040-schedule-il-e-eic.pdf"
+    ],
+    "verifiedOn": "2026-11-10",
+    "confidence": "medium",
+    "catches": "No fixed dollar amount, so no value is given. It was 20% of the EITC when first created.",
+    "notes": "",
+    "sameAs": ""
   },
   {
     "id": "il-first-steps",
@@ -2704,7 +4566,8 @@
     "verifiedOn": "2026-11-10",
     "confidence": "medium",
     "catches": "Claim before the child's 10th birthday, while opening an account or at brightstart.com/first-steps/claim/. Grandparents cannot claim unless legal guardian.",
-    "notes": "Claim page URL was named in results; signupUrl is the Bright Start home."
+    "notes": "Claim page URL was named in results; signupUrl is the Bright Start home.",
+    "sameAs": ""
   },
   {
     "id": "pa-keystone-scholars",
@@ -2743,7 +4606,165 @@
     "verifiedOn": "2026-11-10",
     "confidence": "medium",
     "catches": "Account is created about 4 to 6 months after birth and a postcard explains how to claim it. Usable from age 18 to 29 if the child has a PA 529 account then.",
-    "notes": "Out-of-state births take longer. A separate $25 Allegheny County bonus had a Sept 30, 2026 deadline, so it is left out."
+    "notes": "Out-of-state births take longer. A separate $25 Allegheny County bonus had a Sept 30, 2026 deadline, so it is left out.",
+    "sameAs": ""
+  },
+  {
+    "id": "me-dependent-exemption-tax-credit",
+    "name": "Maine dependent exemption tax credit (under 6)",
+    "brand": "Maine Revenue Services",
+    "category": "money",
+    "whatYouGet": "A refundable credit of up to $610 for each child under 6 (twice the $305 base) for tax year 2025.",
+    "offers": [
+      "cash"
+    ],
+    "certainty": "if-eligible",
+    "freeStuff": "",
+    "valueLow": 0,
+    "valueHigh": 610,
+    "valueSource": "official",
+    "valueBasis": "Up to $610 per child under 6 for tax year 2025; reduced at higher incomes",
+    "costToClaim": "free",
+    "costDetail": "No cost; the worksheet goes with the Maine return.",
+    "requirements": [
+      "eligibility"
+    ],
+    "eligibility": "Maine resident or part-year resident; reduced above $100,000 (single), $125,000 (head of household) or $150,000 (joint) per a fiscal note.",
+    "region": "Maine",
+    "states": [
+      "ME"
+    ],
+    "effort": "some",
+    "when": "after-birth",
+    "whenNote": "Claimed on the return for the year the child is born.",
+    "signupUrl": "https://www.maine.gov/revenue/sites/maine.gov.revenue/files/inline-files/25_dependent_exemption_tx_cr_fillable.pdf",
+    "sourceUrls": [
+      "https://www.maine.gov/revenue/sites/maine.gov.revenue/files/inline-files/25_dependent_exemption_tx_cr_fillable.pdf",
+      "https://legislature.maine.gov/statutes/36/title36sec5219-SS.html"
+    ],
+    "verifiedOn": "2026-11-10",
+    "confidence": "low",
+    "catches": "The rule changes for tax years beginning in 2026 and those details were not checked, so the amount for a 2027 birth is unknown. Phase-out thresholds differed slightly between sources.",
+    "notes": "",
+    "sameAs": ""
+  },
+  {
+    "id": "me-paid-family-medical-leave",
+    "name": "Maine Paid Family and Medical Leave",
+    "brand": "Maine Department of Labor",
+    "category": "money",
+    "whatYouGet": "Up to 12 weeks of pay in a benefit year to bond with a new child; benefits have been paid since May 1, 2026.",
+    "offers": [
+      "cash"
+    ],
+    "certainty": "if-eligible",
+    "freeStuff": "",
+    "valueLow": null,
+    "valueHigh": null,
+    "valueSource": "none",
+    "valueBasis": "",
+    "costToClaim": "free",
+    "costDetail": "Funded by payroll contributions; no sign-up fee.",
+    "requirements": [
+      "eligibility"
+    ],
+    "eligibility": "Earned at least six times the state average weekly wage in the past year. Pay replaces 90% of wages up to half the state average and a share above that.",
+    "region": "Maine",
+    "states": [
+      "ME"
+    ],
+    "effort": "involved",
+    "when": "after-birth",
+    "whenNote": "Application is due in advance when the need is known, or as soon as you know.",
+    "signupUrl": "https://www.maine.gov/paidleave/workers/index.shtml",
+    "sourceUrls": [
+      "https://www.maine.gov/paidleave/",
+      "https://www.maine.gov/paidleave/workers/index.shtml",
+      "https://legislature.maine.gov/statutes/26/title26sec850-B.pdf"
+    ],
+    "verifiedOn": "2026-11-10",
+    "confidence": "low",
+    "catches": "The weekly maximum for 2026 and the exact upper-tier rate were not confirmed (results disagree), so no dollar value is given. Whether you can apply before the birth was not confirmed.",
+    "notes": "",
+    "sameAs": ""
+  },
+  {
+    "id": "ma-child-family-tax-credit",
+    "name": "Massachusetts Child and Family Tax Credit",
+    "brand": "Massachusetts Department of Revenue",
+    "category": "money",
+    "whatYouGet": "A state tax credit of $440 per qualifying dependent under 13 for tax year 2025, with no limit on number of dependents.",
+    "offers": [
+      "cash"
+    ],
+    "certainty": "if-eligible",
+    "freeStuff": "",
+    "valueLow": 440,
+    "valueHigh": 440,
+    "valueSource": "official",
+    "valueBasis": "$440 per dependent stated in the 2025 Form 1 instructions",
+    "costToClaim": "free",
+    "costDetail": "No cost; claimed on Massachusetts Form 1.",
+    "requirements": [
+      "eligibility"
+    ],
+    "eligibility": "Dependent under 13 for federal purposes; file as single, head of household or joint (not married filing separately).",
+    "region": "Massachusetts",
+    "states": [
+      "MA"
+    ],
+    "effort": "some",
+    "when": "after-birth",
+    "whenNote": "Claimed on the return for the year the child is born.",
+    "signupUrl": "https://www.mass.gov/doc/child-family-tax-credit-flyer/download",
+    "sourceUrls": [
+      "https://www.mass.gov/doc/2025-form-1-instructions/download",
+      "https://www.mass.gov/doc/child-family-tax-credit-flyer/download"
+    ],
+    "verifiedOn": "2026-11-10",
+    "confidence": "medium",
+    "catches": "Income limits were not in the results.",
+    "notes": "Signup URL is the state flyer.",
+    "sameAs": ""
+  },
+  {
+    "id": "ma-paid-family-medical-leave",
+    "name": "Massachusetts Paid Family and Medical Leave",
+    "brand": "Massachusetts Dept. of Family and Medical Leave",
+    "category": "money",
+    "whatYouGet": "Up to 12 weeks of pay to bond with a new child; 80% of wages up to half the state average wage plus 50% above that, capped at $1,230.39 a week in 2026.",
+    "offers": [
+      "cash"
+    ],
+    "certainty": "if-eligible",
+    "freeStuff": "",
+    "valueLow": 7382,
+    "valueHigh": 7382,
+    "valueSource": "estimate",
+    "valueBasis": "12 weeks at half the $1,230.39 weekly maximum",
+    "costToClaim": "free",
+    "costDetail": "Funded by payroll contributions; no sign-up fee.",
+    "requirements": [
+      "eligibility"
+    ],
+    "eligibility": "Massachusetts workers who paid into the program and meet its earnings test. The cap is $1,284.61 in 2027, but a benefit year that starts in 2026 keeps the 2026 cap.",
+    "region": "Massachusetts",
+    "states": [
+      "MA"
+    ],
+    "effort": "involved",
+    "when": "after-birth",
+    "whenNote": "Bonding leave must fall within 12 months after the birth.",
+    "signupUrl": "https://www.mass.gov/info-details/paid-family-and-medical-leave-pfml-overview-and-benefits",
+    "sourceUrls": [
+      "https://www.mass.gov/info-details/paid-family-and-medical-leave-pfml-overview-and-benefits",
+      "https://www.mass.gov/info-details/how-pfml-weekly-benefit-amounts-are-calculated-andor-changed"
+    ],
+    "verifiedOn": "2026-11-10",
+    "confidence": "medium",
+    "catches": "Payments can be lower if other income or benefits are reported. Application timing was not in the results.",
+    "notes": "",
+    "sameAs": ""
   },
   {
     "id": "ne-meadowlark",
@@ -2781,7 +4802,86 @@
     "verifiedOn": "2026-11-10",
     "confidence": "medium",
     "catches": "Funds must be used for qualified higher education costs in Nebraska before age 30. Parents may opt out. The family does not own the account.",
-    "notes": "Result text said births in 2025 get the deposit in spring; confirm for 2027 births."
+    "notes": "Result text said births in 2025 get the deposit in spring; confirm for 2027 births.",
+    "sameAs": ""
+  },
+  {
+    "id": "mn-child-tax-credit",
+    "name": "Minnesota Child Tax Credit",
+    "brand": "Minnesota Department of Revenue",
+    "category": "money",
+    "whatYouGet": "A refundable state credit of $1,750 per child under 18 for tax year 2025 ($1,800 in 2026 materials), with no cap on number of children.",
+    "offers": [
+      "cash"
+    ],
+    "certainty": "if-eligible",
+    "freeStuff": "",
+    "valueLow": 0,
+    "valueHigh": 1750,
+    "valueSource": "official",
+    "valueBasis": "Up to $1,750 per child for tax year 2025; reduced above the income threshold",
+    "costToClaim": "free",
+    "costDetail": "No cost; claimed on the Minnesota return.",
+    "requirements": [
+      "eligibility"
+    ],
+    "eligibility": "Credit begins to phase out at $31,950 (single) or $37,910 (joint) for 2025; for 2026 at $32,680 or $38,770.",
+    "region": "Minnesota",
+    "states": [
+      "MN"
+    ],
+    "effort": "some",
+    "when": "after-birth",
+    "whenNote": "Claimed on the return for the year the child is born.",
+    "signupUrl": "https://www.revenue.state.mn.us/child-tax-credit",
+    "sourceUrls": [
+      "https://www.revenue.state.mn.us/child-tax-credit",
+      "https://www.revenue.state.mn.us/sites/default/files/2026-01/minnesota-child-tax-credit-2026.pdf"
+    ],
+    "verifiedOn": "2026-11-10",
+    "confidence": "medium",
+    "catches": "Higher-income families get a reduced or no credit. The Working Family Credit is separate.",
+    "notes": "Used the 2025 figure as the modest estimate.",
+    "sameAs": ""
+  },
+  {
+    "id": "mn-paid-leave",
+    "name": "Minnesota Paid Leave",
+    "brand": "Minnesota Paid Leave",
+    "category": "money",
+    "whatYouGet": "Up to 12 weeks of family leave pay to welcome a new child; most people get 55% to 90% of wages, up to the weekly maximum.",
+    "offers": [
+      "cash"
+    ],
+    "certainty": "if-eligible",
+    "freeStuff": "",
+    "valueLow": 8538,
+    "valueHigh": 8538,
+    "valueSource": "estimate",
+    "valueBasis": "12 weeks at half the $1,423 weekly maximum",
+    "costToClaim": "free",
+    "costDetail": "Funded by payroll contributions; no sign-up fee.",
+    "requirements": [
+      "eligibility"
+    ],
+    "eligibility": "Earned at least $3,900 in the last year in Minnesota. Weekly maximum is $1,423 in most sources (one source says $1,432); the lower figure is used.",
+    "region": "Minnesota",
+    "states": [
+      "MN"
+    ],
+    "effort": "involved",
+    "when": "late-pregnancy",
+    "whenNote": "You can apply up to 60 days before leave; certification is added after the birth.",
+    "signupUrl": "https://paidleave.mn.gov/",
+    "sourceUrls": [
+      "https://pl.mn.gov/sites/default/files/2026-04/2026_04_Factsheet_PaidLeaveOverview_IndFam_Final_ACC.pdf",
+      "https://mn.gov/deed/assets/paid-leave-bonding-presentation-2025-12-acc_tcm1045-715256.pdf"
+    ],
+    "verifiedOn": "2026-11-10",
+    "confidence": "medium",
+    "catches": "Benefits began January 1, 2026. Tell your employer at least 30 days ahead when you can. Medical plus family leave combined is up to 20 weeks.",
+    "notes": "",
+    "sameAs": ""
   },
   {
     "id": "me-alfond-grant",
@@ -2820,7 +4920,8 @@
     "verifiedOn": "2026-11-10",
     "confidence": "medium",
     "catches": "The money is invested and may lose value; paid only to eligible schools; forfeited if not used by the child's 28th birthday. The $100 match needs a $25 contribution.",
-    "notes": "Official FAME and NextGen pages; no application for in-state births."
+    "notes": "Official FAME and NextGen pages; no application for in-state births.",
+    "sameAs": ""
   },
   {
     "id": "nd-college-save-new-baby-match",
@@ -2858,7 +4959,166 @@
     "verifiedOn": "2026-11-10",
     "confidence": "medium",
     "catches": "Not free: you must contribute $200 first. Subject to available funds; BND may change or stop it. Grant returns to BND if the account sits at zero for six months.",
-    "notes": "Left value empty because the family has to put in $200 to get $200."
+    "notes": "Left value empty because the family has to put in $200 to get $200.",
+    "sameAs": ""
+  },
+  {
+    "id": "nj-child-tax-credit",
+    "name": "New Jersey Child Tax Credit",
+    "brand": "New Jersey Division of Taxation",
+    "category": "money",
+    "whatYouGet": "A refundable credit of up to $1,000 per child age 5 or younger for tax year 2025.",
+    "offers": [
+      "cash"
+    ],
+    "certainty": "if-eligible",
+    "freeStuff": "",
+    "valueLow": 200,
+    "valueHigh": 1000,
+    "valueSource": "official",
+    "valueBasis": "$200 to $1,000 per child by taxable income, for tax year 2025",
+    "costToClaim": "free",
+    "costDetail": "No cost; claimed on the New Jersey return.",
+    "requirements": [
+      "eligibility"
+    ],
+    "eligibility": "NJ resident with taxable income of $80,000 or less, not filing married separately. Amount by taxable income: $1,000 up to $30,000; $800 to $40,000; $600 to $50,000; $400 to $60,000; $200 to $80,000.",
+    "region": "New Jersey",
+    "states": [
+      "NJ"
+    ],
+    "effort": "some",
+    "when": "after-birth",
+    "whenNote": "Claimed on the state return for the year the child is born.",
+    "signupUrl": "https://www.nj.gov/treasury/taxation/individuals/childtaxcredit.shtml",
+    "sourceUrls": [
+      "https://www.nj.gov/treasury/taxation/individuals/childtaxcredit.shtml",
+      "https://www.nj.gov/treasury/taxation/pdf/help/2025-update-handout.pdf"
+    ],
+    "verifiedOn": "2026-11-10",
+    "confidence": "medium",
+    "catches": "Part-year residents get a prorated amount.",
+    "notes": "",
+    "sameAs": ""
+  },
+  {
+    "id": "nj-family-leave-insurance",
+    "name": "New Jersey Family Leave Insurance",
+    "brand": "New Jersey Dept. of Labor",
+    "category": "money",
+    "whatYouGet": "Pay for up to 12 weeks in one block (or up to 56 days spread out) to bond with a new child, at 85% of average weekly wage up to the maximum.",
+    "offers": [
+      "cash"
+    ],
+    "certainty": "if-eligible",
+    "freeStuff": "",
+    "valueLow": 6714,
+    "valueHigh": 6714,
+    "valueSource": "estimate",
+    "valueBasis": "12 weeks at half the $1,119 weekly maximum",
+    "costToClaim": "free",
+    "costDetail": "Funded by payroll contributions; no sign-up fee.",
+    "requirements": [
+      "eligibility"
+    ],
+    "eligibility": "Earned at least $310 a week for 20 weeks, or $15,500 in the base year (2026 test). Total benefits are the lesser of 12 times the weekly rate or one-third of base-year earnings.",
+    "region": "New Jersey",
+    "states": [
+      "NJ"
+    ],
+    "effort": "involved",
+    "when": "after-birth",
+    "whenNote": "Must be used before the child turns 1 for the 12-week block.",
+    "signupUrl": "https://www.nj.gov/labor/myleavebenefits/worker/fli/",
+    "sourceUrls": [
+      "https://www.nj.gov/labor/myleavebenefits/worker/fli/",
+      "https://myleavebenefits.nj.gov/help/faq/fli.shtml",
+      "https://www.nj.gov/labor/myleavebenefits/worker/maternity/"
+    ],
+    "verifiedOn": "2026-11-10",
+    "confidence": "medium",
+    "catches": "2026 weekly maximum is $1,119 (up from $1,081 in 2025). Pregnancy and recovery are paid through the separate Temporary Disability program.",
+    "notes": "Application timing was not in the results.",
+    "sameAs": ""
+  },
+  {
+    "id": "nm-child-tax-credit",
+    "name": "New Mexico Child Tax Credit",
+    "brand": "New Mexico Taxation and Revenue Department",
+    "category": "money",
+    "whatYouGet": "A refundable state credit of up to $622 per qualifying child (tax year 2025), larger for lower incomes.",
+    "offers": [
+      "cash"
+    ],
+    "certainty": "if-eligible",
+    "freeStuff": "",
+    "valueLow": 0,
+    "valueHigh": 622,
+    "valueSource": "official",
+    "valueBasis": "Up to $622 per child (lower of $622 and $637); less at higher incomes",
+    "costToClaim": "free",
+    "costDetail": "No cost; claimed on the New Mexico return (PIT-RC).",
+    "requirements": [
+      "eligibility"
+    ],
+    "eligibility": "New Mexico resident with a qualifying child, not a dependent of someone else; the credit shrinks as income rises.",
+    "region": "New Mexico",
+    "states": [
+      "NM"
+    ],
+    "effort": "some",
+    "when": "after-birth",
+    "whenNote": "Claimed on the return for the year the child is born.",
+    "signupUrl": "https://www.tax.newmexico.gov/new-mexico-child-tax-credit/",
+    "sourceUrls": [
+      "https://www.tax.newmexico.gov/new-mexico-child-tax-credit/",
+      "https://realfile.tax.newmexico.gov/2025pit-rc-ins.pdf"
+    ],
+    "verifiedOn": "2026-11-10",
+    "confidence": "low",
+    "catches": "Results disagree: $622 (January 2026 release) and $637 (state chart); the lower is used. Not limited to young children.",
+    "notes": "",
+    "sameAs": ""
+  },
+  {
+    "id": "ny-paid-family-leave",
+    "name": "New York Paid Family Leave",
+    "brand": "New York Paid Family Leave",
+    "category": "money",
+    "whatYouGet": "Up to 12 weeks of pay at 67% of average weekly wage, up to a cap, to bond with a new child.",
+    "offers": [
+      "cash"
+    ],
+    "certainty": "if-eligible",
+    "freeStuff": "",
+    "valueLow": 7371,
+    "valueHigh": 7371,
+    "valueSource": "estimate",
+    "valueBasis": "12 weeks at half the $1,228.53 weekly maximum",
+    "costToClaim": "free",
+    "costDetail": "Funded by payroll contributions; no sign-up fee.",
+    "requirements": [
+      "eligibility"
+    ],
+    "eligibility": "Employed in New York with a covered employer and meeting the program's work-time rules. 2026 weekly maximum is $1,228.53 and total maximum is $14,742.36.",
+    "region": "New York",
+    "states": [
+      "NY"
+    ],
+    "effort": "involved",
+    "when": "after-birth",
+    "whenNote": "Bonding leave can be taken any time in the first 12 months after birth.",
+    "signupUrl": "https://paidfamilyleave.ny.gov/bonding-leave-birth-child",
+    "sourceUrls": [
+      "https://paidfamilyleave.ny.gov/bonding-leave-birth-child",
+      "https://paidfamilyleave.ny.gov/2026",
+      "https://paidfamilyleave.ny.gov/benefits"
+    ],
+    "verifiedOn": "2026-11-10",
+    "confidence": "medium",
+    "catches": "Employee contribution in 2026 is 0.432% of gross wages. Pregnancy disability is a separate New York benefit not covered here. Application timing was not in the results.",
+    "notes": "",
+    "sameAs": ""
   },
   {
     "id": "ssa-newborn-social-security-number",
@@ -2892,58 +5152,166 @@
     "verifiedOn": "2026-11-10",
     "confidence": "low",
     "catches": "Processing time for the card varies by state. Needed for the Child Tax Credit, EITC and the Trump Account deposit.",
-    "notes": "signupUrl is the main SSA number page; the search did not return it directly, so check it. Limited-edition commemorative cards were issued for births July 2 to Dec 31, 2026, per SSA."
+    "notes": "signupUrl is the main SSA number page; the search did not return it directly, so check it. Limited-edition commemorative cards were issued for births July 2 to Dec 31, 2026, per SSA.",
+    "sameAs": ""
   },
   {
-    "id": "state-paid-family-leave-programs",
-    "name": "State paid family leave programs",
-    "brand": "U.S. Department of Labor (overview)",
+    "id": "or-kids-credit",
+    "name": "Oregon Kids Credit",
+    "brand": "Oregon Department of Revenue",
     "category": "money",
-    "whatYouGet": "Partial pay while you take leave to bond with a new baby, in states that run a paid family and medical leave program.",
+    "whatYouGet": "A refundable credit of up to $1,050 per child age 5 or younger for tax year 2025 (up to 5 children).",
     "offers": [
       "cash"
     ],
     "certainty": "if-eligible",
     "freeStuff": "",
-    "valueLow": null,
-    "valueHigh": null,
-    "valueSource": "none",
-    "valueBasis": "",
+    "valueLow": 0,
+    "valueHigh": 1050,
+    "valueSource": "official",
+    "valueBasis": "Up to $1,050 per child for tax year 2025; $0 above $31,550",
+    "costToClaim": "free",
+    "costDetail": "No cost; claimed on the Oregon return.",
+    "requirements": [
+      "eligibility"
+    ],
+    "eligibility": "Full credit at modified AGI of $26,550 or less, reduced to $0 at $31,550.",
+    "region": "Oregon",
+    "states": [
+      "OR"
+    ],
+    "effort": "some",
+    "when": "after-birth",
+    "whenNote": "Claimed on the return for the year the child is born.",
+    "signupUrl": "https://www.oregon.gov/dor/programs/individuals/pages/credits.aspx",
+    "sourceUrls": [
+      "https://www.oregon.gov/dor/programs/individuals/pages/credits.aspx",
+      "https://apps.oregon.gov/oregon-newsroom/OR/DOR/Posts/Post/oregon-kids-credit-offers-big-boost-for-lowest-income-families-91560"
+    ],
+    "verifiedOn": "2026-11-10",
+    "confidence": "medium",
+    "catches": "Tax software had errors in early 2026; check the amount. Some state pages still show older figures.",
+    "notes": "",
+    "sameAs": ""
+  },
+  {
+    "id": "or-paid-leave-oregon",
+    "name": "Paid Leave Oregon",
+    "brand": "Oregon Employment Department",
+    "category": "money",
+    "whatYouGet": "Up to 12 weeks of pay to bond with a child in the first year, plus up to 2 more weeks for pregnancy-related conditions.",
+    "offers": [
+      "cash"
+    ],
+    "certainty": "if-eligible",
+    "freeStuff": "",
+    "valueLow": 10153,
+    "valueHigh": 10153,
+    "valueSource": "estimate",
+    "valueBasis": "12 weeks at half the $1,692.16 weekly maximum",
     "costToClaim": "free",
     "costDetail": "Funded by payroll contributions; no sign-up fee.",
     "requirements": [
       "eligibility"
     ],
-    "eligibility": "Employed in a state with a program and meeting its work and earnings rules. Pay rates, length and start dates differ by state.",
-    "region": "Only in states with a program (CA, NJ, RI, NY, DC, WA, MA, CT, OR, CO, MD, DE, MN, ME)",
+    "eligibility": "Oregon workers who paid into the program. Maximum weekly benefit is $1,692.16 for benefit years starting June 28, 2026 or later; earlier claims keep $1,636.56. Workers earning 65% or less of the state average get 100% of wages.",
+    "region": "Oregon",
     "states": [
-      "CA",
-      "NJ",
-      "RI",
-      "NY",
-      "DC",
-      "WA",
-      "MA",
-      "CT",
-      "OR",
-      "CO",
-      "MD",
-      "DE",
-      "MN",
-      "ME"
+      "OR"
     ],
     "effort": "involved",
     "when": "late-pregnancy",
-    "whenNote": "Most states ask for notice and an application before leave starts; check your state agency.",
-    "signupUrl": "https://www.dol.gov/agencies/wb/featured-paid-leave",
+    "whenNote": "You can apply up to 30 days before leave begins or up to 30 days after it begins.",
+    "signupUrl": "https://paidleave.oregon.gov/employees/",
     "sourceUrls": [
-      "https://www.dol.gov/agencies/wb/featured-paid-leave",
-      "https://www.dol.gov/sites/dolgov/files/WB/paid-leave/HistoryOfPaidLeaveUS.pdf"
+      "https://paidleave.oregon.gov/employees/",
+      "https://paidleave.oregon.gov/resources/common-questions.html",
+      "https://www.oregon.gov/employ/NewsAndMedia/Documents/2026-05-29-Minimum-Maximum-Weekly-Benefit-Amounts.pdf"
+    ],
+    "verifiedOn": "2026-11-10",
+    "confidence": "medium",
+    "catches": "The extra 2 weeks are for pregnancy conditions, not bonding.",
+    "notes": "",
+    "sameAs": ""
+  },
+  {
+    "id": "ri-temporary-caregiver-insurance",
+    "name": "Rhode Island Temporary Caregiver Insurance",
+    "brand": "Rhode Island Dept. of Labor and Training",
+    "category": "money",
+    "whatYouGet": "Pay for several weeks to bond with a new child in the first 12 months of parenting.",
+    "offers": [
+      "cash"
+    ],
+    "certainty": "if-eligible",
+    "freeStuff": "",
+    "valueLow": 3860,
+    "valueHigh": 3860,
+    "valueSource": "estimate",
+    "valueBasis": "7 weeks (lower of 7 or 8) at half the $1,103 weekly maximum",
+    "costToClaim": "free",
+    "costDetail": "Funded by payroll contributions; no sign-up fee.",
+    "requirements": [
+      "eligibility"
+    ],
+    "eligibility": "Rhode Island workers who paid into the program and meet its earnings test. Official materials give a weekly maximum of $1,103, rising to $1,150 for benefit years starting July 1, 2026 or later.",
+    "region": "Rhode Island",
+    "states": [
+      "RI"
+    ],
+    "effort": "involved",
+    "when": "after-birth",
+    "whenNote": "Bonding claims are allowed only in the first 12 months of parenting.",
+    "signupUrl": "https://dlt.ri.gov/individuals/temporary-disability-caregiver-insurance",
+    "sourceUrls": [
+      "https://dlt.ri.gov/individuals/temporary-disability-caregiver-insurance/claimants/tditci-frequently-asked-questions",
+      "https://dlt.ri.gov/individuals/temporary-disability-caregiver-insurance"
     ],
     "verifiedOn": "2026-11-10",
     "confidence": "low",
-    "catches": "No federal paid leave exists; FMLA is unpaid. DOL list (2024): CA, NJ, RI, NY, DC, WA, MA, CT, OR, CO, MD, DE, MN, ME. MD, DE, MN, ME benefits were to start in 2026; not confirmed. Apply through the state agency, not DOL.",
-    "notes": "Only a DOL overview was seen; state agency pages were not searched. Value left empty because pay depends on wages and state."
+    "catches": "Official pages disagree on length: the 2026 FAQ says up to 8 weeks, a June 2026 bulletin says 7. The lower figure (7) is used. The $1,150 figure is stated for TDI and applied to TCI by the FAQ.",
+    "notes": "Confidence low because of the conflict.",
+    "sameAs": ""
+  },
+  {
+    "id": "mi-rx-kids",
+    "name": "Rx Kids (Michigan)",
+    "brand": "Rx Kids",
+    "category": "money",
+    "whatYouGet": "Cash with no strings: $1,500 during pregnancy and $500 a month for 6 months after birth in most communities (some pay 12 months, some only the monthly part).",
+    "offers": [
+      "cash"
+    ],
+    "certainty": "if-eligible",
+    "freeStuff": "Cash of $1,500 in pregnancy and $500 a month after birth.",
+    "valueLow": 3000,
+    "valueHigh": 4500,
+    "valueSource": "estimate",
+    "valueBasis": "$500 x 6 months at the low end; $1,500 plus $500 x 6 months at the high end",
+    "costToClaim": "free",
+    "costDetail": "Free; paid by direct deposit or prepaid card.",
+    "requirements": [
+      "eligibility"
+    ],
+    "eligibility": "Live in a participating community (by where you physically live), be 18 or older (16 to 17 with a guardian's consent), and be at least 16 weeks pregnant or have a baby 6 months or younger born after the community's start date.",
+    "region": "Participating Michigan cities and counties only",
+    "states": [
+      "MI"
+    ],
+    "effort": "involved",
+    "when": "pregnancy",
+    "whenNote": "Apply from 16 weeks of pregnancy; the $1,500 is lost if you apply after the birth, though monthly payments can still start until the baby is 6 months old.",
+    "signupUrl": "https://rxkids.org/",
+    "sourceUrls": [
+      "https://rxkids.org/about/faq/",
+      "https://rxkids.org/guide/",
+      "https://rxkids.org/michigan/detroit/"
+    ],
+    "verifiedOn": "2026-11-10",
+    "confidence": "medium",
+    "catches": "Only certain communities (for example Flint, Detroit, many Upper Peninsula and other counties); start dates and months paid differ by place. The $1,500 needs an application before the baby is born. You need ID, proof of address and a pregnancy or birth document; staff reply in 2 to 4 weeks and the application is rejected if not verified in 60 days. After birth you fill in another form to start monthly payments.",
+    "notes": "Results from several county pages were months old; check your community page. Value low end is 6 months only with no prenatal payment.",
+    "sameAs": ""
   },
   {
     "id": "treasury-trump-account-pilot-deposit",
@@ -2965,23 +5333,103 @@
     "requirements": [
       "eligibility"
     ],
-    "eligibility": "Child born Jan 1, 2025 to Dec 31, 2028, a US citizen with a valid Social Security number, and a qualifying child of the person who elects. One pilot election per child.",
+    "eligibility": "Child born Jan 1, 2025 to Dec 31, 2028, a US citizen with a Social Security number valid for work that was issued before the election, and expected to be a qualifying child of the parent who elects. One pilot election per child.",
     "region": "US",
     "states": [],
     "effort": "some",
     "when": "after-birth",
-    "whenNote": "Needs the baby's Social Security number; elected on Form 4547, usually with the tax return.",
-    "signupUrl": "https://www.irs.gov/newsroom/heres-how-to-claim-trump-account-seed-money-for-your-child",
+    "whenNote": "The SSN must be issued before the election. The IRS says if you elect after a qualifying event such as a birth and have already filed your tax return, use the online options at trumpaccounts.gov.",
+    "signupUrl": "https://www.irs.gov/trumpaccounts",
     "sourceUrls": [
-      "https://www.irs.gov/newsroom/heres-how-to-claim-trump-account-seed-money-for-your-child",
-      "https://www.irs.gov/pub/irs-pdf/f4547.pdf",
-      "https://www.irs.gov/pub/irs-pdf/i4547.pdf",
-      "https://home.treasury.gov/news/press-releases/sb0372"
+      "https://www.irs.gov/trumpaccounts",
+      "https://www.irs.gov/forms-pubs/about-form-4547",
+      "https://www.irs.gov/instructions/i4547",
+      "https://www.irs.gov/faqs/trump-accounts-frequently-asked-questions",
+      "https://www.irs.gov/newsroom/heres-how-to-claim-trump-account-seed-money-for-your-child"
     ],
     "verifiedOn": "2026-11-10",
     "confidence": "medium",
-    "catches": "The parent must elect it: check the pilot box on Form 4547 (with the tax return, or through the Trump Accounts website, app or IRS online account). Search results showed no deposit before July 4, 2026. Confirm current steps on the IRS page.",
-    "notes": "Official names and steps taken from IRS and Treasury search results. SSA also puts Trump Account information with newborn Social Security cards."
+    "catches": "The parent must elect it; it is not automatic even if Treasury enrolls the child. File Form 4547 on the Trump Accounts website or app, in your IRS Individual Online Account, on paper, or with a tax return, and tick the $1,000 pilot box. After the election the trustee contacts you to claim the account and verify identity. For a baby born in 2027 the SSN must exist first, so this follows the birth.",
+    "notes": "Changed: signupUrl now the IRS Trump Accounts page; account opening confirmed (contributions opened July 4, 2026; election online since mid-2026); added timing and SSN-first rule.",
+    "sameAs": ""
+  },
+  {
+    "id": "vt-child-tax-credit",
+    "name": "Vermont Child Tax Credit",
+    "brand": "Vermont Department of Taxes",
+    "category": "money",
+    "whatYouGet": "A fully refundable credit of up to $1,000 per child age 6 or younger for tax year 2025.",
+    "offers": [
+      "cash"
+    ],
+    "certainty": "if-eligible",
+    "freeStuff": "",
+    "valueLow": 0,
+    "valueHigh": 1000,
+    "valueSource": "official",
+    "valueBasis": "Up to $1,000 per child for tax year 2025; reduced above $125,000 AGI",
+    "costToClaim": "free",
+    "costDetail": "No cost; claimed on the Vermont return.",
+    "requirements": [
+      "eligibility"
+    ],
+    "eligibility": "Vermont resident; reduced by $20 per $1,000 of AGI above $125,000 and gone at $175,000. A Social Security number or ITIN is not required.",
+    "region": "Vermont",
+    "states": [
+      "VT"
+    ],
+    "effort": "some",
+    "when": "after-birth",
+    "whenNote": "Claimed on the return for the year the child is born.",
+    "signupUrl": "https://tax.vermont.gov/individuals/personal-income-tax/tax-credits",
+    "sourceUrls": [
+      "https://tax.vermont.gov/individuals/personal-income-tax/tax-credits",
+      "https://legislature.vermont.gov/statutes/section/32/151/05830f"
+    ],
+    "verifiedOn": "2026-11-10",
+    "confidence": "medium",
+    "catches": "Age limit rose from 5 to 6 for 2025 under Act 71 of 2025.",
+    "notes": "",
+    "sameAs": ""
+  },
+  {
+    "id": "wa-paid-family-medical-leave",
+    "name": "Washington Paid Family and Medical Leave",
+    "brand": "Washington Employment Security Department",
+    "category": "money",
+    "whatYouGet": "Up to 12 weeks of pay to bond with a new child, up to 90% of weekly pay, with a 2026 weekly maximum of $1,647.",
+    "offers": [
+      "cash"
+    ],
+    "certainty": "if-eligible",
+    "freeStuff": "",
+    "valueLow": 9882,
+    "valueHigh": 9882,
+    "valueSource": "estimate",
+    "valueBasis": "12 weeks at half the $1,647 weekly maximum",
+    "costToClaim": "free",
+    "costDetail": "Funded by payroll contributions; no sign-up fee.",
+    "requirements": [
+      "eligibility"
+    ],
+    "eligibility": "At least 820 hours worked in the qualifying period. Up to 16 weeks combined medical and family leave in a claim year, or 18 with pregnancy or birth complications. Minimum benefit is $100 a week in 2026.",
+    "region": "Washington",
+    "states": [
+      "WA"
+    ],
+    "effort": "involved",
+    "when": "after-birth",
+    "whenNote": "Bonding leave is for the first year after the birth.",
+    "signupUrl": "https://paidleave.wa.gov/how-paid-leave-works/",
+    "sourceUrls": [
+      "https://paidleave.wa.gov/how-paid-leave-works/",
+      "https://paidleave.wa.gov/find-out-how-paid-leave-works/"
+    ],
+    "verifiedOn": "2026-11-10",
+    "confidence": "medium",
+    "catches": "Can be taken in full weeks or intermittently. Application timing was not in the results.",
+    "notes": "",
+    "sameAs": ""
   },
   {
     "id": "bzzagent-campaigns",
@@ -3021,7 +5469,8 @@
     "verifiedOn": "2026-11-08",
     "confidence": "medium",
     "catches": "Per the privacy policy, selection is typically random among qualified applicants when more qualify than there are spots. Reviews and campaign activities are required. The join link on bzzagent.com goes to sampling.powerreviews.com, which is off the bzzagent.com domain (PowerReviews owns BzzAgent). Samples are limited and only chosen applicants get one. Required review and posting per campaign, shared with followers, with disclosure rules. Sponsoring brands may receive info about your participation and act as independent controllers. Privacy notice says it does not sell data for money but shares data with ad/analytics partners, which may count as a sale or share under state law. Campaign invite emails.",
-    "notes": "Not parenting-specific. Confidence capped at medium because the sign-up step is on another domain."
+    "notes": "Not parenting-specific. Confidence capped at medium because the sign-up step is on another domain.",
+    "sameAs": ""
   },
   {
     "id": "home-tester-club-us-product-tests",
@@ -3061,7 +5510,8 @@
     "verifiedOn": "2026-11-08",
     "confidence": "medium",
     "catches": "Site says it invites its 20 most active members to an exclusive test each month; most members get no test. Not every applicant gets a test. Test partner companies can see your survey answers, written reviews with first name, and photo/video reviews, tied to profile demographics (name, email, phone and address are not shared with them per the policy). Feedback surveys and email after tests. Points have no monetary value.",
-    "notes": "Not parenting-specific; check the Test page for baby or kids' campaigns."
+    "notes": "Not parenting-specific; check the Test page for baby or kids' campaigns.",
+    "sameAs": ""
   },
   {
     "id": "influenster-voxbox",
@@ -3099,7 +5549,8 @@
     "verifiedOn": "2026-11-08",
     "confidence": "medium",
     "catches": "There is no application for a VoxBox; Influenster picks members based on activity and impact score. Official guide (via search results) says to be eligible for a VoxBox you must sign up and download the app. Not guaranteed a VoxBox; selection depends on activity and impact score. Recipients are expected to post reviews or social content and disclose the product was free. Privacy policy: shares name/last initial/location with third parties who may publish it, shares aggregate data with advertisers, and shares data with partners and service providers; reviews and profile are public. Marketing about specials and new features by email.",
-    "notes": "Checked from the official site's search results; the site blocks automated reading, so details may be incomplete. Home page and article pages returned a Cloudflare bot challenge (403), so offer details rest on official-domain search results. Privacy policy and terms pages were read. Not parenting-specific."
+    "notes": "Checked from the official site's search results; the site blocks automated reading, so details may be incomplete. Home page and article pages returned a Cloudflare bot challenge (403), so offer details rest on official-domain search results. Privacy policy and terms pages were read. Not parenting-specific.",
+    "sameAs": ""
   },
   {
     "id": "moms-meet-sampling-programs",
@@ -3137,7 +5588,8 @@
     "verifiedOn": "2026-11-10",
     "confidence": "low",
     "catches": "Acceptance is not guaranteed; you apply per program and must give feedback. Not baby-specific; open programs seen were food and kids items, and the page may be stale.",
-    "notes": "Seen only as official-domain search results."
+    "notes": "Seen only as official-domain search results.",
+    "sameAs": ""
   },
   {
     "id": "ptpa-parent-tested-parent-approved",
@@ -3178,7 +5630,8 @@
     "verifiedOn": "2026-11-10",
     "confidence": "medium",
     "catches": "Testers are picked at random from the database; most members are not picked. Selected testers have 24 hours to accept. The profile asks about income, education and children.",
-    "notes": "Seen only as official-domain search results. Many pages are old; the homepage listed a door-lock test for parents of 0 to 3 year olds."
+    "notes": "Seen only as official-domain search results. Many pages are old; the homepage listed a door-lock test for parents of 0 to 3 year olds.",
+    "sameAs": ""
   },
   {
     "id": "pinchme-samples",
@@ -3216,7 +5669,8 @@
     "verifiedOn": "2026-11-08",
     "confidence": "medium",
     "catches": "Samples are limited and not guaranteed; the site says they are typically claimed within minutes on release, so most people get few or none. Terms say members are not guaranteed any samples. Privacy policy says information is shared with affiliates, business partners and brand partners for their own business purposes, including direct marketing. Marketing emails about campaigns and offers. Members are asked to share feedback and must follow FTC endorsement disclosure rules.",
-    "notes": "Not parenting-specific. Terms say membership may be limited by territory and eligibility; the specific rules were not found on the pages read."
+    "notes": "Not parenting-specific. Terms say membership may be limited by territory and eligibility; the specific rules were not found on the pages read.",
+    "sameAs": ""
   },
   {
     "id": "tryazon-tryabox-parties",
@@ -3255,6 +5709,7 @@
     "verifiedOn": "2026-11-08",
     "confidence": "medium",
     "catches": "Sponsors choose participants; a limited number of host spots per party. As fetched today, the sign-up form page displayed 'forms are currently under maintenance' and the TryaBox page listed no open opportunities. Applications are shared with the sponsoring brand. FAQ says selection also looks at social accounts and who actively shares, and hosts follow FTC disclosure rules, so expect to post on social media. Privacy policy says it will not sell or rent your information and shares aggregated demographics with partners. Email communications with unsubscribe.",
-    "notes": "Terms of Use page shows an effective date of May 25, 2018. Specific what-you-get varies by party or TryaBox."
+    "notes": "Terms of Use page shows an effective date of May 25, 2018. Specific what-you-get varies by party or TryaBox.",
+    "sameAs": ""
   }
 ]
