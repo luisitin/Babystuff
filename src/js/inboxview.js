@@ -39,7 +39,16 @@
     for (var i = 0; i < l.length; i++) if (l[i].id === id) return l[i];
     return null;
   }
-  function activePrograms() { return (BFF.programs || []).filter(function (p) { return BFF.tracker.getStatus(p.id) !== 'skipped'; }); }
+  // Skipped programs are left out, and so are programs the person's answers in My info rule out
+  // (unless they are already in progress).
+  function activePrograms() {
+    var L = BFF.logic, pr = profile();
+    return (BFF.programs || []).filter(function (p) {
+      var st = BFF.tracker.getStatus(p.id);
+      if (st === 'skipped') return false;
+      return !(L && L.hiddenByAnswers && L.hiddenByAnswers(p, pr, st));
+    });
+  }
   function checklistPrograms() {
     var started = (BFF.programs || []).filter(function (p) { var s = BFF.tracker.getStatus(p.id); return s === 'signed-up' || s === 'received'; });
     return started.length ? started : activePrograms();

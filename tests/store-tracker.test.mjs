@@ -173,3 +173,62 @@ test('guided and phone source: plus tags follow the email-scope rule', () => {
   const ph = fs.readFileSync(new URL('../src/js/phone.js', import.meta.url), 'utf8');
   assert.match(ph, /E\.inEmailFeatures\(q\)/);
 });
+
+// ---- Phase H: "Your situation" answers in the profile ----
+import { createRequire } from 'node:module';
+const requireH = createRequire(import.meta.url);
+
+test('h situation: stored with the profile, old profiles load, clear removes them', () => {
+  const { BFF } = load(progs);
+  // An old profile without the four keys loads fine.
+  BFF.store.set('profile.v1', { firstName: 'Ann', state: 'TX' });
+  const old = BFF.store.get('profile.v1', {});
+  assert.equal(old.cover, undefined);
+  assert.equal(old.job, undefined);
+  BFF.store.set('profile.v1', Object.assign({}, old, { cover: 'private', insurer: 'Aetna', lowIncome: 'no', job: 'yes' }));
+  const now = BFF.store.get('profile.v1', {});
+  assert.deepEqual([now.cover, now.insurer, now.lowIncome, now.job], ['private', 'Aetna', 'no', 'yes']);
+  BFF.store.remove('profile.v1');
+  assert.deepEqual(J(BFF.store.get('profile.v1', {})), {});
+});
+
+test('h situation: backup round trip, blanks only, bad values dropped', () => {
+  const a = load(progs).BFF;
+  a.store.set('profile.v1', { firstName: 'Ann', cover: 'medicaid', insurer: 'Aetna', lowIncome: 'yes', job: 'no' });
+  const text = a.tracker.exportJSON({ includeProfile: true });
+  const exported = JSON.parse(text).profile;
+  assert.deepEqual([exported.cover, exported.insurer, exported.lowIncome, exported.job], ['medicaid', 'Aetna', 'yes', 'no']);
+  const b = load(progs).BFF;
+  b.tracker.importJSON(text);
+  const got = b.store.get('profile.v1', {});
+  assert.deepEqual([got.cover, got.insurer, got.lowIncome, got.job], ['medicaid', 'Aetna', 'yes', 'no']);
+  // Existing answers are not overwritten; blanks are filled.
+  const c = load(progs).BFF;
+  c.store.set('profile.v1', { cover: 'none' });
+  c.tracker.importJSON(text);
+  const merged = c.store.get('profile.v1', {});
+  assert.equal(merged.cover, 'none');
+  assert.equal(merged.job, 'no');
+  // Unknown values are dropped.
+  const d = load(progs).BFF;
+  d.tracker.importJSON(JSON.stringify({ app: 'baby-freebies-finder', version: 1, tracker: {}, profile: { cover: 'gold', lowIncome: 'maybe', job: 5, firstName: 'Z' } }));
+  const bad = d.store.get('profile.v1', {});
+  assert.equal(bad.firstName, 'Z');
+  assert.equal(bad.cover, undefined);
+  assert.equal(bad.lowIncome, undefined);
+  assert.equal(bad.job, undefined);
+  // A backup without the keys still imports.
+  const e = load(progs).BFF;
+  e.tracker.importJSON(JSON.stringify({ app: 'baby-freebies-finder', version: 1, tracker: {}, profile: { firstName: 'Y' } }));
+  assert.equal(e.store.get('profile.v1', {}).firstName, 'Y');
+});
+
+test('h situation: the fill-script payload never contains the answers', () => {
+  const F = requireH('../src/js/fillscript.js');
+  const profile = { firstName: 'Jane', lastName: 'Doe', email: 'jane@gmail.com', state: 'TX', cover: 'medicaid', insurer: 'SecretPlanXyz', lowIncome: 'yes', job: 'no' };
+  const script = F.build({ profile, programs: [{ id: 'p', name: 'P', requirements: ['email'], signupUrl: 'https://www.similac.com/x' }], tagMap: {} });
+  assert.ok(script.includes('jane@gmail.com'));
+  const D = JSON.parse(/var D=(.*?);var FM=/s.exec(script)[1]);
+  assert.deepEqual(Object.keys(D.profile).sort(), ['email', 'firstName', 'lastName', 'state']);
+  for (const bad of ['SecretPlanXyz', 'lowIncome']) assert.ok(!script.includes(bad), bad);
+});

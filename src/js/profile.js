@@ -21,6 +21,15 @@
     { key: 'dueDate', label: 'Due date or baby’s birthday', ac: 'off', type: 'date' }
   ];
 
+  // Optional answers that decide which programs are hidden. Never used to fill any form.
+  var SITUATION = [
+    { key: 'cover', label: 'Health cover', options: [['private', 'Employer or private plan'], ['marketplace', 'Marketplace plan'], ['medicaid', 'Medicaid or CHIP'], ['tricare', 'TRICARE'], ['none', 'No cover now']] },
+    { key: 'insurer', label: 'Insurer or health plan', options: null },
+    { key: 'lowIncome', label: 'Does your household get WIC, SNAP or similar help, or expect to qualify?', options: [['yes', 'Yes'], ['no', 'No']] },
+    { key: 'job', label: 'Do you or your partner have a paid job?', options: [['yes', 'Yes'], ['no', 'No']] }
+  ];
+  var sitSel = {}, sitField = {};
+
   var CHECKS = {
     email: { re: /^[^\s@]+@[^\s@]+\.[^\s@]+$/, msg: 'This does not look like an email address. You can still save it.' },
     zip: { re: /^\d{5}(-\d{4})?$/, msg: 'ZIP codes are usually 5 digits. You can still save it.' }
@@ -44,6 +53,24 @@
     var p = store.get(KEY, {});
     return p && typeof p === 'object' && !Array.isArray(p) ? p : {};
   }
+  function insurers() {
+    var seen = {}, out = [];
+    (BFF.programs || []).forEach(function (p) {
+      var v = p && typeof p.insurer === 'string' ? p.insurer.trim() : '';
+      if (v && !seen[v]) { seen[v] = true; out.push(v); }
+    });
+    return out.sort(function (a, b) { return a.localeCompare(b, 'en', { sensitivity: 'base' }); });
+  }
+  function sitValue(p, k) {
+    var v = typeof p[k] === 'string' ? p[k] : '';
+    var opts = k === 'insurer' ? insurers().concat(['other']) : SITUATION.filter(function (d) { return d.key === k; })[0].options.map(function (o) { return o[0]; });
+    return opts.indexOf(v) === -1 ? '' : v;
+  }
+  // Show the insurer question only when the data names insurers and cover is not "none".
+  function syncSituation(p) {
+    var hasIns = insurers().length > 0;
+    sitField.insurer.hidden = !hasIns || sitSel.cover.value === 'none';
+  }
   function validate(f) {
     var c = CHECKS[f.check], v = inputs[f.key].value.trim();
     var bad = !!(c && v && !c.re.test(v));
@@ -64,6 +91,8 @@
       inputs[f.key].value = v;
       if (f.check) validate(f);
     });
+    SITUATION.forEach(function (d) { sitSel[d.key].value = sitValue(p, d.key); });
+    syncSituation(p);
     if (plusBox) { plusBox.checked = !!p.usePlusTags; if (p.usePlusTags) tagMapNow(false); updatePlus(); }
   }
   // Live preview of the tagged address plus a note about the person's email provider.
@@ -116,6 +145,11 @@
     FIELDS.forEach(function (f) { p[f.key] = inputs[f.key].value.trim(); });
     if (!p.dueDate && keptDue) p.dueDate = keptDue;
     p.usePlusTags = !!(plusBox && plusBox.checked);
+    SITUATION.forEach(function (d) {
+      var v = sitSel[d.key].value;
+      if (d.key === 'insurer' && sitField.insurer.hidden) v = '';
+      if (v) p[d.key] = v;
+    });
     var keepMap = cleanMap(read().plusTagMap);
     if (Object.keys(keepMap).length) p.plusTagMap = keepMap;
     var ok = store.set(KEY, p);
@@ -163,6 +197,31 @@
         form.appendChild(h('div', { class: 'fx-field' }, [h('label', { 'for': id, text: f.label }), input, hint]));
       });
       el.appendChild(form);
+
+      var sit = h('section', { class: 'fx-card fx-form fx-situation', 'aria-labelledby': 'info-sit-h' }, [
+        h('h3', { id: 'info-sit-h', text: 'Your situation (optional)' }),
+        h('p', { class: 'fx-muted', text: 'Used only to hide programs that cannot apply to you. Stays on this device.' })
+      ]);
+      SITUATION.forEach(function (d) {
+        var id = 'info-' + d.key;
+        var sel = h('select', { id: id, name: d.key, class: 'fx-select', autocomplete: 'off' });
+        sel.appendChild(h('option', { value: '', text: 'Not answered' }));
+        (d.options || insurers().map(function (v) { return [v, v]; }).concat([['other', 'Another one']])).forEach(function (o) {
+          sel.appendChild(h('option', { value: o[0], text: o[1] }));
+        });
+        sel.addEventListener('change', function () {
+          if (d.key === 'cover') syncSituation(read());
+          statusEl.className = 'fx-saved fx-saved--block';
+          statusEl.textContent = 'Saving…';
+          if (timer) clearTimeout(timer);
+          timer = setTimeout(saveNow, 400);
+        });
+        sitSel[d.key] = sel;
+        var fld = h('div', { class: 'fx-field', 'data-situation': d.key }, [h('label', { 'for': id, text: d.label }), sel]);
+        sitField[d.key] = fld;
+        sit.appendChild(fld);
+      });
+      el.appendChild(sit);
 
       plusBox = h('input', { type: 'checkbox', id: 'info-plus' });
       plusPreview = h('p', { class: 'fx-plus-preview' });

@@ -10,6 +10,12 @@
   var KEY = 'tracker.v1';
   var MAX_BYTES = 1024 * 1024, MAX_ENTRIES = 5000, MAX_NOTE = 2000, MAX_FIELD = 200;
   var PROFILE_KEYS = ['firstName', 'lastName', 'email', 'phone', 'address1', 'address2', 'city', 'state', 'zip', 'dueDate'];
+  // Optional "Your situation" answers. Kept in the profile and the backup, never used by any form filling.
+  var SITUATION = {
+    cover: ['private', 'marketplace', 'medicaid', 'tricare', 'none'],
+    lowIncome: ['yes', 'no'],
+    job: ['yes', 'no']
+  };
   var has = function (o, k) { return Object.prototype.hasOwnProperty.call(o, k); };
 
   function emit(id) {
@@ -58,6 +64,11 @@
       PROFILE_KEYS.forEach(function (k) {
         if (typeof data.profile[k] === 'string') profile[k] = data.profile[k].slice(0, MAX_FIELD);
       });
+      Object.keys(SITUATION).forEach(function (k) {
+        var v = data.profile[k];
+        if (typeof v === 'string' && SITUATION[k].indexOf(v) !== -1) profile[k] = v;
+      });
+      if (typeof data.profile.insurer === 'string' && data.profile.insurer.trim()) profile.insurer = data.profile.insurer.trim().slice(0, MAX_FIELD);
       if (typeof data.profile.usePlusTags === 'boolean') profile.usePlusTags = data.profile.usePlusTags;
       var ptm = data.profile.plusTagMap;
       if (ptm && typeof ptm === 'object' && !Array.isArray(ptm)) {

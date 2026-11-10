@@ -378,3 +378,38 @@ Data rules added in the second merge:
 
 - Directory due-date buttons: on phones the buttons are equal-width tiles in one row (number on top, label under it, at least 44px tall). A single button keeps a capped width. From 640px wide they go back to inline buttons in a wrapping row. CSS only; the button markup is unchanged.
 - My info plus-address preview: the address sits in its own `span.fx-plus-addr` (block, `overflow-wrap: anywhere`), so it breaks only when it cannot fit. The paragraph text still reads "Preview: address (for program)".
+
+## Phase H: tabs, short cards and fit questions (contract)
+
+Why: the Programs page was about 61,000 px tall, the top pick was a tax credit, and the app could not tell who qualifies. Nothing in the product rules changes. `isTrulyFree`, `isOpenToAll`, `verdict`, ranking and the value maths are unchanged.
+
+### Kinds and tabs
+- `L.kindOf(p)` by the first offer: product, coupons, points, sweepstakes, testing -> `stuff`; cash -> `money`; service, coverage -> `care`. Missing offers -> `stuff`. `L.KINDS` lists them.
+- `filterPrograms` options: `kind` (`''` or `'all'` = no filter), `hideNoFit` (with `profile`, `statusOf`), `fitsMine` (with `profile`; keeps fit `yes` only).
+- Four buttons above "Sort and filter": Free stuff (n), Money (n), Care and cover (n), All (n). Counts are programs under the other current filters, so the count on the chosen tab equals "Showing N". Default `stuff`. Saved in `bff.prefs.v1` as `filters.kind`.
+- Ranks are numbered within the tab (`rankMap` over the programs left after the state and answers rules, narrowed to the tab). Verdict groups stay.
+- Summary adds "N money programs (tax credits, savings deposits, paid leave) are under Money." (distinct groups, omitted at 0).
+- "Show these" switches to Free stuff and clears the filters and "Fits my answers". The due-date buttons switch to All, so each count equals the lead cards in its section. "Start a guided run with these N" still uses the shown list. Guided run and tracker ignore the tab.
+
+### Short cards
+- Collapsed card: rank, verdict badge, one certainty or fit badge, status badge (only when not To do), name and brand, one free-stuff line (clamped to 2 lines), the short value line, the sign-up link and a "Details" button. The long basis sentence, chips, facts, catches, status select, cost, requirements, who, where, notes, sources and verified date sit in `.card-more`.
+- Open state is kept in memory across re-renders only.
+- "Sort and filter" is one `<details>`: Sort by, What you get, Category and the five chips. Summary text shows "(n on)". It opens itself whenever any is not at its default. Search sits above the tabs. "Clear filters" resets the tab to Free stuff.
+
+### Your situation
+- My info section "Your situation (optional)": `cover` (private, marketplace, medicaid, tricare, none), `insurer` (distinct non-empty `insurer` values in the data, sorted, plus `other`; hidden when the data has none or `cover` is `none`), `lowIncome` (yes, no), `job` (yes, no). Stored in `profile.v1`, kept in the JSON backup (values checked on import, blanks filled only), cleared with "Clear my info". Old profiles load fine.
+- These four are never used by the fill script (`cleanProfile` whitelists the form fields), the bookmark, the phone view, the autofill helper, the guided run's copy fields, email features or any link. A unit test pins the fill-script payload.
+- `L.fit(p, profile)` -> `yes`, `no`, `maybe` over `p.audience` (missing = `[]`): any `no` -> `no`; no tags -> `yes`; all `yes` -> `yes`; else `maybe`. Tags: medicaid, wic, low-income, insured, marketplace, military, employer, worker, local, member (needs `p.insurer`); unknown tags are unknown. `L.hasSituation(profile)`: any of the four answered.
+- `L.hiddenByAnswers(p, profile, status)`: fit `no` and status is empty or `todo`. `L.hiddenByAnswersCount(list, profile, statusOf)`.
+- Hidden when fit is `no`: Directory, guided run (default list and setup list), and the Gmail search program list. Pref `prefs.showNoFit` shows them in the Directory and guided run, with a "Does not match your answers" badge in the Directory. The state rule is separate and unchanged.
+- Badges: with answers, fit `yes` and a non-empty audience -> "Fits your answers"; fit `maybe` -> "If you qualify". With no answers, "If you qualify" only for `certainty: if-eligible`. Other certainties show a short badge (Guaranteed, Likely, Chance only).
+- Summary: no answers -> "Answer four quick questions in My info to hide programs that cannot apply to you."; answers -> "N programs fit your answers; M hidden." The "X more are free if you qualify" line leaves out fit `no`.
+
+### DOM hooks for browser tests
+- Tabs: `.kind-tabs` (role group), `button.kind-tab[data-kind="stuff|money|care|all"]` with `aria-pressed`, text "Label (n)" (`.kt-label`, `.kt-count`).
+- Filters: `details.dir-filters` (its `summary` text "Sort and filter" or "Sort and filter (n on)"), search input `input[type=search]` outside it, chip `label[data-chip="fitsMine"]`, `.chip-hint`.
+- Cards: `article.card[data-program-id]`, `.is-open` when open, `button.card-toggle[aria-expanded][aria-controls]`, `.card-more#more-<id>` (`hidden` when closed), `.card-status-badge` (hidden for To do), `.badge-certainty` with `.tag-fit`, `.tag-qualify` or `.tag-certainty`, `.tag-nomatch`, `.free-line`, `.value-line`, `.value-basis` (only in `.card-more`), `.card-foot a.btn-primary`, `select[data-program-id]` (inside `.card-more`).
+- Summary: `.dir-summary`, `.sum-main`, `.sum-more`, `.sum-money`, `.sum-situation`, `.show-these`, `.when-buttons button`.
+- Lists: `.dir-fit` (hidden-by-answers box with its Show/Hide button), `.dir-state`, `.result-count`, `.start-run`, `.dir-group`, `.same-group`.
+- My info: `.fx-situation`, selects `#info-cover`, `#info-insurer`, `#info-lowIncome`, `#info-job` (field wrappers carry `data-situation`).
+- Prefs: `filters.kind`, `filters.fitsMine`, `showNoFit` in `bff.prefs.v1`.
