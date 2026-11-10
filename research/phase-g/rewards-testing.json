@@ -1,0 +1,429 @@
+[
+ {
+  "id": "pg-brandsaver-rewards",
+  "name": "P&G brandSAVER Points & Rewards",
+  "brand": "Procter & Gamble",
+  "category": "rewards",
+  "whatYouGet": "Free to join. Earn points by completing a profile, taking surveys or scanning receipts for P&G products, then redeem 750 points for a $5 off any P&G product digital reward or use points for sweepstakes entries. Also offers coupons and rebates on 60+ P&G brands.",
+  "costToClaim": "free",
+  "costDetail": "No cost to join, or any fees ever (per the site)",
+  "requirements": [
+   "email"
+  ],
+  "eligibility": "",
+  "region": "US",
+  "signupUrl": "https://pgbrandsaver.com/rewards/",
+  "sourceUrls": [
+   "https://pgbrandsaver.com/",
+   "https://pgbrandsaver.com/rewards/",
+   "https://pgbrandsaver.com/fan-clubs/",
+   "https://privacypolicy.pg.com/en-US/"
+  ],
+  "verifiedOn": "2026-11-08",
+  "confidence": "high",
+  "catches": "Points come from surveys and receipt scans of P&G purchases (50 points per product); 750 points buys one $5-off digital reward and 25 points buys one prize-draw entry. Points have no cash value and lapse after a year with none earned. No free product arrives. Privacy policy says P&G discloses personal data to third-party partners where it has a lawful basis, receives data from other companies, and may share hashed email identifiers with ad platforms (Google, Meta, Microsoft, Pinterest, Reddit, Snap, TikTok) for interest-based ads. Its FAQ says it does not sell personal data for monetary compensation, but the site footer says 'We may sell your sensitive personal data.' Marketing email/text with opt-out. Points come from surveys and receipt scans.",
+  "notes": "The former pgeveryday.com now leads to P&G brandSAVER. No baby-specific offer is listed on the rewards page. Eligibility rules are not on the pages read (see Offer Rules page).",
+  "offers": [
+   "points",
+   "coupons",
+   "sweepstakes"
+  ],
+  "certainty": "likely",
+  "freeStuff": "",
+  "valueLow": 5,
+  "valueHigh": 20,
+  "valueSource": "estimate",
+  "valueBasis": "750 points = $5 off; a few rewards from receipt scans and profile points",
+  "effort": "some",
+  "when": "anytime",
+  "whenNote": "",
+  "states": []
+ },
+ {
+  "id": "bzzagent-campaigns",
+  "name": "BzzAgent",
+  "brand": "BzzAgent (PowerReviews)",
+  "category": "product-testing",
+  "whatYouGet": "Community that invites members by email to apply for free product samples from brands, then share an honest review per posting instructions.",
+  "costToClaim": "free",
+  "costDetail": "Participation is free; members are not paid for reviews",
+  "requirements": [
+   "email",
+   "eligibility"
+  ],
+  "eligibility": "Must be 18+ (or the age of majority where you live); the platform is operated in the United States.",
+  "region": "US",
+  "signupUrl": "https://bzzagent.com/how-it-works/",
+  "sourceUrls": [
+   "https://bzzagent.com/",
+   "https://bzzagent.com/how-it-works/",
+   "https://bzzagent.com/about-us/",
+   "https://bzzagent.com/privacy-policy/",
+   "https://bzzagent.com/terms-and-conditions/"
+  ],
+  "verifiedOn": "2026-11-08",
+  "confidence": "medium",
+  "catches": "Per the privacy policy, selection is typically random among qualified applicants when more qualify than there are spots. Reviews and campaign activities are required. The join link on bzzagent.com goes to sampling.powerreviews.com, which is off the bzzagent.com domain (PowerReviews owns BzzAgent). Samples are limited and only chosen applicants get one. Required review and posting per campaign, shared with followers, with disclosure rules. Sponsoring brands may receive info about your participation and act as independent controllers. Privacy notice says it does not sell data for money but shares data with ad/analytics partners, which may count as a sale or share under state law. Campaign invite emails.",
+  "notes": "Not parenting-specific. Confidence capped at medium because the sign-up step is on another domain.",
+  "offers": [
+   "testing"
+  ],
+  "certainty": "chance",
+  "freeStuff": "",
+  "valueLow": null,
+  "valueHigh": null,
+  "valueSource": "none",
+  "valueBasis": "",
+  "effort": "some",
+  "when": "anytime",
+  "whenNote": "",
+  "states": []
+ },
+ {
+  "id": "home-tester-club-us-product-tests",
+  "name": "Home Tester Club",
+  "brand": "Home Tester Club",
+  "category": "product-testing",
+  "whatYouGet": "Free to join. Members can apply for free product tests with samples mailed to them, then rate and review them; points are earned for activity. Current campaigns have included children's oral care products.",
+  "costToClaim": "free",
+  "costDetail": "Completely free to join",
+  "requirements": [
+   "email",
+   "address",
+   "eligibility"
+  ],
+  "eligibility": "Product tests are matched to member profile; not everyone is selected",
+  "region": "US",
+  "signupUrl": "https://www.hometesterclub.com/us/en/account/join",
+  "sourceUrls": [
+   "https://www.hometesterclub.com/us/en",
+   "https://www.hometesterclub.com/us/en/faq",
+   "https://www.hometesterclub.com/us/en/privacy",
+   "https://www.hometesterclub.com/us/en/terms"
+  ],
+  "verifiedOn": "2026-11-08",
+  "confidence": "high",
+  "catches": "Site says it invites its 20 most active members to an exclusive test each month; most members get no test. Not every applicant gets a test. Test partner companies can see your survey answers, written reviews with first name, and photo/video reviews, tied to profile demographics (name, email, phone and address are not shared with them per the policy). Feedback surveys and email after tests. Points have no monetary value.",
+  "notes": "Not parenting-specific; check the Test page for baby or kids' campaigns.",
+  "offers": [
+   "testing"
+  ],
+  "certainty": "chance",
+  "freeStuff": "",
+  "valueLow": null,
+  "valueHigh": null,
+  "valueSource": "none",
+  "valueBasis": "",
+  "effort": "some",
+  "when": "anytime",
+  "whenNote": "",
+  "states": []
+ },
+ {
+  "id": "influenster-voxbox",
+  "name": "Influenster VoxBox",
+  "brand": "Influenster",
+  "category": "product-testing",
+  "whatYouGet": "Selected members may receive free product boxes (VoxBoxes) to try and review; has a New Parent product category. Not guaranteed.",
+  "costToClaim": "free",
+  "costDetail": "Free to join; boxes go to selected members only",
+  "requirements": [
+   "email",
+   "app"
+  ],
+  "eligibility": "Terms bar anyone under 16 from using the service",
+  "region": "US",
+  "signupUrl": "https://www.influenster.com/registration",
+  "sourceUrls": [
+   "https://www.influenster.com/privacy",
+   "https://www.influenster.com/terms",
+   "https://www.influenster.com/article/how-do-i-get-a-voxbox-from-influenster"
+  ],
+  "verifiedOn": "2026-11-08",
+  "confidence": "medium",
+  "catches": "There is no application for a VoxBox; Influenster picks members based on activity and impact score. Official guide (via search results) says to be eligible for a VoxBox you must sign up and download the app. Not guaranteed a VoxBox; selection depends on activity and impact score. Recipients are expected to post reviews or social content and disclose the product was free. Privacy policy: shares name/last initial/location with third parties who may publish it, shares aggregate data with advertisers, and shares data with partners and service providers; reviews and profile are public. Marketing about specials and new features by email.",
+  "notes": "Checked from the official site's search results; the site blocks automated reading, so details may be incomplete. Home page and article pages returned a Cloudflare bot challenge (403), so offer details rest on official-domain search results. Privacy policy and terms pages were read. Not parenting-specific.",
+  "offers": [
+   "testing"
+  ],
+  "certainty": "chance",
+  "freeStuff": "",
+  "valueLow": null,
+  "valueHigh": null,
+  "valueSource": "none",
+  "valueBasis": "",
+  "effort": "some",
+  "when": "anytime",
+  "whenNote": "",
+  "states": []
+ },
+ {
+  "id": "pinchme-samples",
+  "name": "PINCHme",
+  "brand": "PINCHme",
+  "category": "product-testing",
+  "whatYouGet": "Apply for free product samples; once qualified for 4 products your box ships free. Feedback on samples unlocks more offers, and extra surveys can earn gift cards.",
+  "costToClaim": "free",
+  "costDetail": "Free to join, no credit card required, box ships free at 4 products",
+  "requirements": [
+   "email",
+   "address"
+  ],
+  "eligibility": "",
+  "region": "US",
+  "signupUrl": "https://www.pinchme.com/",
+  "sourceUrls": [
+   "https://www.pinchme.com/",
+   "https://www.pinchme.com/policy",
+   "https://www.pinchme.com/tos"
+  ],
+  "verifiedOn": "2026-11-08",
+  "confidence": "high",
+  "catches": "Samples are limited and not guaranteed; the site says they are typically claimed within minutes on release, so most people get few or none. Terms say members are not guaranteed any samples. Privacy policy says information is shared with affiliates, business partners and brand partners for their own business purposes, including direct marketing. Marketing emails about campaigns and offers. Members are asked to share feedback and must follow FTC endorsement disclosure rules.",
+  "notes": "Not parenting-specific. Terms say membership may be limited by territory and eligibility; the specific rules were not found on the pages read.",
+  "offers": [
+   "testing"
+  ],
+  "certainty": "chance",
+  "freeStuff": "",
+  "valueLow": null,
+  "valueHigh": null,
+  "valueSource": "none",
+  "valueBasis": "",
+  "effort": "quick",
+  "when": "anytime",
+  "whenNote": "",
+  "states": []
+ },
+ {
+  "id": "tryazon-tryabox-parties",
+  "name": "Tryazon",
+  "brand": "Tryazon",
+  "category": "product-testing",
+  "whatYouGet": "Members apply to host parties or receive TryaBoxes of brand products to try, with promised free products per the site.",
+  "costToClaim": "free",
+  "costDetail": "Described as free to try and keep products; sponsor selects participants",
+  "requirements": [
+   "email",
+   "eligibility"
+  ],
+  "eligibility": "18+ (per Terms of Use); US and Canada applicants accepted; sponsors select by demographics such as location, age or number of children",
+  "region": "US",
+  "signupUrl": "https://www.tryazon.com/host-sign-up-form/",
+  "sourceUrls": [
+   "https://www.tryazon.com/",
+   "https://www.tryazon.com/faq/",
+   "https://www.tryazon.com/privacy-policy/",
+   "https://www.tryazon.com/terms-use/"
+  ],
+  "verifiedOn": "2026-11-08",
+  "confidence": "medium",
+  "catches": "Sponsors choose participants; a limited number of host spots per party. As fetched today, the sign-up form page displayed 'forms are currently under maintenance' and the TryaBox page listed no open opportunities. Applications are shared with the sponsoring brand. FAQ says selection also looks at social accounts and who actively shares, and hosts follow FTC disclosure rules, so expect to post on social media. Privacy policy says it will not sell or rent your information and shares aggregated demographics with partners. Email communications with unsubscribe.",
+  "notes": "Terms of Use page shows an effective date of May 25, 2018. Specific what-you-get varies by party or TryaBox.",
+  "offers": [
+   "testing"
+  ],
+  "certainty": "chance",
+  "freeStuff": "",
+  "valueLow": null,
+  "valueHigh": null,
+  "valueSource": "none",
+  "valueBasis": "",
+  "effort": "some",
+  "when": "anytime",
+  "whenNote": "",
+  "states": []
+ },
+ {
+  "id": "moms-meet-sampling-programs",
+  "name": "Moms Meet Sampling Programs",
+  "brand": "Moms Meet",
+  "category": "product-testing",
+  "whatYouGet": "Approved Mom Ambassadors can apply for free product sampling programs, get a kit mailed, and report back. Current listings are mostly food and kids products.",
+  "costToClaim": "free",
+  "costDetail": "Site says the program is completely free and products are mailed at no cost",
+  "requirements": [
+   "email",
+   "address",
+   "eligibility"
+  ],
+  "eligibility": "Only approved Mom Ambassadors or content creators; US residents",
+  "signupUrl": "https://momsmeet.com/current-programs/",
+  "sourceUrls": [
+   "https://momsmeet.com/current-programs/",
+   "https://momsmeet.com/faq/"
+  ],
+  "catches": "Acceptance is not guaranteed; you apply per program and must give feedback. Not baby-specific; open programs seen were food and kids items, and the page may be stale.",
+  "notes": "Seen only as official-domain search results.",
+  "offers": [
+   "testing"
+  ],
+  "certainty": "chance",
+  "freeStuff": "",
+  "valueLow": null,
+  "valueHigh": null,
+  "valueSource": "none",
+  "valueBasis": "",
+  "effort": "some",
+  "when": "anytime",
+  "whenNote": "",
+  "region": "US",
+  "states": [],
+  "verifiedOn": "2026-11-10",
+  "confidence": "low"
+ },
+ {
+  "id": "ptpa-parent-tested-parent-approved",
+  "name": "Parent Tested Parent Approved (PTPA) Tester Program",
+  "brand": "PTPA",
+  "category": "product-testing",
+  "whatYouGet": "Free to join. Testers are picked from a profile database to receive baby and child products to test, and keep the products.",
+  "costToClaim": "free",
+  "costDetail": "Membership costs nothing; testers keep the product, per the FAQ",
+  "requirements": [
+   "email",
+   "address",
+   "eligibility"
+  ],
+  "eligibility": "Matched by profile and each product's criteria; North America",
+  "signupUrl": "https://ptpa.com/become-a-member/",
+  "sourceUrls": [
+   "https://ptpa.com/",
+   "https://ptpa.com/become-a-member/",
+   "https://ptpa.com/faqs/",
+   "https://ptpa.com/how-it-works-2/"
+  ],
+  "catches": "Testers are picked at random from the database; most members are not picked. Selected testers have 24 hours to accept. The profile asks about income, education and children.",
+  "notes": "Seen only as official-domain search results. Many pages are old; the homepage listed a door-lock test for parents of 0 to 3 year olds.",
+  "offers": [
+   "testing",
+   "product"
+  ],
+  "certainty": "chance",
+  "freeStuff": "",
+  "valueLow": null,
+  "valueHigh": null,
+  "valueSource": "none",
+  "valueBasis": "",
+  "effort": "some",
+  "when": "anytime",
+  "whenNote": "",
+  "region": "US",
+  "states": [],
+  "verifiedOn": "2026-11-10",
+  "confidence": "medium"
+ },
+ {
+  "id": "target-circle-registry-completion-offer",
+  "name": "Target Baby Registry 15% Completion Offer",
+  "brand": "Target",
+  "category": "registry-box",
+  "whatYouGet": "A free Target Circle 15% off offer for the items left on your baby registry, sent as your due date nears.",
+  "costToClaim": "purchase-required",
+  "costDetail": "Free Target Circle account; the saving applies only to purchases you make",
+  "requirements": [
+   "email",
+   "registry",
+   "purchase"
+  ],
+  "eligibility": "Registry active 14 days; one offer per Target Circle member",
+  "signupUrl": "https://www.target.com/gift-registry/create-baby-registry",
+  "sourceUrls": [
+   "https://www.target.com/help/article/000062273",
+   "https://www.target.com/gift-registry/create-baby-registry"
+  ],
+  "catches": "Redeemable up to two times, once in a 12-month period, and expires in 6 months. It is a discount, not a free item.",
+  "notes": "Seen only as official-domain search results. Separate from the welcome kit entry.",
+  "offers": [
+   "coupons"
+  ],
+  "certainty": "likely",
+  "freeStuff": "",
+  "valueLow": 15,
+  "valueHigh": 45,
+  "valueSource": "estimate",
+  "valueBasis": "15% off about $100 to $300 of remaining registry items",
+  "effort": "some",
+  "when": "late-pregnancy",
+  "whenNote": "Target says the offer is issued eight weeks before the expected arrival date",
+  "region": "US",
+  "states": [],
+  "verifiedOn": "2026-11-10",
+  "confidence": "medium"
+ },
+ {
+  "id": "amazon-baby-registry-completion-discount",
+  "name": "Amazon Baby Registry Completion Discount",
+  "brand": "Amazon",
+  "category": "registry-box",
+  "whatYouGet": "15% off registry purchases, up to $300 in savings, for the registry owner.",
+  "costToClaim": "purchase-required",
+  "costDetail": "No fee stated for the discount; it applies only to purchases you make",
+  "requirements": [
+   "email",
+   "registry",
+   "purchase"
+  ],
+  "eligibility": "Registry active at least 14 days; primary registrant only",
+  "signupUrl": "https://www.amazon.com/baby-reg/homepage",
+  "sourceUrls": [
+   "https://www.amazon.com/gp/help/customer/display.html?nodeId=GV4FFW94JAGFL4RH",
+   "https://www.amazon.com/baby-reg/benefits/summary"
+  ],
+  "catches": "Window opens 60 days before the arrival date and ends 90 days after. Cannot combine with other offers such as Lightning Deals. Orders are capped at a combined $2,000. Some Amazon pages are over a year old.",
+  "notes": "Seen only as official-domain search results. The Welcome Box needs Prime and is a separate entry.",
+  "offers": [
+   "coupons"
+  ],
+  "certainty": "likely",
+  "freeStuff": "",
+  "valueLow": 30,
+  "valueHigh": 100,
+  "valueSource": "estimate",
+  "valueBasis": "15% off about $200 to $700 of registry items, under the $300 cap",
+  "effort": "some",
+  "when": "late-pregnancy",
+  "whenNote": "Window starts 60 days before the arrival date and ends 90 days after",
+  "region": "US",
+  "states": [],
+  "verifiedOn": "2026-11-10",
+  "confidence": "medium"
+ },
+ {
+  "id": "amazon-family-diaper-savings",
+  "name": "Amazon Family Diaper Savings",
+  "brand": "Amazon",
+  "category": "diapers-wipes",
+  "whatYouGet": "Prime members who join Amazon Family can get up to 20% off diapers and baby food through Subscribe & Save.",
+  "costToClaim": "membership-required",
+  "costDetail": "Needs a paid Prime membership; discount applies only to items you buy",
+  "requirements": [
+   "membership",
+   "email",
+   "purchase"
+  ],
+  "eligibility": "Amazon Family membership, which requires Prime",
+  "signupUrl": "https://www.amazon.com/gp/family/signup/welcome/",
+  "sourceUrls": [
+   "https://www.amazon.com/gp/help/customer/display.html?nodeId=TCbZ3gKsASNXZSr4Ol"
+  ],
+  "catches": "Discount varies by item (listings showed 15% to 25%). The Prime fee is not counted in the value. Amazon may change the terms.",
+  "notes": "Seen only as official-domain search results.",
+  "offers": [
+   "coupons"
+  ],
+  "certainty": "likely",
+  "freeStuff": "",
+  "valueLow": 50,
+  "valueHigh": 150,
+  "valueSource": "estimate",
+  "valueBasis": "up to 20% off roughly $250 to $750 of diapers a year at about $0.30 each",
+  "effort": "some",
+  "when": "after-birth",
+  "whenNote": "",
+  "region": "US",
+  "states": [],
+  "verifiedOn": "2026-11-10",
+  "confidence": "medium"
+ }
+]
