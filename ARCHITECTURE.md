@@ -237,3 +237,92 @@ A card titled "Gmail connection" in the tracker.
 ### Tests
 - `node --test` (CI): all existing tests, plus `host`, `inbox`, `fillscript`, and build tests for both outputs (fresh-build match, no external resources, no network APIs, URL allowlist; `artifact.html` has no doctype, `<html>`, `<head>`, `<body>` or CSP meta and starts with `<title>`).
 - `node tests/e2e/run.mjs` (local, needs the preinstalled Playwright; not part of CI): phone-size checks of both outputs, every link and route, the mocked `window.claude` flows for downloads and Gmail (mock built from the type files and the shapes above, synthetic values only), and the fill script against fixture forms served by request interception for official program URLs.
+
+## Phase G: what is really free, ranking, and a plan by due date (contract)
+
+Why: the person using the app is expecting a baby and wants to claim every offer worth claiming. Their feedback on the live app: the "Truly free" filter showed sweepstakes, coupons and points instead of things where real free samples arrive, and there was no way to see which offers are the good ones. Phase G fixes the filter, ranks every program by what it is worth, and widens the research to money and benefit programs.
+
+Nothing in the product rules changes: no network calls, no form submission, personal details only in localStorage.
+
+### New program fields (all required on every entry in `data/programs.json`)
+| Field | Type | Rules |
+|---|---|---|
+| `offers` | string[] | Not empty. What the program gives, most important first. Only from: `product`, `coupons`, `points`, `sweepstakes`, `service`, `coverage`, `cash`, `testing` |
+| `certainty` | string | How sure the first `offers` entry is: `guaranteed`, `likely`, `if-eligible`, `chance` |
+| `freeStuff` | string | One short sentence: what arrives at no cost and with no purchase. `""` when nothing does |
+| `valueLow`, `valueHigh` | integer or null | Rough US dollar value to one family in the baby's first year. Both null when no fair figure exists. `valueLow <= valueHigh` |
+| `valueSource` | string | `official` (the official page states a dollar figure), `estimate` (worked out from what the official page lists), `none` (both values null) |
+| `valueBasis` | string | How the figure was reached, in a few words. `""` only when `valueSource` is `none` |
+| `effort` | string | `quick` (a short form, about 5 minutes), `some` (a registry, an app, a phone call), `involved` (an application, documents or an appointment) |
+| `when` | string | Best time to do it: `pregnancy` (now, while pregnant), `late-pregnancy` (the last 4 to 8 weeks), `after-birth`, `anytime` |
+| `whenNote` | string | The official reason for the timing, or `""` |
+| `states` | string[] | USPS codes when the program is only for some states (include `DC`). `[]` when it is nationwide or varies by local office |
+
+Meaning of `offers` values:
+- `product`: physical things you keep. Samples, full-size items, welcome boxes, gear (pump, crib, car seat), books, food packages.
+- `coupons`: coupons, formula checks, percent-off or completion discounts, free-with-purchase offers.
+- `points`: reward points earned by buying or scanning receipts.
+- `sweepstakes`: prize draws.
+- `service`: free help from a person (lactation visit, car seat check, helpline, home visits, classes).
+- `coverage`: health coverage or a benefit that pays bills (Medicaid, CHIP, marketplace plans).
+- `cash`: money for the family or the child (account deposits, tax credits, paid leave).
+- `testing`: product-testing panels where you may be picked.
+
+Rule for the order: if a real product is sent with no purchase, `product` comes first, even when the brand talks more about its coupons or its sweepstakes.
+
+Meaning of `certainty` values:
+- `guaranteed`: everyone who signs up and meets the plain conditions gets it.
+- `likely`: most people get it, but the official page says "while supplies last", "may include" or "varies".
+- `if-eligible`: certain once you meet income, insurance, state or similar rules.
+- `chance`: a draw or a selection. Most people get nothing.
+
+Value rules: count only what a family gets without buying something just to get it. For coupons and points, count the saving on things they would buy anyway. Use `official` only when the official page gives the figure. An `estimate` uses ordinary US shelf prices, and `valueBasis` shows the sum (for example "2 sample cans at about $20 each"). Never present an estimate as the brand's own figure.
+
+New category: `money` ("Money and savings"), for cash programs such as account deposits for newborns, tax credits and paid leave. It goes after `assistance` in `CATEGORIES`.
+
+### `BFF.logic` additions and changes
+- `OFFER_LABELS`: product → "Free product", coupons → "Coupons and discounts", points → "Reward points", sweepstakes → "Prize draw", service → "Free service", coverage → "Health coverage", cash → "Cash", testing → "Product testing".
+- `CERTAINTY_LABELS`: guaranteed → "Everyone who signs up gets it", likely → "Most people get it, supplies vary", if-eligible → "Only if you qualify", chance → "Only if you are picked or win".
+- `EFFORT_LABELS`: quick → "About 5 minutes", some → "Takes some setup", involved → "Application or appointment".
+- `WHEN_LABELS`: pregnancy → "Now, while pregnant", late-pregnancy → "In the last weeks before the due date", after-birth → "After the baby arrives", anytime → "Any time". `WHEN_ORDER` is that order.
+- `VERDICTS`: ordered list of `{id, label}`: top → "Top pick", good → "Worth doing", small → "Small extra", conditional → "Only if you would buy anyway", longshot → "Long shot".
+- `isTrulyFree(p)` (changed): `costToClaim === 'free'`, requirements include neither `purchase` nor `membership`, `offers[0] === 'product'`, and `certainty` is not `chance`. A program with no `offers` is not truly free.
+- `isOpenToAll(p)`: `certainty !== 'if-eligible'` and `!isEligibilityBased(p)`.
+- `guidedDefault(p)` keeps its formula (`isTrulyFree(p) && !isEligibilityBased(p)`), so it narrows with `isTrulyFree`.
+- `valueMid(p)`: the mean of `valueLow` and `valueHigh`, or null.
+- `expectedValue(p)`: `valueMid(p)` times a weight (guaranteed 1, if-eligible 1, likely 0.7, chance 0.1), or null.
+- `verdict(p)`, first match wins:
+  1. `longshot` when `certainty === 'chance'` or `offers[0]` is `sweepstakes` or `testing`
+  2. `conditional` when `costToClaim !== 'free'`, or requirements include `purchase` or `membership`, or `offers[0]` is `coupons` or `points`
+  3. `top` when `expectedValue(p) >= 100`
+  4. `good` when `expectedValue(p) >= 20`
+  5. `small` otherwise (including unknown value)
+- `rankPrograms(list)`: a new array sorted by verdict order, then `expectedValue` high to low (null last), then effort (quick, some, involved), then confidence, then name. `rankMap(list)` returns `{id: position}` starting at 1.
+- `sortPrograms(list, key)`: new key `best` (uses `rankPrograms`) and new key `when` (`WHEN_ORDER`, then rank). `recommended` stays as an alias of `best` so saved preferences keep working.
+- `filterPrograms(list, opts)`: new options `offer` (keep programs whose `offers` include it), `openToAll` (keep `isOpenToAll`), `state` with `hideOtherStates` (drop programs whose `states` is not empty and does not include `state`). The text query also searches `freeStuff`.
+- `valueText(p)`: "Worth about $40 to $60 (our estimate)", "Worth about $400 (the program's figure)", "Worth about $25 (our estimate)" when low equals high, or "Value not known".
+- `totalValue(list)`: `{low, high, count}` over programs with a value.
+- `weeksUntil(dueDate, today)`: whole weeks from `today` to an ISO `YYYY-MM-DD` date, negative after it, null when the date cannot be read.
+
+### Directory (`src/js/directory.js`, `src/css/`)
+- Sort options: "Best value first" (`best`, the default), "When to do it" (`when`), then the existing Name, Recently verified, Category, Confidence. A saved `recommended` loads as `best`.
+- With `best`, the list is grouped under the verdict labels. With `when`, it is grouped under the `WHEN_LABELS`. Other sorts have no groups. Heading levels must not skip.
+- New select "What you get": "Anything", then the eight `OFFER_LABELS`.
+- Chips: "Truly free" (new meaning), "Open to everyone" (`openToAll`), "Email only", "Needs a registry". When "Truly free" is on, one line under the chips says: "Truly free: real products or samples at no cost. No purchase, no fee, not a prize draw."
+- When My info has a state and some programs are for other states only, those are hidden and a line says "N programs for other states are hidden." with a "Show them" button (stored in prefs).
+- Each card gains: its rank ("#3", from `rankMap` over all programs), the verdict badge, the offer kinds, a "Free with no purchase" line (`freeStuff`, or "Nothing arrives free without a purchase or a win."), the value line with `valueBasis`, the certainty label, the effort label, and "Best time" with `whenNote`.
+- A summary above the list: how many truly free programs there are and their combined value (labelled as an estimate), and, when My info has a due date, the weeks left and how many programs are best done now, in the last weeks, and after the birth. Without a due date it says to add one in My info. The due date is read from `profile.v1` and never leaves the page.
+
+### Guided run, tracker and helper
+- `guided.js`: the default selection is still `guidedDefault`; the queue follows `rankPrograms`. The "Truly free only" button uses the new meaning.
+- `tracker.js`: the summary shows the combined value of programs marked Signed up or Received, labelled as an estimate. No stored data changes shape.
+- `tools/autofill`: `--all-free` still follows `guidedDefault`.
+
+### Research (`research/phase-g/`)
+Seven lanes, each owning the existing programs in its categories (adding the new fields and correcting anything that changed) and looking for programs the list lacks: `formula-feeding`, `diapers-babycare`, `registry`, `health-benefits`, `assistance`, `rewards-testing`, `money`. Each writes `<lane>.json` (full program objects) and `<lane>-notes.md`. The shared brief is `research/phase-g/BRIEF.md`. A merge step writes `data/programs.json`; a fact-check step re-reads the highest-ranked entries.
+
+### Tests
+- `tests/data.test.mjs`: the new fields, their enums, `valueLow <= valueHigh`, `valueSource` agreeing with the values, `states` as USPS codes, and the `money` category.
+- `tests/logic.test.mjs`: the new truly-free rule (a sweepstakes-first or coupons-first program is not truly free), verdicts, ranking order, new filters, `valueText`, `totalValue`, `weeksUntil`.
+- A data test pins the user's complaint: no program whose first offer is `sweepstakes`, `coupons`, `points` or `testing` passes `isTrulyFree`.
+- `tests/e2e/run.mjs`: the new sort, groups, select, chips, card lines and summary in both outputs.
