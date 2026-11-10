@@ -4,6 +4,16 @@ on:
   schedule:
     - cron: '17 14 * * 1'
   workflow_dispatch:
+    inputs:
+      role:
+        description: 'Which links to check: signup, source or all'
+        type: choice
+        options: [all, signup, source]
+        default: all
+      ids:
+        description: 'Optional comma-separated program ids to recheck (empty = every program)'
+        type: string
+        default: ''
 
 permissions:
   contents: read
@@ -25,13 +35,29 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-      - name: Check signup links
+      - name: Check signup and source links
         id: check
-        # Exit codes: 0 all OK (BLOCKED allowed), 1 links need attention, 2 the checker itself failed.
+        # Exit codes: 0 nothing needs attention (OK, BLOCKED, SUSPECT), 1 links need attention, 2 the checker itself failed.
+        # Inputs arrive through env, never interpolated into the shell line; the script validates them.
+        env:
+          INPUT_ROLE: ${{ github.event.inputs.role }}
+          INPUT_IDS: ${{ github.event.inputs.ids }}
         run: |
           set +e
-          node scripts/check-links.mjs --out link-report.md --json link-report.json
+          args=(--out link-report.md --json link-report.json)
+          if [ -n "$INPUT_ROLE" ]; then args+=(--role "$INPUT_ROLE"); fi
+          if [ -n "$INPUT_IDS" ]; then args+=(--ids "$INPUT_IDS"); fi
+          node scripts/check-links.mjs "${args[@]}"
           echo "code=$?" >> "$GITHUB_OUTPUT"
+      - name: Show the report in the log and the run summary
+        if: always()
+        run: |
+          if [ -f link-report.md ]; then
+            cat link-report.md
+            cat link-report.md >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "No report was produced (the checker failed before writing one)."
+          fi
       - name: Upload reports
         if: always()
         uses: actions/upload-artifact@v4
@@ -99,7 +125,7 @@ jobs:
           CHECK_CODE: ${{ steps.check.outputs.code }}
         run: |
           if [ "$CHECK_CODE" = "1" ]; then
-            echo "::error::Link check found NOT-FOUND, OFF-DOMAIN or DEAD entries. See the link-check issue and the link-report artifact."
+            echo "::error::Link check found NOT-FOUND, OFF-DOMAIN or DEAD links. See the report in the log, the link-check issue and the link-report artifact."
           else
             echo "::error::The link checker itself failed (exit code $CHECK_CODE). See the step log."
           fi
