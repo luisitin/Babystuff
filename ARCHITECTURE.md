@@ -143,30 +143,33 @@ Artifact frame facts the code must respect (from the Artifact page contract):
 - Side gutter: `padding-left: max(16px, env(safe-area-inset-left, 0px))` and the same on the right, on one outer wrapper. A sticky header uses `top: env(safe-area-inset-top, 0px)`. The fixed bottom nav adds the bottom inset. Keep the skeleton's `:root` padding.
 
 ### New files, load order and owners
-JS order in both outputs: `logic.js`, `store.js`, `email.js`, `zip.js`, `host.js`, `fieldmatch.js`, `fillscript.js`, `inbox.js`, `tracker.js`, `profile.js`, `directory.js`, `guided.js`, `inboxview.js`, `phone.js`, `app.js`. CSS order: `base.css`, `features.css`, `phase-f.css`.
+JS order in both outputs: `logic.js`, `store.js`, `email.js`, `zip.js`, `host.js`, `fieldmatch.js`, `fillscript.js`, `inbox.js`, `tracker.js`, `profile.js`, `directory.js`, `guided.js`, `inboxview.js`, `phone.js`, `app.js`. CSS order: `base.css`, `features.css`, `inbox.css`, `phone.css` (plus `artifact.css`, appended only in `artifact.html`).
 
 | File | Owner | Purpose |
 |---|---|---|
-| `scripts/build.mjs`, `src/index.html`, `src/css/base.css`, `src/js/app.js` | F1 | two outputs, safe-area gutter, apple-touch-icon, routing |
+| `scripts/build.mjs`, `src/index.html`, `src/css/base.css`, `src/css/features.css`, `src/css/artifact.css`, `src/js/app.js` | F1 | two outputs, safe-area gutter, routing; `artifact.css` holds the few rules only the artifact needs (the skeleton already pads `:root` by the top and bottom safe-area insets) |
 | `src/js/zip.js` | F1 | `BFF.zip.store(files)`: stored (no compression) ZIP with CRC-32, UMD, Node-testable |
 | `src/js/host.js` | F1 | `BFF.host`: where the page runs and how files, copying and links behave there |
 | `src/js/tracker.js` | F1 | uses `BFF.host` for every file and mailto; mounts the inbox panel |
 | `src/js/guided.js`, `src/js/directory.js` | F1 | links that work without `window.open` |
-| `scripts/check-links.mjs`, `.github/workflows/*`, `tests/check-links.test.mjs` | F1 | link check covers `signupUrl` and every `sourceUrls` entry |
+| `scripts/check-links.mjs`, `.github/workflows/*`, `tests/check-links.test.mjs` | F4 | link check covers `signupUrl` and every `sourceUrls` entry |
 | `tests/build.test.mjs`, `tests/host.test.mjs` | F1 | both outputs, zip, host helpers |
 | `src/js/inbox.js` | F2 | `BFF.inbox`: pure Gmail logic, UMD, Node-testable |
 | `src/js/inboxview.js` | F2 | `BFF.inboxView.mount(el)`: the "Gmail connection" panel |
-| `src/css/phase-f.css` (section `/* inbox */`) | F2 | panel styles, tokens from `base.css` only |
+| `src/css/inbox.css` | F2 | panel styles, tokens from `base.css` only |
 | `tests/inbox.test.mjs` | F2 | |
 | `src/js/fieldmatch.js` | F3 | the field matcher moved from `tools/autofill/field-matcher.mjs`, UMD |
 | `tools/autofill/field-matcher.mjs` | F3 | thin wrapper re-exporting `src/js/fieldmatch.js`; existing tests keep passing unchanged |
 | `src/js/fillscript.js` | F3 | `BFF.fill`: builds the fill script and bookmarklet, UMD |
 | `src/js/phone.js` | F3 | `BFF.phoneView.mount(el)`: "Fill forms on your phone" panel |
 | `src/js/profile.js` | F3 | mounts the phone panel at the end of My info |
-| `src/css/phase-f.css` (section `/* phone */`) | F3 | |
+| `src/css/phone.css` | F3 | panel styles, tokens from `base.css` only |
 | `tests/fillscript.test.mjs` | F3 | |
 
 Mount points (so builders do not edit each other's files): `tracker.js` calls `BFF.inboxView && BFF.inboxView.mount(node)` with an empty `<div id="trk-inbox">` placed right after the "Email and calendar" card. `profile.js` calls `BFF.phoneView && BFF.phoneView.mount(node)` with `<div id="info-phone">` at the end of the view. `guided.js` shows a one-line hint ("Filling on your phone? Set up the fill script in My info.") linking to `#info`. Both `mount` functions must tolerate being called before or after their script loads (views init at boot, after all scripts).
+
+### Parallel build protocol
+Builders F1 to F4 work in the same tree at the same time. Each edits only the files it owns, runs only its own test files, and does not run git commands that change the tree or the index (`add`, `commit`, `stash`, `checkout`, `reset`, `restore`). Only F1 runs `node scripts/build.mjs` in the repo root; everyone else copies the repo to a scratch directory to build or to try the page in a browser. The orchestrator integrates, builds, runs the full test suite and commits. Code against the contract below when another owner's file is still a stub, and guard optional globals (`BFF.host && ...`).
 
 ### `BFF.host` (`src/js/host.js`)
 - `inArtifact`: `!!(window.claude && typeof window.claude.use === 'function')`. There is no other `window.claude` member to read.
