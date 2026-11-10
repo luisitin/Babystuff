@@ -65,6 +65,7 @@
   function taggedEmail(pr, prog) {
     var E = BFF.email;
     if (!E || !pr.usePlusTags || !prog || E.supportsPlus(pr.email) === false) return '';
+    if (E.inEmailFeatures && !E.inEmailFeatures(prog)) return '';
     return E.plusAddress(pr.email, BFF.plusTags ? BFF.plusTags.forProgram(prog) : E.tagFor(prog, progs()));
   }
   function detailList(p, prog) {

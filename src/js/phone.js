@@ -125,6 +125,12 @@
   function buildScript() {
     var p = readProfile();
     var map = p.usePlusTags && BFF.plusTags && BFF.plusTags.map ? BFF.plusTags.map() : {};
+    var E = BFF.email;
+    if (E && E.inEmailFeatures) {
+      var kept = {};
+      (BFF.programs || []).forEach(function (q) { if (q && map[q.id] && E.inEmailFeatures(q)) kept[q.id] = map[q.id]; });
+      map = kept;
+    }
     return BFF.fill.build({ profile: p, programs: BFF.programs || [], tagMap: map });
   }
 

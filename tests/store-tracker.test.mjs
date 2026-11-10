@@ -166,3 +166,10 @@ test('tracker source: plus address and Gmail search follow the email-scope rule'
   assert.match(src, /gmailSearchUrl\(\{[^}]*program: p \}\)/);
   assert.ok(src.includes('Government and benefit programs are left out of the filters and searches.'));
 });
+
+test('guided and phone source: plus tags follow the email-scope rule', () => {
+  const g = fs.readFileSync(new URL('../src/js/guided.js', import.meta.url), 'utf8');
+  assert.match(g, /E\.inEmailFeatures && !E\.inEmailFeatures\(prog\)\) return ''/);
+  const ph = fs.readFileSync(new URL('../src/js/phone.js', import.meta.url), 'utf8');
+  assert.match(ph, /E\.inEmailFeatures\(q\)/);
+});
