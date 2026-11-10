@@ -232,3 +232,11 @@ test('h situation: the fill-script payload never contains the answers', () => {
   assert.deepEqual(Object.keys(D.profile).sort(), ['email', 'firstName', 'lastName', 'state']);
   for (const bad of ['SecretPlanXyz', 'lowIncome']) assert.ok(!script.includes(bad), bad);
 });
+
+test('tracker.js loads without DOM or BFF.logic and still exposes the view entry points', () => {
+  const { BFF } = load(progs);
+  assert.equal(typeof BFF.views.tracker.init, 'function');
+  assert.equal(typeof BFF.views.tracker.show, 'function');
+  assert.equal(BFF.logic, undefined);
+  assert.equal(BFF.tracker.valueLine(), null);
+});

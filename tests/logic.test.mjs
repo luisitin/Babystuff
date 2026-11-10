@@ -583,3 +583,164 @@ test('rankPrograms ends on id, so data order does not matter', () => {
     assert.equal(L.hiddenByAnswers(list[1], pr), true);
   });
 }
+
+// ---- Phase I: the Tracker's own list ----
+const TP = (id, o) => P(Object.assign({ id, name: id, valueLow: 10, valueHigh: 20, when: 'pregnancy', effort: 'quick' }, o));
+
+test('trackerScope: rank order, left-out counts and total', () => {
+  const list = [
+    TP('tx-only', { states: ['TX'], valueLow: 100, valueHigh: 100 }),
+    TP('ca-only', { states: ['CA'] }),
+    TP('mcd', { audience: ['medicaid'] }),
+    TP('open', { valueLow: 50, valueHigh: 50 })
+  ];
+  const prof = { state: 'TX', cover: 'private' };
+  const s = L.trackerScope(list, { state: 'TX', profile: prof, statusOf: () => 'todo' });
+  assert.deepEqual(s.rows.map((r) => r.p.id), ['tx-only', 'open']);
+  assert.deepEqual(s.left, { otherState: 1, noFit: 1, covered: 0 });
+  assert.equal(s.total, 4);
+  assert.ok(s.rows.every((r) => r.status === 'todo' && r.others.length === 0));
+});
+
+test('trackerScope: no state set leaves state-only programs out; show switches bring them back', () => {
+  const list = [TP('tx-only', { states: ['TX'] }), TP('open')];
+  const s = L.trackerScope(list, { profile: {}, statusOf: () => 'todo' });
+  assert.deepEqual(s.rows.map((r) => r.p.id), ['open']);
+  assert.equal(s.left.otherState, 1);
+  const s2 = L.trackerScope(list, { profile: {}, showOtherStates: true, statusOf: () => 'todo' });
+  assert.equal(s2.rows.length, 2);
+  assert.equal(s2.left.otherState, 0);
+  const s3 = L.trackerScope(list, { statusOf: () => 'todo' });   // no opts at all besides statusOf
+  assert.equal(s3.rows.length, 1);
+  assert.equal(L.trackerScope(list).rows.length, 1);              // not even statusOf
+});
+
+test('trackerScope: the answers rule programs out only when answered, and showNoFit brings them back', () => {
+  const list = [TP('mcd', { audience: ['medicaid'] }), TP('open')];
+  assert.equal(L.trackerScope(list, { profile: {}, statusOf: () => 'todo' }).rows.length, 2);
+  const prof = { cover: 'private' };
+  const s = L.trackerScope(list, { profile: prof, statusOf: () => 'todo' });
+  assert.equal(s.rows.length, 1);
+  assert.equal(s.left.noFit, 1);
+  assert.equal(L.trackerScope(list, { profile: prof, showNoFit: true, statusOf: () => 'todo' }).rows.length, 2);
+});
+
+test('trackerScope: acted-on programs stay in, even when state or answers would hide them', () => {
+  const list = [TP('ca-only', { states: ['CA'] }), TP('mcd', { audience: ['medicaid'] }), TP('skip', {}), TP('open')];
+  const st = { 'ca-only': 'signed-up', mcd: 'received', skip: 'skipped' };
+  const s = L.trackerScope(list, { state: 'TX', profile: { cover: 'private' }, statusOf: (id) => st[id] || 'todo' });
+  assert.deepEqual(s.rows.map((r) => r.p.id).sort(), ['ca-only', 'mcd', 'open', 'skip']);
+  assert.deepEqual(s.rows.filter((r) => r.status !== 'todo').map((r) => r.status).sort(), ['received', 'signed-up', 'skipped']);
+  assert.deepEqual(s.left, { otherState: 0, noFit: 0, covered: 0 });
+});
+
+test('trackerScope: alternates fold under the first lead in rank order', () => {
+  const list = [
+    TP('lead', { valueLow: 300, valueHigh: 300 }),
+    TP('alt-b', { sameAs: 'lead', valueLow: 100, valueHigh: 100 }),
+    TP('alt-a', { sameAs: 'lead', valueLow: 200, valueHigh: 200 }),
+    TP('solo')
+  ];
+  const s = L.trackerScope(list, { statusOf: () => 'todo' });
+  assert.equal(s.rows.length, 2);
+  assert.equal(s.rows[0].p.id, 'lead');
+  assert.deepEqual(s.rows[0].others.map((p) => p.id), ['alt-a', 'alt-b']);
+});
+
+test('trackerScope: a sign-up covers its group; Skipped does not', () => {
+  const list = [
+    TP('lead', { valueLow: 300, valueHigh: 300 }),
+    TP('alt1', { sameAs: 'lead', valueLow: 200, valueHigh: 200 }),
+    TP('alt2', { sameAs: 'lead', valueLow: 100, valueHigh: 100 })
+  ];
+  const sign = (id) => (id === 'alt1' ? 'signed-up' : 'todo');
+  const s = L.trackerScope(list, { statusOf: sign });
+  assert.deepEqual(s.rows.map((r) => r.p.id + ':' + r.status), ['alt1:signed-up']);
+  assert.equal(s.left.covered, 2);
+  // received covers too
+  assert.equal(L.trackerScope(list, { statusOf: (id) => (id === 'lead' ? 'received' : 'todo') }).left.covered, 2);
+  // Skipped does not: the next alternate becomes the lead
+  const skip = L.trackerScope(list, { statusOf: (id) => (id === 'lead' ? 'skipped' : 'todo') });
+  assert.deepEqual(skip.rows.map((r) => r.p.id + ':' + r.status), ['lead:skipped', 'alt1:todo']);
+  assert.deepEqual(skip.rows[1].others.map((p) => p.id), ['alt2']);
+  assert.equal(skip.left.covered, 0);
+});
+
+test('trackerScope: all switches off the three leave-out rules but still folds alternates', () => {
+  const list = [
+    TP('ca-only', { states: ['CA'] }),
+    TP('mcd', { audience: ['medicaid'] }),
+    TP('lead', { valueLow: 300, valueHigh: 300 }),
+    TP('alt', { sameAs: 'lead', valueLow: 100, valueHigh: 100 }),
+    TP('signed', { sameAs: 'lead' })
+  ];
+  const statusOf = (id) => (id === 'signed' ? 'signed-up' : 'todo');
+  const s = L.trackerScope(list, { all: true, state: 'TX', profile: { cover: 'private' }, statusOf });
+  assert.deepEqual(s.left, { otherState: 0, noFit: 0, covered: 0 });
+  assert.equal(s.rows.length, 4);
+  const lead = s.rows.find((r) => r.p.id === 'lead');
+  assert.deepEqual(lead.others.map((p) => p.id), ['alt']);
+  assert.equal(s.total, 5);
+});
+
+test('readyNow: due-date windows', () => {
+  const w = (when) => ({ when });
+  for (const weeks of [null, undefined, 9, 40]) {
+    assert.equal(L.readyNow(w('pregnancy'), weeks), true, 'pregnancy ' + weeks);
+    assert.equal(L.readyNow(w('anytime'), weeks), true, 'anytime ' + weeks);
+    assert.equal(L.readyNow(w('late-pregnancy'), weeks), false, 'late ' + weeks);
+    assert.equal(L.readyNow(w('after-birth'), weeks), false, 'after ' + weeks);
+  }
+  for (const weeks of [8, 0]) {
+    assert.equal(L.readyNow(w('late-pregnancy'), weeks), true, 'late ' + weeks);
+    assert.equal(L.readyNow(w('pregnancy'), weeks), true);
+    assert.equal(L.readyNow(w('after-birth'), weeks), false, 'after ' + weeks);
+  }
+  for (const when of ['pregnancy', 'late-pregnancy', 'after-birth', 'anytime']) assert.equal(L.readyNow(w(when), -1), true, when);
+});
+
+test('trackerSections: to-do rows only; optional by verdict; later puts last-weeks first', () => {
+  const rows = [
+    { p: TP('a', { when: 'after-birth' }), status: 'todo', others: [] },
+    { p: TP('b', { when: 'pregnancy' }), status: 'todo', others: [] },
+    { p: TP('c', { when: 'late-pregnancy' }), status: 'todo', others: [] },
+    { p: TP('d', { offers: ['coupons'] }), status: 'todo', others: [] },
+    { p: TP('e', { certainty: 'chance', when: 'after-birth' }), status: 'todo', others: [] },
+    { p: TP('f', { when: 'after-birth' }), status: 'signed-up', others: [] },
+    { p: TP('g', { when: 'late-pregnancy' }), status: 'todo', others: [] },
+    { p: TP('h', { when: 'anytime' }), status: 'skipped', others: [] }
+  ];
+  const s = L.trackerSections(rows, null);
+  assert.deepEqual(s.now.map((r) => r.p.id), ['b']);
+  assert.deepEqual(s.later.map((r) => r.p.id), ['c', 'g', 'a']);   // late-pregnancy before after-birth, rank order kept
+  assert.deepEqual(s.optional.map((r) => r.p.id), ['d', 'e']);
+  const near = L.trackerSections(rows, 5);
+  assert.deepEqual(near.now.map((r) => r.p.id), ['b', 'c', 'g']);
+  assert.deepEqual(near.later.map((r) => r.p.id), ['a']);
+  const past = L.trackerSections(rows, -2);
+  assert.equal(past.later.length, 0);
+  assert.equal(past.now.length, 4);
+  assert.deepEqual(L.trackerSections([], 3), { now: [], later: [], optional: [] });
+});
+
+test('toClaim: leaves out optional and acted-on rows; money is apart; a group counts once', () => {
+  const rows = [
+    { p: TP('stuff', { valueLow: 100, valueHigh: 200 }), status: 'todo', others: [] },
+    { p: TP('care', { offers: ['service'], valueLow: 50, valueHigh: 50 }), status: 'todo', others: [] },
+    { p: TP('cash', { offers: ['cash'], valueLow: 1000, valueHigh: 2000 }), status: 'todo', others: [] },
+    { p: TP('buy', { offers: ['coupons'], valueLow: 999, valueHigh: 999 }), status: 'todo', others: [] },
+    { p: TP('draw', { certainty: 'chance', valueLow: 500, valueHigh: 500 }), status: 'todo', others: [] },
+    { p: TP('done', { valueLow: 70, valueHigh: 70 }), status: 'signed-up', others: [] },
+    { p: TP('unknown', { valueLow: null, valueHigh: null }), status: 'todo', others: [] }
+  ];
+  const t = L.toClaim(rows);
+  assert.equal(t.free.low, 150); assert.equal(t.free.high, 250); assert.equal(t.free.count, 2); assert.equal(t.free.missing, 1);
+  assert.equal(t.money.low, 1000); assert.equal(t.money.high, 2000); assert.equal(t.money.count, 1);
+  // two rows of the same group (as a caller might pass them) still count once
+  const twin = L.toClaim([
+    { p: TP('x', { valueLow: 40, valueHigh: 60 }), status: 'todo', others: [] },
+    { p: TP('y', { sameAs: 'x', valueLow: 30, valueHigh: 30 }), status: 'todo', others: [] }
+  ]);
+  assert.equal(twin.free.count, 1);
+  assert.deepEqual(L.toClaim([]).free, { low: 0, high: 0, count: 0, missing: 0 });
+});

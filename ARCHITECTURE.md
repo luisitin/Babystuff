@@ -54,6 +54,7 @@ Written as `(function (root) { … if (typeof module === 'object' && module.expo
 - `sortPrograms(list, key)`: key is `recommended` (the directory default: `guidedDefault` first, then email-only first, then confidence high/medium/low, then CATEGORIES order, then name), `name` (A-Z), `verified` (newest `verifiedOn` first), `category` (CATEGORIES order, then name) or `confidence` (high, medium, low, then name). Returns a new array.
 - `domainOf(url)`: hostname without `www.`
 - `escapeHtml(s)`
+- Phase I adds `trackerScope`, `readyNow`, `trackerSections` and `toClaim` (see "Phase I" at the end).
 
 ### `BFF.store` (`src/js/store.js`)
 - `get(key, fallback)`, `set(key, value)`, `remove(key)`: JSON in localStorage under the prefix `bff.`, wrapped in try/catch with an in-memory fallback. `BFF.store.persistent` is a boolean.
@@ -63,6 +64,7 @@ Written as `(function (root) { … if (typeof module === 'object' && module.expo
 - Statuses: `todo` (default), `signed-up`, `received`, `skipped`, with labels To do, Signed up, Received, Skipped.
 - `getStatus(id)`, `setStatus(id, status)`, `getNote(id)`, `setNote(id, text)`, `all()`, `counts()`, `exportJSON({includeProfile})`, `importJSON(text)` (validates, then merges).
 - Each setter dispatches `bff:tracker-changed`.
+- `getEntry(id)`, `restoreEntry(id, entry)`, `counts()`, `valueLine()`, `reset()`, `exportJSON`, `analyzeImport`, `importJSON` are unchanged. The view (`BFF.views.tracker = {init, show}`) is described in "Phase I".
 - Directory cards show a status `<select>` wired to `getStatus` and `setStatus` (builder 1 builds the control; builder 2 provides the API).
 
 ### Views and routing (`#hash`)
@@ -413,3 +415,34 @@ Why: the Programs page was about 61,000 px tall, the top pick was a tax credit, 
 - Lists: `.dir-fit` (hidden-by-answers box with its Show/Hide button), `.dir-state`, `.result-count`, `.start-run`, `.dir-group`, `.same-group`.
 - My info: `.fx-situation`, selects `#info-cover`, `#info-insurer`, `#info-lowIncome`, `#info-job` (field wrappers carry `data-situation`).
 - Prefs: `filters.kind`, `filters.fitsMine`, `showNoFit` in `bff.prefs.v1`.
+
+## Phase I: a Tracker you can work down (contract)
+
+Why: the Tracker listed every program in file order, including ones for other states and ones the answers in My info rule out, and the list started 1,600 px down a 54,000 px page. Now it is the person's own to-do list: only what applies, best first, what can be done now on top, small rows, tools folded away. Nothing in the product rules changes.
+
+### `BFF.logic` helpers (pure)
+- `trackerScope(list, {state, showOtherStates, profile, showNoFit, statusOf, all})` returns `{rows, left: {otherState, noFit, covered}, total}`. Programs are taken in `rankPrograms` order. A program with a status other than `todo` is always its own row, `{p, status, others: []}`. A to-do program is left out and counted when: its `states` do not include the person's state (or no state is set) and `showOtherStates` is off; the answers in My info rule it out and `showNoFit` is off (only when `hasSituation`); or another program of the same group (`groupKey`) is Signed up or Received. Skipped never covers a group. `all: true` switches off those three rules only. Left-in to-do programs of one group fold: the first is the lead row, the others go in its `others`, in rank order. `total` is the number of programs.
+- `readyNow(p, weeks)`: `weeks` is what `weeksUntil` returns. With null or more than 8: true for `pregnancy` and `anytime`. From 0 to 8: also `late-pregnancy`. Below 0: always true.
+- `trackerSections(rows, weeks)` returns `{now, later, optional}` from to-do rows only. `optional` holds rows whose `verdict` is `conditional` or `longshot`, whatever their timing. Of the rest, `now` holds `readyNow` rows and `later` the others, `late-pregnancy` before the rest, each in rank order.
+- `toClaim(rows)` returns `{free, money}`, each a `totalValue` result, from to-do rows that are not optional (lead programs only). `money` is kind `money`; `free` is kind `stuff` or `care`.
+
+### Scope
+One `trackerScope` result feeds the summary, the tab counts and the list. The Tracker reads `showOtherStates` and `showNoFit` from `bff.prefs.v1` (the Programs page owns them), the profile (`state`, the situation answers, `dueDate`) and a session-only switch (`view.showAll`, not stored). It is recomputed on every render.
+
+### Page layout (top to bottom)
+1. Summary card: "X of N done (S skipped)" (X = Signed up or Received rows, N = rows that are not Skipped) with a progress bar; `p#trk-toclaim` ("Still to claim: about $A to $B in free things and covered care, and about $C to $D in money programs (tax credits, deposits, paid leave) if you qualify.", parts at zero left out, or "Nothing left to claim on your list."); the muted "Our estimate..." line; the existing claimed-value line.
+2. Three `details.fx-fold[data-fold="email|gmail|backup"]`, closed by default: "Email and calendar", "Check Gmail for sign-up emails" (holds `div#trk-inbox`, mounted by `inboxview.js`), "Backup and restore". Open state is stored in `prefs.trkOpen` as `{email, gmail, backup}` booleans. A message that changes inside a fold is scrolled into view. All control ids are unchanged: `trk-archive`, `trk-acct`, `trk-inc-profile`, `trk-restore`, `trk-paste`, `trk-inbox`.
+3. Tabs `div.fx-tabs[role=group]`, `button.fx-tab[data-filter="todo|signed-up|received|skipped|all"][aria-pressed]`, text "Label (n)" (`.fx-tab-label`, `.fx-tab-count`). Default `todo`. Counts are rows from the scope.
+4. `div#trk-list`, with `data-tab`.
+5. `div.fx-trk-left` (hidden when nothing is left out): "Left out of your list: A programs for other states, B that your answers in My info rule out, C other ways to get something you already signed up for." (with no state: "A programs only for some states (add your state in My info)"), and a button "Show all N programs" / "Back to my list".
+
+### List
+- To do tab: `section.fx-trk-sec[data-sec="now"]` ("Do now (N)", helper line, button `.fx-trk-help` "Do these with help" that calls `BFF.guided.preselect(ids)` then `BFF.nav.go('guided')`, after the "Replace run" confirm when `BFF.guided.runInfo()` reports a run); `section[data-sec="later"]` ("Later (N)", each row has a timing tag from `WHEN_LABELS` in `.fx-trk-line3`); `details.fx-trk-sec[data-sec="optional"]` ("Only if you would buy anyway, and long shots (N)", closed). Each has `.fx-trk-sec-title` (an `h3`) with a `.fx-trk-count` "(N)". Empty: `p.fx-trk-empty` "Nothing left to do. Everything on your list is signed up, received or skipped." When Do now is empty and Later is not: "Nothing to do right now. The rest comes later:".
+- Other tabs: one flat `section[data-sec="all"]` in rank order, or `p.fx-trk-empty` ("Nothing signed up yet. Change a program's status after you sign up." / "Nothing marked received yet." / "Nothing skipped." / "Nothing here yet.").
+- Row: `li.fx-trk-row[data-id][data-status]` with `.fx-trk-title` (name), `.fx-trk-meta` (brand, verdict, `valueText`), `.fx-trk-line3` (timing tag, or "Signed up YYYY-MM-DD" from `signedUpAt`), `.fx-trk-actions` (the "Sign up" link, `select#trk-s-<id>` with the hidden label "Status for <name>", and `button#trk-d-<id>.fx-trk-more` "Details" with `aria-expanded` and `aria-controls="trk-p-<id>"`, plus a marker and hidden "(has a note)" when a note exists). `div#trk-p-<id>.fx-trk-panel` is built on first open: `whatYouGet`, "Sign up with: <address>", "Search my Gmail", and `textarea#trk-n-<id>` (saves 500 ms after typing, on blur and on pagehide). Same-thing alternates sit in `details.fx-trk-others` ("N more ways to get the same thing") as nested `li.fx-trk-row`.
+
+### Rows stay put
+A change made with a row's own control (status select or note) sets `view.localChange = id` around the `BFF.tracker` call. The `bff:tracker-changed` listener then only restyles the row (`.fx-moved`, dashed border, select shows the new status), announces "<name> marked <label>." in the live region and updates the summary, tab counts, section counts and left-out line. The row moves at the next full render: tab switch, `show()`, the show-all switch, a profile change, or any change from elsewhere (Gmail panel, restore, reset, Programs page, guided run; when the Tracker is hidden the render waits for `show`). A full render keeps focus on the same control when it still exists, otherwise moves it to the pressed tab, and never touches the folds or the Gmail panel.
+
+### Checklist
+`checklistPrograms()`: programs Signed up or Received first; otherwise the person's own to-do list in the order shown (Do now, Later, optional). The email code's length limits still apply.
