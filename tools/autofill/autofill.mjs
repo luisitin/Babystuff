@@ -11,7 +11,7 @@ import path from 'node:path';
 import readline from 'node:readline';
 import { parseBackup, selectTodo, profileForProgram, parseAnswer, applyAnswers, defaultOutPath } from './backup.mjs';
 import { writeFileSync } from 'node:fs';
-import { classifyField, valueFor, cleanText, sameSite, isGuidedDefault } from './field-matcher.mjs';
+import { classifyField, valueFor, cleanText, sameSite, isGuidedDefault, hiddenByState } from './field-matcher.mjs';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const PROGRAMS = path.resolve(here, '../../data/programs.json');
@@ -275,15 +275,15 @@ async function main() {
   // Programs to visit: [{ p, title, url }]
   let chosen = [];
   if (backup) {
-    chosen = selectTodo(programs, backup.tracker, { includeAllTodo: args.includes('--include-all-todo'), only });
+    const bp = backup.profile && backup.profile.email !== undefined ? backup.profile : loadProfile(fixtureMode);
+    chosen = selectTodo(programs, backup.tracker, { includeAllTodo: args.includes('--include-all-todo'), only, state: bp && bp.state });
     if (only) for (const id of only) if (!programs.some((p) => p.id === id)) { console.error(`Unknown program id: ${id} (try --list)`); process.exit(1); }
     if (!chosen.length) { console.log('Nothing to do: no programs in that backup are still To do (and guided-run eligible).'); return; }
   } else if (!fixtureMode || positional.length || args.includes('--all-free')) {
     const allFree = args.includes('--all-free');
-    const myState = allFree ? String(loadProfile(fixtureMode).state || '').trim().toUpperCase() : '';
+    const myState = allFree ? String(loadProfile(fixtureMode).state || '') : '';
     // Programs limited to some states are skipped unless the profile's state is one of them (none set: skipped).
-    const hiddenByState = (p) => Array.isArray(p.states) && p.states.length > 0 && !p.states.some((x) => String(x).toUpperCase() === myState);
-    const ids = allFree ? programs.filter((p) => isGuidedDefault(p) && !hiddenByState(p)).map((p) => p.id) : positional;
+    const ids = allFree ? programs.filter((p) => isGuidedDefault(p) && !hiddenByState(p, myState)).map((p) => p.id) : positional;
     if (!ids.length) { usage(); process.exit(1); }
     for (const id of ids) {
       const p = programs.find((x) => x.id === id);
