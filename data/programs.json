@@ -21,6 +21,8 @@
       "address"
     ],
     "eligibility": "Not stated. Limits, if any, were not visible.",
+    "audience": [],
+    "insurer": "",
     "region": "US",
     "states": [],
     "effort": "quick",
@@ -61,6 +63,8 @@
       "due-date"
     ],
     "eligibility": "Sweepstakes entry is for legal US residents 18+ who join in 2026; benefits vary by the details you give",
+    "audience": [],
+    "insurer": "",
     "region": "US",
     "states": [],
     "effort": "quick",
@@ -103,6 +107,8 @@
       "due-date"
     ],
     "eligibility": "Parents with a child's birthday or due date",
+    "audience": [],
+    "insurer": "",
     "region": "US",
     "states": [],
     "effort": "quick",
@@ -144,6 +150,8 @@
       "due-date"
     ],
     "eligibility": "Legal residents of the 50 states and DC, 18+; enrollment is per eligible child up to 9 months; one account per household per child",
+    "audience": [],
+    "insurer": "",
     "region": "US (50 states and DC)",
     "states": [],
     "effort": "quick",
@@ -184,6 +192,8 @@
       "due-date"
     ],
     "eligibility": "Families managing cow's milk allergy; also joins you to Enfamil Family Beginnings",
+    "audience": [],
+    "insurer": "",
     "region": "US",
     "states": [],
     "effort": "quick",
@@ -223,6 +233,8 @@
       "due-date"
     ],
     "eligibility": "Same MySimilac Rewards terms as the main program",
+    "audience": [],
+    "insurer": "",
     "region": "US (50 states and DC)",
     "states": [],
     "effort": "quick",
@@ -262,6 +274,8 @@
       "purchase"
     ],
     "eligibility": "Amazon Family membership, which requires Prime",
+    "audience": [],
+    "insurer": "",
     "region": "US",
     "states": [],
     "effort": "some",
@@ -299,6 +313,10 @@
       "eligibility"
     ],
     "eligibility": "Low-income postpartum members of the Diamond State Health Plan (Delaware Medicaid).",
+    "audience": [
+      "medicaid"
+    ],
+    "insurer": "",
     "region": "Delaware",
     "states": [
       "DE"
@@ -336,6 +354,10 @@
     "costDetail": "No cost, no application",
     "requirements": [],
     "eligibility": "Any baby born at a participating California hospital; no income limit, immigration requirement or application. Twins each get their own 400. Does not affect Medi-Cal, WIC or other benefits.",
+    "audience": [
+      "local"
+    ],
+    "insurer": "",
     "region": "California",
     "states": [
       "CA"
@@ -378,6 +400,8 @@
       "address"
     ],
     "eligibility": "Baby up to 4 weeks old (the page's wording); babies over 18 lb get coupons instead. US terms not confirmed.",
+    "audience": [],
+    "insurer": "",
     "region": "US",
     "states": [],
     "effort": "quick",
@@ -416,6 +440,8 @@
       "purchase"
     ],
     "eligibility": "",
+    "audience": [],
+    "insurer": "",
     "region": "US",
     "states": [],
     "effort": "some",
@@ -455,6 +481,8 @@
       "purchase"
     ],
     "eligibility": "",
+    "audience": [],
+    "insurer": "",
     "region": "US",
     "states": [],
     "effort": "some",
@@ -493,6 +521,10 @@
       "insurance"
     ],
     "eligibility": "Babies under age 2 enrolled in TennCare or CoverKids; the baby is eligible only after birth.",
+    "audience": [
+      "medicaid"
+    ],
+    "insurer": "",
     "region": "Tennessee",
     "states": [
       "TN"
@@ -532,6 +564,8 @@
       "registry"
     ],
     "eligibility": "Primary registry owner.",
+    "audience": [],
+    "insurer": "",
     "region": "US",
     "states": [],
     "effort": "some",
@@ -571,6 +605,8 @@
       "registry"
     ],
     "eligibility": "Primary registry owner with a free Kohl's Rewards account; one box per customer per year; coupon expires after 365 days.",
+    "audience": [],
+    "insurer": "",
     "region": "US",
     "states": [],
     "effort": "some",
@@ -608,6 +644,8 @@
       "registry"
     ],
     "eligibility": "Registry owner.",
+    "audience": [],
+    "insurer": "",
     "region": "US",
     "states": [],
     "effort": "some",
@@ -645,6 +683,8 @@
       "registry"
     ],
     "eligibility": "Registry owner.",
+    "audience": [],
+    "insurer": "",
     "region": "US",
     "states": [],
     "effort": "some",
@@ -686,6 +726,8 @@
       "membership"
     ],
     "eligibility": "Primary registry owner with an active Prime account; Amazon Business accounts do not qualify.",
+    "audience": [],
+    "insurer": "",
     "region": "US",
     "states": [],
     "effort": "some",
@@ -726,6 +768,8 @@
       "purchase"
     ],
     "eligibility": "Adults 18+ in the 50 US states and Puerto Rico; one box per person, Walmart account and household per 365 days.",
+    "audience": [],
+    "insurer": "",
     "region": "US (50 states and Puerto Rico)",
     "states": [],
     "effort": "some",
@@ -764,6 +808,8 @@
       "registry"
     ],
     "eligibility": "Registry owner and partner; collaborators cannot use it.",
+    "audience": [],
+    "insurer": "",
     "region": "US",
     "states": [],
     "effort": "some",
@@ -802,6 +848,8 @@
       "email"
     ],
     "eligibility": "Registry owner; US only.",
+    "audience": [],
+    "insurer": "",
     "region": "US",
     "states": [],
     "effort": "some",
@@ -841,6 +889,8 @@
       "purchase"
     ],
     "eligibility": "Adults 18+ in the 48 contiguous states; limit one per person. Registry must be created on or after the reward start date (Feb 9, 2026).",
+    "audience": [],
+    "insurer": "",
     "region": "US (48 contiguous states)",
     "states": [],
     "effort": "some",
@@ -882,6 +932,8 @@
       "purchase"
     ],
     "eligibility": "Arrival date under 9 months away or baby under 4 weeks old; one box per household and per registry; US addresses.",
+    "audience": [],
+    "insurer": "",
     "region": "US",
     "states": [],
     "effort": "some",
@@ -922,6 +974,8 @@
       "purchase"
     ],
     "eligibility": "One box per qualifying registry.",
+    "audience": [],
+    "insurer": "",
     "region": "US",
     "states": [],
     "effort": "some",
@@ -959,6 +1013,8 @@
       "registry"
     ],
     "eligibility": "Registry owner.",
+    "audience": [],
+    "insurer": "",
     "region": "US",
     "states": [],
     "effort": "some",
@@ -997,6 +1053,10 @@
       "registry"
     ],
     "eligibility": "Baby registrants who ask for it in a participating store; details not confirmed.",
+    "audience": [
+      "local"
+    ],
+    "insurer": "",
     "region": "US",
     "states": [],
     "effort": "some",
@@ -1036,6 +1096,8 @@
       "purchase"
     ],
     "eligibility": "Active baby registries created after 08/15/2023 that haven't claimed a previous kit; one kit per year.",
+    "audience": [],
+    "insurer": "",
     "region": "US",
     "states": [],
     "effort": "some",
@@ -1073,6 +1135,8 @@
       "email"
     ],
     "eligibility": "Registry owner with a free Target Circle account.",
+    "audience": [],
+    "insurer": "",
     "region": "US",
     "states": [],
     "effort": "some",
@@ -1111,6 +1175,10 @@
       "insurance"
     ],
     "eligibility": "Members of plans that cover pump supplies.",
+    "audience": [
+      "insured"
+    ],
+    "insurer": "",
     "region": "US",
     "states": [],
     "effort": "some",
@@ -1148,6 +1216,10 @@
       "insurance"
     ],
     "eligibility": "Members of plans that cover preventive lactation benefits.",
+    "audience": [
+      "insured"
+    ],
+    "insurer": "",
     "region": "US",
     "states": [],
     "effort": "some",
@@ -1187,6 +1259,8 @@
       "email"
     ],
     "eligibility": "Not stated; open to anyone registering on the MAM US shop",
+    "audience": [],
+    "insurer": "",
     "region": "US",
     "states": [],
     "effort": "quick",
@@ -1224,6 +1298,8 @@
       "address"
     ],
     "eligibility": "Expecting and new parents in Alabama.",
+    "audience": [],
+    "insurer": "",
     "region": "Alabama",
     "states": [
       "AL"
@@ -1263,6 +1339,10 @@
       "eligibility"
     ],
     "eligibility": "Children (the US page refers to ages 0-5) living in an area covered by a local program partner; the check-availability page lets you register online or by mail where offered.",
+    "audience": [
+      "local"
+    ],
+    "insurer": "",
     "region": "Varies by area",
     "states": [],
     "effort": "quick",
@@ -1300,6 +1380,8 @@
       "address"
     ],
     "eligibility": "California residents with a street address (no P.O. boxes); one kit per child.",
+    "audience": [],
+    "insurer": "",
     "region": "California",
     "states": [
       "CA"
@@ -1339,6 +1421,10 @@
       "eligibility"
     ],
     "eligibility": "Households on public assistance or with limited resources.",
+    "audience": [
+      "low-income"
+    ],
+    "insurer": "",
     "region": "New York",
     "states": [
       "NY"
@@ -1377,6 +1463,8 @@
       "email"
     ],
     "eligibility": "Anyone expecting a baby.",
+    "audience": [],
+    "insurer": "",
     "region": "US",
     "states": [],
     "effort": "quick",
@@ -1413,6 +1501,10 @@
       "eligibility"
     ],
     "eligibility": "Children from birth to age 5 who go to a participating clinic. The official results give no income rules for families.",
+    "audience": [
+      "local"
+    ],
+    "insurer": "",
     "region": "Participating clinics in all 50 states",
     "states": [],
     "effort": "some",
@@ -1452,6 +1544,8 @@
       "email"
     ],
     "eligibility": "",
+    "audience": [],
+    "insurer": "",
     "region": "US",
     "states": [],
     "effort": "some",
@@ -1492,6 +1586,10 @@
       "eligibility"
     ],
     "eligibility": "People with or applying for Marketplace coverage; employer plans follow their own rules.",
+    "audience": [
+      "marketplace"
+    ],
+    "insurer": "",
     "region": "US",
     "states": [],
     "effort": "some",
@@ -1531,6 +1629,11 @@
       "eligibility"
     ],
     "eligibility": "Members of an Aetna Better Health Medicaid plan in the listed states.",
+    "audience": [
+      "medicaid",
+      "member"
+    ],
+    "insurer": "Aetna",
     "region": "KY, IL, LA, OK, FL",
     "states": [
       "KY",
@@ -1577,6 +1680,10 @@
       "eligibility"
     ],
     "eligibility": "Aetna medical plan members; Aetna Better Health plans run separate programs by state.",
+    "audience": [
+      "member"
+    ],
+    "insurer": "Aetna",
     "region": "US",
     "states": [],
     "effort": "some",
@@ -1617,6 +1724,10 @@
       "phone"
     ],
     "eligibility": "Pregnant members of AmeriHealth Caritas Delaware (reward list seen); Florida and Ohio pages describe care management without amounts.",
+    "audience": [
+      "member"
+    ],
+    "insurer": "AmeriHealth Caritas",
     "region": "DE (rewards listed); FL, OH care management",
     "states": [
       "DE",
@@ -1662,6 +1773,11 @@
       "phone"
     ],
     "eligibility": "Pregnant members of Blue Cross Community Health Plans (IL) or BCBSTX Medicaid/CHIP; join by phone 1-888-421-7781.",
+    "audience": [
+      "medicaid",
+      "member"
+    ],
+    "insurer": "Blue Cross Blue Shield",
     "region": "IL, TX",
     "states": [
       "IL",
@@ -1704,6 +1820,10 @@
       "eligibility"
     ],
     "eligibility": "People whose health plan covers a breast pump; coverage, timing and prescription rules vary by plan.",
+    "audience": [
+      "insured"
+    ],
+    "insurer": "",
     "region": "US",
     "states": [],
     "effort": "some",
@@ -1741,6 +1861,10 @@
       "eligibility"
     ],
     "eligibility": "People with a Marketplace or other health plan, except grandfathered plans.",
+    "audience": [
+      "insured"
+    ],
+    "insurer": "",
     "region": "US",
     "states": [],
     "effort": "some",
@@ -1779,6 +1903,10 @@
       "eligibility"
     ],
     "eligibility": "People whose health plan covers a breast pump; coverage, timing and prescription rules vary by plan.",
+    "audience": [
+      "insured"
+    ],
+    "insurer": "",
     "region": "US",
     "states": [],
     "effort": "some",
@@ -1817,6 +1945,11 @@
       "eligibility"
     ],
     "eligibility": "CareSource Medicaid members in the states with the program (Indiana, Kentucky and Ohio on the pages seen).",
+    "audience": [
+      "medicaid",
+      "member"
+    ],
+    "insurer": "CareSource",
     "region": "IN, KY, OH",
     "states": [
       "IN",
@@ -1858,6 +1991,8 @@
       "app"
     ],
     "eligibility": "Anyone pregnant; starting at 28 weeks (26 if high risk).",
+    "audience": [],
+    "insurer": "",
     "region": "US",
     "states": [],
     "effort": "quick",
@@ -1895,6 +2030,10 @@
       "address"
     ],
     "eligibility": "All families with newborns in participating communities.",
+    "audience": [
+      "local"
+    ],
+    "insurer": "",
     "region": "Participating communities in about 18 states",
     "states": [],
     "effort": "some",
@@ -1932,6 +2071,8 @@
       "eligibility"
     ],
     "eligibility": "Not stated; likely needs a prescription filled at a Price Chopper or Market 32 pharmacy. Ask the pharmacist.",
+    "audience": [],
+    "insurer": "",
     "region": "Price Chopper and Market 32 pharmacies in Connecticut, Massachusetts, New Hampshire, New York, Pennsylvania and Vermont",
     "states": [
       "CT",
@@ -1975,6 +2116,8 @@
       "eligibility"
     ],
     "eligibility": "Needs a prescription for a covered prenatal vitamin; a 2011 Meijer release says any customer qualifies regardless of insurance or co-pay.",
+    "audience": [],
+    "insurer": "",
     "region": "Meijer stores in Illinois, Indiana, Kentucky, Michigan, Ohio and Wisconsin",
     "states": [
       "IL",
@@ -2018,6 +2161,10 @@
       "insurance"
     ],
     "eligibility": "People with ACA-compliant plans; some religious employers are exempt.",
+    "audience": [
+      "insured"
+    ],
+    "insurer": "",
     "region": "US",
     "states": [],
     "effort": "some",
@@ -2057,6 +2204,10 @@
       "eligibility"
     ],
     "eligibility": "Anthem members; Medicaid versions have other names (for example New Baby, New Life in Virginia).",
+    "audience": [
+      "member"
+    ],
+    "insurer": "Anthem",
     "region": "US",
     "states": [],
     "effort": "some",
@@ -2095,6 +2246,8 @@
       "eligibility"
     ],
     "eligibility": "People who are pregnant or recently gave birth; Medicaid/CHIP depends on state and income.",
+    "audience": [],
+    "insurer": "",
     "region": "US",
     "states": [],
     "effort": "involved",
@@ -2133,6 +2286,11 @@
       "eligibility"
     ],
     "eligibility": "Pregnant members of a UnitedHealthcare Community Plan; rewards depend on the state plan.",
+    "audience": [
+      "medicaid",
+      "member"
+    ],
+    "insurer": "UnitedHealthcare",
     "region": "US",
     "states": [],
     "effort": "some",
@@ -2172,6 +2330,10 @@
       "eligibility"
     ],
     "eligibility": "Cigna members whose plan includes the program; availability depends on funding type or benefit election.",
+    "audience": [
+      "member"
+    ],
+    "insurer": "Cigna",
     "region": "US",
     "states": [],
     "effort": "some",
@@ -2211,6 +2373,11 @@
       "eligibility"
     ],
     "eligibility": "Highmark Health Options (DE, WV) or Highmark Wholecare (PA) Medicaid members.",
+    "audience": [
+      "medicaid",
+      "member"
+    ],
+    "insurer": "Highmark",
     "region": "DE, WV, PA",
     "states": [
       "DE",
@@ -2255,6 +2422,11 @@
       "eligibility"
     ],
     "eligibility": "Humana Healthy Horizons Medicaid members who are pregnant, in the states listed.",
+    "audience": [
+      "medicaid",
+      "member"
+    ],
+    "insurer": "Humana",
     "region": "Only some states (OH, OK, VA, KY, FL, SC seen in search results; list may be incomplete)",
     "states": [
       "OH",
@@ -2301,6 +2473,10 @@
       "eligibility"
     ],
     "eligibility": "People whose health plan covers a breast pump; coverage, timing and prescription rules vary by plan.",
+    "audience": [
+      "insured"
+    ],
+    "insurer": "",
     "region": "US",
     "states": [],
     "effort": "some",
@@ -2338,6 +2514,10 @@
       "insurance"
     ],
     "eligibility": "Kaiser Permanente members; some regions open some classes to nonmembers.",
+    "audience": [
+      "member"
+    ],
+    "insurer": "Kaiser Permanente",
     "region": "CA, GA, MD, VA, DC",
     "states": [
       "CA",
@@ -2384,6 +2564,10 @@
       "eligibility"
     ],
     "eligibility": "People whose insurance covers lactation support and is in The Lactation Network's network; you provide your insurance card details at registration.",
+    "audience": [
+      "insured"
+    ],
+    "insurer": "",
     "region": "US (50 states and DC; insurance-network dependent)",
     "states": [],
     "effort": "some",
@@ -2421,6 +2605,10 @@
       "eligibility"
     ],
     "eligibility": "People in underserved areas, including the uninsured and underinsured.",
+    "audience": [
+      "local"
+    ],
+    "insurer": "",
     "region": "Columbus and Southeast OH, Tucson and Phoenix AZ, DC area, New York City, Houston",
     "states": [
       "OH",
@@ -2464,6 +2652,10 @@
       "insurance"
     ],
     "eligibility": "MassHealth members who are pregnant or lactating.",
+    "audience": [
+      "medicaid"
+    ],
+    "insurer": "",
     "region": "Massachusetts",
     "states": [
       "MA"
@@ -2504,6 +2696,10 @@
       "purchase"
     ],
     "eligibility": "People whose plan covers maternity compression; a separate prescription is needed.",
+    "audience": [
+      "insured"
+    ],
+    "insurer": "",
     "region": "US",
     "states": [],
     "effort": "some",
@@ -2542,6 +2738,10 @@
       "eligibility"
     ],
     "eligibility": "Income-based (MAGI) and non-financial criteria; rules vary by state. Postpartum care is covered at least 60 days, and many states extend to 12 months.",
+    "audience": [
+      "low-income"
+    ],
+    "insurer": "",
     "region": "Varies by state",
     "states": [],
     "effort": "involved",
@@ -2581,6 +2781,10 @@
       "eligibility"
     ],
     "eligibility": "Medicaid members in states that cover doula services; many need a licensed provider to recommend it.",
+    "audience": [
+      "medicaid"
+    ],
+    "insurer": "",
     "region": "Varies by state",
     "states": [],
     "effort": "involved",
@@ -2618,6 +2822,10 @@
       "eligibility"
     ],
     "eligibility": "Medicaid or CHIP members of the listed plans.",
+    "audience": [
+      "medicaid"
+    ],
+    "insurer": "",
     "region": "FL, TX, WA, GA",
     "states": [
       "FL",
@@ -2661,6 +2869,8 @@
       "email"
     ],
     "eligibility": "Pregnant and postpartum people and partners.",
+    "audience": [],
+    "insurer": "",
     "region": "US",
     "states": [],
     "effort": "quick",
@@ -2700,6 +2910,10 @@
       "eligibility"
     ],
     "eligibility": "Molina members who are pregnant; reward rules and items depend on the state plan.",
+    "audience": [
+      "member"
+    ],
+    "insurer": "Molina",
     "region": "Only some states (TX, OH, IL, FL, SC, WI seen in search results; list may be incomplete)",
     "states": [
       "TX",
@@ -2747,6 +2961,10 @@
       "eligibility"
     ],
     "eligibility": "People whose health plan covers a breast pump; coverage, timing and prescription rules vary by plan.",
+    "audience": [
+      "insured"
+    ],
+    "insurer": "",
     "region": "US",
     "states": [],
     "effort": "some",
@@ -2786,6 +3004,10 @@
       "eligibility"
     ],
     "eligibility": "Ambetter health plan members; program pages vary by state.",
+    "audience": [
+      "member"
+    ],
+    "insurer": "Centene / Ambetter",
     "region": "US",
     "states": [],
     "effort": "some",
@@ -2824,6 +3046,10 @@
       "eligibility"
     ],
     "eligibility": "TRICARE beneficiaries; the page says eligibility begins at 27 weeks of pregnancy and covers mothers who legally adopt an infant and plan to breastfeed.",
+    "audience": [
+      "military"
+    ],
+    "insurer": "",
     "region": "US",
     "states": [],
     "effort": "some",
@@ -2863,6 +3089,11 @@
       "phone"
     ],
     "eligibility": "UPMC for You members who join Baby Steps before 34 weeks and start prenatal care before 13 weeks.",
+    "audience": [
+      "medicaid",
+      "member"
+    ],
+    "insurer": "UPMC",
     "region": "Pennsylvania",
     "states": [
       "PA"
@@ -2902,6 +3133,8 @@
       "eligibility"
     ],
     "eligibility": "Children 18 and under in the listed groups.",
+    "audience": [],
+    "insurer": "",
     "region": "US",
     "states": [],
     "effort": "some",
@@ -2941,6 +3174,10 @@
       "eligibility"
     ],
     "eligibility": "Members of an accepted insurance plan.",
+    "audience": [
+      "insured"
+    ],
+    "insurer": "",
     "region": "US",
     "states": [],
     "effort": "some",
@@ -2979,6 +3216,10 @@
       "eligibility"
     ],
     "eligibility": "Members of a covered insurance plan; discounted self-pay rates exist for others.",
+    "audience": [
+      "insured"
+    ],
+    "insurer": "",
     "region": "US",
     "states": [],
     "effort": "some",
@@ -3017,6 +3258,11 @@
       "eligibility"
     ],
     "eligibility": "Wellpoint Medicaid members in WA or WV who complete required visits.",
+    "audience": [
+      "medicaid",
+      "member"
+    ],
+    "insurer": "Wellpoint",
     "region": "WA, WV",
     "states": [
       "WA",
@@ -3055,6 +3301,8 @@
     "costDetail": "Page does not state a cost; the service is a referral line, not a benefit itself.",
     "requirements": [],
     "eligibility": "Anyone.",
+    "audience": [],
+    "insurer": "",
     "region": "US",
     "states": [],
     "effort": "quick",
@@ -3091,6 +3339,10 @@
       "eligibility"
     ],
     "eligibility": "Pregnant women with family income at or below the federal poverty line, or receiving TANF, SSI or SNAP; only programs that serve pregnant women (some Early Head Start programs, including the home-based option) enroll them.",
+    "audience": [
+      "low-income"
+    ],
+    "insurer": "",
     "region": "US (local programs)",
     "states": [],
     "effort": "involved",
@@ -3128,6 +3380,11 @@
       "eligibility"
     ],
     "eligibility": "Financial need, infant 12 months or younger, and receiving safe sleep education (per search result); each partner sets its own criteria; crib limits 30 lb and 35 in.",
+    "audience": [
+      "low-income",
+      "local"
+    ],
+    "insurer": "",
     "region": "US (via local partners)",
     "states": [],
     "effort": "involved",
@@ -3162,6 +3419,8 @@
     "costDetail": "Safe Kids coalitions host 8,000+ free inspection events",
     "requirements": [],
     "eligibility": "Anyone with a child car seat.",
+    "audience": [],
+    "insurer": "",
     "region": "US",
     "states": [],
     "effort": "some",
@@ -3198,6 +3457,11 @@
       "eligibility"
     ],
     "eligibility": "Families in need; each local program sets its own rules.",
+    "audience": [
+      "low-income",
+      "local"
+    ],
+    "insurer": "",
     "region": "US",
     "states": [],
     "effort": "some",
@@ -3235,6 +3499,11 @@
       "eligibility"
     ],
     "eligibility": "Families in need attending an event; events are city by city.",
+    "audience": [
+      "low-income",
+      "local"
+    ],
+    "insurer": "",
     "region": "US (event cities)",
     "states": [],
     "effort": "some",
@@ -3273,6 +3542,10 @@
       "eligibility"
     ],
     "eligibility": "Pregnant women, new parents, children to 18 months and partners in a funded service area.",
+    "audience": [
+      "local"
+    ],
+    "insurer": "",
     "region": "US (funded project areas)",
     "states": [],
     "effort": "some",
@@ -3310,6 +3583,10 @@
       "eligibility"
     ],
     "eligibility": "Low-income households or those receiving federal aid.",
+    "audience": [
+      "low-income"
+    ],
+    "insurer": "",
     "region": "Mississippi",
     "states": [
       "MS"
@@ -3346,6 +3623,8 @@
     "costDetail": "Free and confidential",
     "requirements": [],
     "eligibility": "Anyone pregnant, postpartum or a family member; English and Spanish, and interpreter support in more than 60 languages.",
+    "audience": [],
+    "insurer": "",
     "region": "US",
     "states": [],
     "effort": "quick",
@@ -3384,6 +3663,11 @@
       "address"
     ],
     "eligibility": "First-time moms who meet an income rule and are about 28 weeks pregnant or less (a second page says under 29 weeks); local agency sets details and area.",
+    "audience": [
+      "low-income",
+      "local"
+    ],
+    "insurer": "",
     "region": "US (local agencies)",
     "states": [],
     "effort": "involved",
@@ -3418,6 +3702,8 @@
     "costDetail": "Free and confidential",
     "requirements": [],
     "eligibility": "Anyone; no diagnosis needed.",
+    "audience": [],
+    "insurer": "",
     "region": "US",
     "states": [],
     "effort": "quick",
@@ -3456,6 +3742,10 @@
       "phone"
     ],
     "eligibility": "Low-income families or those with financial hardship; caregivers attend a class.",
+    "audience": [
+      "low-income"
+    ],
+    "insurer": "",
     "region": "Texas",
     "states": [
       "TX"
@@ -3495,6 +3785,10 @@
       "phone"
     ],
     "eligibility": "Parents eligible for WIC, SNAP, Medicaid, TANF or FAMIS with a child 7 or younger.",
+    "audience": [
+      "low-income"
+    ],
+    "insurer": "",
     "region": "Virginia",
     "states": [
       "VA"
@@ -3534,6 +3828,10 @@
       "eligibility"
     ],
     "eligibility": "Pregnant, postpartum (up to 6 months) or breastfeeding women, infants and children under 5; income at or below 185% of the federal poverty guidelines (or on Medicaid, SNAP or TANF), live in the state, and a nutrition-risk check. The 2026-27 limit is $29,526 for one person and $40,034 for two, plus $10,508 per added person; an expected birth counts as a household member.",
+    "audience": [
+      "low-income"
+    ],
+    "insurer": "",
     "region": "US (apply through your state or local WIC agency)",
     "states": [],
     "effort": "involved",
@@ -3573,6 +3871,10 @@
       "eligibility"
     ],
     "eligibility": "WIC participants who breastfeed; pump rules and peer counselor access vary by state.",
+    "audience": [
+      "wic"
+    ],
+    "insurer": "",
     "region": "US",
     "states": [],
     "effort": "some",
@@ -3611,6 +3913,10 @@
       "eligibility"
     ],
     "eligibility": "WIC-certified women, infants over 4 months and children; offered only by participating states.",
+    "audience": [
+      "wic"
+    ],
+    "insurer": "",
     "region": "Participating states only",
     "states": [],
     "effort": "some",
@@ -3647,6 +3953,8 @@
       "eligibility"
     ],
     "eligibility": "Massachusetts resident child; open a new U.Fund 529 before the first birthday or adoption anniversary.",
+    "audience": [],
+    "insurer": "",
     "region": "Massachusetts",
     "states": [
       "MA"
@@ -3685,6 +3993,10 @@
       "eligibility"
     ],
     "eligibility": "Pregnant, 27 weeks or fewer (priority for 20 to 27 weeks), household income under $39,000, living in Multnomah County. 100 slots.",
+    "audience": [
+      "low-income"
+    ],
+    "insurer": "",
     "region": "Multnomah County, Oregon only",
     "states": [
       "OR"
@@ -3723,6 +4035,10 @@
       "eligibility"
     ],
     "eligibility": "Worked in California and paid into State Disability Insurance in the base period (about 5 to 18 months before the claim). Pay is about 70% to 90% of wages depending on income, up to the maximum.",
+    "audience": [
+      "worker"
+    ],
+    "insurer": "",
     "region": "California",
     "states": [
       "CA"
@@ -3763,6 +4079,11 @@
       "eligibility"
     ],
     "eligibility": "Qualify for CalEITC with a child younger than 6 on Dec 31; earned income generally $32,900 or less (phase-out starts at $27,425). The child may have an ITIN instead of an SSN.",
+    "audience": [
+      "low-income",
+      "worker"
+    ],
+    "insurer": "",
     "region": "California",
     "states": [
       "CA"
@@ -3802,6 +4123,8 @@
       "eligibility"
     ],
     "eligibility": "Child born in California on or after July 1, 2023, any income.",
+    "audience": [],
+    "insurer": "",
     "region": "California",
     "states": [
       "CA"
@@ -3842,6 +4165,8 @@
       "eligibility"
     ],
     "eligibility": "Connecticut resident; one $100 per child regardless of the number of accounts.",
+    "audience": [],
+    "insurer": "",
     "region": "Connecticut",
     "states": [
       "CT"
@@ -3882,6 +4207,10 @@
       "eligibility"
     ],
     "eligibility": "Work-related care for a child under 13; credit is 20% to 50% of up to $3,000 of expenses for one child, depending on income. FSA is only if your employer offers it.",
+    "audience": [
+      "worker"
+    ],
+    "insurer": "",
     "region": "US",
     "states": [],
     "effort": "some",
@@ -3920,6 +4249,8 @@
       "eligibility"
     ],
     "eligibility": "Child under 17 at year end with a Social Security number valid for work, issued by the return due date (including extensions). Full credit up to $200,000 income ($400,000 joint); refundable part needs $2,500 earned income. A child without the SSN can still bring the $500 Credit for Other Dependents.",
+    "audience": [],
+    "insurer": "",
     "region": "US",
     "states": [],
     "effort": "some",
@@ -3958,6 +4289,8 @@
       "eligibility"
     ],
     "eligibility": "Rhode Island child; open an account within a year of birth or adoption.",
+    "audience": [],
+    "insurer": "",
     "region": "Rhode Island",
     "states": [
       "RI"
@@ -3996,6 +4329,10 @@
       "eligibility"
     ],
     "eligibility": "Earned at least $2,500 in Colorado in the past year. From July 1, 2026 the maximum is $1,448.02 a week: 90% of the first $804.46 of weekly wage, 50% above that.",
+    "audience": [
+      "worker"
+    ],
+    "insurer": "",
     "region": "Colorado",
     "states": [
       "CO"
@@ -4036,6 +4373,10 @@
       "eligibility"
     ],
     "eligibility": "Connecticut workers who paid into the program. Pay is based on the two highest quarters of the base period.",
+    "audience": [
+      "worker"
+    ],
+    "insurer": "",
     "region": "Connecticut",
     "states": [
       "CT"
@@ -4075,6 +4416,10 @@
       "eligibility"
     ],
     "eligibility": "Child born on or after July 1, 2023 whose birth was covered by HUSKY (Connecticut Medicaid). Parent immigration status does not matter.",
+    "audience": [
+      "medicaid"
+    ],
+    "insurer": "",
     "region": "Connecticut",
     "states": [
       "CT"
@@ -4113,6 +4458,10 @@
       "eligibility"
     ],
     "eligibility": "Workers covered by a DC employer under the Paid Family Leave Act and meeting its earnings rules.",
+    "audience": [
+      "worker"
+    ],
+    "insurer": "",
     "region": "District of Columbia",
     "states": [
       "DC"
@@ -4152,6 +4501,10 @@
       "eligibility"
     ],
     "eligibility": "Employer with 10 or more employees (employers with 10 to 24 may offer a minimum of 6 weeks until 2031), 12 months with the employer, 1,250 hours in the past year, and mostly working in Delaware.",
+    "audience": [
+      "worker"
+    ],
+    "insurer": "",
     "region": "Delaware",
     "states": [
       "DE"
@@ -4191,6 +4544,11 @@
       "eligibility"
     ],
     "eligibility": "Earned income and AGI under the limit for filing status and children. For tax year 2026 with one child: $51,593 ($58,863 married filing jointly); investment income up to $12,200. The child and the filer need valid Social Security numbers.",
+    "audience": [
+      "low-income",
+      "worker"
+    ],
+    "insurer": "",
     "region": "US",
     "states": [],
     "effort": "some",
@@ -4229,6 +4587,8 @@
       "eligibility"
     ],
     "eligibility": "New York resident with a child under 17 at year end; reduced by $16.50 per $1,000 of federal AGI above $75,000 (single or head of household), $110,000 (joint) or $55,000 (married filing separately).",
+    "audience": [],
+    "insurer": "",
     "region": "New York",
     "states": [
       "NY"
@@ -4269,6 +4629,8 @@
       "eligibility"
     ],
     "eligibility": "Child born or adopted in Colorado on or after Jan 1, 2020; parent or guardian owns the account; apply before the child's fifth birthday.",
+    "audience": [],
+    "insurer": "",
     "region": "Colorado",
     "states": [
       "CO"
@@ -4309,6 +4671,10 @@
       "purchase"
     ],
     "eligibility": "You need an HSA, FSA or HRA plan. Pub 502 excludes excess bottles for food storage.",
+    "audience": [
+      "insured"
+    ],
+    "insurer": "",
     "region": "US",
     "states": [],
     "effort": "some",
@@ -4345,6 +4711,11 @@
       "eligibility"
     ],
     "eligibility": "You must qualify for the Illinois EITC and have a dependent under 12 on Dec 31.",
+    "audience": [
+      "low-income",
+      "worker"
+    ],
+    "insurer": "",
     "region": "Illinois",
     "states": [
       "IL"
@@ -4384,6 +4755,8 @@
       "eligibility"
     ],
     "eligibility": "Child born or adopted on or after Jan 1, 2023 to Illinois residents; parent or guardian claims it.",
+    "audience": [],
+    "insurer": "",
     "region": "Illinois",
     "states": [
       "IL"
@@ -4423,6 +4796,8 @@
       "eligibility"
     ],
     "eligibility": "Child born on or after Jan 1, 2019 to Pennsylvania residents, or later adopted by residents.",
+    "audience": [],
+    "insurer": "",
     "region": "Pennsylvania",
     "states": [
       "PA"
@@ -4463,6 +4838,8 @@
       "eligibility"
     ],
     "eligibility": "Maine resident or part-year resident; reduced above $100,000 (single), $125,000 (head of household) or $150,000 (joint) per a fiscal note.",
+    "audience": [],
+    "insurer": "",
     "region": "Maine",
     "states": [
       "ME"
@@ -4502,6 +4879,10 @@
       "eligibility"
     ],
     "eligibility": "Earned at least six times the state average weekly wage in the past year. Pay replaces 90% of wages up to half the state average and a share above that.",
+    "audience": [
+      "worker"
+    ],
+    "insurer": "",
     "region": "Maine",
     "states": [
       "ME"
@@ -4542,6 +4923,8 @@
       "eligibility"
     ],
     "eligibility": "Dependent under 13 for federal purposes; file as single, head of household or joint (not married filing separately).",
+    "audience": [],
+    "insurer": "",
     "region": "Massachusetts",
     "states": [
       "MA"
@@ -4581,6 +4964,10 @@
       "eligibility"
     ],
     "eligibility": "Massachusetts workers who paid into the program and meet its earnings test. The cap is $1,284.61 in 2027, but a benefit year that starts in 2026 keeps the 2026 cap.",
+    "audience": [
+      "worker"
+    ],
+    "insurer": "",
     "region": "Massachusetts",
     "states": [
       "MA"
@@ -4620,6 +5007,8 @@
       "eligibility"
     ],
     "eligibility": "Child born in Nebraska in 2020 or later.",
+    "audience": [],
+    "insurer": "",
     "region": "Nebraska",
     "states": [
       "NE"
@@ -4659,6 +5048,10 @@
       "eligibility"
     ],
     "eligibility": "Credit begins to phase out at $31,950 (single) or $37,910 (joint) for 2025; for 2026 at $32,680 or $38,770.",
+    "audience": [
+      "low-income"
+    ],
+    "insurer": "",
     "region": "Minnesota",
     "states": [
       "MN"
@@ -4697,6 +5090,10 @@
       "eligibility"
     ],
     "eligibility": "Earned at least $3,900 in the last year in Minnesota. Weekly maximum is $1,423 in most sources (one source says $1,432); the lower figure is used.",
+    "audience": [
+      "worker"
+    ],
+    "insurer": "",
     "region": "Minnesota",
     "states": [
       "MN"
@@ -4736,6 +5133,8 @@
       "eligibility"
     ],
     "eligibility": "Baby born to Maine residents since Jan 1, 2013. Babies born elsewhere who become Maine residents before age 1 qualify if a NextGen 529 is opened before age 1.",
+    "audience": [],
+    "insurer": "",
     "region": "Maine",
     "states": [
       "ME"
@@ -4777,6 +5176,8 @@
       "purchase"
     ],
     "eligibility": "Newborn up to 12 months old living in North Dakota; one match per child; no income limit; anyone can apply.",
+    "audience": [],
+    "insurer": "",
     "region": "North Dakota",
     "states": [
       "ND"
@@ -4815,6 +5216,10 @@
       "eligibility"
     ],
     "eligibility": "NJ resident with taxable income of $80,000 or less, not filing married separately. Amount by taxable income: $1,000 up to $30,000; $800 to $40,000; $600 to $50,000; $400 to $60,000; $200 to $80,000.",
+    "audience": [
+      "low-income"
+    ],
+    "insurer": "",
     "region": "New Jersey",
     "states": [
       "NJ"
@@ -4854,6 +5259,10 @@
       "eligibility"
     ],
     "eligibility": "Earned at least $310 a week for 20 weeks, or $15,500 in the base year (2026 test). Total benefits are the lesser of 12 times the weekly rate or one-third of base-year earnings.",
+    "audience": [
+      "worker"
+    ],
+    "insurer": "",
     "region": "New Jersey",
     "states": [
       "NJ"
@@ -4894,6 +5303,10 @@
       "eligibility"
     ],
     "eligibility": "New Mexico resident with a qualifying child, not a dependent of someone else; the credit shrinks as income rises.",
+    "audience": [
+      "low-income"
+    ],
+    "insurer": "",
     "region": "New Mexico",
     "states": [
       "NM"
@@ -4933,6 +5346,10 @@
       "eligibility"
     ],
     "eligibility": "Employed in New York with a covered employer and meeting the program's work-time rules. 2026 weekly maximum is $1,228.53 and total maximum is $14,742.36.",
+    "audience": [
+      "worker"
+    ],
+    "insurer": "",
     "region": "New York",
     "states": [
       "NY"
@@ -4971,6 +5388,8 @@
     "costDetail": "Free; SSA says anyone asking for payment is a scam.",
     "requirements": [],
     "eligibility": "Baby born in a US hospital; getting a number is voluntary. Providing parents' Social Security numbers is requested but you can apply without both.",
+    "audience": [],
+    "insurer": "",
     "region": "US",
     "states": [],
     "effort": "quick",
@@ -5008,6 +5427,10 @@
       "eligibility"
     ],
     "eligibility": "Full credit at modified AGI of $26,550 or less, reduced to $0 at $31,550.",
+    "audience": [
+      "low-income"
+    ],
+    "insurer": "",
     "region": "Oregon",
     "states": [
       "OR"
@@ -5047,6 +5470,10 @@
       "eligibility"
     ],
     "eligibility": "Oregon workers who paid into the program. Maximum weekly benefit is $1,692.16 for benefit years starting June 28, 2026 or later; earlier claims keep $1,636.56. Workers earning 65% or less of the state average get 100% of wages.",
+    "audience": [
+      "worker"
+    ],
+    "insurer": "",
     "region": "Oregon",
     "states": [
       "OR"
@@ -5087,6 +5514,10 @@
       "eligibility"
     ],
     "eligibility": "Rhode Island workers who paid into the program and meet its earnings test. Official materials give a weekly maximum of $1,103, rising to $1,150 for benefit years starting July 1, 2026 or later.",
+    "audience": [
+      "worker"
+    ],
+    "insurer": "",
     "region": "Rhode Island",
     "states": [
       "RI"
@@ -5126,6 +5557,10 @@
       "eligibility"
     ],
     "eligibility": "Live in a participating community (by where you physically live), be 18 or older (16 to 17 with a guardian's consent), and be at least 16 weeks pregnant or have a baby 6 months or younger born after the community's start date.",
+    "audience": [
+      "local"
+    ],
+    "insurer": "",
     "region": "Participating Michigan cities and counties only",
     "states": [
       "MI"
@@ -5166,6 +5601,8 @@
       "eligibility"
     ],
     "eligibility": "Child born Jan 1, 2025 to Dec 31, 2028, a US citizen with a Social Security number valid for work that was issued before the election, and expected to be a qualifying child of the parent who elects. One pilot election per child.",
+    "audience": [],
+    "insurer": "",
     "region": "US",
     "states": [],
     "effort": "some",
@@ -5206,6 +5643,8 @@
       "eligibility"
     ],
     "eligibility": "Vermont resident; reduced by $20 per $1,000 of AGI above $125,000 and gone at $175,000. A Social Security number or ITIN is not required.",
+    "audience": [],
+    "insurer": "",
     "region": "Vermont",
     "states": [
       "VT"
@@ -5245,6 +5684,10 @@
       "eligibility"
     ],
     "eligibility": "At least 820 hours worked in the qualifying period. Up to 16 weeks combined medical and family leave in a claim year, or 18 with pregnancy or birth complications. Minimum benefit is $100 a week in 2026.",
+    "audience": [
+      "worker"
+    ],
+    "insurer": "",
     "region": "Washington",
     "states": [
       "WA"
@@ -5285,6 +5728,8 @@
       "eligibility"
     ],
     "eligibility": "Must be 18+ (or the age of majority where you live); the platform is operated in the United States.",
+    "audience": [],
+    "insurer": "",
     "region": "US",
     "states": [],
     "effort": "some",
@@ -5327,6 +5772,8 @@
       "eligibility"
     ],
     "eligibility": "Product tests are matched to member profile; not everyone is selected",
+    "audience": [],
+    "insurer": "",
     "region": "US",
     "states": [],
     "effort": "some",
@@ -5367,6 +5814,8 @@
       "app"
     ],
     "eligibility": "Terms bar anyone under 16 from using the service",
+    "audience": [],
+    "insurer": "",
     "region": "US",
     "states": [],
     "effort": "some",
@@ -5407,6 +5856,8 @@
       "eligibility"
     ],
     "eligibility": "Only approved Mom Ambassadors or content creators; US residents",
+    "audience": [],
+    "insurer": "",
     "region": "US",
     "states": [],
     "effort": "some",
@@ -5447,6 +5898,8 @@
       "eligibility"
     ],
     "eligibility": "Matched by profile and each product's criteria; North America",
+    "audience": [],
+    "insurer": "",
     "region": "US",
     "states": [],
     "effort": "some",
@@ -5487,6 +5940,8 @@
       "address"
     ],
     "eligibility": "",
+    "audience": [],
+    "insurer": "",
     "region": "US",
     "states": [],
     "effort": "quick",
@@ -5526,6 +5981,8 @@
       "eligibility"
     ],
     "eligibility": "18+ (per Terms of Use); US and Canada applicants accepted; sponsors select by demographics such as location, age or number of children",
+    "audience": [],
+    "insurer": "",
     "region": "US",
     "states": [],
     "effort": "some",

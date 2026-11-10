@@ -1,6 +1,6 @@
 // Groups 1 to 4: boot, routes, link audit, click-through.
 import fs from 'node:fs';
-import { ROOT, ROUTES, PROGRAMS, PROFILE, open, clean, runGroup, seedProfileUI, norm, artifactFragment, lsDump } from './harness.mjs';
+import { ROOT, ROUTES, PROGRAMS, PROFILE, open, clean, runGroup, seedProfileUI, norm, artifactFragment, lsDump, openCard } from './harness.mjs';
 import { L, ALL, byId } from './model.mjs';
 
 export const suspects = []; // buttons that visibly did nothing (reported, never failed)
@@ -93,7 +93,7 @@ export async function prepare(h) {
   await h.go('directory');
   const ids = PROGRAMS.slice(0, 3).map((p) => p.id);
   const vals = ['signed-up', 'received', 'skipped'];
-  for (let i = 0; i < ids.length; i++) await h.page.locator('select[data-program-id="' + ids[i] + '"]').selectOption(vals[i]);
+  for (let i = 0; i < ids.length; i++) { await openCard(h.page, ids[i]); await h.page.locator('select[data-program-id="' + ids[i] + '"]').selectOption(vals[i]); }
 }
 async function expandAll(page) { await page.evaluate(() => document.querySelectorAll('details').forEach((d) => { d.open = true; })); }
 async function startGuided(h) {
@@ -141,7 +141,7 @@ export async function links(env) {
       await h.go('directory');
       const stateOnly = ALL.filter((p) => L.hiddenByState(p, PROFILE.state));
       const idsNow = async () => h.page.evaluate(() => [...document.querySelectorAll('#view-directory article.card')].map((c) => c.dataset.programId));
-      const box = h.page.locator('#view-directory .dir-state');
+      const box = h.page.locator('#view-directory .dir-state:not(.dir-fit)');
       let before = await idsNow();
       g.check(label + ': with state ' + PROFILE.state + ' the other-state programs are not listed and the state line gives their count', stateOnly.length > 0 && stateOnly.every((p) => !before.includes(p.id)) && before.length === ALL.length - stateOnly.length && (await box.innerText()).includes(stateOnly.length + ' programs for other states are hidden.'), before.length + ' cards, ' + stateOnly.length + ' hidden');
       await box.getByRole('button', { name: 'Show them' }).click(); await h.page.waitForTimeout(200);

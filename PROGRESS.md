@@ -107,6 +107,17 @@ The contract is in `ARCHITECTURE.md` ("Phase G"). Rounds 1 to 5 are written ther
   - The session's network was Limited, so no official page could be read directly in Phase G. Every Phase G entry rests on official-domain search results and is capped at medium.
   - The session hit its web-search limit during the second research wave. Leads left unsearched: the FSA or HSA life-event rule; the adoption credit; the head-of-household filing change; Oakland Brilliant Baby; Oklahoma Dream Accounts; more city and state child-account programs; Colorado's state child tax credit; more brand sample programs; and the pages that removed programs now forward to (Carolina Complete Health "Start Smart for Your Baby" and the Medela Family newsletter).
 
+## Phase H, shorter list, tabs and "does this apply to me" (done, 2026-11-10)
+Why: on a phone the Programs page was about 61,000px tall, the #1 "Top pick" was a tax credit, and 83 "if you qualify" programs gave no way to say whether you qualify.
+- Data: every program has `audience` (who it is for; `[]` means anyone) and `insurer` (for member-only plans). Tagged from text already in the data, no new web research. Doubtful calls are in `research/phase-h/audience-notes.md`. 63 programs are for anyone; 14 insurers are named.
+- Tabs: Programs opens on "Free stuff", with "Money", "Care and cover" and "All" beside it. `L.kindOf` sorts by the first offer. Ranks are numbered within the tab.
+- Short cards: rank, badges, name, one line, value and the sign-up link; a Details button opens the rest. Sort and filters sit under "Sort and filter".
+- Your situation (optional) in My info: health cover, insurer, WIC/SNAP or similar help, paid job. `L.fit` gives yes, no or maybe per program. A "no" hides the program (with a "Show them" line), a "yes" shows "Fits your answers". Programs already in progress are never hidden. The answers stay in localStorage, travel in the JSON backup, and are never used by the fill script, bookmark, phone view, autofill helper, guided copy or email. "Truly free", verdicts and ranking are unchanged.
+- Size at 390px wide: Free stuff tab about 10,300px with no answers (was about 61,000px for the whole list), about 9,400px with a sample profile; All tab about 16,600px. First card starts within two screens. The targets of 9,000px and 190px cards were missed by a little (10,300px and a 195px median).
+- Tests: 248 unit tests pass. Browser suite: 1235 checks, 0 failed (was 983), with new groups for tabs and cards (79), situation answers (101) and layout at 360 and 390 wide (72). No app bugs found by the suite.
+- Known small things: the Programs list redraws a hidden-by-answers change only after leaving and returning to the page; an imported backup keeps an unknown insurer name as text.
+- Helpers this phase: 3 on `sonnet` (data tags, app build, browser suite) and 1 on `haiku` (docs and screenshots). Expected environment variables other than `CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH` are still missing.
+
 ## Not tested (needs a person)
 - Phase G: the entries and value figures against their official pages (the network was Limited) and the due-date plan and state rule on a real phone. (After round 5 the due-date buttons were looked at once at 768 and 1280 pixels wide: one inline row, no sideways scroll. The browser suite itself runs at phone width.)
 - A real iPhone: Safari AutoFill, the Shortcut, the bookmark, Home Screen install.

@@ -14,3 +14,7 @@ Run from the repo root: `node tests/e2e/run.mjs` (optional `--shots <dir>` saves
 - Not part of `node --test` or CI: it needs a browser (Playwright is preinstalled locally, not on CI runners). Without Playwright it prints `e2e skipped: Playwright not available` and exits 0.
 - Files are named without `.test.` on purpose so `node --test` never picks them up.
 - Layout: `run.mjs` (runner), `lib/harness.mjs` (reporter, page opener), `lib/model.mjs` (expected answers), `lib/groups-a.mjs` to `groups-d.mjs` (the checks), `lib/mock.mjs` (Gmail and artifact mock), `lib/fixtures.mjs` (synthetic form).
+
+## Phase H (group 13)
+
+Groups 1 to 12 open the Programs page through `open()`, which taps the All tab and unfolds "Sort and filter" (pass `all: false` for the real default view) and, where a card's status select is needed, opens the card with `openCard()`. Group 13 covers the tabs, collapsed cards, the filters disclosure, the four "Your situation" answers (save, reload, backup and restore, Clear my info), what they hide, the "Show them" choice, tracked programs never hidden, "Fits my answers", the answers never reaching the fill script, bookmark, phone view or guided copy, and no sideways scroll at 360 and 390. It prints three lines (13, 14, 15). Expected numbers come from `lib/model.mjs`.

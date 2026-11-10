@@ -15,10 +15,10 @@ const diff = (a, b) => 'page-only: ' + a.filter((x) => !b.includes(x)).slice(0, 
 
 const SCRAPE = `(() => [...document.querySelectorAll('#view-directory article.card')].map((c) => {
   const t = (s) => { const e = c.querySelector(s); return e ? e.textContent.replace(/\\s+/g, ' ').trim() : null; };
-  return { id: c.dataset.programId, grouped: !!c.closest('details.same-group'), rank: t('.rank'), verdict: t('.badge-verdict'), free: t('.free-line'), value: t('.value-line'),
+  return { id: c.dataset.programId, grouped: !!c.closest('details.same-group'), rank: t('.rank'), verdict: t('.badge-verdict'), free: t('.free-line'), value: (t('.value-line') || '') + (t('.value-basis') ? ' ' + t('.value-basis') : ''),
     chips: [...c.querySelectorAll('ul.offer-chips li')].map((x) => x.textContent.trim()),
     facts: [...c.querySelectorAll('dl.facts > div')].map((d) => [d.querySelector('dt').textContent.trim(), d.querySelector('dd').textContent.replace(/\\s+/g, ' ').trim()]),
-    tags: [...c.querySelectorAll('.badge-tag')].map((x) => x.textContent.trim()), same: t('.same-as'), more: !!c.querySelector('details.more-details > summary'), level: (c.querySelector('h3,h4') || {}).tagName };
+    tags: [...c.querySelectorAll('.tag-qualify, .tag-fit, .tag-nomatch, .tag-state')].map((x) => x.textContent.trim()), same: t('.same-as'), more: !!c.querySelector('button.card-toggle[aria-controls]'), level: (c.querySelector('h3,h4') || {}).tagName };
 }))()`;
 const SECTIONS = `(() => [...document.querySelectorAll('#view-directory section.dir-group')].map((s) => ({ key: s.id.replace('dir-group-', ''), head: s.querySelector('.group-title').textContent.replace(/\\s+/g, ' ').trim(),
   count: s.querySelector('.group-count').textContent, leads: [...s.querySelectorAll('article.card')].filter((c) => !c.closest('details.same-group')).map((c) => c.dataset.programId), cards: s.querySelectorAll('article.card').length })))()`;
@@ -57,9 +57,9 @@ export async function directoryG(env) {
         const pool = M.pool;
         const nHidden = L.otherStateCount(ALL, '');
         // state line and what is hidden
-        const box = await page.locator('#view-directory .dir-state').innerText();
+        const box = await page.locator('#view-directory .dir-state:not(.dir-fit)').innerText();
         g.check(tag + 'no state: the state line asks to add a state and gives the count', box.includes(nHidden + ' programs are only for some states.') && box.includes('Add your state in My info'), box);
-        g.check(tag + 'no state: the state line links to My info and has a Show them button', (await page.locator('#view-directory .dir-state a[href="#info"]').count()) === 1 && (await page.locator('#view-directory .dir-state button', { hasText: 'Show them' }).count()) === 1);
+        g.check(tag + 'no state: the state line links to My info and has a Show them button', (await page.locator('#view-directory .dir-state:not(.dir-fit) a[href="#info"]').count()) === 1 && (await page.locator('#view-directory .dir-state:not(.dir-fit) button', { hasText: 'Show them' }).count()) === 1);
         const cards = await page.evaluate(SCRAPE);
         const cardIds = cards.map((c) => c.id);
         g.check(tag + 'no state: state-only programs are not in the list, everything else is', sameSet(cardIds, ids(pool)) && stateOnly.every((p) => !cardIds.includes(p.id)), diff(cardIds, ids(pool)));
@@ -110,10 +110,10 @@ export async function directoryG(env) {
         g.check(tag + 'same-thing cards say which main program they repeat', bad.same.length === 0 && cards.some((c) => c.same), bad.same.slice(0, 2).join(' | '));
         // More details opens
         const first = page.locator('#view-directory article.card').first();
-        const det = first.locator('details.more-details');
-        g.check(tag + 'More details is closed at first', !(await det.evaluate((d) => d.open)));
-        await first.locator('details.more-details > summary').click();
-        g.check(tag + 'More details opens and shows What you need and the verified line', (await det.evaluate((d) => d.open)) && /What you need|Verified/.test(await det.innerText()) && /Verified \d{4}-\d{2}-\d{2}/.test(await det.innerText()));
+        const det = first.locator('.card-more');
+        g.check(tag + 'card details are closed at first', await det.evaluate((d) => d.hidden));
+        await first.locator('button.card-toggle').click();
+        g.check(tag + 'Details opens and shows What you need and the verified line', !(await det.evaluate((d) => d.hidden)) && /What you need|Verified/.test(await det.innerText()) && /Verified \d{4}-\d{2}-\d{2}/.test(await det.innerText()));
 
         // same-thing groups
         const sg = await page.evaluate(() => [...document.querySelectorAll('#view-directory details.same-group')].map((d) => ({ key: d.dataset.group, open: d.open, sum: d.querySelector('summary').textContent.trim(), cards: [...d.querySelectorAll('article.card')].map((c) => ({ id: c.dataset.programId, rank: c.querySelector('.rank').textContent })) })));
@@ -187,24 +187,24 @@ export async function directoryG(env) {
         const st = await page.evaluate(() => ({
           tf: document.querySelector('label.chip-toggle input[type=checkbox]') && [...document.querySelectorAll('#view-directory label.chip-toggle')].map((l) => l.textContent.trim() + '=' + l.querySelector('input').checked).join('; '),
           q: document.querySelector('#view-directory input[type=search]').value, active: document.activeElement.className, btns: document.querySelectorAll('#view-directory button.show-these').length }));
-        g.check(tag + 'Show these: Truly free and Open to everyone on, Email only and Needs a registry off', st.tf === 'Truly free=true; Open to everyone=true; Email only=false; Needs a registry=false', st.tf);
+        g.check(tag + 'Show these: Truly free and Open to everyone on, Email only and Needs a registry off', st.tf === 'Truly free=true; Open to everyone=true; Email only=false; Needs a registry=false; Fits my answers=false', st.tf);
         g.check(tag + 'Show these: search text, Category and What you get are cleared, the sort stays', st.q === '' && (await pick(page, 'Category').inputValue()) === '' && (await sel.inputValue()) === '' && (await pick(page, 'Sort by').inputValue()) === 'name');
         const SS = summaryFor(pool);
         const figure = +(/^(\d+) truly free/.exec(norm(await page.locator('#view-directory .dir-summary .sum-main').first().innerText())) || [0, -1])[1];
         g.check(tag + 'Show these: the count line equals the summary figure and the module', norm(await countLine(page)) === 'Showing ' + SS.free.length + ' of ' + pool.length + ' programs' && figure === SS.freeGroups && SS.free.length === SS.freeGroups, await countLine(page) + ' figure=' + figure);
         g.check(tag + 'Show these: focus is on the result count, and the button is gone', st.active.includes('result-count') && st.btns === 0, st.active);
         g.check(tag + 'Show these: only truly free programs open to everyone are listed', sameSet(await shownIds(page), ids(SS.free)));
-        await page.locator('#view-directory button.btn-small', { hasText: 'Clear filters' }).first().click();
+        await page.locator('#view-directory button.btn-small', { hasText: 'Clear filters' }).first().click(); await h.showAll(); // Clear filters also returns to the Free stuff tab
         // Show them / Hide them without a state
-        await page.locator('#view-directory .dir-state button').click(); await settle(page);
-        const box2 = norm(await page.locator('#view-directory .dir-state').innerText());
-        g.check(tag + 'no state: Show them lists the state-only programs and the button becomes Hide them', sameSet(await shownIds(page), ids(L.filterPrograms(ALL, {}))) && box2.includes(nHidden + ' programs only for some states are shown.') && (await page.locator('#view-directory .dir-state button').innerText()) === 'Hide them', box2);
-        g.check(tag + 'no state: focus stays on the Show them / Hide them button', await page.evaluate(() => document.activeElement === document.querySelector('#view-directory .dir-state button')));
+        await page.locator('#view-directory .dir-state:not(.dir-fit) button').click(); await settle(page);
+        const box2 = norm(await page.locator('#view-directory .dir-state:not(.dir-fit)').innerText());
+        g.check(tag + 'no state: Show them lists the state-only programs and the button becomes Hide them', sameSet(await shownIds(page), ids(L.filterPrograms(ALL, {}))) && box2.includes(nHidden + ' programs only for some states are shown.') && (await page.locator('#view-directory .dir-state:not(.dir-fit) button').innerText()) === 'Hide them', box2);
+        g.check(tag + 'no state: focus stays on the Show them / Hide them button', await page.evaluate(() => document.activeElement === document.querySelector('#view-directory .dir-state:not(.dir-fit) button')));
         const rk = await page.evaluate(SCRAPE);
         const M2 = shownFor('', true, {}, 'best');
         g.check(tag + 'with them shown, ranks are worked out over all programs and still have no gaps', rk.every((c) => c.rank === '#' + M2.ranks[c.id]) && new Set(rk.map((c) => c.rank)).size === M2.groups.length);
-        await page.locator('#view-directory .dir-state button').click(); await settle(page);
-        g.check(tag + 'Hide them hides them again and keeps focus on the button', sameSet(await shownIds(page), ids(pool)) && (await page.evaluate(() => document.activeElement === document.querySelector('#view-directory .dir-state button'))));
+        await page.locator('#view-directory .dir-state:not(.dir-fit) button').click(); await settle(page);
+        g.check(tag + 'Hide them hides them again and keeps focus on the button', sameSet(await shownIds(page), ids(pool)) && (await page.evaluate(() => document.activeElement === document.querySelector('#view-directory .dir-state:not(.dir-fit) button'))));
         clean(g, h, tag + 'default view');
         await h.ctx.close();
       }
@@ -216,20 +216,20 @@ export async function directoryG(env) {
         const M = shownFor('TX', false, {}, 'best');
         const nHidden = L.otherStateCount(ALL, 'TX');
         const txOnly = ALL.filter((p) => p.states.includes('TX'));
-        const box = norm(await page.locator('#view-directory .dir-state').innerText());
+        const box = norm(await page.locator('#view-directory .dir-state:not(.dir-fit)').innerText());
         g.check(tag + 'state TX: the line says N programs for other states are hidden', box.includes(nHidden + ' programs for other states are hidden.') && !box.includes('Add your state'), box);
         const got = await shownIds(page);
         g.check(tag + 'state TX: programs of other states are hidden, Texas and nationwide programs shown', sameSet(got, ids(M.pool)) && got.every((id) => !byId[id].states.length || byId[id].states.includes('TX')), diff(got, ids(M.pool)));
         const cards = await page.evaluate(SCRAPE);
         g.check(tag + 'state TX: Texas programs carry the "In your state" tag and others do not', txOnly.length > 0 && cards.every((c) => c.tags.includes('In your state') === byId[c.id].states.includes('TX')), cards.filter((c) => c.tags.includes('In your state') !== byId[c.id].states.includes('TX')).map((c) => c.id).slice(0, 3).join(','));
         g.check(tag + 'state TX: ranks and group counts come from the shown programs and have no gaps', cards.every((c) => c.rank === '#' + M.ranks[c.id]) && JSON.stringify((await page.evaluate(SECTIONS)).map((s) => s.head)) === JSON.stringify(L.VERDICTS.map((v) => ({ v, n: M.groups.filter((x) => L.verdict(x.lead) === v.id).length })).filter((x) => x.n).map((x) => x.v.label + ' (' + x.n + ')')));
-        await page.locator('#view-directory .dir-state button').click(); await settle(page);
+        await page.locator('#view-directory .dir-state:not(.dir-fit) button').click(); await settle(page);
         const all2 = await shownIds(page);
-        const box3 = norm(await page.locator('#view-directory .dir-state').innerText());
+        const box3 = norm(await page.locator('#view-directory .dir-state:not(.dir-fit)').innerText());
         g.check(tag + 'state TX: Show them adds the other states, says so and keeps focus on the button', sameSet(all2, ids(L.filterPrograms(ALL, {}))) && box3.includes(nHidden + ' programs for other states are shown.') && (await page.evaluate(() => document.activeElement.textContent)) === 'Hide them', box3);
         await page.reload(); await page.waitForFunction((n) => document.querySelectorAll('#view-directory article.card').length === n, ALL.length, { timeout: 4000 }).catch(() => {}); await settle(page);
         g.check(tag + 'state TX: the Show them choice is remembered after a reload', sameSet(await shownIds(page), ids(L.filterPrograms(ALL, {}))));
-        await page.locator('#view-directory .dir-state button').click(); await settle(page);
+        await page.locator('#view-directory .dir-state:not(.dir-fit) button').click(); await settle(page);
         g.check(tag + 'state TX: Hide them hides them and keeps focus', sameSet(await shownIds(page), ids(M.pool)) && (await page.evaluate(() => document.activeElement.textContent)) === 'Show them');
         clean(g, h, tag + 'state TX');
         await h.ctx.close();
@@ -363,12 +363,12 @@ export async function guidedTrackerG(env) {
         const h = await open(browser, { mode, profile: plain });
         const page = h.page;
         const M = shownFor('TX', true, { trulyFree: true }, 'best');
-        await page.locator('#view-directory .dir-state button').click(); await settle(page);
+        await page.locator('#view-directory .dir-state:not(.dir-fit) button').click(); await settle(page);
         await chip(page, 'Truly free').check(); await settle(page);
         await page.getByRole('button', { name: /^Start a guided run with these/ }).click();
         await page.waitForSelector('#view-guided:not([hidden])'); await settle(page);
         await h.go('directory');
-        await page.locator('#view-directory .dir-state button').click(); await settle(page); // Hide them
+        await page.locator('#view-directory .dir-state:not(.dir-fit) button').click(); await settle(page); // Hide them
         await h.go('guided');
         const listed = await page.evaluate(() => [...document.querySelectorAll('#view-guided ul.fx-pick input[type=checkbox]')].map((c) => ({ id: c.id.replace('gd-pick-', ''), on: c.checked })));
         const otherSel = ALL.filter((p) => L.hiddenByState(p, 'TX') && L.isTrulyFree(p)).map((p) => p.id);

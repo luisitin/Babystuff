@@ -34,6 +34,8 @@ Layout: `src/` (HTML, CSS, vanilla JS), `data/programs.json`, `scripts/build.mjs
 
 Phase G fields (full definitions in `ARCHITECTURE.md`, "Phase G"; `tests/data.test.mjs` enforces them): `offers` (not empty, most important first, from: product, coupons, points, sweepstakes, service, coverage, cash, testing), `certainty` (guaranteed, likely, if-eligible, chance), `freeStuff` (what arrives with no cost and no purchase, or `""`), `valueLow` and `valueHigh` (whole dollars for one family in the first year, or both null), `valueSource` (official, estimate, none), `valueBasis`, `effort` (quick, some, involved), `when` (pregnancy, late-pregnancy, after-birth, anytime), `whenNote`, `states` (USPS codes, `[]` when nationwide), `sameAs` (`""`, or the id of the main entry when this is another way to get the same thing).
 
+Phase H fields (`tests/data.test.mjs` enforces them): `audience` (a list of tags from medicaid, wic, low-income, insured, marketplace, employer, worker, military, local, member; `[]` means anyone, and every tag must hold) and `insurer` (non-empty exactly when `audience` has `member`).
+
 "Truly free" in the app means: free to claim, no purchase or paid membership, the first offer is a product, and it does not depend on chance. Sweepstakes, coupons, points and product testing never count. Keep that meaning when adding data or filters.
 
 ## Product rules
@@ -43,7 +45,7 @@ Phase G fields (full definitions in `ARCHITECTURE.md`, "Phase G"; `tests/data.te
 - No frameworks and no runtime dependencies. `node scripts/build.mjs` builds `index.html` (works offline, from disk or on GitHub Pages; its Content-Security-Policy blocks all network requests) and `artifact.html` (a fragment for publishing as a Claude artifact). Commit both after every change to `src/` or the data; CI fails if either is stale.
 - Inside a Claude artifact, `window.open`, `mailto:`, `<a download>`, `alert`, `confirm`, `prompt` and printing do not work for most viewers. Go through `BFF.host` (real `<a href>` links, Claude's save prompt, copyable text) and never tell the person something was sent or saved unless the host confirmed it.
 - Never put a raw U+2028 or U+2029 character in source, and do not type them as backslash-u escapes (the tooling turns those into raw characters, which breaks the page). Use `String.fromCharCode(0x2028)`.
-- Personal details live only in the browser's localStorage.
+- Personal details live only in the browser's localStorage. The four "Your situation" answers in My info are used only to hide and badge programs, and they never go into the fill script, bookmark, phone view, autofill helper, guided copy or email.
 - The autofill helper never submits, never bypasses CAPTCHAs or bot checks, and does one site at a time.
 - Automation (Phases E and F) means one-tap buttons, downloads (Gmail filters, .ics reminders, backups), the tap-to-run Gmail connection, the fill script and GitHub Actions. It never means submitting sign-up forms or clicking through bot checks.
 - Link checks never pretend to be a person. A site that refuses robots (403, bot challenge, timeout) is recorded as blocked, not retried with other headers or tools, and its entry stays at medium confidence unless an official page was read directly.

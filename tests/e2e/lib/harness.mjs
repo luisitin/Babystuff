@@ -107,11 +107,22 @@ export async function open(browser, o = {}) {
     await page.waitForSelector('#view-directory, .view:not([hidden])', { state: 'attached' });
     await page.waitForTimeout(o.settle === undefined ? 250 : o.settle);
   }
+  // Phase H: the Programs page opens on the Free stuff tab with the filters folded. Older checks look at every program, so by
+  // default we do what a person would: tap All and unfold "Sort and filter". Pass {all: false} to test the real default view.
+  h.showAll = async () => {
+    await page.waitForSelector('#view-directory .kind-tab[data-kind="all"]', { state: 'attached', timeout: 4000 }).catch(() => {});
+    const t = page.locator('#view-directory .kind-tab[data-kind="all"]');
+    if (await t.count()) { if ((await t.getAttribute('aria-pressed')) !== 'true') await t.click(); }
+    await page.evaluate(() => { const d = document.querySelector('#view-directory details.dir-filters'); if (d) d.open = true; });
+    await page.waitForTimeout(120);
+  };
   h.go = async (route) => {
     await page.evaluate((r) => { location.hash = '#' + r; }, route);
     await page.waitForSelector('#view-' + route + ':not([hidden])');
     await page.waitForTimeout(80);
+    if (route === 'directory' && o.all !== false) await h.showAll();
   };
+  if (o.goto !== false && o.all !== false && /^#?directory/.test(o.hash || 'directory')) await h.showAll();
   return h;
 }
 
@@ -135,6 +146,11 @@ export async function seedProfileUI(h, profile = PROFILE, plus = false) {
   await page.getByLabel('State', { exact: true }).selectOption(profile.state);
   if (plus) await page.getByLabel('Give each program its own plus address').check();
   await page.waitForFunction(() => /Saved on this device/.test(document.querySelector('#view-info .fx-saved').textContent), null, { timeout: 4000 });
+}
+// Phase H: status selects live inside the collapsed card details. Open a card the way a person does (its Details button).
+export async function openCard(page, id) {
+  const t = page.locator('article.card[data-program-id="' + id + '"] button.card-toggle').first();
+  if ((await t.getAttribute('aria-expanded')) !== 'true') await t.click();
 }
 export async function setStatuses(page, map) {
   await page.evaluate((m) => { Object.keys(m).forEach((id) => BFF.tracker.setStatus(id, m[id])); }, map);

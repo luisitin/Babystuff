@@ -466,3 +466,120 @@ test('rankPrograms ends on id, so data order does not matter', () => {
     assert.deepEqual(L.collapseGroups([]), []);
   });
 }
+
+// ---- Phase H: kinds, fit, answers ----
+{
+  const A = (id, o) => Object.assign({ id, name: id, category: 'formula', costToClaim: 'free', certainty: 'guaranteed', offers: ['product'], requirements: [], audience: [] }, o || {});
+  test('h kindOf by first offer', () => {
+    for (const o of ['product', 'coupons', 'points', 'sweepstakes', 'testing']) assert.equal(L.kindOf(A('a', { offers: [o] })), 'stuff', o);
+    assert.equal(L.kindOf(A('a', { offers: ['cash', 'product'] })), 'money');
+    assert.equal(L.kindOf(A('a', { offers: ['service'] })), 'care');
+    assert.equal(L.kindOf(A('a', { offers: ['coverage'] })), 'care');
+    assert.equal(L.kindOf(A('a', { offers: ['product', 'cash'] })), 'stuff');
+    assert.equal(L.kindOf(A('a', { offers: [] })), 'stuff');
+    assert.equal(L.kindOf({}), 'stuff');
+  });
+  test('h filterPrograms kind option', () => {
+    const list = [A('s'), A('m', { offers: ['cash'] }), A('c', { offers: ['coverage'] })];
+    const ids = (k) => L.filterPrograms(list, { kind: k }).map((p) => p.id);
+    assert.deepEqual(ids('stuff'), ['s']);
+    assert.deepEqual(ids('money'), ['m']);
+    assert.deepEqual(ids('care'), ['c']);
+    assert.deepEqual(ids('all'), ['s', 'm', 'c']);
+    assert.deepEqual(ids(''), ['s', 'm', 'c']);
+    assert.deepEqual(ids(undefined), ['s', 'm', 'c']);
+  });
+  const prof = (o) => Object.assign({}, o);
+  const fitOf = (tags, pr, extra) => L.fit(A('a', Object.assign({ audience: tags }, extra || {})), pr);
+  test('h fit: no tags, missing audience, unknown tag', () => {
+    assert.equal(L.fit(A('a'), {}), 'yes');
+    assert.equal(L.fit({ id: 'x' }, {}), 'yes');
+    assert.equal(L.fit(A('a'), undefined), 'yes');
+    assert.equal(fitOf(['mystery'], { cover: 'private' }), 'maybe');
+    assert.equal(fitOf(['local'], { cover: 'private', job: 'yes' }), 'maybe');
+  });
+  test('h fit: medicaid', () => {
+    assert.equal(fitOf(['medicaid'], prof({ cover: 'medicaid' })), 'yes');
+    for (const c of ['private', 'marketplace', 'tricare', 'none']) assert.equal(fitOf(['medicaid'], prof({ cover: c })), 'no', c);
+    assert.equal(fitOf(['medicaid'], {}), 'maybe');
+    assert.equal(fitOf(['medicaid'], { cover: 'bogus' }), 'maybe');
+  });
+  test('h fit: wic and low-income', () => {
+    for (const t of ['wic', 'low-income']) {
+      assert.equal(fitOf([t], { lowIncome: 'yes' }), 'yes');
+      assert.equal(fitOf([t], { lowIncome: 'no' }), 'no');
+      assert.equal(fitOf([t], { lowIncome: '', cover: 'medicaid' }), 'yes');
+      assert.equal(fitOf([t], { cover: 'medicaid' }), 'yes');
+      assert.equal(fitOf([t], { lowIncome: 'no', cover: 'medicaid' }), 'no');
+      assert.equal(fitOf([t], { cover: 'private' }), 'maybe');
+      assert.equal(fitOf([t], {}), 'maybe');
+    }
+  });
+  test('h fit: insured, marketplace, military', () => {
+    for (const c of ['private', 'marketplace', 'medicaid', 'tricare']) assert.equal(fitOf(['insured'], { cover: c }), 'yes', c);
+    assert.equal(fitOf(['insured'], { cover: 'none' }), 'no');
+    assert.equal(fitOf(['insured'], {}), 'maybe');
+    assert.equal(fitOf(['marketplace'], { cover: 'marketplace' }), 'yes');
+    for (const c of ['private', 'medicaid', 'tricare', 'none']) assert.equal(fitOf(['marketplace'], { cover: c }), 'no', c);
+    assert.equal(fitOf(['marketplace'], {}), 'maybe');
+    assert.equal(fitOf(['military'], { cover: 'tricare' }), 'yes');
+    for (const c of ['private', 'medicaid', 'marketplace', 'none']) assert.equal(fitOf(['military'], { cover: c }), 'no', c);
+    assert.equal(fitOf(['military'], {}), 'maybe');
+  });
+  test('h fit: employer and worker', () => {
+    assert.equal(fitOf(['employer'], { job: 'no' }), 'no');
+    assert.equal(fitOf(['employer'], { job: 'yes' }), 'maybe');
+    assert.equal(fitOf(['employer'], {}), 'maybe');
+    assert.equal(fitOf(['worker'], { job: 'yes' }), 'yes');
+    assert.equal(fitOf(['worker'], { job: 'no' }), 'no');
+    assert.equal(fitOf(['worker'], {}), 'maybe');
+  });
+  test('h fit: member', () => {
+    const m = { insurer: 'Aetna' };
+    assert.equal(fitOf(['member'], { insurer: 'Aetna' }, m), 'yes');
+    assert.equal(fitOf(['member'], { insurer: 'Cigna' }, m), 'no');
+    assert.equal(fitOf(['member'], { insurer: 'other' }, m), 'no');
+    assert.equal(fitOf(['member'], { cover: 'none' }, m), 'no');
+    assert.equal(fitOf(['member'], { cover: 'private' }, m), 'maybe');
+    assert.equal(fitOf(['member'], {}, m), 'maybe');
+    assert.equal(fitOf(['member'], { insurer: 'Aetna' }, {}), 'no');
+  });
+  test('h fit: AND semantics', () => {
+    assert.equal(fitOf(['medicaid', 'wic'], { cover: 'medicaid', lowIncome: 'yes' }), 'yes');
+    assert.equal(fitOf(['medicaid', 'wic'], { cover: 'medicaid', lowIncome: 'no' }), 'no');
+    assert.equal(fitOf(['medicaid', 'wic'], { cover: 'private' }), 'no');
+    assert.equal(fitOf(['insured', 'worker'], { cover: 'private' }), 'maybe');
+    assert.equal(fitOf(['insured', 'local'], { cover: 'private' }), 'maybe');
+    assert.equal(fitOf(['insured', 'worker'], { cover: 'private', job: 'yes' }), 'yes');
+    assert.equal(fitOf(['local', 'worker'], { cover: 'none', job: 'no' }), 'no');
+  });
+  test('h hasSituation', () => {
+    assert.equal(L.hasSituation({}), false);
+    assert.equal(L.hasSituation(undefined), false);
+    assert.equal(L.hasSituation({ firstName: 'A', cover: '', job: '' }), false);
+    assert.equal(L.hasSituation({ cover: 'none' }), true);
+    assert.equal(L.hasSituation({ job: 'no' }), true);
+    assert.equal(L.hasSituation({ lowIncome: 'yes' }), true);
+    assert.equal(L.hasSituation({ insurer: 'other' }), true);
+    assert.equal(L.hasSituation({ cover: 'weird' }), false);
+  });
+  test('h hidden by answers, counting, and tracker exemption', () => {
+    const list = [A('open'), A('mcd', { audience: ['medicaid'] }), A('wic', { audience: ['wic'] }), A('loc', { audience: ['local'] })];
+    const pr = { cover: 'private', lowIncome: 'no' };
+    assert.equal(L.hiddenByAnswersCount(list, pr), 2);
+    assert.equal(L.hiddenByAnswersCount(list, {}), 0);
+    assert.deepEqual(L.filterPrograms(list, { hideNoFit: true, profile: pr }).map((p) => p.id), ['open', 'loc']);
+    assert.equal(L.filterPrograms(list, { profile: pr }).length, 4);
+    // Fits my answers: only fit yes (maybe is dropped too).
+    assert.deepEqual(L.filterPrograms(list, { fitsMine: true, profile: pr }).map((p) => p.id), ['open']);
+    // In-progress programs are never hidden.
+    const st = { mcd: 'signed-up', wic: 'todo' };
+    const statusOf = (id) => st[id] || 'todo';
+    assert.equal(L.hiddenByAnswersCount(list, pr, statusOf), 1);
+    assert.deepEqual(L.filterPrograms(list, { hideNoFit: true, profile: pr, statusOf }).map((p) => p.id), ['open', 'mcd', 'loc']);
+    assert.equal(L.hiddenByAnswers(list[1], pr, 'received'), false);
+    assert.equal(L.hiddenByAnswers(list[1], pr, 'skipped'), false);
+    assert.equal(L.hiddenByAnswers(list[1], pr, 'todo'), true);
+    assert.equal(L.hiddenByAnswers(list[1], pr), true);
+  });
+}
