@@ -267,13 +267,14 @@ test('filterPrograms offer, openToAll, state, freeStuff', () => {
   assert.deepEqual(names({ query: 'sample cans' }), ['Alpha']);
   // state is ignored unless hideOtherStates is on
   assert.equal(names({ state: 'NY' }).length, 5);
-  assert.equal(names({ hideOtherStates: true }).length, 5);
+  // with no state, every state-limited program is dropped
+  assert.deepEqual(names({ hideOtherStates: true }), ['Alpha', 'Beta', 'Delta']);
   assert.deepEqual(names({ state: 'NY', hideOtherStates: true }), ['Alpha', 'Beta', 'Delta']);
   assert.deepEqual(names({ state: 'TX', hideOtherStates: true }), ['Alpha', 'Beta', 'Gamma', 'Delta']);
   assert.deepEqual(names({ state: 'CA', hideOtherStates: true }), ['Alpha', 'Beta', 'Delta', 'Eps']);
   assert.equal(L.otherStateCount(list, 'NY'), 2);
   assert.equal(L.otherStateCount(list, 'TX'), 1);
-  assert.equal(L.otherStateCount(list, ''), 0);
+  assert.equal(L.otherStateCount(list, ''), 2);
   assert.equal(L.otherStateCount(null, 'NY'), 0);
   assert.deepEqual(names({ trulyFree: true }), ['Alpha', 'Eps']);
 });
@@ -314,4 +315,75 @@ test('weeksUntil', () => {
   assert.equal(L.weeksUntil(undefined, '2026-11-10'), null);
   assert.equal(L.weeksUntil('2026-11-10', 'bad'), null);
   assert.equal(typeof L.weeksUntil('2099-01-01'), 'number');
+});
+
+test('hiddenByState', () => {
+  const tx = P({ states: ['TX'] });
+  assert.equal(L.hiddenByState(tx, ''), true);
+  assert.equal(L.hiddenByState(tx, undefined), true);
+  assert.equal(L.hiddenByState(tx, 'CA'), true);
+  assert.equal(L.hiddenByState(tx, 'TX'), false);
+  assert.equal(L.hiddenByState(tx, ' tx '), false);
+  assert.equal(L.hiddenByState(P({ states: [] }), ''), false);
+  assert.equal(L.hiddenByState(P({}), 'CA'), false);
+  assert.equal(L.hiddenByState(null, 'CA'), false);
+});
+
+test('filterPrograms hides state-limited programs with no state or another state', () => {
+  const list = [P({ name: 'Open' }), P({ name: 'Ct', states: ['CT'] })];
+  const names = (o) => L.filterPrograms(list, o).map((p) => p.name);
+  assert.deepEqual(names({ hideOtherStates: true }), ['Open']);
+  assert.deepEqual(names({ hideOtherStates: true, state: 'CA' }), ['Open']);
+  assert.deepEqual(names({ hideOtherStates: true, state: 'CT' }), ['Open', 'Ct']);
+  assert.deepEqual(names({}), ['Open', 'Ct']);
+});
+
+test('needsQualifying', () => {
+  assert.equal(L.needsQualifying(P({})), false);
+  assert.equal(L.needsQualifying(P({ certainty: 'if-eligible' })), true);
+  assert.equal(L.needsQualifying(P({ category: 'assistance' })), true);
+  assert.equal(L.needsQualifying(P({ requirements: ['insurance'] })), true);
+});
+
+test('verdict: free coverage with unknown value is good', () => {
+  const cov = P({ offers: ['coverage'], certainty: 'if-eligible', valueLow: null, valueHigh: null });
+  assert.equal(L.verdict(cov), 'good');
+  assert.equal(L.verdict(P({ offers: ['service'], valueLow: null, valueHigh: null })), 'small');
+  assert.equal(L.verdict(P({ offers: ['coverage'], valueLow: 5, valueHigh: 5 })), 'small');
+  assert.equal(L.verdict(P({ offers: ['coverage'], costToClaim: 'purchase-required', valueLow: null, valueHigh: null })), 'conditional');
+});
+
+test('money', () => {
+  assert.equal(L.money(3200), '$3,200');
+  assert.equal(L.money(999), '$999');
+  assert.equal(L.money(1234567), '$1,234,567');
+  assert.equal(L.money(0), '$0');
+  assert.equal(L.money(1000.4), '$1,000');
+  assert.equal(L.valueText(P({ valueLow: 3200, valueHigh: 3200, valueSource: 'official' })), "Worth about $3,200 (the program's figure)");
+});
+
+test('roundTotal', () => {
+  assert.equal(L.roundTotal(986), 990);
+  assert.equal(L.roundTotal(12340), 12300);
+  assert.equal(L.roundTotal(994), 990);
+  assert.equal(L.roundTotal(1049), 1000);
+  assert.equal(L.roundTotal(1050), 1100);
+  assert.equal(L.roundTotal(0), 0);
+  assert.equal(L.roundTotal(4), 0);
+  assert.equal(L.roundTotal(5), 10);
+});
+
+test('totalValue counts a sameAs group once with its largest value', () => {
+  const list = [
+    P({ id: 'main', sameAs: '', valueLow: 100, valueHigh: 200 }),
+    P({ id: 'door2', sameAs: 'main', valueLow: 150, valueHigh: 300 }),
+    P({ id: 'door3', sameAs: 'main', valueLow: 50, valueHigh: 60 }),
+    P({ id: 'other', valueLow: 10, valueHigh: 20 }),
+    P({ id: 'none', valueLow: null, valueHigh: null })
+  ];
+  assert.deepEqual(L.totalValue(list), { low: 160, high: 320, count: 2 });
+  // a missing sameAs is the same as an empty one
+  assert.deepEqual(L.totalValue([P({ id: 'a', valueLow: 1, valueHigh: 2 }), P({ id: 'b', sameAs: '', valueLow: 1, valueHigh: 2 })]), { low: 2, high: 4, count: 2 });
+  // a group whose main program is not in the list still collapses
+  assert.deepEqual(L.totalValue([P({ id: 'x', sameAs: 'gone', valueLow: 5, valueHigh: 9 }), P({ id: 'y', sameAs: 'gone', valueLow: 6, valueHigh: 7 })]), { low: 5, high: 9, count: 1 });
 });

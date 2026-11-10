@@ -137,6 +137,7 @@
     var ev = expectedValue(p);
     if (ev !== null && ev >= 100) return 'top';
     if (ev !== null && ev >= 20) return 'good';
+    if (ev === null && first === 'coverage') return 'good';
     return 'small';
   }
   function verdictIndex(p) {
@@ -174,8 +175,19 @@
     var s = stateOf(state);
     return !!s && st.length > 0 && !st.some(function (x) { return stateOf(x) === s; });
   }
+  // True when the program is limited to some states and the person's state is
+  // unknown or not one of them.
+  function hiddenByState(p, state) {
+    var st = statesOf(p);
+    if (!p || st.length === 0) return false;
+    var s = stateOf(state);
+    return !s || !st.some(function (x) { return stateOf(x) === s; });
+  }
   function otherStateCount(list, state) {
-    return (list || []).filter(function (p) { return isOtherState(p, state); }).length;
+    return (list || []).filter(function (p) { return hiddenByState(p, state); }).length;
+  }
+  function needsQualifying(p) {
+    return !isOpenToAll(p);
   }
 
   function filterPrograms(list, opts) {
@@ -189,7 +201,7 @@
       if (opts.needsRegistry && !needsRegistry(p)) return false;
       if (opts.offer && offers(p).indexOf(opts.offer) === -1) return false;
       if (opts.openToAll && !isOpenToAll(p)) return false;
-      if (opts.state && opts.hideOtherStates && isOtherState(p, opts.state)) return false;
+      if (opts.hideOtherStates && hiddenByState(p, opts.state)) return false;
       if (q) {
         var hay = [p.name, p.brand, p.whatYouGet, p.notes, p.eligibility, p.freeStuff].join('\n').toLowerCase();
         if (hay.indexOf(q) === -1) return false;
@@ -239,7 +251,16 @@
   }
 
   function money(n) {
-    return '$' + Math.round(n);
+    var r = Math.round(Number(n) || 0);
+    var neg = r < 0;
+    var digits = String(Math.abs(r)).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    return (neg ? '-' : '') + '$' + digits;
+  }
+  // For combined figures only: nearest 10 under 1,000, otherwise nearest 100.
+  function roundTotal(n) {
+    var x = Number(n) || 0;
+    var step = Math.abs(x) < 1000 ? 10 : 100;
+    return Math.round(x / step) * step;
   }
   function valueText(p) {
     var lo = p ? num(p.valueLow) : null, hi = p ? num(p.valueHigh) : null;
@@ -249,12 +270,18 @@
     return 'Worth about ' + range + ' (' + src + ')';
   }
   function totalValue(list) {
-    var t = { low: 0, high: 0, count: 0 };
-    (list || []).forEach(function (p) {
+    var groups = {};
+    var order = [];
+    (list || []).forEach(function (p, i) {
       var lo = p ? num(p.valueLow) : null, hi = p ? num(p.valueHigh) : null;
       if (lo === null || hi === null) return;
-      t.low += lo; t.high += hi; t.count++;
+      var key = (p.sameAs || '') || p.id || ('#' + i);
+      var g = groups[key];
+      if (!g) { groups[key] = { low: lo, high: hi }; order.push(key); }
+      else if (hi > g.high) { g.low = lo; g.high = hi; }
     });
+    var t = { low: 0, high: 0, count: order.length };
+    order.forEach(function (k) { t.low += groups[k].low; t.high += groups[k].high; });
     return t;
   }
 
@@ -312,7 +339,12 @@
     verdict: verdict,
     rankPrograms: rankPrograms,
     rankMap: rankMap,
+    isOtherState: isOtherState,
+    hiddenByState: hiddenByState,
     otherStateCount: otherStateCount,
+    needsQualifying: needsQualifying,
+    money: money,
+    roundTotal: roundTotal,
     valueText: valueText,
     totalValue: totalValue,
     weeksUntil: weeksUntil,
