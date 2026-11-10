@@ -22,7 +22,7 @@ Read first: `CLAUDE.md` (research rules, product rules), the section "Phase G" a
 ## What to do
 1. **Existing programs in your lane** (ids listed in your task). Copy each object from `data/programs.json` and add the new fields. Check with official-domain searches whether the offer still stands and what it really gives. Change an old field only when official-domain results show it is wrong or out of date, and write each change in your notes. Leave `verifiedOn` and `confidence` as they are unless you changed the entry on today's evidence (then set `verifiedOn` to today and `confidence` to `medium` at most). If a program has ended, do not delete it silently: leave it out of your JSON and say so in your notes with the evidence.
 2. **New programs.** Find legitimate programs the list lacks, starting from the leads in your task. Quality over number: a program earns a place when a family really gets something from it. Prefer programs where a real product, service or money arrives with no purchase.
-3. **Timing.** Fill `when` and `whenNote` from what the official source says (for example a window before the due date, or a deadline after the birth). The baby in question is due in early 2027, so check that each offer applies to a 2027 birth.
+3. **Timing.** Fill `when` and `whenNote` from what the official source says (for example a window before the due date, or a deadline after the birth). People using the app now are expecting babies in late 2026 and in 2027, so check that each offer still applies to a birth in 2027.
 
 ## Output
 Write two files, saving the JSON after each program so nothing is lost:
