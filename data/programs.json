@@ -4,7 +4,7 @@
     "name": "Baby's Only A2 organic formula free sample",
     "brand": "Baby's Only (Nature's One)",
     "category": "formula",
-    "whatYouGet": "The A2 Organic Milk infant formula page says you can get a free sample and pay only shipping. Nature's One also has a free-sample-program page.",
+    "whatYouGet": "The A2 Organic Milk infant formula page says you can get a free sample and pay only shipping.",
     "offers": [
       "product"
     ],
@@ -28,13 +28,12 @@
     "whenNote": "",
     "signupUrl": "https://babysonly.com/products/organic-gentle-infant-formula",
     "sourceUrls": [
-      "https://babysonly.com/products/organic-gentle-infant-formula",
-      "https://naturesone.com/free-sample-program"
+      "https://babysonly.com/products/organic-gentle-infant-formula"
     ],
     "verifiedOn": "2026-11-10",
     "confidence": "low",
     "catches": "Search snippets of the offer text may be old (one page showed as indexed years ago). The sample size, shipping cost and whether it is still offered are unconfirmed, and checkout may add a subscription; read the cart before paying. A full can is listed at about $186, so this is a try-before-you-buy route, not free formula.",
-    "notes": "A separate Baby's Only toddler page links to a USDA Organic sample offer with no terms shown. Nature's One blog says it would send a free full-size sample (blog is a lead only).",
+    "notes": "A separate Baby's Only toddler page links to a USDA Organic sample offer with no terms shown. Nature's One blog says it would send a free full-size sample (blog is a lead only). The older Nature's One free-sample page now forwards to the Baby's Only shop page.",
     "sameAs": ""
   },
   {
@@ -1205,45 +1204,6 @@
     "sameAs": ""
   },
   {
-    "id": "medela-moms-room",
-    "name": "Medela Moms' Room",
-    "brand": "Medela",
-    "category": "feeding",
-    "whatYouGet": "Free account with breastfeeding tips and exclusive offers. The sign-up page advertises a free gift; what the gift is was not shown.",
-    "offers": [
-      "product",
-      "coupons"
-    ],
-    "certainty": "likely",
-    "freeStuff": "A free gift for joining, contents not stated.",
-    "valueLow": null,
-    "valueHigh": null,
-    "valueSource": "none",
-    "valueBasis": "",
-    "costToClaim": "free",
-    "costDetail": "Free to join",
-    "requirements": [
-      "email",
-      "due-date"
-    ],
-    "eligibility": "Not stated",
-    "region": "US",
-    "states": [],
-    "effort": "quick",
-    "when": "pregnancy",
-    "whenNote": "",
-    "signupUrl": "https://www.medela.us/breastfeeding/the-moms-room",
-    "sourceUrls": [
-      "https://www.medela.us/breastfeeding/the-moms-room",
-      "https://www.medela.us/mbus/the-moms-room"
-    ],
-    "verifiedOn": "2026-11-10",
-    "confidence": "low",
-    "catches": "Gift contents, size and terms are unconfirmed. Form offers an opt-in for promotional messages. Medela also asks insurance-pump customers whether to receive free samples, a separate step.",
-    "notes": "Seen only as official-domain search results; the form asks email, password and baby's due or birth date.",
-    "sameAs": ""
-  },
-  {
     "id": "al-dhr-baby-box-initiative",
     "name": "Alabama Baby Box Initiative",
     "brand": "Alabama Department of Human Resources",
@@ -1467,43 +1427,6 @@
     "confidence": "medium",
     "catches": "Only at clinics that take part; ask your child's doctor. Program rules start books at the 6-month visit, and books for earlier visits are encouraged but not required.",
     "notes": "Official-domain search results only. No sign-up form: you find a participating clinic with the Find a Site map and get the book at visits.",
-    "sameAs": ""
-  },
-  {
-    "id": "text4baby-free-text-messages",
-    "name": "Text4baby free text messages",
-    "brand": "Text4baby (Wellpass)",
-    "category": "baby-care",
-    "whatYouGet": "Three free texts a week with pregnancy and baby health tips, timed to the due date, until the baby turns one.",
-    "offers": [
-      "service"
-    ],
-    "certainty": "guaranteed",
-    "freeStuff": "Free health text messages.",
-    "valueLow": null,
-    "valueHigh": null,
-    "valueSource": "none",
-    "valueBasis": "",
-    "costToClaim": "free",
-    "costDetail": "Free, even without a text plan.",
-    "requirements": [
-      "phone"
-    ],
-    "eligibility": "Pregnant women and parents of babies under one.",
-    "region": "US",
-    "states": [],
-    "effort": "quick",
-    "when": "pregnancy",
-    "whenNote": "Messages timed to the due date.",
-    "signupUrl": "https://partners.text4baby.org/index.php/sign-up",
-    "sourceUrls": [
-      "https://partners.text4baby.org/index.php/about",
-      "https://partners.text4baby.org/index.php/sign-up"
-    ],
-    "verifiedOn": "2026-11-10",
-    "confidence": "low",
-    "catches": "Undated pages; sponsor details differ, so confirm the service is still active.",
-    "notes": "Text BABY (or BEBE) to 511411.",
     "sameAs": ""
   },
   {
@@ -2064,16 +1987,14 @@
     "effort": "some",
     "when": "pregnancy",
     "whenNote": "",
-    "signupUrl": "https://newsroom.meijer.com/specialty-teams",
+    "signupUrl": "https://www.meijer.com/shopping/services/pharmacy/pharmacy-services",
     "sourceUrls": [
-      "https://newsroom.meijer.com/specialty-teams",
-      "https://community.meijer.com/meijer/b/mediarelations/posts/june-29-2011-meijer-delivers-one-million-free-pre-natal-vitamin-prescriptions-to-women-throughout-the-midwest",
       "https://www.meijer.com/shopping/services/pharmacy/pharmacy-services"
     ],
     "verifiedOn": "2026-11-10",
     "confidence": "low",
-    "catches": "The newsroom page is undated and the detailed terms are from a 2011 release, so the covered brands may have changed (the 2011 list named TriAdvance, Trinatal GT, Trinatal Ultra, Vol-Nate, Vol-Plus, Vol-Tab). Meijer's current quality page only says to ask the pharmacist about free select prescriptions. Needs a prescription from a clinician. Call the pharmacy first.",
-    "notes": "Not fetchable; based on official-domain search results only.",
+    "catches": "The newsroom page is undated and the detailed terms are from a 2011 release, so the covered brands may have changed (the 2011 list named TriAdvance, Trinatal GT, Trinatal Ultra, Vol-Nate, Vol-Plus, Vol-Tab). Meijer's current quality page only says to ask the pharmacist about free select prescriptions. Needs a prescription from a clinician. Call the pharmacy first. The Meijer pages this was first based on are gone and meijer.com refuses automatic checks, so ask at the pharmacy counter whether prenatal vitamins are still on the free list.",
+    "notes": "Based on official-domain search results only. The link check on 2026-11-10 found the two older Meijer pages gone; the pharmacy services page could not be checked by a robot.",
     "sameAs": ""
   },
   {
@@ -2512,15 +2433,14 @@
     "effort": "some",
     "when": "pregnancy",
     "whenNote": "Prenatal care is best started early.",
-    "signupUrl": "https://www.marchofdimes.org/our-work/programs/mobile-health-centers",
+    "signupUrl": "https://www.marchofdimes.org/find-support/support-your-area",
     "sourceUrls": [
-      "https://www.marchofdimes.org/our-work/programs/mobile-health-centers",
       "https://www.marchofdimes.org/find-support/support-your-area"
     ],
     "verifiedOn": "2026-11-10",
     "confidence": "low",
     "catches": "Limited locations. Whether every site is free was not confirmed.",
-    "notes": "New centers planned in AZ and AL in 2026.",
+    "notes": "The program's own page was taken down (link check, 2026-11-10). This link is the March of Dimes page for support in your area.",
     "sameAs": ""
   },
   {
@@ -2769,10 +2689,10 @@
     ],
     "certainty": "if-eligible",
     "freeStuff": "In some states a car seat, crib or Bump Box for attending prenatal visits, plus gift-card rewards.",
-    "valueLow": 50,
-    "valueHigh": 250,
-    "valueSource": "estimate",
-    "valueBasis": "Gift-card rewards of about $50 to $250 by state; car seat items would add about $100 in some states",
+    "valueLow": null,
+    "valueHigh": null,
+    "valueSource": "none",
+    "valueBasis": "",
     "costToClaim": "free",
     "costDetail": "Free for eligible Molina Medicaid or CHIP members; amounts vary by state.",
     "requirements": [
@@ -2792,16 +2712,14 @@
     "effort": "some",
     "when": "pregnancy",
     "whenNote": "Rewards depend on early prenatal and postpartum visits (for example a first-trimester exam in Florida).",
-    "signupUrl": "https://www.molinahealthcare.com/members/oh/en-us/mem/medicaid/cshcn/coverd/services/pregnancy-rewards.aspx",
+    "signupUrl": "https://molinahealthcare.com/Pregnancy/SC",
     "sourceUrls": [
-      "https://www.molinahealthcare.com/members/oh/en-us/mem/medicaid/cshcn/coverd/services/pregnancy-rewards.aspx",
-      "https://www.molinahealthcare.com/members/tx/en-US/mem/chip/coverd/hm/edu/pregprog.aspx",
       "https://molinahealthcare.com/Pregnancy/SC"
     ],
     "verifiedOn": "2026-11-10",
-    "confidence": "medium",
-    "catches": "Rewards can take up to 120 days to process (Florida) and need an enrolled member at the time of the visit. Other states may differ; the list is only the states seen.",
-    "notes": "Examples from results: Texas $25 to $50 early exam plus a car seat, $50 postpartum; Ohio up to $225 to $250; Illinois $50 or a Bump Box or car seat; Florida $25, $50, $50; South Carolina up to $100; Wisconsin car seat or Pack n Play after 6 prenatal visits.",
+    "confidence": "low",
+    "catches": "Rewards can take up to 120 days to process (Florida) and need an enrolled member at the time of the visit. Other states may differ; the list is only the states seen. Two of the three Molina pages this was based on have been taken down. The link goes to the South Carolina pregnancy page; call the number on your member card to ask what your state's plan gives now.",
+    "notes": "From search results on pages that have since been taken down: Examples from results: Texas $25 to $50 early exam plus a car seat, $50 postpartum; Ohio up to $225 to $250; Illinois $50 or a Bump Box or car seat; Florida $25, $50, $50; South Carolina up to $100; Wisconsin car seat or Pack n Play after 6 prenatal visits.",
     "sameAs": ""
   },
   {
@@ -3078,47 +2996,6 @@
     "sameAs": ""
   },
   {
-    "id": "wellcare-nc-better-beginnings",
-    "name": "WellCare of North Carolina Better Beginnings rewards",
-    "brand": "WellCare of North Carolina (Medicaid)",
-    "category": "health-benefits",
-    "whatYouGet": "Medicaid members who notify the plan of pregnancy earn $25 for a prenatal visit and $25 for a postpartum visit, plus a choice of stroller, play yard, car seat or diapers.",
-    "offers": [
-      "cash",
-      "product"
-    ],
-    "certainty": "if-eligible",
-    "freeStuff": "Rewards plus a stroller, play yard, car seat or diapers for members who attend a prenatal visit.",
-    "valueLow": 100,
-    "valueHigh": 150,
-    "valueSource": "estimate",
-    "valueBasis": "$25 to $50 in rewards plus one item such as a play yard at about $80 to $100",
-    "costToClaim": "free",
-    "costDetail": "Members of the plan only.",
-    "requirements": [
-      "insurance",
-      "eligibility"
-    ],
-    "eligibility": "WellCare of NC Medicaid members who submit a Notification of Pregnancy.",
-    "region": "North Carolina",
-    "states": [
-      "NC"
-    ],
-    "effort": "some",
-    "when": "pregnancy",
-    "whenNote": "Notify the plan during pregnancy; reward follows a prenatal visit.",
-    "signupUrl": "https://www.wellcarenc.com/members/medicaid/healthy-moms-and-babies/better-beginnings.html",
-    "sourceUrls": [
-      "https://www.wellcarenc.com/members/medicaid/healthy-moms-and-babies/better-beginnings.html",
-      "https://www.wellcarenc.com/members/medicaid/benefits/my-health-pays.html"
-    ],
-    "verifiedOn": "2026-11-10",
-    "confidence": "medium",
-    "catches": "Must notify the plan before the birth. Up to $75 a year in rewards. A New Parent package and free pump are also mentioned; confirm with the plan.",
-    "notes": "South Carolina and Georgia WellCare pages exist but are older and not included.",
-    "sameAs": ""
-  },
-  {
     "id": "wellpoint-medicaid-baby-essentials",
     "name": "Wellpoint Medicaid baby essentials gift card",
     "brand": "Wellpoint (Elevance Health)",
@@ -3228,46 +3105,6 @@
     "confidence": "medium",
     "catches": "Not every program serves pregnant women; waiting lists possible.",
     "notes": "Checked from the official site's search results; the site blocks automated reading, so details may be incomplete. headstart.gov returned 403 to automated fetching; official-domain search results say apply by contacting a local program (Head Start Center Locator or toll-free line 1-866-763-6481) and that waitlists are common.",
-    "sameAs": ""
-  },
-  {
-    "id": "ohio-every-baby-sleeps-safe",
-    "name": "Every Baby Sleeps Safe portable crib",
-    "brand": "Ohio Department of Health",
-    "category": "assistance",
-    "whatYouGet": "A free portable crib kit with a fitted sheet and safe sleep education, given by a local Cribs for Kids partner.",
-    "offers": [
-      "product"
-    ],
-    "certainty": "if-eligible",
-    "freeStuff": "A free portable crib kit if you qualify.",
-    "valueLow": 80,
-    "valueHigh": 80,
-    "valueSource": "estimate",
-    "valueBasis": "One portable crib at about $80 shelf price",
-    "costToClaim": "free",
-    "costDetail": "Free while funding lasts",
-    "requirements": [
-      "eligibility",
-      "address"
-    ],
-    "eligibility": "Ohio families at least 32 weeks pregnant or with a baby under 1 year, with low income (partners use 100% to 185% of poverty guidelines; one page says under 200%); must attend a safe sleep education session.",
-    "region": "Ohio",
-    "states": [
-      "OH"
-    ],
-    "effort": "involved",
-    "when": "late-pregnancy",
-    "whenNote": "The program starts at 32 weeks of pregnancy.",
-    "signupUrl": "https://odh.ohio.gov/know-our-programs/maternal-infant-wellness/safe-sleep",
-    "sourceUrls": [
-      "https://odh.ohio.gov/know-our-programs/maternal-infant-wellness/safe-sleep",
-      "https://odh.ohio.gov/know-our-programs/maternal-infant-wellness/media/cribs-for-kids"
-    ],
-    "verifiedOn": "2026-11-10",
-    "confidence": "medium",
-    "catches": "While quantities last. Partner list in the results dates from 2023, so confirm with a county partner.",
-    "notes": "Official-domain search results only.",
     "sameAs": ""
   },
   {
@@ -3552,14 +3389,14 @@
     "effort": "involved",
     "when": "pregnancy",
     "whenNote": "Enrollment is open only up to about 28 weeks of pregnancy; the site says enroll as soon as you know.",
-    "signupUrl": "https://www.nursefamilypartnership.org/nfp-moms/",
+    "signupUrl": "https://changent.org/nfp-moms/",
     "sourceUrls": [
-      "https://www.nursefamilypartnership.org/nfp-moms/"
+      "https://changent.org/nfp-moms/"
     ],
     "verifiedOn": "2026-11-10",
     "confidence": "medium",
     "catches": "Only where a local agency serves your area. The income figure was not in the results. The site is now branded Changent.",
-    "notes": "Official-domain search results only; pages are several years old.",
+    "notes": "nursefamilypartnership.org now forwards to changent.org (link check, 2026-11-10). Details are from official-domain search results only, and those pages were several years old.",
     "sameAs": ""
   },
   {
@@ -3781,8 +3618,7 @@
     "whenNote": "Issued to certified WIC participants, including pregnant women.",
     "signupUrl": "https://www.fns.usda.gov/fmnp/wic-farmers-market-nutrition-program",
     "sourceUrls": [
-      "https://www.fns.usda.gov/fmnp/wic-farmers-market-nutrition-program",
-      "https://www.fns.usda.gov/fmnp/overview"
+      "https://www.fns.usda.gov/fmnp/wic-farmers-market-nutrition-program"
     ],
     "verifiedOn": "2026-11-10",
     "confidence": "medium",
@@ -3820,8 +3656,7 @@
     "whenNote": "Open the account before the child's first birthday.",
     "signupUrl": "https://www.mass.gov/info-details/babysteps",
     "sourceUrls": [
-      "https://www.mass.gov/info-details/babysteps",
-      "https://www.mass.gov/info-details/about-the-babysteps-savings-plan"
+      "https://www.mass.gov/info-details/babysteps"
     ],
     "verifiedOn": "2026-11-10",
     "confidence": "medium",
@@ -4247,9 +4082,8 @@
     "effort": "quick",
     "when": "after-birth",
     "whenNote": "Automatic after a HUSKY-covered birth.",
-    "signupUrl": "https://portal.ct.gov/OTT/Debt-Management/CT-Baby-Bonds",
+    "signupUrl": "https://portal.ct.gov/ott/ct-baby-bonds/faq",
     "sourceUrls": [
-      "https://portal.ct.gov/OTT/Debt-Management/CT-Baby-Bonds",
       "https://portal.ct.gov/ott/ct-baby-bonds/faq"
     ],
     "verifiedOn": "2026-11-10",
@@ -4482,8 +4316,7 @@
     "whenNote": "Often bought in the last weeks of pregnancy or after birth.",
     "signupUrl": "https://www.irs.gov/publications/p502",
     "sourceUrls": [
-      "https://www.irs.gov/publications/p502",
-      "https://taxmap.irs.gov/taxmap/pubs/p502-004.htm"
+      "https://www.irs.gov/publications/p502"
     ],
     "verifiedOn": "2026-11-10",
     "confidence": "low",
@@ -4810,7 +4643,7 @@
     "name": "Minnesota Child Tax Credit",
     "brand": "Minnesota Department of Revenue",
     "category": "money",
-    "whatYouGet": "A refundable state credit of $1,750 per child under 18 for tax year 2025 ($1,800 in 2026 materials), with no cap on number of children.",
+    "whatYouGet": "A refundable state credit of $1,750 per child under 18 for tax year 2025, with no cap on number of children.",
     "offers": [
       "cash"
     ],
@@ -4835,8 +4668,7 @@
     "whenNote": "Claimed on the return for the year the child is born.",
     "signupUrl": "https://www.revenue.state.mn.us/child-tax-credit",
     "sourceUrls": [
-      "https://www.revenue.state.mn.us/child-tax-credit",
-      "https://www.revenue.state.mn.us/sites/default/files/2026-01/minnesota-child-tax-credit-2026.pdf"
+      "https://www.revenue.state.mn.us/child-tax-credit"
     ],
     "verifiedOn": "2026-11-10",
     "confidence": "medium",
