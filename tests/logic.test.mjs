@@ -387,3 +387,57 @@ test('totalValue counts a sameAs group once with its largest value', () => {
   // a group whose main program is not in the list still collapses
   assert.deepEqual(L.totalValue([P({ id: 'x', sameAs: 'gone', valueLow: 5, valueHigh: 9 }), P({ id: 'y', sameAs: 'gone', valueLow: 6, valueHigh: 7 })]), { low: 5, high: 9, count: 1 });
 });
+
+{
+  const note = (o) => L.freeNote(o);
+  test('r3 freeNote follows the order in the brief', () => {
+    assert.equal(note({ certainty: 'chance', offers: ['cash'] }), 'Nothing arrives unless you are picked.');
+    assert.equal(note({ offers: ['testing'] }), 'Nothing arrives unless you are picked.');
+    assert.equal(note({ offers: ['cash'], requirements: ['purchase'] }), 'Nothing arrives free without a purchase.');
+    assert.equal(note({ costToClaim: 'purchase-required', offers: ['coverage'] }), 'Nothing arrives free without a purchase.');
+    assert.equal(note({ requirements: ['membership'] }), 'Nothing arrives free without a paid membership.');
+    assert.equal(note({ costToClaim: 'shipping-fee', offers: ['cash'] }), 'Not fully free. You pay a shipping fee.');
+    assert.equal(note({ offers: ['cash'] }), 'This pays money. No product is sent.');
+    assert.equal(note({ offers: ['coverage'] }), 'This covers a cost. No product is sent.');
+    assert.equal(note({ offers: ['service'] }), 'This is a free service. No product is sent.');
+    assert.equal(note({ offers: ['coupons'] }), 'This gives coupons or discounts. Nothing arrives free without a purchase.');
+    assert.equal(note({ offers: ['points'] }), 'This gives points for purchases. Nothing arrives free without a purchase.');
+    assert.equal(note({ offers: [] }), 'What arrives is not stated.');
+    assert.equal(note({}), 'What arrives is not stated.');
+  });
+  test('r3 groupKey', () => {
+    assert.equal(L.groupKey({ id: 'a' }), 'a');
+    assert.equal(L.groupKey({ id: 'b', sameAs: 'a' }), 'a');
+    assert.equal(L.groupKey({ id: 'b', sameAs: '' }), 'b');
+  });
+  const mk = (id, extra) => Object.assign({ id, name: id, category: 'formula', costToClaim: 'free', certainty: 'sure', offers: ['samples'], requirements: [], valueLow: 10, valueHigh: 10 }, extra || {});
+  test('r3 rankMap shares one number per group, with no gaps', () => {
+    const list = [mk('main', { valueLow: 100, valueHigh: 100 }), mk('x', { sameAs: 'main' }), mk('y', { sameAs: 'main', valueLow: 100, valueHigh: 100 }), mk('solo', { valueLow: 50, valueHigh: 50 })];
+    const r = L.rankMap(list);
+    assert.equal(r.main, r.x);
+    assert.equal(r.main, r.y);
+    assert.equal(new Set(Object.values(r)).size, 2);
+    assert.deepEqual(Object.values(r).sort(), [1, 1, 1, 2]);
+    assert.equal(r.main, 1);
+  });
+  test('r3 rankMap with the main entry absent still groups members', () => {
+    const r = L.rankMap([mk('x', { sameAs: 'gone' }), mk('y', { sameAs: 'gone' }), mk('z', { valueLow: 1, valueHigh: 1 })]);
+    assert.equal(r.x, r.y);
+    assert.notEqual(r.x, r.z);
+  });
+  test('r3 collapseGroups keeps first-appearance order and the first member leads', () => {
+    const a = mk('a'), b = mk('b', { sameAs: 'a' }), c = mk('c'), d = mk('d', { sameAs: 'a' }), e = mk('e');
+    const out = L.collapseGroups([b, c, d, a, e]);
+    assert.deepEqual(out.map((g) => g.lead.id), ['b', 'c', 'e']);
+    assert.deepEqual(out[0].others.map((p) => p.id), ['d', 'a']);
+    assert.deepEqual(out[1].others, []);
+  });
+  test('r3 collapseGroups with the main entry absent and ties', () => {
+    const out = L.collapseGroups([mk('x', { sameAs: 'm' }), mk('y', { sameAs: 'm' }), mk('t1'), mk('t2')]);
+    assert.equal(out.length, 3);
+    assert.equal(out[0].lead.id, 'x');
+    assert.deepEqual(out[0].others.map((p) => p.id), ['y']);
+    assert.deepEqual(out.map((g) => g.lead.id), ['x', 't1', 't2']);
+    assert.deepEqual(L.collapseGroups([]), []);
+  });
+}

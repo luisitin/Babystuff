@@ -158,10 +158,47 @@
   function rankPrograms(list) {
     return (list || []).filter(function (p) { return !!p; }).sort(rankCmp);
   }
+  function groupKey(p) { return (p && (p.sameAs || p.id)) || ''; }
+  // Programs that are the same thing share one rank number.
   function rankMap(list) {
     var map = {};
-    rankPrograms(list).forEach(function (p, i) { map[p.id] = i + 1; });
+    var seen = {};
+    var n = 0;
+    rankPrograms(list).forEach(function (p) {
+      var k = groupKey(p);
+      if (!Object.prototype.hasOwnProperty.call(seen, k)) seen[k] = ++n;
+      map[p.id] = seen[k];
+    });
     return map;
+  }
+  // [{ lead, others }] in order of first appearance; lead is the first member met.
+  function collapseGroups(list) {
+    var out = [];
+    var at = {};
+    (list || []).forEach(function (p) {
+      if (!p) return;
+      var k = groupKey(p);
+      if (Object.prototype.hasOwnProperty.call(at, k)) out[at[k]].others.push(p);
+      else { at[k] = out.length; out.push({ lead: p, others: [] }); }
+    });
+    return out;
+  }
+  // The sentence for a program whose freeStuff text is empty.
+  function freeNote(p) {
+    p = p || {};
+    var offers = Array.isArray(p.offers) ? p.offers : [];
+    var reqs = Array.isArray(p.requirements) ? p.requirements : [];
+    var first = offers[0];
+    if (p.certainty === 'chance' || first === 'sweepstakes' || first === 'testing') return 'Nothing arrives unless you are picked.';
+    if (reqs.indexOf('purchase') !== -1 || p.costToClaim === 'purchase-required') return 'Nothing arrives free without a purchase.';
+    if (reqs.indexOf('membership') !== -1 || p.costToClaim === 'membership-required') return 'Nothing arrives free without a paid membership.';
+    if (p.costToClaim === 'shipping-fee') return 'Not fully free. You pay a shipping fee.';
+    if (first === 'cash') return 'This pays money. No product is sent.';
+    if (first === 'coverage') return 'This covers a cost. No product is sent.';
+    if (first === 'service') return 'This is a free service. No product is sent.';
+    if (first === 'coupons') return 'This gives coupons or discounts. Nothing arrives free without a purchase.';
+    if (first === 'points') return 'This gives points for purchases. Nothing arrives free without a purchase.';
+    return 'What arrives is not stated.';
   }
 
   function stateOf(x) {
@@ -339,6 +376,9 @@
     verdict: verdict,
     rankPrograms: rankPrograms,
     rankMap: rankMap,
+    groupKey: groupKey,
+    collapseGroups: collapseGroups,
+    freeNote: freeNote,
     isOtherState: isOtherState,
     hiddenByState: hiddenByState,
     otherStateCount: otherStateCount,

@@ -345,6 +345,11 @@ main:focus { outline: none; }
 .badge-tag { border: 1px solid transparent; }
 .tag-qualify { background: var(--surface-2); color: var(--text); border-color: var(--border-strong); }
 .tag-state { background: var(--success-bg); color: var(--success); border-color: var(--success); }
+.same-group { grid-column: 1 / -1; min-width: 0; border: 1px solid var(--border, currentColor); border-radius: var(--radius, 8px); padding: 0 var(--space-3, 12px); }
+.same-group > summary { cursor: pointer; padding: var(--space-3, 12px) 0; font-weight: 600; min-height: 44px; display: flex; align-items: center; }
+.same-group > summary:focus-visible { outline: 3px solid var(--focus, currentColor); outline-offset: 2px; }
+.same-group-cards { padding-bottom: var(--space-3, 12px); }
+.sum-show { margin: 0; }
 .same-as { margin: 0; font-size: .9375rem; color: var(--muted); font-style: italic; }
 .sum-more { font-size: .9375rem; }
 .more-details > :not(summary) { margin-top: var(--space-2); }

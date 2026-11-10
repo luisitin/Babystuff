@@ -356,3 +356,10 @@ Data rules added in the second merge:
 - A completion discount is valued on one scale: the discount percent times $200 (low) and times $600 (high) of registry items the family would buy anyway, under any official cap. `valueBasis` says so.
 - Pregnancy coverage (Medicaid, CHIP, marketplace) keeps null values. No fair single figure exists.
 - A tax credit that pays back part of a cost (dependent care) is `purchase-required` with `purchase` in `requirements`.
+
+### Phase G, round 3 (Directory refinements)
+
+- `freeNote(p)` (logic): the sentence on a card whose `freeStuff` is empty. Order: chance, sweepstakes or testing; purchase; membership; shipping fee; then by first offer (cash, coverage, service, coupons, points); else "What arrives is not stated."
+- Same-thing groups: `groupKey(p)` = `sameAs || id`. `rankMap` gives every member of a group the same rank number (groups numbered in `rankPrograms` order, no gaps). `collapseGroups(sorted)` returns `[{ lead, others }]` in order of first appearance. The Directory shows the lead as a card and the others inside a native `<details class="same-group">` ("N more ways to get the same thing") right after it, in the same grid (it spans the full row). The section is decided by the lead. Section "(N)" counts leads; "Showing X of Y programs" still counts programs; the summary figures count distinct group keys. Open groups are remembered in memory only, and restored after a re-render.
+- Summary: a "Show these" button turns on "Truly free" and "Open to everyone", then focuses the result count. Hidden when both are already on or the figure is 0.
+- Guided and tracker use only `rankPrograms`, so they needed no change.

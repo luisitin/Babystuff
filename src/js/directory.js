@@ -37,6 +37,7 @@
   var els = {};
   var shownIds = [];
   var uid = 0;
+  var openGroups = {};
 
   function h(tag, attrs, kids) {
     var n = document.createElement(tag);
@@ -136,7 +137,7 @@
     els.stateBox = h('div', { class: 'dir-state', hidden: true });
     els.summary = h('section', { class: 'dir-summary', 'aria-label': 'Summary' });
 
-    els.count = h('p', { class: 'result-count', 'aria-live': 'polite', 'aria-atomic': 'true' });
+    els.count = h('p', { class: 'result-count', tabindex: '-1', 'aria-live': 'polite', 'aria-atomic': 'true' });
     var resultRow = h('div', { class: 'result-row' }, [els.count, els.clear]);
     els.list = h('div', { class: 'dir-groups' });
     els.empty = h('div', { class: 'empty', hidden: true }, [
@@ -232,7 +233,7 @@
     if (typeof p.freeStuff === 'string') {
       kids.push(p.freeStuff.trim()
         ? h('p', { class: 'free-line' }, [h('strong', { text: 'Free with no purchase: ' }), document.createTextNode(p.freeStuff)])
-        : h('p', { class: 'free-line free-none', text: 'Nothing arrives free without a purchase or a win.' }));
+        : h('p', { class: 'free-line free-none', text: L.freeNote(p) }));
     }
     var vt = L.valueText(p);
     var vb = [h('strong', { text: vt })];
@@ -358,26 +359,45 @@
 
   function plural(n, one, many) { return n + ' ' + (n === 1 ? one : many); }
 
+  function distinctGroups(list) {
+    var seen = {}, n = 0;
+    list.forEach(function (p) { var k = L.groupKey(p); if (!seen[k]) { seen[k] = true; n++; } });
+    return n;
+  }
+
   function renderSummary(pool) {
     var box = els.summary;
     box.textContent = '';
     var free = pool.filter(function (p) { return L.isTrulyFree(p) && L.isOpenToAll(p); });
+    var freeGroups = distinctGroups(free);
     var tv = L.totalValue(free);
     var lo = L.roundTotal(tv.low), hi = L.roundTotal(tv.high);
     var worth = '.';
     if (tv.count) worth = ', worth about ' + (lo === hi ? L.money(lo) : L.money(lo) + ' to ' + L.money(hi)) + ' together.';
     box.appendChild(h('p', { class: 'sum-main' }, [
-      h('strong', { text: free.length + ' truly free ' + (free.length === 1 ? 'program' : 'programs') + ' open to everyone' }),
+      h('strong', { text: freeGroups + ' truly free ' + (freeGroups === 1 ? 'program' : 'programs') + ' open to everyone' }),
       document.createTextNode(worth)
     ]));
     var noValue = free.filter(function (p) { return L.valueMid(p) === null; }).length;
     box.appendChild(h('p', { class: 'dir-note', text: tv.count
       ? 'This is our estimate, from ordinary shelf prices.' + (noValue ? ' ' + noValue + (noValue === 1 ? ' has' : ' have') + ' no known value and ' + (noValue === 1 ? 'is' : 'are') + ' not counted.' : '')
       : 'No dollar value is known for these programs yet.' }));
-    var more = pool.filter(function (p) {
+    var more = distinctGroups(pool.filter(function (p) {
       var v = L.verdict(p);
       return L.needsQualifying(p) && (v === 'top' || v === 'good' || v === 'small');
-    }).length;
+    }));
+    if (freeGroups > 0 && !(state.trulyFree && state.openToAll)) {
+      var show = h('button', { type: 'button', class: 'btn btn-small show-these', text: 'Show these' });
+      show.addEventListener('click', function () {
+        state.trulyFree = true;
+        state.openToAll = true;
+        savePrefs();
+        syncControls();
+        render();
+        els.count.focus();
+      });
+      box.appendChild(h('p', { class: 'sum-show' }, [show]));
+    }
     box.appendChild(h('p', { class: 'sum-more', text: more + ' more ' + (more === 1 ? 'is' : 'are') + ' free if you qualify (income, insurance or where you live).' }));
 
     var due = typeof profile.dueDate === 'string' ? profile.dueDate.trim() : '';
@@ -408,11 +428,25 @@
     box.appendChild(row);
   }
 
+  function appendGroup(grid, g, level, rankOf) {
+    grid.appendChild(card(g.lead, level, rankOf[g.lead.id]));
+    if (!g.others.length) return;
+    var key = L.groupKey(g.lead);
+    var n = g.others.length;
+    var det = h('details', { class: 'same-group', 'data-group': key }, [
+      h('summary', { text: n === 1 ? '1 more way to get the same thing' : n + ' more ways to get the same thing' }),
+      h('div', { class: 'card-grid same-group-cards' }, g.others.map(function (o) { return card(o, level, rankOf[o.id]); }))
+    ]);
+    if (openGroups[key]) det.open = true;
+    det.addEventListener('toggle', function () { if (det.open) openGroups[key] = true; else delete openGroups[key]; });
+    grid.appendChild(det);
+  }
+
   function groupSection(id, title, note, items, rankOf) {
     var hid = 'dir-ghead-' + id;
     var head = h('h3', { class: 'group-title', id: hid, tabindex: '-1' }, [document.createTextNode(title + ' '), h('span', { class: 'group-count', text: '(' + items.length + ')' })]);
     var grid = h('div', { class: 'card-grid' });
-    items.forEach(function (p) { grid.appendChild(card(p, 'h4', rankOf[p.id])); });
+    items.forEach(function (g) { appendGroup(grid, g, 'h4', rankOf); });
     return h('section', { class: 'dir-group', id: 'dir-group-' + id, 'aria-labelledby': hid }, [head, h('p', { class: 'group-note', text: note }), grid]);
   }
 
@@ -423,18 +457,19 @@
     var rankOf = L.rankMap(pool);
     var opts = Object.assign({}, state, { state: info.st, hideOtherStates: info.hide });
     var shown = L.sortPrograms(L.filterPrograms(pool, opts), state.sort);
+    var collapsed = L.collapseGroups(shown);
     els.list.textContent = '';
     var frag = document.createDocumentFragment();
     if (state.sort === 'best' || state.sort === 'when') {
       var groups = state.sort === 'best'
-        ? L.VERDICTS.map(function (v) { return { id: v.id, title: v.label, note: VERDICT_NOTES[v.id], items: shown.filter(function (p) { return L.verdict(p) === v.id; }) }; })
-        : L.WHEN_ORDER.map(function (w) { return { id: w, title: L.WHEN_LABELS[w], note: WHEN_NOTES[w], items: shown.filter(function (p) { return p.when === w; }) }; })
-          .concat([{ id: 'none', title: 'Timing not listed', note: WHEN_NOTES.none, items: shown.filter(function (p) { return L.WHEN_ORDER.indexOf(p.when) === -1; }) }]);
+        ? L.VERDICTS.map(function (v) { return { id: v.id, title: v.label, note: VERDICT_NOTES[v.id], items: collapsed.filter(function (g) { return L.verdict(g.lead) === v.id; }) }; })
+        : L.WHEN_ORDER.map(function (w) { return { id: w, title: L.WHEN_LABELS[w], note: WHEN_NOTES[w], items: collapsed.filter(function (g) { return g.lead.when === w; }) }; })
+          .concat([{ id: 'none', title: 'Timing not listed', note: WHEN_NOTES.none, items: collapsed.filter(function (g) { return L.WHEN_ORDER.indexOf(g.lead.when) === -1; }) }]);
       groups.forEach(function (g) { if (g.items.length) frag.appendChild(groupSection(g.id, g.title, g.note, g.items, rankOf)); });
       els.list.className = 'dir-groups';
     } else {
       var grid = h('div', { class: 'card-grid' });
-      shown.forEach(function (p) { grid.appendChild(card(p, 'h3', rankOf[p.id])); });
+      collapsed.forEach(function (g) { appendGroup(grid, g, 'h3', rankOf); });
       frag.appendChild(grid);
       els.list.className = 'dir-groups';
     }
