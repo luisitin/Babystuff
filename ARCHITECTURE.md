@@ -373,3 +373,8 @@ Data rules added in the second merge:
 - A saved `offer` and the label lookups use own-property checks.
 - Plus-address tagging follows `BFF.email.inEmailFeatures(p)` everywhere: guided run, fill script (`programList`) and the phone view. Other programs get the plain address. When several listed programs share the page's domain and their addresses differ, the fill script still uses the plain address.
 - `tools/autofill`: `hiddenByState(p, state)` lives in `field-matcher.mjs`. `--all-free` and `--from-backup` (`selectTodo`, option `state`) both use it. The backup's own profile state is used when the backup has My info, else `profile.json`.
+
+### Phase G, round 5 (phone layout)
+
+- Directory due-date buttons: on phones the buttons are equal-width tiles in one row (number on top, label under it, at least 44px tall). A single button keeps a capped width. From 640px wide they go back to inline buttons in a wrapping row. CSS only; the button markup is unchanged.
+- My info plus-address preview: the address sits in its own `span.fx-plus-addr` (block, `overflow-wrap: anywhere`), so it breaks only when it cannot fit. The paragraph text still reads "Preview: address (for program)".
