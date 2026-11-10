@@ -2,7 +2,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
-import { cpSync, mkdtempSync, readFileSync, rmSync } from 'node:fs';
+import { cpSync, mkdtempSync, readdirSync, readFileSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -158,4 +158,21 @@ test('artifact.html is a fragment: title first, viewport-fit-sides meta, no docu
 test('artifact.html carries no theme-fighting inline display styles', () => {
   const markup = OUTPUTS['artifact.html'].replace(DATA_BLOCK, '');
   assert.doesNotMatch(markup.replace(/<script>[\s\S]*?<\/script>/, '').replace(/<style>[\s\S]*?<\/style>/, ''), /style\s*=\s*["'][^"']*display/i);
+});
+
+test('index.html, artifact.html and src/ hold no raw U+FFFD, U+2028 or U+2029', () => {
+  const banned = [
+    [String.fromCharCode(0xFFFD), 'U+FFFD'],
+    [String.fromCharCode(0x2028), 'U+2028'],
+    [String.fromCharCode(0x2029), 'U+2029'],
+  ];
+  const walk = (dir) => readdirSync(join(root, dir), { withFileTypes: true })
+    .flatMap((e) => (e.isDirectory() ? walk(join(dir, e.name)) : [join(dir, e.name)]));
+  const files = ['index.html', 'artifact.html', ...walk('src')];
+  const hits = [];
+  for (const rel of files) {
+    const text = readFileSync(join(root, rel), 'utf8');
+    for (const [ch, label] of banned) if (text.includes(ch)) hits.push(rel + ' contains raw ' + label);
+  }
+  assert.deepEqual(hits, []);
 });

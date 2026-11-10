@@ -62,7 +62,7 @@
     return str(text).replace(/&(?:#(\d{1,7})|#[xX]([0-9a-fA-F]{1,6})|([A-Za-z][A-Za-z0-9]{1,8}));/g, function (all, dec, hex, name) {
       if (name) return Object.prototype.hasOwnProperty.call(NAMED, name) ? NAMED[name] : all;
       var cp = dec ? parseInt(dec, 10) : parseInt(hex, 16);
-      if (!(cp > 0) || cp > 0x10ffff || (cp >= 0xd800 && cp <= 0xdfff)) return '�';
+      if (!(cp > 0) || cp > 0x10ffff || (cp >= 0xd800 && cp <= 0xdfff)) return String.fromCharCode(0xFFFD);
       return String.fromCodePoint(cp);
     });
   }

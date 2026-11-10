@@ -245,5 +245,5 @@ test('icsReminders folds long lines at 75 octets', () => {
   assert.ok(lines.some((l) => l.startsWith(' ')));
   const unfolded = ics.replace(/\r\n /g, '');
   assert.ok(unfolded.includes('SUMMARY:Check for ' + name + ' mail or box'));
-  assert.ok(!unfolded.includes('�'));
+  assert.ok(!unfolded.includes(String.fromCharCode(0xFFFD)));
 });
