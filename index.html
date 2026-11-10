@@ -487,11 +487,11 @@ details.dir-filters { margin: 0 0 var(--space-1); }
 /* ===== Phase I part 3: what My info is missing (profile.js, directory.js, guided.js) ===== */
 .fx-need { margin: var(--space-1) 0 0; font-size: .875rem; color: var(--muted); }
 .fx-need[hidden] { display: none; }
-.fx-field.fx-ask { background: var(--warning-bg); color: var(--warning-text); border: 2px solid var(--warning-border); border-radius: var(--radius-sm); padding: var(--space-3); margin-left: calc(-1 * var(--space-3)); margin-right: calc(-1 * var(--space-3)); }
-.fx-field.fx-ask .fx-need { color: var(--warning-text); }
+.fx-field.fx-ask, .fx-plus-row.fx-ask { background: var(--warning-bg); color: var(--warning-text); border: 2px solid var(--warning-border); border-radius: var(--radius-sm); padding: var(--space-3); margin-left: calc(-1 * var(--space-3)); margin-right: calc(-1 * var(--space-3)); }
+.fx-field.fx-ask .fx-need, .fx-plus-row.fx-ask .fx-need { color: var(--warning-text); }
 .fx-ask-back { display: inline-flex; align-items: center; min-height: 44px; margin-top: var(--space-2); font-weight: 600; color: var(--primary); }
 .fx-ask-back:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
-.fx-field.fx-ask .fx-ask-back { color: var(--warning-text); text-decoration: underline; }
+.fx-field.fx-ask .fx-ask-back, .fx-plus-row.fx-ask .fx-ask-back { color: var(--warning-text); text-decoration: underline; }
 .dir-miss { margin: 0 0 var(--space-2); }
 .dir-miss[hidden] { display: none; }
 .gd-miss-box { margin: var(--space-3) 0; }
@@ -3733,7 +3733,7 @@ details.dir-filters { margin: 0 0 var(--space-1); }
     var msg = h('p', { class: 'fx-msg', role: 'status', 'aria-live': 'polite' });
     watchMsg(msg);
     view.mailHint = h('p', { class: 'fx-warn', hidden: '' }, [
-      document.createTextNode('Add your email in '), h('a', { href: '#info', text: 'My info' }), document.createTextNode(' to email yourself the checklist.')
+      document.createTextNode('Add your email in '), h('a', { href: '#info', text: 'My info', 'data-info-key': 'email' }), document.createTextNode(' to email yourself the checklist.')
     ]);
     // 1. checklist by email: a real mailto link (kept current by refreshMailto) plus a Copy button that always works.
     var inArt = !!(BFF.host && BFF.host.inArtifact);
@@ -3767,7 +3767,7 @@ details.dir-filters { margin: 0 0 var(--space-1); }
     // 2. Gmail filters
     var arch = h('input', { type: 'checkbox', id: 'trk-archive' });
     view.archive = arch;
-    view.plusHint = h('p', { class: 'fx-small', hidden: '' }, [document.createTextNode('For tidy, safe filters, turn on plus addresses in '), h('a', { href: '#info', text: 'My info' }),
+    view.plusHint = h('p', { class: 'fx-small', hidden: '' }, [document.createTextNode('For tidy, safe filters, turn on plus addresses in '), h('a', { href: '#info', text: 'My info', 'data-info-key': 'plus' }),
       document.createTextNode('. Without them, filters only add a label for each program’s sender domain (big stores and .gov sites are left out), and Skip the inbox is off.')]);
     var fBtn = h('button', { type: 'button', class: 'fx-btn', text: 'Download Gmail filters' });
     fBtn.addEventListener('click', function () {
@@ -4096,7 +4096,7 @@ details.dir-filters { margin: 0 0 var(--space-1); }
   function nowHelp(secs, weeks) {
     if (!secs.now.length) return [document.createTextNode(secs.later.length ? 'Nothing to do right now. The rest comes later:' : 'Nothing else to do right now. Only the options below are left.')];
     if (typeof weeks !== 'number') {
-      return [document.createTextNode('These work now, while pregnant or at any time. Add your due date in '), h('a', { href: '#info', text: 'My info' }),
+      return [document.createTextNode('These work now, while pregnant or at any time. Add your due date in '), h('a', { href: '#info', text: 'My info', 'data-info-key': 'dueDate' }),
         document.createTextNode(' to see when the rest is ready.')];
     }
     if (weeks < 0) return [document.createTextNode('Your due date has passed, so everything on your list is ready now.')];
@@ -4179,7 +4179,7 @@ details.dir-filters { margin: 0 0 var(--space-1); }
     if (sig === view.missSig) return;
     view.missSig = sig;
     view.missBox.textContent = '';
-    var n = M && M.notice && counts ? M.notice(counts) : null;
+    var n = M && M.notice && counts ? M.notice(counts, { compact: true }) : null;
     if (n) view.missBox.appendChild(n);
     view.missBox.hidden = !n;
   }
@@ -4326,8 +4326,20 @@ details.dir-filters { margin: 0 0 var(--space-1); }
   function statusLookup() {
     return BFF.tracker && BFF.tracker.getStatus ? function (id) { return BFF.tracker.getStatus(id); } : undefined;
   }
-  function controlFor(key) { return key === 'state' ? inputs.state : sitSel[key]; }
-  function wrapFor(key) { return key === 'state' ? (inputs.state && inputs.state.parentNode) : sitField[key]; }
+  var PLUS_ROW = null;   // wrapper around the plus-address checkbox row, so it can take the highlight
+  var ASK_KEYS = NEED_KEYS.concat(['dueDate', 'email', 'plus']);
+  function controlFor(key) {
+    if (key === 'plus') return plusBox;
+    return sitSel[key] || inputs[key];
+  }
+  function wrapFor(key) {
+    if (key === 'plus') return PLUS_ROW;
+    if (sitField[key]) return sitField[key];
+    return inputs[key] && inputs[key].parentNode;
+  }
+  function hasValue(c) { return !!c && (c.type === 'checkbox' ? c.checked : !!c.value); }
+  // Drop the highlight once the asked-for field has an answer.
+  function settleAsk(key) { if (ask && ask.key === key && hasValue(controlFor(key))) ask.wrap.classList.remove('fx-ask'); }
   // Under each unanswered field: how many programs still to do depend on it. Neutral, not an error.
   function refreshNeeds() {
     var L = BFF.logic;
@@ -4342,10 +4354,8 @@ details.dir-filters { margin: 0 0 var(--space-1); }
       if (answered || !n) { el.textContent = ''; el.hidden = true; }
       else { el.textContent = n === 1 ? '1 program depends on this.' : n + ' programs depend on this.'; el.hidden = false; }
     });
-    if (ask) {
-      var c = controlFor(ask.key);
-      if (c && c.value) ask.wrap.classList.remove('fx-ask');
-    }
+    // Only the select fields settle here; text, date and checkbox fields settle on their own change/blur.
+    if (ask && NEED_KEYS.indexOf(ask.key) !== -1) settleAsk(ask.key);
   }
   function needLine(key, control) {
     var id = 'info-' + key + '-need';
@@ -4365,12 +4375,12 @@ details.dir-filters { margin: 0 0 var(--space-1); }
   var BACK = { directory: 'Back to Programs', tracker: 'Back to Tracker', guided: 'Back to Do it for me' };
   function applyAsk(w) {
     var key = w && w.key;
-    if (NEED_KEYS.indexOf(key) === -1) return;
+    if (ASK_KEYS.indexOf(key) === -1) return;
     if (key === 'insurer' && sitField.insurer.hidden) key = 'cover';
     var wrap = wrapFor(key), control = controlFor(key);
     if (!wrap || !control) return;
     ask = { key: key, from: w.from, wrap: wrap, back: null };
-    wrap.classList.add('fx-ask');
+    if (!hasValue(control)) wrap.classList.add('fx-ask');
     if (BACK[w.from]) {
       ask.back = h('a', { class: 'fx-ask-back', href: '#' + w.from, text: BACK[w.from] });
       wrap.appendChild(ask.back);
@@ -4572,6 +4582,8 @@ details.dir-filters { margin: 0 0 var(--space-1); }
           timer = setTimeout(saveNow, 400);
         });
         if (f.check) input.addEventListener('blur', function () { validate(f); });
+        input.addEventListener('change', function () { settleAsk(f.key); });
+        input.addEventListener('blur', function () { settleAsk(f.key); });
         if (f.key === 'email') { input.addEventListener('change', updatePlus); input.addEventListener('blur', updatePlus); }
         form.appendChild(h('div', { class: 'fx-field' }, [h('label', { 'for': id, text: f.label }), input, hint, f.key === 'state' ? needLine('state', input) : null]));
         if (f.key === 'state') input.addEventListener('change', function () { if (input.value && ask && ask.key === 'state') ask.wrap.classList.remove('fx-ask'); });
@@ -4610,6 +4622,7 @@ details.dir-filters { margin: 0 0 var(--space-1); }
       plusBox.addEventListener('change', function () {
         if (plusBox.checked) tagMapNow(true);
         updatePlus();
+        settleAsk('plus');
         statusEl.className = 'fx-saved fx-saved--block';
         statusEl.textContent = 'Saving…';
         if (timer) clearTimeout(timer);
@@ -4617,7 +4630,7 @@ details.dir-filters { margin: 0 0 var(--space-1); }
       });
       el.appendChild(h('section', { class: 'fx-card', 'aria-labelledby': 'info-plus-h' }, [
         h('h3', { id: 'info-plus-h', text: 'Plus addresses' }),
-        h('div', { class: 'fx-check' }, [plusBox, h('label', { 'for': 'info-plus', text: 'Give each program its own plus address' })]),
+        PLUS_ROW = h('div', { class: 'fx-plus-row' }, [h('div', { class: 'fx-check' }, [plusBox, h('label', { 'for': 'info-plus', text: 'Give each program its own plus address' })])]),
         h('p', { class: 'fx-muted', text: 'Adds a short tag to your email, like yourname+similac@gmail.com. The guided run copies the tagged address, and you can filter or search your inbox by program.' }),
         plusPreview,
         plusNote,
@@ -5221,7 +5234,7 @@ details.dir-filters { margin: 0 0 var(--space-1); }
     if (wk === null) {
       box.appendChild(h('p', { class: 'dir-note' }, [
         document.createTextNode('Add your due date in '),
-        h('a', { href: '#info', text: 'My info' }),
+        h('a', { href: '#info', text: 'My info', 'data-info-key': 'dueDate' }),
         document.createTextNode(' to see what to do when. It stays on this device.')
       ]));
       return;
@@ -5665,12 +5678,13 @@ details.dir-filters { margin: 0 0 var(--space-1); }
     body.appendChild(h('p', { class: 'fx-lead', text: 'Pick the programs to work through. For each one you get a sign-up page to open and your details ready to copy. Nothing is ever submitted for you.' }));
     body.appendChild(phoneHint());
     var pr = profile();
-    if (!pr.firstName && !pr.email && !pr.address1) {
+    var emptyInfo = !pr.firstName && !pr.email && !pr.address1;
+    if (emptyInfo) {
       var w = h('p', { class: 'fx-warn' }, [document.createTextNode('My info is empty, so there is nothing to copy yet. '), h('a', { href: '#info', text: 'Fill in My info' }), document.createTextNode(' first.')]);
       body.appendChild(w);
     }
     var counts = missingCounts();
-    var mn = BFF.missing && counts ? BFF.missing.notice(counts, { compact: true }) : null;
+    var mn = !emptyInfo && BFF.missing && counts ? BFF.missing.notice(counts, { compact: true }) : null;
     if (mn) body.appendChild(h('div', { class: 'gd-miss-box' }, [mn]));
     var count = h('p', { class: 'fx-count', role: 'status', 'aria-live': 'polite' });
     var start = h('button', { type: 'button', class: 'fx-btn fx-btn--primary' });
@@ -6186,7 +6200,7 @@ details.dir-filters { margin: 0 0 var(--space-1); }
     var btnClear = h('button', { type: 'button', class: 'fx-btn fx-btn--link ib-btn', hidden: '', text: 'Clear results from this page' });
     var actions = h('div', { class: 'fx-actions ib-actions', hidden: '' }, [btnCheck, btnLabel, btnList, btnKit, btnAddr, btnClear]);
     var needEmail = h('p', { class: 'fx-warn', hidden: '' }, [
-      document.createTextNode('A draft goes to your own address, so add your email in '), h('a', { href: '#info', text: 'My info' }), document.createTextNode(' first.')
+      document.createTextNode('A draft goes to your own address, so add your email in '), h('a', { href: '#info', text: 'My info', 'data-info-key': 'email' }), document.createTextNode(' first.')
     ]);
     var live = h('p', { class: 'ib-live fx-msg', role: 'status', 'aria-live': 'polite' });
     var err = h('p', { class: 'ib-error fx-warn', role: 'alert', hidden: '' });

@@ -106,7 +106,7 @@
     var btnClear = h('button', { type: 'button', class: 'fx-btn fx-btn--link ib-btn', hidden: '', text: 'Clear results from this page' });
     var actions = h('div', { class: 'fx-actions ib-actions', hidden: '' }, [btnCheck, btnLabel, btnList, btnKit, btnAddr, btnClear]);
     var needEmail = h('p', { class: 'fx-warn', hidden: '' }, [
-      document.createTextNode('A draft goes to your own address, so add your email in '), h('a', { href: '#info', text: 'My info' }), document.createTextNode(' first.')
+      document.createTextNode('A draft goes to your own address, so add your email in '), h('a', { href: '#info', text: 'My info', 'data-info-key': 'email' }), document.createTextNode(' first.')
     ]);
     var live = h('p', { class: 'ib-live fx-msg', role: 'status', 'aria-live': 'polite' });
     var err = h('p', { class: 'ib-error fx-warn', role: 'alert', hidden: '' });

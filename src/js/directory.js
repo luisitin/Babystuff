@@ -536,7 +536,7 @@
     if (wk === null) {
       box.appendChild(h('p', { class: 'dir-note' }, [
         document.createTextNode('Add your due date in '),
-        h('a', { href: '#info', text: 'My info' }),
+        h('a', { href: '#info', text: 'My info', 'data-info-key': 'dueDate' }),
         document.createTextNode(' to see what to do when. It stays on this device.')
       ]));
       return;

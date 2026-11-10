@@ -506,7 +506,7 @@
     var msg = h('p', { class: 'fx-msg', role: 'status', 'aria-live': 'polite' });
     watchMsg(msg);
     view.mailHint = h('p', { class: 'fx-warn', hidden: '' }, [
-      document.createTextNode('Add your email in '), h('a', { href: '#info', text: 'My info' }), document.createTextNode(' to email yourself the checklist.')
+      document.createTextNode('Add your email in '), h('a', { href: '#info', text: 'My info', 'data-info-key': 'email' }), document.createTextNode(' to email yourself the checklist.')
     ]);
     // 1. checklist by email: a real mailto link (kept current by refreshMailto) plus a Copy button that always works.
     var inArt = !!(BFF.host && BFF.host.inArtifact);
@@ -540,7 +540,7 @@
     // 2. Gmail filters
     var arch = h('input', { type: 'checkbox', id: 'trk-archive' });
     view.archive = arch;
-    view.plusHint = h('p', { class: 'fx-small', hidden: '' }, [document.createTextNode('For tidy, safe filters, turn on plus addresses in '), h('a', { href: '#info', text: 'My info' }),
+    view.plusHint = h('p', { class: 'fx-small', hidden: '' }, [document.createTextNode('For tidy, safe filters, turn on plus addresses in '), h('a', { href: '#info', text: 'My info', 'data-info-key': 'plus' }),
       document.createTextNode('. Without them, filters only add a label for each program’s sender domain (big stores and .gov sites are left out), and Skip the inbox is off.')]);
     var fBtn = h('button', { type: 'button', class: 'fx-btn', text: 'Download Gmail filters' });
     fBtn.addEventListener('click', function () {
@@ -869,7 +869,7 @@
   function nowHelp(secs, weeks) {
     if (!secs.now.length) return [document.createTextNode(secs.later.length ? 'Nothing to do right now. The rest comes later:' : 'Nothing else to do right now. Only the options below are left.')];
     if (typeof weeks !== 'number') {
-      return [document.createTextNode('These work now, while pregnant or at any time. Add your due date in '), h('a', { href: '#info', text: 'My info' }),
+      return [document.createTextNode('These work now, while pregnant or at any time. Add your due date in '), h('a', { href: '#info', text: 'My info', 'data-info-key': 'dueDate' }),
         document.createTextNode(' to see when the rest is ready.')];
     }
     if (weeks < 0) return [document.createTextNode('Your due date has passed, so everything on your list is ready now.')];
@@ -952,7 +952,7 @@
     if (sig === view.missSig) return;
     view.missSig = sig;
     view.missBox.textContent = '';
-    var n = M && M.notice && counts ? M.notice(counts) : null;
+    var n = M && M.notice && counts ? M.notice(counts, { compact: true }) : null;
     if (n) view.missBox.appendChild(n);
     view.missBox.hidden = !n;
   }

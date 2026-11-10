@@ -38,8 +38,20 @@
   function statusLookup() {
     return BFF.tracker && BFF.tracker.getStatus ? function (id) { return BFF.tracker.getStatus(id); } : undefined;
   }
-  function controlFor(key) { return key === 'state' ? inputs.state : sitSel[key]; }
-  function wrapFor(key) { return key === 'state' ? (inputs.state && inputs.state.parentNode) : sitField[key]; }
+  var PLUS_ROW = null;   // wrapper around the plus-address checkbox row, so it can take the highlight
+  var ASK_KEYS = NEED_KEYS.concat(['dueDate', 'email', 'plus']);
+  function controlFor(key) {
+    if (key === 'plus') return plusBox;
+    return sitSel[key] || inputs[key];
+  }
+  function wrapFor(key) {
+    if (key === 'plus') return PLUS_ROW;
+    if (sitField[key]) return sitField[key];
+    return inputs[key] && inputs[key].parentNode;
+  }
+  function hasValue(c) { return !!c && (c.type === 'checkbox' ? c.checked : !!c.value); }
+  // Drop the highlight once the asked-for field has an answer.
+  function settleAsk(key) { if (ask && ask.key === key && hasValue(controlFor(key))) ask.wrap.classList.remove('fx-ask'); }
   // Under each unanswered field: how many programs still to do depend on it. Neutral, not an error.
   function refreshNeeds() {
     var L = BFF.logic;
@@ -54,10 +66,8 @@
       if (answered || !n) { el.textContent = ''; el.hidden = true; }
       else { el.textContent = n === 1 ? '1 program depends on this.' : n + ' programs depend on this.'; el.hidden = false; }
     });
-    if (ask) {
-      var c = controlFor(ask.key);
-      if (c && c.value) ask.wrap.classList.remove('fx-ask');
-    }
+    // Only the select fields settle here; text, date and checkbox fields settle on their own change/blur.
+    if (ask && NEED_KEYS.indexOf(ask.key) !== -1) settleAsk(ask.key);
   }
   function needLine(key, control) {
     var id = 'info-' + key + '-need';
@@ -77,12 +87,12 @@
   var BACK = { directory: 'Back to Programs', tracker: 'Back to Tracker', guided: 'Back to Do it for me' };
   function applyAsk(w) {
     var key = w && w.key;
-    if (NEED_KEYS.indexOf(key) === -1) return;
+    if (ASK_KEYS.indexOf(key) === -1) return;
     if (key === 'insurer' && sitField.insurer.hidden) key = 'cover';
     var wrap = wrapFor(key), control = controlFor(key);
     if (!wrap || !control) return;
     ask = { key: key, from: w.from, wrap: wrap, back: null };
-    wrap.classList.add('fx-ask');
+    if (!hasValue(control)) wrap.classList.add('fx-ask');
     if (BACK[w.from]) {
       ask.back = h('a', { class: 'fx-ask-back', href: '#' + w.from, text: BACK[w.from] });
       wrap.appendChild(ask.back);
@@ -284,6 +294,8 @@
           timer = setTimeout(saveNow, 400);
         });
         if (f.check) input.addEventListener('blur', function () { validate(f); });
+        input.addEventListener('change', function () { settleAsk(f.key); });
+        input.addEventListener('blur', function () { settleAsk(f.key); });
         if (f.key === 'email') { input.addEventListener('change', updatePlus); input.addEventListener('blur', updatePlus); }
         form.appendChild(h('div', { class: 'fx-field' }, [h('label', { 'for': id, text: f.label }), input, hint, f.key === 'state' ? needLine('state', input) : null]));
         if (f.key === 'state') input.addEventListener('change', function () { if (input.value && ask && ask.key === 'state') ask.wrap.classList.remove('fx-ask'); });
@@ -322,6 +334,7 @@
       plusBox.addEventListener('change', function () {
         if (plusBox.checked) tagMapNow(true);
         updatePlus();
+        settleAsk('plus');
         statusEl.className = 'fx-saved fx-saved--block';
         statusEl.textContent = 'Saving…';
         if (timer) clearTimeout(timer);
@@ -329,7 +342,7 @@
       });
       el.appendChild(h('section', { class: 'fx-card', 'aria-labelledby': 'info-plus-h' }, [
         h('h3', { id: 'info-plus-h', text: 'Plus addresses' }),
-        h('div', { class: 'fx-check' }, [plusBox, h('label', { 'for': 'info-plus', text: 'Give each program its own plus address' })]),
+        PLUS_ROW = h('div', { class: 'fx-plus-row' }, [h('div', { class: 'fx-check' }, [plusBox, h('label', { 'for': 'info-plus', text: 'Give each program its own plus address' })])]),
         h('p', { class: 'fx-muted', text: 'Adds a short tag to your email, like yourname+similac@gmail.com. The guided run copies the tagged address, and you can filter or search your inbox by program.' }),
         plusPreview,
         plusNote,

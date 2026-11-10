@@ -278,12 +278,13 @@
     body.appendChild(h('p', { class: 'fx-lead', text: 'Pick the programs to work through. For each one you get a sign-up page to open and your details ready to copy. Nothing is ever submitted for you.' }));
     body.appendChild(phoneHint());
     var pr = profile();
-    if (!pr.firstName && !pr.email && !pr.address1) {
+    var emptyInfo = !pr.firstName && !pr.email && !pr.address1;
+    if (emptyInfo) {
       var w = h('p', { class: 'fx-warn' }, [document.createTextNode('My info is empty, so there is nothing to copy yet. '), h('a', { href: '#info', text: 'Fill in My info' }), document.createTextNode(' first.')]);
       body.appendChild(w);
     }
     var counts = missingCounts();
-    var mn = BFF.missing && counts ? BFF.missing.notice(counts, { compact: true }) : null;
+    var mn = !emptyInfo && BFF.missing && counts ? BFF.missing.notice(counts, { compact: true }) : null;
     if (mn) body.appendChild(h('div', { class: 'gd-miss-box' }, [mn]));
     var count = h('p', { class: 'fx-count', role: 'status', 'aria-live': 'polite' });
     var start = h('button', { type: 'button', class: 'fx-btn fx-btn--primary' });
