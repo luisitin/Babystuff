@@ -195,6 +195,17 @@
     return id || 'Other';
   }
 
+  function programName(id) {
+    var list = programs();
+    for (var i = 0; i < list.length; i++) if (list[i].id === id) return list[i].name;
+    return '';
+  }
+
+  function inMyState(p) {
+    var st = profState().toUpperCase();
+    return !!st && Array.isArray(p.states) && p.states.some(function (x) { return String(x).toUpperCase() === st; });
+  }
+
   function card(p, level, rank) {
     var cost = p.costToClaim;
     var badges = h('div', { class: 'badges' }, [
@@ -206,12 +217,18 @@
     var vlabel = '';
     L.VERDICTS.forEach(function (v) { if (v.id === vid) vlabel = v.label; });
     var top = [];
-    if (rank) top.push(h('span', { class: 'rank', text: '#' + rank, title: 'Rank by value among all programs' }));
+    if (rank) top.push(h('span', { class: 'rank', text: '#' + rank, title: 'Rank by value among the programs listed' }));
     if (vlabel) top.push(h('span', { class: 'badge badge-verdict badge-v-' + vid, text: vlabel }));
+    if (p.certainty === 'if-eligible') top.push(h('span', { class: 'badge badge-tag tag-qualify', text: 'If you qualify' }));
+    if (inMyState(p)) top.push(h('span', { class: 'badge badge-tag tag-state', text: 'In your state' }));
 
     var kids = [];
     if (top.length) kids.push(h('div', { class: 'card-top' }, top));
     kids.push(h('div', { class: 'card-head' }, [h(level, { text: p.name }), h('p', { class: 'card-brand', text: p.brand })]));
+    if (p.sameAs) {
+      var mainName = programName(p.sameAs);
+      if (mainName) kids.push(h('p', { class: 'same-as', text: 'Another way to get the same thing as ' + mainName + '. You only need one.' }));
+    }
     if (typeof p.freeStuff === 'string') {
       kids.push(p.freeStuff.trim()
         ? h('p', { class: 'free-line' }, [h('strong', { text: 'Free with no purchase: ' }), document.createTextNode(p.freeStuff)])
@@ -225,9 +242,6 @@
     if (offs.length) {
       kids.push(h('ul', { class: 'chips offer-chips', 'aria-label': 'What you get' }, offs.map(function (o) { return h('li', { class: 'chip', text: L.OFFER_LABELS[o] }); })));
     }
-    kids.push(badges);
-    if (p.costDetail) kids.push(h('p', { class: 'cost-detail', text: p.costDetail }));
-    if (p.whatYouGet) kids.push(h('p', { text: p.whatYouGet }));
 
     var facts = [];
     if (L.CERTAINTY_LABELS[p.certainty]) facts.push(['How sure', L.CERTAINTY_LABELS[p.certainty]]);
@@ -240,19 +254,6 @@
       })));
     }
 
-    var reqs = Array.isArray(p.requirements) ? p.requirements : [];
-    if (reqs.length) {
-      kids.push(h('div', null, [
-        h('p', { class: 'card-section-title', text: 'What you need' }),
-        h('ul', { class: 'chips' }, reqs.map(function (r) { return h('li', { class: 'chip', text: L.REQUIREMENT_LABELS[r] || r }); }))
-      ]));
-    }
-
-    var meta = [];
-    if (p.eligibility) meta.push(h('div', null, [h('dt', { text: 'Who: ' }), h('dd', { text: p.eligibility })]));
-    if (p.region) meta.push(h('div', null, [h('dt', { text: 'Where: ' }), h('dd', { text: p.region })]));
-    if (meta.length) kids.push(h('dl', { class: 'meta' }, meta));
-
     if (p.catches && String(p.catches).trim()) {
       kids.push(h('div', { class: 'catches', role: 'note' }, [
         h('strong', { text: 'Catches' }),
@@ -260,29 +261,12 @@
       ]));
     }
 
-    var sources = Array.isArray(p.sourceUrls) ? p.sourceUrls : [];
-    if (p.notes || sources.length) {
-      var d = [h('summary', { text: 'Notes and sources' })];
-      if (p.notes) d.push(h('p', { text: p.notes }));
-      if (sources.length) {
-        d.push(h('ul', { class: 'source-list' }, sources.map(function (u) {
-          return h('li', null, [h('a', { href: u, target: '_blank', rel: 'noopener noreferrer' }, [
-            document.createTextNode(L.domainOf(u) + ' page '),
-            h('span', { class: 'visually-hidden', text: '(opens in a new tab)' }),
-            h('span', { 'aria-hidden': 'true', text: '\u2197' })
-          ])]);
-        })));
-      }
-      kids.push(h('details', null, d));
-    }
-
     var foot = [
       h('a', { class: 'btn btn-primary', href: p.signupUrl, target: '_blank', rel: 'noopener noreferrer' }, [
         document.createTextNode('Sign up on ' + L.domainOf(p.signupUrl) + ' '),
         h('span', { class: 'visually-hidden', text: '(opens in a new tab)' }),
-        h('span', { 'aria-hidden': 'true', text: '\u2197' })
-      ]),
-      h('p', { class: 'verified', text: 'Verified ' + (p.verifiedOn || 'date unknown') + ' · ' + (p.confidence || 'unknown') + ' confidence' })
+        h('span', { 'aria-hidden': 'true', text: String.fromCharCode(0x2197) })
+      ])
     ];
     if (BFF.tracker) {
       var sid = 'st-' + p.id;
@@ -293,31 +277,72 @@
     }
     kids.push(h('div', { class: 'card-foot' }, foot));
 
+    // Everything else sits in one disclosure.
+    var d = [h('summary', null, [document.createTextNode('More details'), h('span', { class: 'visually-hidden', text: ' about ' + p.name })])];
+    d.push(badges);
+    if (p.whatYouGet) d.push(h('p', { text: p.whatYouGet }));
+    if (p.costDetail) d.push(h('p', { class: 'cost-detail', text: p.costDetail }));
+    var reqs = Array.isArray(p.requirements) ? p.requirements : [];
+    if (reqs.length) {
+      d.push(h('div', null, [
+        h('p', { class: 'card-section-title', text: 'What you need' }),
+        h('ul', { class: 'chips' }, reqs.map(function (r) { return h('li', { class: 'chip', text: L.REQUIREMENT_LABELS[r] || r }); }))
+      ]));
+    }
+    var meta = [];
+    if (p.eligibility) meta.push(h('div', null, [h('dt', { text: 'Who: ' }), h('dd', { text: p.eligibility })]));
+    if (p.region) meta.push(h('div', null, [h('dt', { text: 'Where: ' }), h('dd', { text: p.region })]));
+    if (meta.length) d.push(h('dl', { class: 'meta' }, meta));
+    if (p.notes) d.push(h('p', { text: p.notes }));
+    var sources = Array.isArray(p.sourceUrls) ? p.sourceUrls : [];
+    if (sources.length) {
+      d.push(h('ul', { class: 'source-list' }, sources.map(function (u) {
+        return h('li', null, [h('a', { href: u, target: '_blank', rel: 'noopener noreferrer' }, [
+          document.createTextNode(L.domainOf(u) + ' page '),
+          h('span', { class: 'visually-hidden', text: '(opens in a new tab)' }),
+          h('span', { 'aria-hidden': 'true', text: String.fromCharCode(0x2197) })
+        ])]);
+      })));
+    }
+    d.push(h('p', { class: 'verified', text: 'Verified ' + (p.verifiedOn || 'date unknown') + ' · ' + (p.confidence || 'unknown') + ' confidence' }));
+    kids.push(h('details', { class: 'more-details' }, d));
+
     return h('article', { class: 'card', 'data-program-id': p.id }, kids);
   }
 
   function stateInfo() {
     var st = profState();
-    var hidden = st ? L.otherStateCount(programs(), st) : 0;
-    return { st: st, hidden: hidden, hide: !!st && hidden > 0 && !showOther };
+    var hidden = L.otherStateCount(programs(), st);
+    return { st: st, hidden: hidden, hide: hidden > 0 && !showOther };
   }
 
   function renderStateBox(info) {
     els.stateBox.textContent = '';
     els.stateBox.hidden = false;
-    if (info.st && info.hidden > 0) {
-      var t;
-      if (info.hide) t = info.hidden === 1 ? '1 program for another state is hidden.' : info.hidden + ' programs for other states are hidden.';
-      else t = info.hidden === 1 ? '1 program for another state is shown.' : info.hidden + ' programs for other states are shown.';
-      var b = h('button', { type: 'button', class: 'btn btn-small', text: info.hide ? 'Show them' : 'Hide them' });
-      b.addEventListener('click', function () { showOther = !showOther; savePrefs(); render(); var nb = els.stateBox.querySelector('button'); if (nb) nb.focus(); });
-      els.stateBox.appendChild(h('p', { text: t }));
-      els.stateBox.appendChild(b);
-    } else if (!info.st && programs().some(function (p) { return Array.isArray(p.states) && p.states.length; })) {
-      els.stateBox.appendChild(h('p', { class: 'dir-note', text: 'Some programs are for one state only. Add your state in My info to hide the others.' }));
+    if (info.hidden === 0) { els.stateBox.hidden = true; return; }
+    var n = info.hidden, t;
+    if (!info.st) {
+      if (info.hide) t = (n === 1 ? '1 program is' : n + ' programs are') + ' only for some states. ';
+      else t = (n === 1 ? '1 program only for some states is' : n + ' programs only for some states are') + ' shown. ';
+      var kids = [document.createTextNode(t)];
+      if (info.hide) {
+        kids.push(document.createTextNode('Add your state in '));
+        kids.push(h('a', { href: '#info', text: 'My info' }));
+        kids.push(document.createTextNode(' to see the ones for you.'));
+      } else {
+        kids.push(document.createTextNode('Add your state in '));
+        kids.push(h('a', { href: '#info', text: 'My info' }));
+        kids.push(document.createTextNode(' to narrow them.'));
+      }
+      els.stateBox.appendChild(h('p', null, kids));
+    } else if (info.hide) {
+      els.stateBox.appendChild(h('p', { text: n === 1 ? '1 program for another state is hidden.' : n + ' programs for other states are hidden.' }));
     } else {
-      els.stateBox.hidden = true;
+      els.stateBox.appendChild(h('p', { text: n === 1 ? '1 program for another state is shown.' : n + ' programs for other states are shown.' }));
     }
+    var b = h('button', { type: 'button', class: 'btn btn-small', text: info.hide ? 'Show them' : 'Hide them' });
+    b.addEventListener('click', function () { showOther = !showOther; savePrefs(); render(); var nb = els.stateBox.querySelector('button'); if (nb) nb.focus(); });
+    els.stateBox.appendChild(b);
   }
 
   function goGroup(when) {
@@ -336,15 +361,24 @@
   function renderSummary(pool) {
     var box = els.summary;
     box.textContent = '';
-    var free = pool.filter(L.isTrulyFree);
+    var free = pool.filter(function (p) { return L.isTrulyFree(p) && L.isOpenToAll(p); });
     var tv = L.totalValue(free);
+    var lo = L.roundTotal(tv.low), hi = L.roundTotal(tv.high);
+    var worth = '.';
+    if (tv.count) worth = ', worth about ' + (lo === hi ? L.money(lo) : L.money(lo) + ' to ' + L.money(hi)) + ' together.';
     box.appendChild(h('p', { class: 'sum-main' }, [
-      h('strong', { text: plural(free.length, 'truly free program', 'truly free programs') }),
-      document.createTextNode(tv.count ? ', worth about ' + (tv.low === tv.high ? '$' + Math.round(tv.low) : '$' + Math.round(tv.low) + ' to $' + Math.round(tv.high)) + ' together.' : '.')
+      h('strong', { text: free.length + ' truly free ' + (free.length === 1 ? 'program' : 'programs') + ' open to everyone' }),
+      document.createTextNode(worth)
     ]));
+    var noValue = free.filter(function (p) { return L.valueMid(p) === null; }).length;
     box.appendChild(h('p', { class: 'dir-note', text: tv.count
-      ? 'This is our estimate, from ordinary shelf prices. Programs with no known value are not counted' + (tv.count < free.length ? ' (' + (free.length - tv.count) + ' of the truly free ones).' : '.')
+      ? 'This is our estimate, from ordinary shelf prices.' + (noValue ? ' ' + noValue + (noValue === 1 ? ' has' : ' have') + ' no known value and ' + (noValue === 1 ? 'is' : 'are') + ' not counted.' : '')
       : 'No dollar value is known for these programs yet.' }));
+    var more = pool.filter(function (p) {
+      var v = L.verdict(p);
+      return L.needsQualifying(p) && (v === 'top' || v === 'good' || v === 'small');
+    }).length;
+    box.appendChild(h('p', { class: 'sum-more', text: more + ' more ' + (more === 1 ? 'is' : 'are') + ' free if you qualify (income, insurance or where you live).' }));
 
     var due = typeof profile.dueDate === 'string' ? profile.dueDate.trim() : '';
     var wk = due ? L.weeksUntil(due) : null;
@@ -385,10 +419,10 @@
   function render() {
     var all = programs();
     var info = stateInfo();
-    var rankOf = L.rankMap(all);
     var pool = L.filterPrograms(all, { state: info.st, hideOtherStates: info.hide });
+    var rankOf = L.rankMap(pool);
     var opts = Object.assign({}, state, { state: info.st, hideOtherStates: info.hide });
-    var shown = L.sortPrograms(L.filterPrograms(all, opts), state.sort);
+    var shown = L.sortPrograms(L.filterPrograms(pool, opts), state.sort);
     els.list.textContent = '';
     var frag = document.createDocumentFragment();
     if (state.sort === 'best' || state.sort === 'when') {
@@ -408,7 +442,7 @@
     els.tfNote.hidden = !state.trulyFree;
     renderStateBox(info);
     renderSummary(pool);
-    els.count.textContent = 'Showing ' + shown.length + ' of ' + all.length + ' programs';
+    els.count.textContent = 'Showing ' + shown.length + ' of ' + pool.length + ' programs';
     els.empty.hidden = shown.length !== 0;
     shownIds = shown.map(function (p) { return p.id; });
     els.start.textContent = 'Start a guided run with these ' + shown.length;
