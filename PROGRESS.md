@@ -76,7 +76,7 @@ The user asked to "make it fully functional with just a connection to email or s
 ## Phase G, what is really free, ranking, and a plan by due date (2026-11-10)
 The user reported that the "Truly free" filter showed sweepstakes, coupons and points instead of real free samples, and asked for the list to show which offers are worth the most, a plan by due date, and research into money and benefit programs.
 
-The contract is in `ARCHITECTURE.md` ("Phase G"). Rounds 1 to 4 are written there. Round 4 is the code-review fixes. Nothing in the product rules changed: no network calls, no form submission, and personal details only in localStorage.
+The contract is in `ARCHITECTURE.md` ("Phase G"). Rounds 1 to 5 are written there. Round 4 is the code-review fixes. Round 5 is a phone layout fix: the due-date buttons sit in one row of equal tiles, and the plus-address preview has its own line. Nothing in the product rules changed: no network calls, no form submission, and personal details only in localStorage.
 
 - Research (the session's network was Limited, so no official page was read directly):
   - Wave 1: seven lanes, `formula-feeding`, `diapers-babycare`, `registry`, `health-benefits`, `assistance`, `rewards-testing` and `money`. Each wrote `research/phase-g/<lane>.json` and `<lane>-notes.md`. The shared brief is `research/phase-g/BRIEF.md`. The first merge took the list from 37 to 86 programs (`research/phase-g/merge-notes.md`).
@@ -99,16 +99,16 @@ The contract is in `ARCHITECTURE.md` ("Phase G"). Rounds 1 to 4 are written ther
 - Code review (`docs/code-review-phase-g.md`): 0 high, 3 medium and 4 low, The review was of commit `feb5ed6`. Its medium findings were: the tracker's "no known value" count mixed programs and groups; the due-date counts did not match the lists they jump to, and still showed after the due date; and plus addresses still applied to government programs in the guided run and the fill script. The four low findings are listed in the file. All seven were fixed in round 4, each with a unit test.
 - Tests:
   - Unit: `node --test` passes 231 of 231.
-  - Browser (`node tests/e2e/run.mjs`): 983 checks, 0 failed. Groups 11 and 12 are new and cover the ranking, the filters, the summary, the state rule, the due-date plan, the guided run, the tracker value line and the email features. Expected numbers are worked out from the data by the real modules (`tests/e2e/lib/model.mjs`), not typed in. Before the update the same suite had 591 checks and 9 failed; all 9 were old expectations that Phase G changed on purpose, and none was an app bug.
+  - Browser (`node tests/e2e/run.mjs`): 983 checks, 0 failed, and the same result again after round 5. Groups 11 and 12 are new and cover the ranking, the filters, the summary, the state rule, the due-date plan, the guided run, the tracker value line and the email features. Expected numbers are worked out from the data by the real modules (`tests/e2e/lib/model.mjs`), not typed in. Before the update the same suite had 591 checks and 9 failed; all 9 were old expectations that Phase G changed on purpose, and none was an app bug.
   - Mutation spot-check: 18 deliberate breaks, each made in a throwaway copy of the build, 18 caught (`tests/e2e/MUTATIONS.md`).
   - One browser check ("the Show them choice is remembered after a reload", artifact output) failed in one early run and passed in every later run. It is noted in `tests/e2e/FINDINGS.md`.
-- Model audit: 62 subagent transcripts in the session before the last three helpers, 50 `claude-sonnet-5-5` and 12 `claude-haiku-5-5`, none on any other model. The final count goes here when the phase closes.
+- Model audit: 65 subagent transcripts in the session (27 in this phase), 52 `claude-sonnet-5-5` and 13 `claude-haiku-5-5`, none on any other model.
 - Limits:
   - The session's network was Limited, so no official page could be read directly in Phase G. Every Phase G entry rests on official-domain search results and is capped at medium.
   - The session hit its web-search limit during the second research wave. Leads left unsearched: the FSA or HSA life-event rule; the adoption credit; the head-of-household filing change; Oakland Brilliant Baby; Oklahoma Dream Accounts; more city and state child-account programs; Colorado's state child tax credit; more brand sample programs; and the pages that removed programs now forward to (Carolina Complete Health "Start Smart for Your Baby" and the Medela Family newsletter).
 
 ## Not tested (needs a person)
-- Phase G: the entries and value figures against their official pages (the network was Limited), and the due-date plan and state rule on a phone.
+- Phase G: the entries and value figures against their official pages (the network was Limited), the due-date plan and state rule on a real phone, and the due-date buttons on a wide screen after round 5 (the browser run and the screenshots are at phone width).
 - A real iPhone: Safari AutoFill, the Shortcut, the bookmark, Home Screen install.
 - The real Claude viewer: the save prompt, the Gmail consent card, and whether the Claude iPhone app runs connector calls from an artifact.
 - A real Gmail account and the real program sign-up forms.
