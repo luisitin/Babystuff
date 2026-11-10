@@ -12,10 +12,10 @@ const programs = JSON.parse(raw);
 const EXPECTED_KEYS = [
   'id', 'name', 'brand', 'category', 'whatYouGet', 'offers', 'certainty', 'freeStuff',
   'valueLow', 'valueHigh', 'valueSource', 'valueBasis', 'costToClaim', 'costDetail',
-  'requirements', 'eligibility', 'region', 'states', 'effort', 'when', 'whenNote',
+  'requirements', 'eligibility', 'audience', 'insurer', 'region', 'states', 'effort', 'when', 'whenNote',
   'signupUrl', 'sourceUrls', 'verifiedOn', 'confidence', 'catches', 'notes', 'sameAs',
 ];
-const ARRAY_KEYS = ['offers', 'requirements', 'states', 'sourceUrls'];
+const ARRAY_KEYS = ['offers', 'requirements', 'audience', 'states', 'sourceUrls'];
 const NUMBER_KEYS = ['valueLow', 'valueHigh'];
 const STRING_KEYS = EXPECTED_KEYS.filter((k) => !ARRAY_KEYS.includes(k) && !NUMBER_KEYS.includes(k));
 const CATEGORIES = ['formula', 'diapers-wipes', 'registry-box', 'feeding', 'baby-care', 'rewards',
@@ -346,4 +346,38 @@ test('merged-out ids are gone and the per-state paid leave entries exist', () =>
   assert.ok(!ids.has('baby-dove-newsletter-samples'));
   for (const id of ['ca-paid-family-leave-sdi', 'ny-paid-family-leave', 'wa-paid-family-medical-leave']) assert.ok(ids.has(id), id);
   assert.ok(!programs.find((p) => p.id === 'caresource-babies-first-rewards').states.includes('GA'));
+});
+
+const AUDIENCE = ['medicaid', 'wic', 'low-income', 'insured', 'marketplace', 'employer', 'worker', 'military',
+  'local', 'member'];
+
+test('audience is an array of distinct allowed tags', () => {
+  check('audience', (p) => {
+    if (!Array.isArray(p.audience)) return 'audience must be an array';
+    const bad = p.audience.filter((t) => !AUDIENCE.includes(t));
+    if (bad.length) return `unknown tags: ${bad}`;
+    if (new Set(p.audience).size !== p.audience.length) return 'duplicate tags';
+    return null;
+  });
+});
+
+test('insurer is a string, non-empty exactly when audience includes member', () => {
+  check('insurer', (p) => {
+    if (typeof p.insurer !== 'string') return 'insurer must be a string';
+    const member = p.audience.includes('member');
+    if (member && p.insurer.trim() === '') return 'member needs an insurer';
+    if (!member && p.insurer !== '') return 'insurer set without member';
+    if (p.insurer !== p.insurer.trim()) return 'insurer has surrounding spaces';
+    return null;
+  });
+});
+
+test('no two insurers differ only by case or surrounding spaces', () => {
+  const seen = new Map();
+  for (const p of programs) {
+    if (!p.insurer) continue;
+    const key = p.insurer.trim().toLowerCase();
+    if (seen.has(key)) assert.equal(seen.get(key), p.insurer, `insurer spelling differs: ${p.id}`);
+    else seen.set(key, p.insurer);
+  }
 });
