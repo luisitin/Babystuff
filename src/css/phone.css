@@ -1,0 +1,24 @@
+/* "Fill forms on your phone" card in My info. Tokens from base.css only. */
+.ph-card { overflow-wrap: anywhere; }
+.ph-card h3 { margin: 0 0 var(--space-2); }
+.ph-opt { margin: var(--space-4) 0; padding-top: var(--space-3); border-top: 1px solid var(--border); }
+.ph-opt h4 { margin: 0 0 var(--space-2); }
+.ph-card h4 { color: var(--text); }
+.ph-list { margin: var(--space-2) 0; padding-left: var(--space-5); }
+.ph-list li { margin: var(--space-2) 0; }
+.ph-warn { border: 1px solid var(--warning-border); background: var(--warning-bg); color: var(--warning-text); }
+.ph-empty { margin: var(--space-3) 0; padding: var(--space-3); border: 1px dashed var(--border-strong); border-radius: var(--radius-sm); background: var(--surface-2); color: var(--text); }
+.ph-actions { flex-direction: column; align-items: stretch; margin: var(--space-2) 0; }
+.ph-group { margin: var(--space-2) 0; }
+.ph-actions .fx-btn { width: 100%; min-height: 48px; }
+.ph-status { min-height: 1.4em; margin: var(--space-2) 0; color: var(--text); font-weight: 600; }
+.ph-status:empty { display: none; }
+.ph-text { width: 100%; min-height: 120px; font-family: ui-monospace, Menlo, Consolas, monospace; font-size: .85em; }
+.ph-card .fx-btn:disabled { color: var(--muted); border-style: dashed; }
+.ph-card .fx-btn:focus-visible, .ph-text:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+@media (min-width: 560px) {
+  .ph-actions { flex-direction: row; }
+  .ph-actions .fx-btn { width: auto; }
+}
+.ph-tag { margin: 0 0 var(--space-2); color: var(--muted); font-size: .9em; font-weight: 600; }
+.ph-warn .ph-list { padding-left: var(--space-4); }

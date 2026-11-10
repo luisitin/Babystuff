@@ -1,0 +1,179 @@
+[
+  {
+    "verifiedOn": "2026-11-08",
+    "id": "pg-brandsaver-rewards",
+    "name": "P&G brandSAVER Points & Rewards",
+    "brand": "Procter & Gamble",
+    "category": "rewards",
+    "whatYouGet": "Free to join. Earn points by completing a profile, taking surveys or scanning receipts for P&G products, then redeem 750 points for a $5 off any P&G product digital reward or use points for sweepstakes entries. Also offers coupons and rebates on 60+ P&G brands.",
+    "costToClaim": "free",
+    "costDetail": "No cost to join, or any fees ever (per the site)",
+    "requirements": [
+      "email"
+    ],
+    "eligibility": "",
+    "region": "US",
+    "signupUrl": "https://pgbrandsaver.com/rewards/",
+    "sourceUrls": [
+      "https://pgbrandsaver.com/",
+      "https://pgbrandsaver.com/rewards/",
+      "https://pgbrandsaver.com/fan-clubs/",
+      "https://privacypolicy.pg.com/en-US/"
+    ],
+    "confidence": "high",
+    "catches": "Privacy policy says P&G discloses personal data to third-party partners where it has a lawful basis, receives data from other companies, and may share hashed email identifiers with ad platforms (Google, Meta, Microsoft, Pinterest, Reddit, Snap, TikTok) for interest-based ads. Its FAQ says it does not sell personal data for monetary compensation, but the site footer says 'We may sell your sensitive personal data.' Marketing email/text with opt-out. Points come from surveys and receipt scans.",
+    "notes": "The former pgeveryday.com now leads to P&G brandSAVER. No baby-specific offer is listed on the rewards page. Eligibility rules are not on the pages read (see Offer Rules page)."
+  },
+  {
+    "verifiedOn": "2026-11-08",
+    "id": "influenster-voxbox",
+    "name": "Influenster VoxBox",
+    "brand": "Influenster",
+    "category": "product-testing",
+    "whatYouGet": "Selected members may receive free product boxes (VoxBoxes) to try and review; has a New Parent product category. Not guaranteed.",
+    "costToClaim": "free",
+    "costDetail": "Free to join; boxes go to selected members only",
+    "requirements": [
+      "app"
+    ],
+    "eligibility": "Terms bar anyone under 16 from using the service",
+    "region": "US",
+    "signupUrl": "https://www.influenster.com/registration",
+    "sourceUrls": [
+      "https://www.influenster.com/privacy",
+      "https://www.influenster.com/terms",
+      "https://www.influenster.com/article/how-do-i-get-a-voxbox-from-influenster"
+    ],
+    "confidence": "medium",
+    "catches": "Not guaranteed a VoxBox; selection depends on activity and impact score. Recipients are expected to post reviews or social content and disclose the product was free. Privacy policy: shares name/last initial/location with third parties who may publish it, shares aggregate data with advertisers, and shares data with partners and service providers; reviews and profile are public. Marketing about specials and new features by email.",
+    "notes": "Home page and article pages returned a Cloudflare bot challenge (403), so offer details rest on official-domain search results. Privacy policy and terms pages were read. Not parenting-specific."
+  },
+  {
+    "verifiedOn": "2026-11-08",
+    "id": "bzzagent-campaigns",
+    "name": "BzzAgent",
+    "brand": "BzzAgent (PowerReviews)",
+    "category": "product-testing",
+    "whatYouGet": "Community that invites members by email to apply for free product samples from brands, then share an honest review per posting instructions.",
+    "costToClaim": "free",
+    "costDetail": "Participation is free; members are not paid for reviews",
+    "requirements": [
+      "email",
+      "eligibility"
+    ],
+    "eligibility": "Must be 18+ (or age of majority) and a resident of the US, UK or Canada (excl. Quebec)",
+    "region": "US",
+    "signupUrl": "https://sampling.powerreviews.com/join",
+    "sourceUrls": [
+      "https://bzzagent.com/",
+      "https://bzzagent.com/how-it-works/",
+      "https://bzzagent.com/about-us/",
+      "https://bzzagent.com/privacy-policy/",
+      "https://bzzagent.com/terms-and-conditions/"
+    ],
+    "confidence": "medium",
+    "catches": "Samples are limited and only chosen applicants get one. Required review and posting per campaign, shared with followers, with disclosure rules. Sponsoring brands may receive info about your participation and act as independent controllers. Privacy notice says it does not sell data for money but shares data with ad/analytics partners, which may count as a sale or share under state law. Campaign invite emails.",
+    "notes": "Sign-up link on bzzagent.com goes to sampling.powerreviews.com (PowerReviews owns BzzAgent), so signupUrl is off the bzzagent.com domain; confidence capped at medium. Not parenting-specific."
+  },
+  {
+    "verifiedOn": "2026-11-08",
+    "id": "home-tester-club-us-product-tests",
+    "name": "Home Tester Club",
+    "brand": "Home Tester Club",
+    "category": "product-testing",
+    "whatYouGet": "Free to join. Members can apply for free product tests with samples mailed to them, then rate and review them; points are earned for activity. Current campaigns have included children's oral care products.",
+    "costToClaim": "free",
+    "costDetail": "Completely free to join",
+    "requirements": [
+      "email",
+      "address",
+      "eligibility"
+    ],
+    "eligibility": "Product tests are matched to member profile; not everyone is selected",
+    "region": "US",
+    "signupUrl": "https://www.hometesterclub.com/us/en/account/join",
+    "sourceUrls": [
+      "https://www.hometesterclub.com/us/en",
+      "https://www.hometesterclub.com/us/en/faq",
+      "https://www.hometesterclub.com/us/en/privacy",
+      "https://www.hometesterclub.com/us/en/terms"
+    ],
+    "confidence": "high",
+    "catches": "Not every applicant gets a test. Test partner companies can see your survey answers, written reviews with first name, and photo/video reviews, tied to profile demographics (name, email, phone and address are not shared with them per the policy). Feedback surveys and email after tests. Points have no monetary value.",
+    "notes": "Not parenting-specific; check the Test page for baby or kids' campaigns."
+  },
+  {
+    "verifiedOn": "2026-11-08",
+    "id": "pinchme-samples",
+    "name": "PINCHme",
+    "brand": "PINCHme",
+    "category": "product-testing",
+    "whatYouGet": "Apply for free product samples; once qualified for 4 products your box ships free. Feedback on samples unlocks more offers, and extra surveys can earn gift cards.",
+    "costToClaim": "free",
+    "costDetail": "Free to join, no credit card required, box ships free at 4 products",
+    "requirements": [
+      "email",
+      "address"
+    ],
+    "eligibility": "",
+    "region": "US",
+    "signupUrl": "https://www.pinchme.com/",
+    "sourceUrls": [
+      "https://www.pinchme.com/",
+      "https://www.pinchme.com/policy",
+      "https://www.pinchme.com/tos"
+    ],
+    "confidence": "high",
+    "catches": "Terms say members are not guaranteed any samples. Privacy policy says information is shared with affiliates, business partners and brand partners for their own business purposes, including direct marketing. Marketing emails about campaigns and offers. Members are asked to share feedback and must follow FTC endorsement disclosure rules.",
+    "notes": "Not parenting-specific. Terms say membership may be limited by territory and eligibility; the specific rules were not found on the pages read."
+  },
+  {
+    "verifiedOn": "2026-11-08",
+    "id": "tryazon-tryabox-parties",
+    "name": "Tryazon",
+    "brand": "Tryazon",
+    "category": "product-testing",
+    "whatYouGet": "Members apply to host parties or receive TryaBoxes of brand products to try, with promised free products per the site.",
+    "costToClaim": "free",
+    "costDetail": "Described as free to try and keep products; sponsor selects participants",
+    "requirements": [
+      "email",
+      "eligibility"
+    ],
+    "eligibility": "18+; sponsors select by demographics such as location, age or number of children",
+    "region": "US",
+    "signupUrl": "https://www.tryazon.com/host-sign-up-form/",
+    "sourceUrls": [
+      "https://www.tryazon.com/",
+      "https://www.tryazon.com/faq/",
+      "https://www.tryazon.com/privacy-policy/",
+      "https://www.tryazon.com/terms-use/"
+    ],
+    "confidence": "medium",
+    "catches": "Applications are shared with the sponsoring brand. FAQ says selection also looks at social accounts and who actively shares, and hosts follow FTC disclosure rules, so expect to post on social media. Privacy policy says it will not sell or rent your information and shares aggregated demographics with partners. Email communications with unsubscribe.",
+    "notes": "Terms of Use page shows an effective date of May 25, 2018. Specific what-you-get varies by party or TryaBox."
+  },
+  {
+    "verifiedOn": "2026-11-08",
+    "id": "babycenter-app-rewards",
+    "name": "BabyCenter Rewards Program",
+    "brand": "BabyCenter",
+    "category": "rewards",
+    "whatYouGet": "In-app loyalty program where members earn and redeem points for discounts and products from brands, free for all members, per the BabyCenter app page.",
+    "costToClaim": "free",
+    "costDetail": "Free for all app members",
+    "requirements": [
+      "app"
+    ],
+    "eligibility": "",
+    "region": "US",
+    "signupUrl": "https://www.babycenter.com/mobile-apps",
+    "sourceUrls": [
+      "https://www.babycenter.com/mobile-apps",
+      "https://www.babycenter.com/help-privacy"
+    ],
+    "confidence": "medium",
+    "catches": "Privacy policy (Everyday Health) describes marketing emails, interest-based ads with partners and tracking technologies; details of what rewards cost in points are not on the pages read.",
+    "notes": "Only a one-line mention found; no rewards terms page was found. Home page shows 'Join BabyCenter & Earn Daily Rewards' and a Freebies & Deals roundup link (editorial)."
+  }
+]

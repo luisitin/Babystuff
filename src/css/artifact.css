@@ -1,0 +1,49 @@
+/* artifact.css: rules only the Claude artifact needs (appended after the shared CSS in artifact.html).
+   The artifact skeleton already pads :root by the top and bottom safe-area insets and zeroes the body margin,
+   and the <meta name="claude:viewport-fit-sides"> tag promises that .bff-shell carries the side gutter. */
+
+/* The one outer wrapper: side gutter exactly as promised, vertical padding (none) via padding-block. */
+.bff-shell {
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 0;
+  min-width: 0;
+}
+body { min-height: 0; }
+
+/* Sections inside the wrapper must not add a second gutter. */
+main { padding-left: 0; padding-right: 0; }
+.app-footer { padding-left: 0; padding-right: 0; padding-bottom: calc(60px + var(--space-4)); }
+
+/* Sticky header: sits at the top inset, painted edge to edge, with the gutter on its own padding.
+   The band above it (the inset area) is painted by body::before. */
+html { scroll-padding-top: calc(env(safe-area-inset-top, 0px) + 76px); }
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0 0 auto;
+  height: env(safe-area-inset-top, 0px);
+  z-index: 10;
+  background: var(--bg);
+}
+.app-header {
+  position: sticky;
+  top: env(safe-area-inset-top, 0px);
+  z-index: 20;
+  background: var(--bg);
+  border-bottom: 1px solid var(--border);
+  margin-left: calc(-1 * max(16px, env(safe-area-inset-left, 0px)));
+  margin-right: calc(-1 * max(16px, env(safe-area-inset-right, 0px)));
+  padding: var(--space-2) max(16px, env(safe-area-inset-right, 0px)) var(--space-2) max(16px, env(safe-area-inset-left, 0px));
+}
+
+/* Fixed bottom nav: base.css already keeps it at bottom 0 and adds the bottom, left and right insets to its own
+   padding, so nothing is added here on phones (a 16px gutter would squeeze the five tab labels at 320px). */
+
+@media (min-width: 720px) {
+  body { display: block; }
+  .bff-shell { display: flex; flex-direction: column; }
+  .app-header { padding-top: var(--space-3); padding-bottom: var(--space-3); }
+  .app-nav { padding-left: 0; padding-right: 0; padding-bottom: 0; }
+  .app-footer { padding-bottom: var(--space-4); }
+}

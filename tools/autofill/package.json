@@ -1,0 +1,17 @@
+{
+  "name": "baby-freebies-autofill",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Optional local helper that pre-fills sign-up forms for you to review and submit by hand. Never submits.",
+  "type": "module",
+  "scripts": {
+    "start": "node autofill.mjs",
+    "list": "node autofill.mjs --list"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "playwright": "1.49.1"
+  }
+}

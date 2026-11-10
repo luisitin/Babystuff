@@ -1,0 +1,116 @@
+[
+  {
+    "id": "imagination-library-free-books",
+    "name": "Dolly Parton's Imagination Library",
+    "brand": "Dolly Parton's Imagination Library (The Dollywood Foundation)",
+    "category": "baby-care",
+    "whatYouGet": "A high-quality, age-appropriate book mailed each month to registered children at no cost to the family.",
+    "costToClaim": "free",
+    "costDetail": "Books are 100% free to enrolled children; local program partners cover book and shipping costs.",
+    "requirements": [
+      "address",
+      "due-date",
+      "eligibility"
+    ],
+    "eligibility": "Children (the US page refers to ages 0-5) living in an area covered by a local program partner; the check-availability page lets you register online or by mail where offered.",
+    "region": "Varies by area",
+    "signupUrl": "https://imaginationlibrary.com/check-availability/",
+    "sourceUrls": [
+      "https://imaginationlibrary.com/check-availability/",
+      "https://imaginationlibrary.com/usa/"
+    ],
+    "verifiedOn": "2026-11-08",
+    "confidence": "high",
+    "catches": "Only available where a local program partner serves your address. One local program reported 8-10 weeks for the first book.",
+    "notes": "Check availability by location first. The search-result snippet about 8-10 weeks came from a local program page."
+  },
+  {
+    "id": "1000-books-before-kindergarten",
+    "name": "1000 Books Before Kindergarten",
+    "brand": "1000 Books Before Kindergarten",
+    "category": "baby-care",
+    "whatYouGet": "A free reading challenge with reading logs and an app; many local library programs add small rewards at milestones.",
+    "costToClaim": "free",
+    "costDetail": "Reading logs and program instructions are downloadable; no cost listed for joining.",
+    "requirements": [],
+    "eligibility": "Families with newborns, infants and toddlers; some libraries run local programs.",
+    "region": "US (local library programs vary)",
+    "signupUrl": "https://1000booksbeforekindergarten.org/find-a-program/",
+    "sourceUrls": [
+      "https://1000booksbeforekindergarten.org/",
+      "https://1000booksbeforekindergarten.org/1000-books-before-kindergarten-program/",
+      "https://1000booksbeforekindergarten.org/find-a-program/"
+    ],
+    "verifiedOn": "2026-11-08",
+    "confidence": "high",
+    "catches": "Rewards depend on the local library; the site says to start at home if no local program exists.",
+    "notes": "Directory by state; contact your local library to join."
+  },
+  {
+    "id": "vroom-early-learning-tips",
+    "name": "Vroom Tips",
+    "brand": "Vroom (Bezos Family Foundation)",
+    "category": "baby-care",
+    "whatYouGet": "Free early-learning tips and activities for children 5 and under, via a free app, web app, and printable tips.",
+    "costToClaim": "free",
+    "costDetail": "Site describes the tips and tools as free.",
+    "requirements": [
+      "app"
+    ],
+    "eligibility": "Parents and caregivers of children 5 and under.",
+    "region": "US",
+    "signupUrl": "https://app.vroom.org/",
+    "sourceUrls": [
+      "https://www.vroom.org/",
+      "https://www.vroom.org/about"
+    ],
+    "verifiedOn": "2026-11-08",
+    "confidence": "high",
+    "catches": "",
+    "notes": "Page also mentions Vroom by Text and an Alexa skill. Account details were not read."
+  },
+  {
+    "id": "safe-kids-car-seat-check",
+    "name": "Free car seat inspection (Safe Kids / National CPS Certification)",
+    "brand": "Safe Kids Worldwide",
+    "category": "assistance",
+    "whatYouGet": "A one-on-one check by a certified child passenger safety technician who shows you how to install and use your car seat; Safe Kids coalitions host free inspection events.",
+    "costToClaim": "free",
+    "costDetail": "The page says coalitions host more than 8,000 free car seat inspection events; fees for individual technicians or locations were not confirmed.",
+    "requirements": [],
+    "eligibility": "Anyone with a child car seat.",
+    "region": "US",
+    "signupUrl": "https://cert.safekids.org/get-car-seat-checked",
+    "sourceUrls": [
+      "https://cert.safekids.org/get-car-seat-checked"
+    ],
+    "verifiedOn": "2026-11-08",
+    "confidence": "medium",
+    "catches": "Availability depends on local events and technicians; sessions take about 20-30 minutes and you do the installation yourself with guidance.",
+    "notes": "Bring the car seat manual and vehicle manual. NHTSA's locator page returned Access Denied, so it was not read."
+  },
+  {
+    "id": "carters-rewards",
+    "name": "Carter's Rewards",
+    "brand": "Carter's",
+    "category": "rewards",
+    "whatYouGet": "A free loyalty program for Carter's, OshKosh B'gosh and Skip Hop shoppers that includes a Birthday Surprise offer for each child.",
+    "costToClaim": "free",
+    "costDetail": "Described in search results as a free loyalty program.",
+    "requirements": [
+      "email",
+      "purchase"
+    ],
+    "eligibility": "Birthday offers cover up to five children age 14 or under; search results say a recent purchase and promotional-email opt-in are needed.",
+    "region": "US",
+    "signupUrl": "https://www.carters.com/rewards",
+    "sourceUrls": [
+      "https://www.carters.com/rewards",
+      "https://www.carters.com/customerservice/account-and-rewards"
+    ],
+    "verifiedOn": "",
+    "confidence": "medium",
+    "catches": "A 20% welcome offer is tied to the Carter's credit card. Offers are discounts, not free items; birthday offers need a purchase within 12 months.",
+    "notes": "carters.com returned a bot challenge to the fetch helper, so this is based on carters.com search results only."
+  }
+]

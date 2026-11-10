@@ -1,0 +1,142 @@
+name: Link check
+
+on:
+  schedule:
+    - cron: '17 14 * * 1'
+  workflow_dispatch:
+    inputs:
+      role:
+        description: 'Which links to check: signup, source or all'
+        type: choice
+        options: [all, signup, source]
+        default: all
+      ids:
+        description: 'Optional comma-separated program ids to recheck (empty = every program)'
+        type: string
+        default: ''
+
+permissions:
+  contents: read
+  issues: write
+
+concurrency:
+  group: link-check
+  cancel-in-progress: false
+
+jobs:
+  link-check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    # Actions use major-version tags so they are easy to update; they can be pinned to commit SHAs for stricter supply-chain safety.
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Check signup and source links
+        id: check
+        # Exit codes: 0 nothing needs attention (OK, BLOCKED, SUSPECT), 1 links need attention, 2 the checker itself failed.
+        # Inputs arrive through env, never interpolated into the shell line; the script validates them.
+        env:
+          INPUT_ROLE: ${{ github.event.inputs.role }}
+          INPUT_IDS: ${{ github.event.inputs.ids }}
+        run: |
+          set +e
+          args=(--out link-report.md --json link-report.json)
+          if [ -n "$INPUT_ROLE" ]; then args+=(--role "$INPUT_ROLE"); fi
+          if [ -n "$INPUT_IDS" ]; then args+=(--ids "$INPUT_IDS"); fi
+          node scripts/check-links.mjs "${args[@]}"
+          echo "code=$?" >> "$GITHUB_OUTPUT"
+      - name: Show the report in the log and the run summary
+        if: always()
+        run: |
+          if [ -f link-report.md ]; then
+            cat link-report.md
+            cat link-report.md >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "No report was produced (the checker failed before writing one)."
+          fi
+      - name: Upload reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: link-report
+          path: |
+            link-report.md
+            link-report.json
+          if-no-files-found: warn
+      - name: Open, update or close the link-check issue
+        uses: actions/github-script@v7
+        env:
+          CHECK_CODE: ${{ steps.check.outputs.code }}
+        with:
+          script: |
+            const fs = require('fs');
+            const { owner, repo } = context.repo;
+            const code = process.env.CHECK_CODE;
+            if (code === '0' || code === '1') { /* handled below */ } else { core.error('Link checker itself failed (exit ' + code + '); not touching the issue.'); return; }
+            const failed = code === '1';
+            const runUrl = `${process.env.GITHUB_SERVER_URL}/${owner}/${repo}/actions/runs/${process.env.GITHUB_RUN_ID}`;
+            let report = fs.existsSync('link-report.md')
+              ? fs.readFileSync('link-report.md', 'utf8')
+              : 'The link checker did not produce a report. See the workflow run for details.';
+            const limit = 60000;
+            const suffix = `\n\n(Report truncated. Full report is attached to the workflow run: ${runUrl})`;
+            if (report.length > limit) report = report.slice(0, limit - suffix.length) + suffix;
+            const body = `${report}\n\nWorkflow run: ${runUrl}`.slice(0, 65000);
+
+            if (failed) {
+              try {
+                await github.rest.issues.createLabel({ owner, repo, name: 'link-check', color: 'fbca04', description: 'Automated link check findings' });
+              } catch (e) {
+                if (e.status !== 422) throw e; // 422 means the label already exists
+              }
+            }
+            const open = await github.rest.issues.listForRepo({
+              owner, repo, state: 'open', labels: 'link-check', sort: 'created', direction: 'asc', per_page: 30,
+            });
+            const existing = open.data.find((i) => !i.pull_request);
+
+            if (failed) {
+              if (existing) {
+                await github.rest.issues.createComment({ owner, repo, issue_number: existing.number, body });
+              } else {
+                await github.rest.issues.create({
+                  owner, repo,
+                  title: 'Link check: programs need attention',
+                  body,
+                  labels: ['link-check'],
+                });
+              }
+            } else if (existing) {
+              const date = new Date().toISOString().slice(0, 10);
+              let summaryLine = `No broken links found on ${date}.`;
+              try {
+                const data = JSON.parse(fs.readFileSync('link-report.json', 'utf8'));
+                const ok = data.summary.byClass.OK;
+                const blocked = data.summary.byClass.BLOCKED;
+                const total = data.summary.total;
+                if (![ok, blocked, total].every(Number.isFinite)) throw new Error('unexpected link-report.json shape');
+                summaryLine = `No broken links on ${date}: ${ok} of ${total} links answered OK.`;
+                if (blocked > 0) summaryLine += ` ${blocked} could not be checked automatically because the site refuses robots; open those by hand.`;
+              } catch (e) { /* counts unavailable: keep the generic line */ }
+              await github.rest.issues.createComment({
+                owner, repo, issue_number: existing.number, body: `${summaryLine}\nWorkflow run: ${runUrl}`,
+              });
+              await github.rest.issues.update({
+                owner, repo, issue_number: existing.number, state: 'closed', state_reason: 'completed',
+              });
+            }
+      - name: Fail the job if links need attention
+        if: steps.check.outputs.code != '0'
+        env:
+          CHECK_CODE: ${{ steps.check.outputs.code }}
+        run: |
+          if [ "$CHECK_CODE" = "1" ]; then
+            echo "::error::Link check found NOT-FOUND, OFF-DOMAIN or DEAD links. See the report in the log, the link-check issue and the link-report artifact."
+          else
+            echo "::error::The link checker itself failed (exit code $CHECK_CODE). See the step log."
+          fi
+          exit 1

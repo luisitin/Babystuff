@@ -1,0 +1,38 @@
+[
+  {
+    "id": "pampers-rewards",
+    "name": "Pampers Rewards",
+    "brand": "Pampers",
+    "category": "rewards",
+    "whatYouGet": "Free loyalty app: scan the code inside Pampers diaper or wipe packs to earn Pampers Cash (0 per 10 diaper scans), redeemable for discounts on Pampers at retailers.",
+    "costToClaim": "free",
+    "costDetail": "Free to download and join; page says no subscription or hidden fees. Rewards are discounts on Pampers purchases.",
+    "requirements": ["email", "app", "purchase"],
+    "eligibility": "",
+    "region": "US",
+    "signupUrl": "https://www.pampers.com/en-us/rewards",
+    "sourceUrls": ["https://www.pampers.com/en-us/rewards", "https://support.pampers.com/hc/en-us/articles/21676841189533-How-can-I-get-Pampers-samples-or-coupons"],
+    "verifiedOn": "2026-11-08",
+    "confidence": "high",
+    "catches": "Earning needs Pampers purchases. Pampers Cash expires 6 months after being added or if the account is inactive 6 months. App works on one device at a time. Page also promotes a 7-day free trial of a separate Baby Sleep app.",
+    "notes": "Formerly called Pampers Club. Referral: invite up to 5 friends for $2 each for them and up to $10 for you."
+  },
+  {
+    "id": "huggies-rewards",
+    "name": "Huggies Rewards",
+    "brand": "Huggies",
+    "category": "rewards",
+    "whatYouGet": "Free rewards program and app where purchases of Huggies products earn points that can be redeemed for rewards such as gift cards.",
+    "costToClaim": "free",
+    "costDetail": "Free to join",
+    "requirements": ["email", "app", "purchase"],
+    "eligibility": "",
+    "region": "US",
+    "signupUrl": "https://www.huggies.com/en-us/rewards",
+    "sourceUrls": ["https://www.huggies.com/en-us/rewards/rewardsapp", "https://www1.huggies.com/en-us/offers-and-rewards/rewards"],
+    "verifiedOn": "2026-11-08",
+    "confidence": "medium",
+    "catches": "Points require buying Huggies products. Search snippets disagree on the sign-up bonus amount, so none is listed. Older Rewards+ (Fetch) earning ended per a Huggies page.",
+    "notes": "huggies.com blocks automated fetching (Cloudflare 403); details come from huggies.com search results only."
+  }
+]
