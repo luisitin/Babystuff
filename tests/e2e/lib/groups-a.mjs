@@ -13,7 +13,7 @@ export async function boot(env) {
     const frag = artifactFragment();
     g.check('artifact fragment starts with the title', frag.startsWith('<title>Baby Freebies Finder</title>'), frag.slice(0, 60));
     g.check('artifact fragment has the viewport-fit-sides meta', /<meta name="claude:viewport-fit-sides"/.test(frag));
-    g.check('artifact fragment has no doctype, html, head or body tag', !/<!doctype|<html|<head|<body/i.test(frag));
+    g.check('artifact fragment has no doctype, html, head or body tag', !/<!doctype|<html[\s>]|<head[\s>]|<body[\s>]/i.test(frag));
     for (const mode of ['standalone', 'artifact']) {
       for (const vp of [{ width: 390, height: 844 }, { width: 320, height: 640 }]) {
         for (const scheme of ['light', 'dark']) {
@@ -197,6 +197,7 @@ export async function clickThrough(env) {
         await enterRoute(h, r);
         const url0 = page.url();
         const items = await page.evaluate(() => {
+          document.querySelectorAll('[data-e2e]').forEach((e) => e.removeAttribute('data-e2e'));
           const out = [], seen = new Set();
           document.querySelectorAll('a[href]').forEach((a, i) => {
             const href = a.getAttribute('href');
@@ -242,7 +243,7 @@ export async function clickThrough(env) {
         };
         await enter();
         const names = await pg.locator('button:visible').evaluateAll((bs) => bs.map((b) => (b.getAttribute('aria-label') || b.textContent).trim().replace(/\s+/g, ' ')));
-        let fails = [], did = 0;
+        let fails = [], did = 0; const asked = [];
         for (let i = 0; i < names.length; i++) {
           if (i > 0 || true) await enter();
           const btn = pg.locator('button:visible').nth(i);
@@ -258,6 +259,7 @@ export async function clickThrough(env) {
           if (DESTRUCTIVE.test(name)) {
             const conf = await pg.locator('.fx-confirm').count();
             if (conf) {
+              asked.push(name);
               await pg.locator('.fx-confirm').getByRole('button', { name: 'Cancel' }).click();
               const ls1 = JSON.stringify([await pg.evaluate(() => localStorage.getItem('bff.profile.v1')), await pg.evaluate(() => localStorage.getItem('bff.tracker.v1'))]);
               if (ls1 !== ls0) fails.push(name + ': Cancel changed stored data');
@@ -276,6 +278,7 @@ export async function clickThrough(env) {
             if (s0 === s1 && side.downloads + side.dialogs === d0 && hb.ctx.pages().length === nPages && hb.net.length === net0) suspects.push(tag + ': "' + name + '" changed nothing visible');
           }
         }
+        g.note(tag + ': ' + names.length + ' visible buttons, ' + did + ' clicked; destructive ones that asked first: ' + (asked.join(', ') || 'none'));
         g.check(tag + ': ' + did + ' buttons clicked, no errors, destructive ones ask first and Cancel keeps data', fails.length === 0, fails.slice(0, 3).join(' | '));
       }
       await hb.ctx.close();

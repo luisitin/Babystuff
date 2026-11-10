@@ -39,17 +39,11 @@ const A = await import('./lib/groups-a.mjs');
 const B = await import('./lib/groups-b.mjs');
 const C = await import('./lib/groups-c.mjs');
 const t0 = Date.now();
+const oi = process.argv.indexOf('--only');
+const only = oi > 0 ? process.argv[oi + 1].split(',') : null; // e.g. --only 4,7 runs those group numbers
+const steps = [['1', A.boot], ['2', A.routes], ['3', A.links], ['4', A.clickThrough], ['5', B.downloads], ['6', B.backup], ['7', B.gmail], ['8', C.fill], ['9', C.persistence], ['10', C.a11y]];
 try {
-  await A.boot(env);
-  await A.routes(env);
-  await A.links(env);
-  await A.clickThrough(env);
-  await B.downloads(env);
-  await B.backup(env);
-  await B.gmail(env);
-  await C.fill(env);
-  await C.persistence(env);
-  await C.a11y(env);
+  for (const [id, fn] of steps) if (!only || only.includes(id)) await fn(env);
 } finally {
   await browser.close();
 }

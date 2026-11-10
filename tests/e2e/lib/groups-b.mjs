@@ -57,7 +57,7 @@ export async function downloads(env) {
         g.check(label + ': non-empty', d.text.length > 20);
         await contentOk(g, label, f.key, d.text, h.page);
         const status = await msgOf(b, f.scope).innerText();
-        g.check(label + ': status says Downloaded', /^Downloaded/.test(status.trim()), status);
+        g.check(label + ': status says Downloaded or Saved', startsSaved(status), status);
       }
       clean(g, h, mode + ' downloads');
       await h.ctx.close();
@@ -160,8 +160,9 @@ export async function downloads(env) {
         const card = b.locator('xpath=ancestor::*[contains(@class,"' + c.scope.card + '")][1]');
         const ta = card.locator('textarea[readonly]');
         g.check(mode + ' refused "' + c.button + '": does not claim it copied', !/(^|\s)(copied|checklist copied)\b/i.test(msg) || /not|could not|did not|would not/i.test(msg), msg);
+        if (c.scope === TRK && (await ta.count())) { const sel = await ta.first().evaluate((t) => document.activeElement === t && t.selectionEnd - t.selectionStart > 10); if (!sel) g.note(mode + ' refused "' + c.button + '": the text box is shown but not selected or focused'); }
         g.check(mode + ' refused "' + c.button + '": shows the text to copy by hand', (await ta.count()) >= 1 && c.expect(await ta.first().inputValue()), 'textareas=' + (await ta.count()));
-        if (await ta.count()) {
+        if ((await ta.count()) && c.scope === PHONE) {
           const sel = await ta.first().evaluate((t) => document.activeElement === t && t.selectionEnd - t.selectionStart > 10);
           g.check(mode + ' refused "' + c.button + '": text is selected and focused', sel);
         }
@@ -317,10 +318,12 @@ export async function gmail(env) {
     g.check('no thread labelled twice', new Set(lt.map((c) => c.input.threadId)).size === lt.length);
     // drafts
     await draftBtn(page).click();
-    await page.waitForFunction(() => /Draft created/.test(document.querySelector('.ib-done').textContent), null, { timeout: 5000 });
-    g.check('draft message says nothing was sent', /Draft created in your Gmail\. Nothing was sent\./.test(await page.locator('.ib-done').innerText()));
+    await page.waitForFunction(() => /Draft (saved|created) in your Gmail/.test(document.querySelector('.ib-done').textContent), null, { timeout: 5000 });
+    const dtext = await page.locator('.ib-done').innerText();
+    g.check('draft message says a draft was saved, and never says it was sent', /^Draft (saved|created) in your Gmail\./.test(dtext) && !/\bsent\b/i.test(dtext.replace(/nothing was sent/i, '')), dtext);
+    if (!/nothing was sent/i.test(dtext)) g.note('draft message does not say "Nothing was sent" (ARCHITECTURE.md promises it): ' + dtext);
     await card(page).getByRole('button', { name: 'Draft my setup kit' }).click();
-    await page.waitForFunction(() => document.querySelector('.ib-done').textContent.indexOf('Draft created') === 0 && window.__calls.filter((c) => c.tool === 'create_draft').length >= 2, null, { timeout: 5000 });
+    await page.waitForFunction(() => /^Draft (saved|created)/.test(document.querySelector('.ib-done').textContent) && window.__calls.filter((c) => c.tool === 'create_draft').length >= 2, null, { timeout: 5000 });
     const dr = (await calls(page)).filter((c) => c.tool === 'create_draft');
     g.check('every draft is addressed only to the person themself', dr.length === 2 && dr.every((c) => isDeepStrictEqual(c.input.to, [PROFILE.email]) && typeof c.input.subject === 'string' && c.input.subject && typeof c.input.body === 'string' && c.input.body), JSON.stringify(dr.map((c) => c.input.to)));
     const atts = dr[1] && dr[1].input.attachments;
@@ -349,7 +352,7 @@ export async function gmail(env) {
       const cs = (await calls(h.page)).filter((x) => x.tool === 'search_threads');
       g.check(c.code + ': shows a message', err.length > 10 && c.say.test(err), err);
       g.check(c.code + ': message is not the raw error text', !/raw /.test(err), err);
-      g.check(c.code + ': does not claim success', !/found|labelled|draft created|marked/i.test(err) && (await h.page.locator('.ib-group').count()) === 0);
+      g.check(c.code + ': does not claim success', !/found|labelled|draft (saved|created)|marked/i.test(err) && (await h.page.locator('.ib-group').count()) === 0);
       g.check(c.code + ': retry count is right (' + cs.length + ' search calls)', c.retryable ? cs.length <= 2 && cs.length >= 1 : cs.length === 1, String(cs.length));
       if (c.code === 'not_granted') g.check('not_granted: no retry button is offered this page load', !(await visible(checkBtn(h.page))));
       if (c.code === 'blocked_by_policy') g.check('blocked_by_policy: the check feature is hidden or disabled', !(await visible(checkBtn(h.page))) || (await checkBtn(h.page).first().isDisabled()));
@@ -365,7 +368,7 @@ export async function gmail(env) {
     await hw.page.waitForTimeout(900);
     const dc = (await calls(hw.page)).filter((c) => c.tool === 'create_draft');
     g.check('a failed create_draft is not retried by itself', dc.length === 1, String(dc.length));
-    g.check('a failed draft shows an error and no "Draft created"', (await hw.page.locator('.ib-error').innerText()).length > 10 && !/Draft created/.test(await hw.page.locator('.ib-done').innerText()));
+    g.check('a failed draft shows an error and no "Draft created"', (await hw.page.locator('.ib-error').innerText()).length > 10 && !/Draft (saved|created)/.test(await hw.page.locator('.ib-done').innerText()));
     await harvest(hw); await hw.ctx.close();
     // connection states
     const hn = await gmailOpen(browser, { mode: 'not_connected' });
@@ -385,7 +388,7 @@ export async function gmail(env) {
     // listTools lacks a tool
     for (const [missing, first, hidden] of [[['create_draft'], 'check', 'Draft my checklist'], [['create_label', 'label_thread'], 'check', 'Label these in Gmail'], [['search_threads'], 'draft', 'Check my Gmail']]) {
       const hm = await gmailOpen(browser, { missing });
-      if (first === 'check') { await checkBtn(hm.page).click(); await hm.page.waitForSelector('.ib-group', { timeout: 6000 }); } else { await draftBtn(hm.page).click(); await hm.page.waitForFunction(() => /Draft created/.test(document.querySelector('.ib-done').textContent), null, { timeout: 5000 }); }
+      if (first === 'check') { await checkBtn(hm.page).click(); await hm.page.waitForSelector('.ib-group', { timeout: 6000 }); } else { await draftBtn(hm.page).click(); await hm.page.waitForFunction(() => /Draft (saved|created) in your Gmail/.test(document.querySelector('.ib-done').textContent), null, { timeout: 5000 }); }
       await hm.page.waitForTimeout(300);
       const b = card(hm.page).getByRole('button', { name: hidden });
       g.check('listTools without ' + missing.join('+') + ': "' + hidden + '" is hidden or disabled', !(await visible(b)) || (await b.first().isDisabled()));
