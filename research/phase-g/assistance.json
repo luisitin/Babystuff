@@ -1,0 +1,504 @@
+[
+ {
+  "id": "211-org-community-help",
+  "name": "2-1-1",
+  "brand": "United Way 211",
+  "category": "assistance",
+  "whatYouGet": "Confidential help finding local resources for paying bills, food, housing, utilities, healthcare and other needs: call 2-1-1 and a local expert connects you to services. National Diaper Bank Network's page also points families to 2-1-1 for diaper assistance.",
+  "costToClaim": "free",
+  "costDetail": "Page does not state a cost; the service is a referral line, not a benefit itself.",
+  "requirements": [],
+  "eligibility": "Anyone.",
+  "region": "US",
+  "signupUrl": "https://211.org/",
+  "sourceUrls": [
+   "https://211.org/"
+  ],
+  "verifiedOn": "2026-11-08",
+  "confidence": "medium",
+  "catches": "Resources and what they offer vary by local 211 service; 2-1-1 refers you to programs rather than providing items itself.",
+  "notes": "Fetched directly: home page says every call is completely confidential and links to local 211 lookup. Not baby-specific.",
+  "offers": [
+   "service"
+  ],
+  "certainty": "guaranteed",
+  "freeStuff": "",
+  "valueLow": null,
+  "valueHigh": null,
+  "valueSource": "none",
+  "valueBasis": "",
+  "effort": "quick",
+  "when": "anytime",
+  "whenNote": "",
+  "states": []
+ },
+ {
+  "id": "early-head-start-pregnant-women",
+  "name": "Early Head Start (services for pregnant women)",
+  "brand": "Head Start (HHS/ACF)",
+  "category": "assistance",
+  "whatYouGet": "Early Head Start programs may serve pregnant women and expectant families.",
+  "costToClaim": "free",
+  "costDetail": "Free",
+  "requirements": [
+   "eligibility"
+  ],
+  "eligibility": "Pregnant women with family income at or below the federal poverty line, or receiving TANF, SSI or SNAP; only programs that serve pregnant women (some Early Head Start programs, including the home-based option) enroll them.",
+  "region": "US (local programs)",
+  "signupUrl": "https://www.headstart.gov/how-apply",
+  "sourceUrls": [
+   "https://www.headstart.gov/how-apply",
+   "https://headstart.gov/about-us/article/head-start-faqs"
+  ],
+  "verifiedOn": "2026-11-10",
+  "confidence": "medium",
+  "catches": "Not every program serves pregnant women; waiting lists possible.",
+  "notes": "Checked from the official site's search results; the site blocks automated reading, so details may be incomplete. headstart.gov returned 403 to automated fetching; official-domain search results say apply by contacting a local program (Head Start Center Locator or toll-free line 1-866-763-6481) and that waitlists are common.",
+  "offers": [
+   "service"
+  ],
+  "certainty": "if-eligible",
+  "freeStuff": "",
+  "valueLow": null,
+  "valueHigh": null,
+  "valueSource": "none",
+  "valueBasis": "",
+  "effort": "involved",
+  "when": "pregnancy",
+  "whenNote": "Head Start says a pregnant woman can follow the same steps to enroll herself; not every program serves pregnant women.",
+  "states": []
+ },
+ {
+  "id": "cribs-for-kids-find-a-crib",
+  "name": "Find a Crib",
+  "brand": "Cribs for Kids",
+  "category": "assistance",
+  "whatYouGet": "Free portable crib and safe sleep education through local partners.",
+  "costToClaim": "free",
+  "costDetail": "Free through partner organizations",
+  "requirements": [
+   "eligibility"
+  ],
+  "eligibility": "Financial need, infant 12 months or younger, and receiving safe sleep education (per search result); each partner sets its own criteria; crib limits 30 lb and 35 in.",
+  "region": "US (via local partners)",
+  "signupUrl": "https://cribsforkids.org/find-a-crib/",
+  "sourceUrls": [
+   "https://cribsforkids.org/find-a-crib/"
+  ],
+  "verifiedOn": "2026-11-10",
+  "confidence": "medium",
+  "catches": "Some partners provide education only; availability varies. One Cribs for Kids partner document says the program is not a free crib giveaway, so local partners set the terms.",
+  "notes": "Checked from the official site's search results; the site blocks automated reading, so details may be incomplete. Site returned 403 to automated fetching, so this rests on official-domain search results. Search results say you find the nearest partner on the site map and call to apply; if you are not eligible the site suggests Healthy Start or local health departments.",
+  "offers": [
+   "product"
+  ],
+  "certainty": "if-eligible",
+  "freeStuff": "A portable crib and safe sleep teaching from a local partner, if you qualify.",
+  "valueLow": 80,
+  "valueHigh": 80,
+  "valueSource": "estimate",
+  "valueBasis": "One portable crib at about $80 shelf price",
+  "effort": "involved",
+  "when": "anytime",
+  "whenNote": "Infant must be 12 months or younger; some local partners start before the birth.",
+  "states": []
+ },
+ {
+  "id": "safe-kids-car-seat-check",
+  "name": "Get a Car Seat Checked",
+  "brand": "Safe Kids Worldwide",
+  "category": "assistance",
+  "whatYouGet": "Free car seat inspection events and a search for certified child passenger safety technicians who check installation and teach you to install it yourself.",
+  "costToClaim": "free",
+  "costDetail": "Safe Kids coalitions host 8,000+ free inspection events",
+  "requirements": [],
+  "eligibility": "Anyone with a child car seat.",
+  "region": "US",
+  "signupUrl": "https://cert.safekids.org/get-car-seat-checked",
+  "sourceUrls": [
+   "https://cert.safekids.org/get-car-seat-checked"
+  ],
+  "verifiedOn": "2026-11-08",
+  "confidence": "high",
+  "catches": "Inspection and education only; not a free car seat. The page says events are free but does not say whether individual technicians or inspection stations charge. Availability depends on local events and technicians.",
+  "notes": "Fetched directly: page says Safe Kids coalitions host more than 8,000 free car seat inspection events and lists three ways to find a certified technician (events, the technician search, NHTSA's directory). Bring the car seat and vehicle manuals; you install the seat yourself with guidance.",
+  "offers": [
+   "service"
+  ],
+  "certainty": "guaranteed",
+  "freeStuff": "",
+  "valueLow": null,
+  "valueHigh": null,
+  "valueSource": "none",
+  "valueBasis": "",
+  "effort": "some",
+  "when": "late-pregnancy",
+  "whenNote": "Get the seat checked before the first ride home from the hospital.",
+  "states": []
+ },
+ {
+  "id": "national-diaper-bank-network-get-help",
+  "name": "Get Help Now / Member Diaper Banks",
+  "brand": "National Diaper Bank Network",
+  "category": "assistance",
+  "whatYouGet": "Directs families to local diaper assistance via 2-1-1 and a directory of member diaper banks that distribute free diapers.",
+  "costToClaim": "free",
+  "costDetail": "Free diapers from local diaper banks",
+  "requirements": [
+   "eligibility"
+  ],
+  "eligibility": "Families in need; each local program sets its own rules.",
+  "region": "US",
+  "signupUrl": "https://nationaldiaperbanknetwork.org/get-help-now/",
+  "sourceUrls": [
+   "https://nationaldiaperbanknetwork.org/get-help-now/",
+   "https://nationaldiaperbanknetwork.org/member-directory/"
+  ],
+  "verifiedOn": "2026-11-08",
+  "confidence": "high",
+  "catches": "Availability varies by community; NDBN does not distribute diapers directly.",
+  "notes": "Fetched directly. Per the page: call 2-1-1 or search 211.org for diapers or basic needs, check listings under children, try faith-based groups and food pantries, or use the member diaper bank directory at /member-directory/.",
+  "offers": [
+   "product"
+  ],
+  "certainty": "if-eligible",
+  "freeStuff": "Free diapers from a local diaper bank, if one near you serves your family.",
+  "valueLow": null,
+  "valueHigh": null,
+  "valueSource": "none",
+  "valueBasis": "",
+  "effort": "some",
+  "when": "after-birth",
+  "whenNote": "",
+  "states": []
+ },
+ {
+  "id": "hrsa-healthy-start",
+  "name": "Healthy Start",
+  "brand": "HRSA",
+  "category": "assistance",
+  "whatYouGet": "Community projects offering care coordination, education and support before, during and after pregnancy.",
+  "costToClaim": "free",
+  "costDetail": "Free through local projects",
+  "requirements": [
+   "address",
+   "eligibility"
+  ],
+  "eligibility": "Pregnant women, new parents, children to 18 months and partners in a funded service area.",
+  "region": "US (funded project areas)",
+  "signupUrl": "https://www.hrsa.gov/services/healthy-start",
+  "sourceUrls": [
+   "https://www.hrsa.gov/services/healthy-start",
+   "https://mchb.hrsa.gov/programs-impact/healthy-start"
+  ],
+  "verifiedOn": "2026-11-08",
+  "confidence": "medium",
+  "catches": "Only in funded communities.",
+  "notes": "Checked from the official site's search results; the site blocks automated reading, so details may be incomplete. hrsa.gov and mchb.hrsa.gov returned 403; official-domain search results say projects have different enrollment guidelines, you must live in a served area, and the HRSA page lists a site finder.",
+  "offers": [
+   "service"
+  ],
+  "certainty": "if-eligible",
+  "freeStuff": "",
+  "valueLow": null,
+  "valueHigh": null,
+  "valueSource": "none",
+  "valueBasis": "",
+  "effort": "some",
+  "when": "pregnancy",
+  "whenNote": "Serves pregnant women, partners and babies up to 18 months.",
+  "states": []
+ },
+ {
+  "id": "postpartum-support-international-helpline",
+  "name": "PSI HelpLine",
+  "brand": "Postpartum Support International",
+  "category": "assistance",
+  "whatYouGet": "Free, confidential helpline for perinatal mental health support and resources; call or text 800-944-4773 (Spanish text 971-203-7773), leave a message and a trained volunteer returns your call or text.",
+  "costToClaim": "free",
+  "costDetail": "Free and confidential",
+  "requirements": [],
+  "eligibility": "Anyone; no diagnosis needed.",
+  "region": "US",
+  "signupUrl": "https://postpartum.net/get-help/psi-helpline/",
+  "sourceUrls": [
+   "https://postpartum.net/get-help/psi-helpline/",
+   "https://postpartum.net/contact-us/"
+  ],
+  "verifiedOn": "2026-11-08",
+  "confidence": "medium",
+  "catches": "Not for emergencies; response times vary (search results cite business-hours return, and up to about 48 hours on the Spanish page).",
+  "notes": "Checked from the official site's search results; the site blocks automated reading, so details may be incomplete. postpartum.net returned 403 to automated fetching; details from official-domain search results. In crisis call or text 988.",
+  "offers": [
+   "service"
+  ],
+  "certainty": "guaranteed",
+  "freeStuff": "",
+  "valueLow": null,
+  "valueHigh": null,
+  "valueSource": "none",
+  "valueBasis": "",
+  "effort": "quick",
+  "when": "anytime",
+  "whenNote": "",
+  "states": []
+ },
+ {
+  "id": "usda-wic",
+  "name": "WIC (Special Supplemental Nutrition Program for Women, Infants, and Children)",
+  "brand": "USDA Food and Nutrition Administration",
+  "category": "assistance",
+  "whatYouGet": "Healthy foods, nutrition education, breastfeeding support and referrals for pregnant, postpartum and breastfeeding women, infants and children under 5.",
+  "costToClaim": "free",
+  "costDetail": "Foods provided at no cost; apply through a local WIC agency",
+  "requirements": [
+   "address",
+   "eligibility"
+  ],
+  "eligibility": "Pregnant, postpartum (up to 6 months) or breastfeeding women, infants and children under 5; income at or below 185% of the federal poverty guidelines (or on Medicaid, SNAP or TANF), live in the state, and a nutrition-risk check. The 2026-27 limit is $29,526 for one person and $40,034 for two, plus $10,508 per added person; an expected birth counts as a household member.",
+  "region": "US (apply through your state or local WIC agency)",
+  "signupUrl": "https://www.fna.usda.gov/wic/apply",
+  "sourceUrls": [
+   "https://www.fna.usda.gov/wic/apply",
+   "https://www.fna.usda.gov/wic/eligibility",
+   "https://www.fna.usda.gov/wic"
+  ],
+  "verifiedOn": "2026-11-10",
+  "confidence": "medium",
+  "catches": "Requires an appointment with a local WIC agency; bring ID, proof of address and proof of income or program enrollment as the agency instructs.",
+  "notes": "Steps: 1) Use the Eligibility Tool. 2) Contact your local WIC agency by phone or online to start. 3) Attend an in-person or virtual appointment. fns.usda.gov now redirects to fna.usda.gov (Food and Nutrition Administration).",
+  "offers": [
+   "product"
+  ],
+  "certainty": "if-eligible",
+  "freeStuff": "A monthly food package or food benefit, including fruit and vegetables, for pregnant and postpartum women and infants who qualify.",
+  "valueLow": 288,
+  "valueHigh": 576,
+  "valueSource": "estimate",
+  "valueBasis": "USDA states $48 a month in fruit and vegetable benefit for pregnant participants (FY 2026); counted for 6 to 12 months; other foods and formula not counted",
+  "effort": "involved",
+  "when": "pregnancy",
+  "whenNote": "WIC serves pregnant women, so applying early in pregnancy gives the most months of benefit.",
+  "states": []
+ },
+ {
+  "id": "baby2baby-golden-state-start",
+  "name": "Golden State Start free newborn diapers",
+  "brand": "Baby2Baby / California CalRx",
+  "category": "diapers-wipes",
+  "whatYouGet": "400 free newborn and size 1 diapers handed out around hospital discharge to babies born at a participating California hospital.",
+  "costToClaim": "free",
+  "costDetail": "No cost, no application",
+  "requirements": [],
+  "eligibility": "Any baby born at a participating California hospital; no income limit, immigration requirement or application. Twins each get their own 400. Does not affect Medi-Cal, WIC or other benefits.",
+  "region": "California",
+  "signupUrl": "https://baby2baby.org/goldenstatestart/",
+  "sourceUrls": [
+   "https://baby2baby.org/goldenstatestart/",
+   "https://baby2baby.org/goldenstatestart/frequently-asked-questions/",
+   "https://www.gov.ca.gov/2026/05/08/governor-newsom-launches-first-in-the-nation-program-providing-free-diapers-for-all-new-parents/"
+  ],
+  "verifiedOn": "2026-11-10",
+  "confidence": "medium",
+  "catches": "Only at participating hospitals, which are still being added; the first year prioritizes hospitals with many Medi-Cal patients. One batch of 400 per baby, no more.",
+  "notes": "Official-domain search results only. Participating hospital counts differ between pages; check the hospital list on the Baby2Baby page.",
+  "offers": [
+   "product"
+  ],
+  "certainty": "likely",
+  "freeStuff": "400 free diapers handed out when you leave the hospital.",
+  "valueLow": 120,
+  "valueHigh": 120,
+  "valueSource": "estimate",
+  "valueBasis": "400 newborn diapers at about $0.30 each",
+  "effort": "quick",
+  "when": "late-pregnancy",
+  "whenNote": "Hospital hands the diapers out around discharge; check that your birth hospital takes part before the due date.",
+  "states": [
+   "CA"
+  ]
+ },
+ {
+  "id": "first5california-kit-for-new-parents",
+  "name": "Kit for New Parents",
+  "brand": "First 5 California",
+  "category": "baby-care",
+  "whatYouGet": "A free parenting kit mailed to a California street address, with a parent guide and children's books.",
+  "costToClaim": "free",
+  "costDetail": "No shipping fee for California residents",
+  "requirements": [
+   "address"
+  ],
+  "eligibility": "California residents with a street address (no P.O. boxes); one kit per child.",
+  "region": "California",
+  "signupUrl": "https://apps.ccfc.ca.gov/kitfornewparents",
+  "sourceUrls": [
+   "https://apps.ccfc.ca.gov/kitfornewparents",
+   "https://www.first5california.com/en-us/articles/kit-for-new-parents-newborn/"
+  ],
+  "verifiedOn": "2026-11-10",
+  "confidence": "medium",
+  "catches": "Delivery takes about 30 to 45 days. Results disagree on the languages offered and on the contact email.",
+  "notes": "Official-domain search results only. Contents listed: Parent Guide, a Numbers touch-and-feel book, a What To Do When Your Child Gets Sick book, and more.",
+  "offers": [
+   "product"
+  ],
+  "certainty": "likely",
+  "freeStuff": "A free kit of a parent guide and books mailed to you.",
+  "valueLow": 10,
+  "valueHigh": 15,
+  "valueSource": "estimate",
+  "valueBasis": "About two books at $5 each plus a printed guide at low end",
+  "effort": "quick",
+  "when": "pregnancy",
+  "whenNote": "Delivery takes 30 to 45 days, so ordering before the birth helps.",
+  "states": [
+   "CA"
+  ]
+ },
+ {
+  "id": "hrsa-national-maternal-mental-health-hotline",
+  "name": "National Maternal Mental Health Hotline",
+  "brand": "HRSA",
+  "category": "assistance",
+  "whatYouGet": "Free, confidential, 24/7 call or text support from a counselor for people who are pregnant or new parents; 1-833-852-6262 (1-833-TLC-MAMA).",
+  "costToClaim": "free",
+  "costDetail": "Free and confidential",
+  "requirements": [],
+  "eligibility": "Anyone pregnant, postpartum or a family member; English and Spanish, and interpreter support in more than 60 languages.",
+  "region": "US",
+  "signupUrl": "https://mchb.hrsa.gov/programs-impact/national-maternal-mental-health-hotline",
+  "sourceUrls": [
+   "https://mchb.hrsa.gov/programs-impact/national-maternal-mental-health-hotline",
+   "https://mchb.hrsa.gov/national-maternal-mental-health-hotline/faq"
+  ],
+  "verifiedOn": "2026-11-10",
+  "confidence": "medium",
+  "catches": "Some HRSA pages in the results are old. Counselors are not all licensed clinicians.",
+  "notes": "Official-domain search results only. TTY: dial 711 then the number.",
+  "offers": [
+   "service"
+  ],
+  "certainty": "guaranteed",
+  "freeStuff": "",
+  "valueLow": null,
+  "valueHigh": null,
+  "valueSource": "none",
+  "valueBasis": "",
+  "effort": "quick",
+  "when": "anytime",
+  "whenNote": "",
+  "states": []
+ },
+ {
+  "id": "nurse-family-partnership-home-visits",
+  "name": "Nurse-Family Partnership home visits",
+  "brand": "Nurse-Family Partnership",
+  "category": "assistance",
+  "whatYouGet": "Free visits from a registered nurse during pregnancy and until the child is 2, covering breastfeeding, nutrition, safe sleep and development.",
+  "costToClaim": "free",
+  "costDetail": "Pages say the services are completely free",
+  "requirements": [
+   "eligibility",
+   "address"
+  ],
+  "eligibility": "First-time moms who meet an income rule and are about 28 weeks pregnant or less (a second page says under 29 weeks); local agency sets details and area.",
+  "region": "US (local agencies)",
+  "signupUrl": "https://www.nursefamilypartnership.org/nfp-moms/",
+  "sourceUrls": [
+   "https://www.nursefamilypartnership.org/nfp-moms/"
+  ],
+  "verifiedOn": "2026-11-10",
+  "confidence": "medium",
+  "catches": "Only where a local agency serves your area. The income figure was not in the results. The site is now branded Changent.",
+  "notes": "Official-domain search results only; pages are several years old.",
+  "offers": [
+   "service"
+  ],
+  "certainty": "if-eligible",
+  "freeStuff": "",
+  "valueLow": null,
+  "valueHigh": null,
+  "valueSource": "none",
+  "valueBasis": "",
+  "effort": "involved",
+  "when": "pregnancy",
+  "whenNote": "Enrollment is open only up to about 28 weeks of pregnancy; the site says enroll as soon as you know.",
+  "states": []
+ },
+ {
+  "id": "ohio-every-baby-sleeps-safe",
+  "name": "Every Baby Sleeps Safe portable crib",
+  "brand": "Ohio Department of Health",
+  "category": "assistance",
+  "whatYouGet": "A free portable crib kit with a fitted sheet and safe sleep education, given by a local Cribs for Kids partner.",
+  "costToClaim": "free",
+  "costDetail": "Free while funding lasts",
+  "requirements": [
+   "eligibility",
+   "address"
+  ],
+  "eligibility": "Ohio families at least 32 weeks pregnant or with a baby under 1 year, with low income (partners use 100% to 185% of poverty guidelines; one page says under 200%); must attend a safe sleep education session.",
+  "region": "Ohio",
+  "signupUrl": "https://odh.ohio.gov/know-our-programs/maternal-infant-wellness/safe-sleep",
+  "sourceUrls": [
+   "https://odh.ohio.gov/know-our-programs/maternal-infant-wellness/safe-sleep",
+   "https://odh.ohio.gov/know-our-programs/maternal-infant-wellness/media/cribs-for-kids"
+  ],
+  "verifiedOn": "2026-11-10",
+  "confidence": "medium",
+  "catches": "While quantities last. Partner list in the results dates from 2023, so confirm with a county partner.",
+  "notes": "Official-domain search results only.",
+  "offers": [
+   "product"
+  ],
+  "certainty": "if-eligible",
+  "freeStuff": "A free portable crib kit if you qualify.",
+  "valueLow": 80,
+  "valueHigh": 80,
+  "valueSource": "estimate",
+  "valueBasis": "One portable crib at about $80 shelf price",
+  "effort": "involved",
+  "when": "late-pregnancy",
+  "whenNote": "The program starts at 32 weeks of pregnancy.",
+  "states": [
+   "OH"
+  ]
+ },
+ {
+  "id": "safe-kids-good-neighbor-car-seat-events",
+  "name": "Good Neighbor car seat checkups",
+  "brand": "Safe Kids Worldwide",
+  "category": "assistance",
+  "whatYouGet": "Car seat checkup events in some cities where new car seats are given to families in need.",
+  "costToClaim": "free",
+  "costDetail": "Seats go to those in need; some local coalitions may charge a fee for a seat",
+  "requirements": [
+   "eligibility"
+  ],
+  "eligibility": "Families in need attending an event; events are city by city.",
+  "region": "US (event cities)",
+  "signupUrl": "https://events.safekids.org/events/good-neighbor-car-seat-checkup",
+  "sourceUrls": [
+   "https://events.safekids.org/events/good-neighbor-car-seat-checkup",
+   "https://www.safekids.org/buckle"
+  ],
+  "verifiedOn": "2026-11-10",
+  "confidence": "low",
+  "catches": "Event dates and cities are limited. Safe Kids says a local coalition may charge a fee for a seat.",
+  "notes": "Official-domain search results only; no rules for who gets a seat were shown.",
+  "offers": [
+   "product"
+  ],
+  "certainty": "if-eligible",
+  "freeStuff": "A new car seat at some events if you are in need.",
+  "valueLow": null,
+  "valueHigh": null,
+  "valueSource": "none",
+  "valueBasis": "",
+  "effort": "some",
+  "when": "late-pregnancy",
+  "whenNote": "Seat is needed for the first ride home.",
+  "states": []
+ }
+]
