@@ -118,6 +118,7 @@
       var r = Array.isArray(p.requirements) ? p.requirements : [];
       if (r.indexOf('purchase') >= 0 || r.indexOf('membership') >= 0) return false;
       if (p.category === 'health-benefits' || p.category === 'assistance') return false;
+      if (!Array.isArray(p.offers) || p.offers[0] !== 'product' || p.certainty === 'chance') return false;
       return !(r.indexOf('eligibility') >= 0 || r.indexOf('insurance') >= 0);
     }
 

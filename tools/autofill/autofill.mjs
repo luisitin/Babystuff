@@ -23,7 +23,9 @@ function usage() {
   node autofill.mjs <id> [<id>...]         fill these programs, one at a time
   node autofill.mjs --all-free             programs the app's guided run picks by default:
                                            free, no purchase/membership/insurance/eligibility,
-                                           not health-benefits or assistance
+                                           not health-benefits or assistance, a real product
+                                           comes first (not coupons, points, a draw or testing),
+                                           and not a draw or selection (certainty is not 'chance')
 
 Use with the app's backup (Tracker > Back up, with My info included):
   node autofill.mjs --from-backup <backup.json> [--only id,id] [--include-all-todo]
