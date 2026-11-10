@@ -6,7 +6,7 @@ Two GitHub Actions workflows live in `.github/workflows/`. You do not need to in
 
 **CI (`ci.yml`)** runs on every push and pull request. It builds `index.html` with `node scripts/build.mjs`, fails if the committed `index.html` differs from the fresh build (run the build locally and commit the result to fix it), then runs `node --test`.
 
-**Link check (`link-check.yml`)** runs every Monday and whenever you start it by hand. It visits the `signupUrl` of every program in `data/programs.json`, one at a time with a pause between requests, and writes a report (uploaded as the `link-report` artifact on the run page).
+**Link check (`link-check.yml`)** runs every Monday and whenever you start it by hand. It visits the `signupUrl` and every `sourceUrls` entry of every program in `data/programs.json`, one at a time with a pause between requests, and writes a report (uploaded as the `link-report` artifact on the run page).
 
 - If any link is NOT-FOUND (404/410 or a "page not found" title), OFF-DOMAIN (it now redirects to an unexpected site) or DEAD (DNS lookup fails, connection refused, or a bad TLS certificate), the run fails (red in the Actions tab) and an issue labeled `link-check` is opened, or a comment is added to the one already open.
 - If everything is fine and a `link-check` issue is open, the workflow comments "All links OK" and closes it.
