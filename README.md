@@ -14,8 +14,8 @@ Baby Freebies Finder is a page you can use on a phone or computer to find legiti
 ## What's inside
 
 - **Programs:** the full directory. Search it, filter by category, or tick "Truly free", "Email only" or "Needs a registry". You can sort the list too.
-- **My info:** your name, email, address and due date. It is stored only in your browser. Tip: use a dedicated inbox or a plus address like `yourname+baby@gmail.com`, so sign-up mail is easy to filter.
-- **Tracker:** mark each program as To do, Signed up, Received or Skipped, and add notes. You can download a JSON backup and restore it later.
+- **My info:** your name, email, address and due date. It is stored only in your browser. Tip: use a dedicated inbox or a plus address like `yourname+baby@gmail.com`, so sign-up mail is easy to filter. At the end of My info, the **Fill forms on your phone** card shows three ways to fill sign-up forms on an iPhone. See [On an iPhone](#on-an-iphone).
+- **Tracker:** mark each program as To do, Signed up, Received or Skipped, and add notes. You can download a JSON backup and restore it later. Inside Claude, the **Gmail connection** card under the Email and calendar card is optional. See [Connect Gmail (inside Claude)](#connect-gmail-inside-claude).
 - **Do it for me:** pick the programs you want, then go through them one at a time. Each step opens the official sign-up page and gives you Copy buttons for your details. You press the buttons yourself.
 - **Spot a fake:** short tips for telling real freebie offers from scams.
 
@@ -46,11 +46,41 @@ These buttons save typing and inbox clutter. Each one either hands off to your o
 - **Start a guided run with these N.** In Programs, after you filter the list, press this button to start a guided run with just the programs shown. If a run is already in progress, the app asks before it replaces that run.
 - **Autofill helper.** The optional helper on your computer can work from a backup you download from the Tracker. It writes your statuses into a new `-updated.json` file, which you restore in the Tracker. See [tools/autofill/README.md](tools/autofill/README.md).
 
+## On an iPhone
+
+Three short options, from the least effort to the most. Each one fills empty boxes from My info. You check everything and press the final button yourself.
+
+1. **Safari AutoFill:** no script at all. In Settings, turn on **Use Contact Info** and choose your own contact card.
+2. **A Shortcut:** copy the fill script from My info, then run it from Safari's Share menu on an official sign-up page.
+3. **A bookmark:** copy the bookmark code from My info and paste it as the address of a Safari bookmark.
+
+The steps, the Home Screen note and the troubleshooting list are in [docs/iphone.md](docs/iphone.md). None of this has been tried on a real iPhone yet.
+
+## Connect Gmail (inside Claude)
+
+This is optional. It works only when the app is opened as a Claude artifact (`artifact.html`) with your Gmail connected in Claude. Nothing happens until you tap a button.
+
+After a tap, the **Gmail connection** card can:
+
+- **Check my Gmail:** search your mail for sign-up and shipping emails from the programs in your list, then list what it finds. Suggested tracker updates change only when you tap them.
+- **Label these in Gmail:** add one label, "Baby Freebies", to the conversations it found. It asks you to confirm first.
+- **Draft my checklist** and **Draft my setup kit:** save a draft addressed to your own email address. Nothing is sent.
+
+It never sends, deletes, trashes or archives mail, and it never opens or changes anything without a tap. Claude asks you to allow the connector first, and you can decline. Results disappear when you leave the page.
+
+The card can also offer **Use** followed by your Gmail address and "as my email". That copies the address into My info, but only when you tap it.
+
+**Availability:** Anthropic's help pages say that artifacts using connected apps are available on Pro, Max, Ultra, Team and Enterprise plans on Claude on web and desktop, and that connector tools needing approval for each action are not available to artifacts. The help pages do not say whether this works in the Claude iPhone app. If the Connect button does nothing or says the connection is not available, everything else still works; use the Search my Gmail links instead. Labels and drafts may not be offered in every setup, and the card hides any button that is not offered.
+
+Connecting Gmail in Claude, step by step, is on the card itself. The privacy details are in [PRIVACY.md](PRIVACY.md#gmail-connection-inside-claude-only).
+
 ## Use it
 
 - **Easiest:** download this repository, then double-click `index.html` to open it in any browser. You can also download just that one file.
-- **Online:** use the GitHub Pages link once it is set up (see below).
-- **In Claude:** paste the contents of `index.html` into a Claude artifact.
+- **Online:** use the GitHub Pages link once it is set up (see below). It serves `index.html`.
+- **In Claude:** paste the contents of `artifact.html` into a Claude artifact. It is the same app, packaged for Claude. The Gmail connection works only there.
+
+The build writes both files: `index.html` for the standalone page, and `artifact.html` for Claude.
 
 ## Host it free on GitHub Pages
 
@@ -82,8 +112,8 @@ If GitHub shows another branch as the default, switch it to `main` first in **Se
    - Use official pages only. Blog roundups and coupon sites are leads, not proof.
    - Record only what the official page says today. If a detail is not there, leave it blank and lower the confidence. Do not guess.
    - Set `verifiedOn` and `confidence` honestly.
-3. Run `node scripts/build.mjs` to rebuild `index.html`, then run `node --test` to check the data and the build.
-4. Commit both `data/programs.json` and `index.html`.
+3. Run `node scripts/build.mjs` to rebuild `index.html` and `artifact.html`, then run `node --test` to check the data and the build.
+4. Commit `data/programs.json`, `index.html` and `artifact.html`.
 
 The `research/` folder shows how the current data was gathered. `research/excluded.md` lists what was left out and why, and `research/factcheck.md` records the fact-check.
 
@@ -108,8 +138,8 @@ Edit `profile.json` with your own details before you run it.
 
 GitHub runs three automatic checks for this repository. You do not need to install anything. The full guide is in [docs/automation.md](docs/automation.md).
 
-- **CI** runs on every push and pull request. It rebuilds `index.html`, fails if the committed file is out of date, and runs the tests.
-- **Link check** runs every Monday. You can also start it by hand: open the **Actions** tab, choose **Link check**, tap **Run workflow**, then the green **Run workflow** button. It visits each program's sign-up page and reports pages that are gone or that redirect to another site. Pages that block automated visits are listed but never fail the check.
+- **CI** runs on every push and pull request. It rebuilds `index.html` and `artifact.html`, fails if either committed file is out of date, and runs the tests.
+- **Link check** runs every Monday. You can also start it by hand: open the **Actions** tab, choose **Link check**, tap **Run workflow**, then the green **Run workflow** button. It visits each program's sign-up page and reports pages that are gone or that redirect to another site. Pages that block automated visits are listed but never fail the check. When a run passes and closes an open link-check issue, its closing comment says how many links answered OK and how many could not be checked. The unchecked links, and what to do about them, are in [docs/link-status.md](docs/link-status.md). The checker never pretends to be a person and never retries a site that refuses it.
 - **Email:** GitHub emails the repository owner when a `link-check` issue opens or a scheduled run fails. These are GitHub issue and Actions notifications, not messages from the app.
 
 ## For developers
@@ -117,11 +147,16 @@ GitHub runs three automatic checks for this repository. You do not need to insta
 - **Layout:**
   - `src/`: the HTML, CSS and JavaScript source.
   - `data/programs.json`: the program data.
-  - `scripts/build.mjs`: builds the single self-contained `index.html` with the data and code inlined.
-  - `tests/`: the tests.
+  - `scripts/build.mjs`: builds two self-contained files with the data and code inlined: `index.html` (the standalone page) and `artifact.html` (the same app for a Claude artifact).
+  - `tests/`: the unit tests, run with `node --test`.
+  - `tests/e2e/`: the browser test, run by hand with Playwright. It is not part of CI.
   - `tools/autofill/`: the optional local helper.
   - `research/`: raw research and notes.
-- **Commands:** `npm test` (same as `node --test`) runs the tests. `npm run build` (same as `node scripts/build.mjs`) rebuilds `index.html`.
-- **No dependencies:** the app has no frameworks and no runtime packages. Only the optional autofill helper uses Playwright, and it has its own `package.json`.
-- **Build check:** a test confirms that the committed `index.html` matches a fresh build, so edit `src/` or the data, then rebuild.
+  - `docs/`: guides, including [docs/iphone.md](docs/iphone.md) and [docs/link-status.md](docs/link-status.md).
+- **Commands:**
+  - `npm test` (same as `node --test`) runs the unit tests.
+  - `npm run build` (same as `node scripts/build.mjs`) rebuilds `index.html` and `artifact.html`.
+  - `node tests/e2e/run.mjs` runs the browser test. It needs Playwright, is not part of CI, and is run on your own computer.
+- **No dependencies:** the app has no frameworks and no runtime packages. Only the optional autofill helper and the browser test use Playwright, and the helper has its own `package.json`.
+- **Build check:** a test confirms that both committed files, `index.html` and `artifact.html`, match a fresh build, so edit `src/` or the data, then rebuild.
 - **More reading:** [ARCHITECTURE.md](ARCHITECTURE.md) (the build contract), [PRIVACY.md](PRIVACY.md) (what is stored and where) and [CLAUDE.md](CLAUDE.md) (working rules and the data schema).
