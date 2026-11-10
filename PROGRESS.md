@@ -108,7 +108,7 @@ The contract is in `ARCHITECTURE.md` ("Phase G"). Rounds 1 to 5 are written ther
   - The session hit its web-search limit during the second research wave. Leads left unsearched: the FSA or HSA life-event rule; the adoption credit; the head-of-household filing change; Oakland Brilliant Baby; Oklahoma Dream Accounts; more city and state child-account programs; Colorado's state child tax credit; more brand sample programs; and the pages that removed programs now forward to (Carolina Complete Health "Start Smart for Your Baby" and the Medela Family newsletter).
 
 ## Not tested (needs a person)
-- Phase G: the entries and value figures against their official pages (the network was Limited), the due-date plan and state rule on a real phone, and the due-date buttons on a wide screen after round 5 (the browser run and the screenshots are at phone width).
+- Phase G: the entries and value figures against their official pages (the network was Limited) and the due-date plan and state rule on a real phone. (After round 5 the due-date buttons were looked at once at 768 and 1280 pixels wide: one inline row, no sideways scroll. The browser suite itself runs at phone width.)
 - A real iPhone: Safari AutoFill, the Shortcut, the bookmark, Home Screen install.
 - The real Claude viewer: the save prompt, the Gmail consent card, and whether the Claude iPhone app runs connector calls from an artifact.
 - A real Gmail account and the real program sign-up forms.
