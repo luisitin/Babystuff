@@ -113,7 +113,8 @@ test('decodeEntities', () => {
   assert.equal(I.decodeEntities('&amp;lt;script&amp;gt;'), '&lt;script&gt;'); // one pass only
   assert.equal(I.decodeEntities('a&nbsp;b'), 'a b');
   assert.equal(I.decodeEntities('&#128512;'), '\u{1F600}');
-  assert.equal(I.decodeEntities('&#0;&#xD800;&#99999999;&#x110000;'), '��&#99999999;�');
+  const R = String.fromCharCode(0xFFFD);
+  assert.equal(I.decodeEntities('&#0;&#xD800;&#99999999;&#x110000;'), R + R + '&#99999999;' + R);
   assert.equal(I.decodeEntities('&unknown; &amp'), '&unknown; &amp');
   assert.equal(I.decodeEntities('&constructor; &__proto__;'), '&constructor; &__proto__;');
   assert.equal(I.decodeEntities(null), '');

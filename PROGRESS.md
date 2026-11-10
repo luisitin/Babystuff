@@ -50,3 +50,37 @@ The user asked to "automate through buttons and email connections" and keep goin
   - the link checker has a DEAD class and exit code 2 for crashes.
 - Docs and final checks (`haiku`): README and PRIVACY updated. `node --test` passes 80/80, the build leaves no diff, and offline at 375px the page made 0 requests with no errors. CI passes on GitHub.
 - Model audit: 20 subagent transcripts, 15 `claude-sonnet-5-5` and 5 `claude-haiku-5-5`, none on any other model.
+
+## Phase F, Gmail connection, iPhone fill script, links that always work (done, 2026-11-10)
+The user asked to "make it fully functional with just a connection to email or something, maybe an iPhone shortcut", to research and test thoroughly, and then to "make sure all links work". The contract is in ARCHITECTURE.md ("Phase F"). The rule from Phase E stands: nothing submits a sign-up form or clicks through a bot check.
+- Research (`sonnet`), in `research/phase-f/`: iOS Shortcuts (`ios-shortcuts.md`), Safari and web apps on iPhone (`ios-safari-web.md`), email connections (`email-connection.md`). The session's network was Limited, so Apple, WebKit, MDN and Google help pages were seen only as search results (medium confidence at best). Anthropic's pages were read directly.
+- Build (`sonnet` builders working in parallel on separate files):
+  - `BFF.host` and `BFF.zip`: one place for saving files, copying text and showing text, so every button works both in the standalone page and inside a Claude artifact (no `window.open`, `mailto:` or `<a download>` needed there). `.xml` and `.ics` files are zip-wrapped for Claude's save prompt.
+  - `BFF.inbox` and `BFF.inboxView`: the "Gmail connection" card in the tracker. Tap-to-run only, through Claude's Gmail connector, with five declared tools (`search_threads`, `list_labels`, `create_label`, `label_thread`, `create_draft`). It suggests tracker updates, labels matches and saves drafts to the person's own address. It never sends, deletes or archives, and stores only the time of the last check.
+  - `BFF.fieldmatch`, `BFF.fill` and the "On your iPhone" panel: a fill script for a Shortcut ("Run JavaScript on Web Page") or a Safari bookmark. It runs only on https pages of the official program domains, fills only empty matching boxes, and never clicks or submits. No ready-made shortcut file is shipped, only a recipe.
+  - `scripts/build.mjs` now writes two outputs: `index.html` (standalone, CSP blocks all network) and `artifact.html` (fragment for a Claude artifact). CI fails if either is stale.
+- Review (`sonnet`), `research/phase-f/review-v1.md`: 4 high and 8 medium findings, all fixed with tests. Highlights: a wrong Gmail `view` enum, "your baby is on the way" read as a shipping notice, "Middle name" and "Cardholder name" getting the full name, and a backslash trick in `registrableDomain`.
+- Links:
+  - The checker (`scripts/check-links.mjs`) now covers every `signupUrl` and every `sourceUrls` entry and has a SUSPECT class. Last run on 2026-11-10: 85 unique links, 71 OK, 0 not found, 0 off-domain, 0 dead, 0 suspect, 14 blocked (the site refuses robots or times out).
+  - Replaced: MyGerber sign-up and source, Huggies sign-up (and a dead `www1` source removed), Edgepark (`www` host), Babylist sign-up (`/registry/new`). See `research/phase-f/link-fixes*.json` and `docs/link-status.md`.
+  - The 14 blocked links rest on same-day official-domain search results. Their programs stay at medium confidence. They were not retried with other headers or a real browser.
+- Tests:
+  - Unit: `node --test` passes 174 of 174.
+  - Browser (`node tests/e2e/run.mjs`, Chromium through Playwright, not in CI): 620 checks, 0 failed, in ten groups (boot, routes, link audit, click-through of every link and button, downloads and copy, backup round trip, Gmail card with a mocked connector, fill script on fixture forms, persistence, accessibility). Both build outputs are tested.
+  - Mutation spot-checks (`tests/e2e/MUTATIONS.md`): ten deliberate breakages were applied one at a time and nine were caught. The miss (the Download backup button moved from click to mouseover) is explained in the file, with the check to add.
+- Docs (`haiku`): README (On an iPhone, Connect Gmail), PRIVACY (Gmail connection, fill script), `docs/iphone.md`, `docs/link-status.md`.
+- Launch: PR #1 was merged into `main` on 2026-11-10 after the user reported that the GitHub Pages site showed only the placeholder README. `.nojekyll` was added so Pages serves the app as plain files. The site is https://luisitin.github.io/Babystuff/. Follow-up work goes through a new pull request from the same branch name.
+- Claude artifact: `artifact.html` is published as a Claude artifact titled "Baby Freebies Finder", with the downloads permission and the five Gmail tools declared. The publisher refused the first try because a raw U+FFFD had crept into `src/js/inbox.js`; it is now built with `String.fromCharCode(0xFFFD)`, and a build test fails on a raw U+FFFD, U+2028 or U+2029 in `src/` or either output. The page's Gmail call arguments were compared with the connector's tool schemas and match. No real mailbox call was made, so result shapes are untested against real Gmail.
+- Model audit: 38 subagent transcripts in the session so far (18 in this phase), 28 `claude-sonnet-5-5` and 10 `claude-haiku-5-5`, none on any other model. One `sonnet` builder stopped at the account's 5-hour usage limit before a small polish pass; that list is under Next steps.
+
+### Not tested (needs a person)
+- A real iPhone: Safari AutoFill, the Shortcut, the bookmark, Home Screen install.
+- The real Claude viewer: the save prompt, the Gmail consent card, and whether the Claude iPhone app runs connector calls from an artifact.
+- A real Gmail account and the real program sign-up forms.
+- Screen readers (only automated name, label, focus and contrast checks ran).
+
+### Next steps
+- Polish pass (not done, waiting on the `sonnet` usage limit): select the text in the copy fallback (`src/js/host.js` `showText`); say "Nothing was sent." after a draft is saved; one wording for standalone downloads; ask before the guided run's "Start over"; a plus-address caveat in My info; a keyboard-activation check for the Download backup button (the mutation the suite missed). Details are in `tests/e2e/FINDINGS.md` and `tests/e2e/MUTATIONS.md`.
+- Open the 14 robot-blocked links by hand (`docs/link-status.md`).
+- Try the Shortcut recipe on a phone and correct `docs/iphone.md` if a step is off.
+- Re-verify the Apple and Google help-page claims by reading the pages, once the session's network allows those hosts.
