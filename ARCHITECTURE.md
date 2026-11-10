@@ -326,3 +326,33 @@ Seven lanes, each owning the existing programs in its categories (adding the new
 - `tests/logic.test.mjs`: the new truly-free rule (a sweepstakes-first or coupons-first program is not truly free), verdicts, ranking order, new filters, `valueText`, `totalValue`, `weeksUntil`.
 - A data test pins the user's complaint: no program whose first offer is `sweepstakes`, `coupons`, `points` or `testing` passes `isTrulyFree`.
 - `tests/e2e/run.mjs`: the new sort, groups, select, chips, card lines and summary in both outputs.
+
+### Phase G, round 2 (after the second research wave)
+
+The second wave added many programs for single states and many "if you qualify" benefits. Round 2 keeps them from crowding the list for people they do not apply to, and makes the totals honest.
+
+New optional field `sameAs` (string, `""` when none): the `id` of the main program when this entry is only another door to the very same benefit, so one family can get it once (for example four suppliers of the one insurance-covered breast pump). It must name an existing program, not itself, and the main program's own `sameAs` is `""`.
+
+`BFF.logic`:
+- `money(n)`: whole dollars with thousands separators ("$3,200"). Exported. `valueText` uses it.
+- `roundTotal(n)`: for combined figures only. Under 1,000 it rounds to the nearest 10, otherwise to the nearest 100.
+- `hiddenByState(p, state)`: true when `p.states` is not empty and `state` is empty or not in the list. `filterPrograms` uses it for `hideOtherStates` (so with no state, every state-limited program is dropped). `otherStateCount(list, state)` counts by the same rule.
+- `verdict(p)`: one change. A free program with unknown value whose first offer is `coverage` is `good`, not `small`.
+- `totalValue(list)`: programs are grouped by `sameAs || id`; each group counts once, with its largest `valueHigh` (and that program's `valueLow`). `count` is the number of groups with a value.
+- `needsQualifying(p)`: `!isOpenToAll(p)`.
+
+Directory:
+- State: programs hidden by state are left out unless the person taps "Show them" (`prefs.showOtherStates`). With no state in My info the line reads "N programs are only for some states. Add your state in My info to see the ones for you." (with a link to My info and the "Show them" button). With a state it reads "N programs for other states are hidden." Ranks (`rankMap`) and the summary are worked out over the programs left after this step, so the numbers have no gaps.
+- Summary, first line: the count of programs that are truly free and open to everyone, with their combined value (through `roundTotal`, labelled as our estimate). Second line: "N more are free if you qualify (income, insurance or where you live)." with no sum, because several of them are alternatives. The due-date lines stay.
+- Card: an "If you qualify" tag beside the verdict when `certainty` is `if-eligible`; an "In your state" tag when `states` includes the person's state; when `sameAs` is set, a line "Another way to get the same thing as <main program name>. You only need one."
+- Card layout: always visible are rank, verdict, name, brand, the free line, the value line, the offer chips, How sure, Effort, Best time, Catches, the sign-up button and My status. Everything else (what you get in full, cost, what you need, who, where, notes, sources, verified date) sits in one "More details" disclosure.
+- The filter chips wrap onto more lines at phone width. Nothing scrolls sideways.
+
+Guided run and helper: programs hidden by state are not in the guided list or its default selection (same rule and same `showOtherStates` preference). `tools/autofill --all-free` skips them by the profile's state.
+
+Tracker: the value line uses `totalValue`, so two doors to one benefit count once.
+
+Data rules added in the second merge:
+- A completion discount is valued on one scale: the discount percent times $200 (low) and times $600 (high) of registry items the family would buy anyway, under any official cap. `valueBasis` says so.
+- Pregnancy coverage (Medicaid, CHIP, marketplace) keeps null values. No fair single figure exists.
+- A tax credit that pays back part of a cost (dependent care) is `purchase-required` with `purchase` in `requirements`.
