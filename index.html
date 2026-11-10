@@ -778,7 +778,8 @@ main:focus { outline: none; }
     var ea = expectedValue(a), eb = expectedValue(b);
     var evOrder = ea === eb ? 0 : ea === null ? 1 : eb === null ? -1 : eb - ea;
     return verdictIndex(a) - verdictIndex(b) || evOrder ||
-      effortRank(a) - effortRank(b) || confRank(a) - confRank(b) || byName(a, b);
+      effortRank(a) - effortRank(b) || confRank(a) - confRank(b) || byName(a, b) ||
+      (String(a.id || '') < String(b.id || '') ? -1 : String(a.id || '') > String(b.id || '') ? 1 : 0);
   }
   function rankPrograms(list) {
     return (list || []).filter(function (p) { return !!p; }).sort(rankCmp);
@@ -831,11 +832,6 @@ main:focus { outline: none; }
   }
   function statesOf(p) {
     return p && Array.isArray(p.states) ? p.states : [];
-  }
-  function isOtherState(p, state) {
-    var st = statesOf(p);
-    var s = stateOf(state);
-    return !!s && st.length > 0 && !st.some(function (x) { return stateOf(x) === s; });
   }
   // True when the program is limited to some states and the person's state is
   // unknown or not one of them.
@@ -934,15 +930,19 @@ main:focus { outline: none; }
   function totalValue(list) {
     var groups = {};
     var order = [];
+    var seenKeys = {};
+    var keyCount = 0;
     (list || []).forEach(function (p, i) {
-      var lo = p ? num(p.valueLow) : null, hi = p ? num(p.valueHigh) : null;
-      if (lo === null || hi === null) return;
+      if (!p) return;
+      var lo = num(p.valueLow), hi = num(p.valueHigh);
       var key = (p.sameAs || '') || p.id || ('#' + i);
+      if (!Object.prototype.hasOwnProperty.call(seenKeys, key)) { seenKeys[key] = true; keyCount++; }
+      if (lo === null || hi === null) return;
       var g = groups[key];
       if (!g) { groups[key] = { low: lo, high: hi }; order.push(key); }
       else if (hi > g.high) { g.low = lo; g.high = hi; }
     });
-    var t = { low: 0, high: 0, count: order.length };
+    var t = { low: 0, high: 0, count: order.length, missing: keyCount - order.length };
     order.forEach(function (k) { t.low += groups[k].low; t.high += groups[k].high; });
     return t;
   }
@@ -1004,7 +1004,6 @@ main:focus { outline: none; }
     groupKey: groupKey,
     collapseGroups: collapseGroups,
     freeNote: freeNote,
-    isOtherState: isOtherState,
     hiddenByState: hiddenByState,
     otherStateCount: otherStateCount,
     needsQualifying: needsQualifying,
@@ -2218,7 +2217,7 @@ main:focus { outline: none; }
       var domain = fm.registrableDomain(p.signupUrl);
       if (!domain || !p.id || seen[p.id] || SHARED_HOSTS.test(domain)) return;
       seen[p.id] = true;
-      var email = usePlus && typeof map[p.id] === 'string' && map[p.id] ? em.plusAddress(profile.email, map[p.id]) : '';
+      var email = usePlus && (!em.inEmailFeatures || em.inEmailFeatures(p)) && typeof map[p.id] === 'string' && map[p.id] ? em.plusAddress(profile.email, map[p.id]) : '';
       out.push({ domain: domain, id: String(p.id), name: String(p.name || ''), email: email });
     });
     out.sort(function (a, b) { return a.domain < b.domain ? -1 : a.domain > b.domain ? 1 : a.id < b.id ? -1 : a.id > b.id ? 1 : 0; });
@@ -2846,7 +2845,7 @@ main:focus { outline: none; }
       });
       if (!done.length) return null;
       var t = L.totalValue(done);
-      var missing = done.length - t.count;
+      var missing = t.missing;
       var lead = 'Estimated value of what you have signed up for: ';
       if (!t.count) return lead + 'not known (' + plural(missing, 'program') + ' with no known value)';
       var lo = t.low, hi = t.high;
@@ -3659,6 +3658,8 @@ main:focus { outline: none; }
   var uid = 0;
   var openGroups = {};
 
+  function has(obj, key) { return Object.prototype.hasOwnProperty.call(obj, key); }
+
   function h(tag, attrs, kids) {
     var n = document.createElement(tag);
     if (attrs) Object.keys(attrs).forEach(function (k) {
@@ -3678,7 +3679,7 @@ main:focus { outline: none; }
     if (f && typeof f === 'object') {
       state.query = typeof f.query === 'string' ? f.query : '';
       state.category = L.CATEGORIES.some(function (c) { return c.id === f.category; }) ? f.category : '';
-      state.offer = typeof f.offer === 'string' && L.OFFER_LABELS[f.offer] ? f.offer : '';
+      state.offer = typeof f.offer === 'string' && has(L.OFFER_LABELS, f.offer) ? f.offer : '';
       state.openToAll = !!f.openToAll;
       state.trulyFree = !!f.trulyFree;
       state.emailOnly = !!f.emailOnly;
@@ -3859,15 +3860,15 @@ main:focus { outline: none; }
     var vb = [h('strong', { text: vt })];
     if (p.valueBasis) vb.push(h('span', { class: 'value-basis', text: ' ' + p.valueBasis }));
     kids.push(h('p', { class: 'value-line' }, vb));
-    var offs = Array.isArray(p.offers) ? p.offers.filter(function (o) { return L.OFFER_LABELS[o]; }) : [];
+    var offs = Array.isArray(p.offers) ? p.offers.filter(function (o) { return has(L.OFFER_LABELS, o); }) : [];
     if (offs.length) {
       kids.push(h('ul', { class: 'chips offer-chips', 'aria-label': 'What you get' }, offs.map(function (o) { return h('li', { class: 'chip', text: L.OFFER_LABELS[o] }); })));
     }
 
     var facts = [];
-    if (L.CERTAINTY_LABELS[p.certainty]) facts.push(['How sure', L.CERTAINTY_LABELS[p.certainty]]);
-    if (L.EFFORT_LABELS[p.effort]) facts.push(['Effort', L.EFFORT_LABELS[p.effort]]);
-    if (L.WHEN_LABELS[p.when]) facts.push(['Best time', L.WHEN_LABELS[p.when] + (p.whenNote ? '. ' + p.whenNote : '')]);
+    if (has(L.CERTAINTY_LABELS, p.certainty)) facts.push(['How sure', L.CERTAINTY_LABELS[p.certainty]]);
+    if (has(L.EFFORT_LABELS, p.effort)) facts.push(['Effort', L.EFFORT_LABELS[p.effort]]);
+    if (has(L.WHEN_LABELS, p.when)) facts.push(['Best time', L.WHEN_LABELS[p.when] + (p.whenNote ? '. ' + p.whenNote : '')]);
     if (Array.isArray(p.states) && p.states.length) facts.push(['Only in', p.states.join(', ')]);
     if (facts.length) {
       kids.push(h('dl', { class: 'facts' }, facts.map(function (f) {
@@ -3971,9 +3972,10 @@ main:focus { outline: none; }
     els.sort.value = 'when';
     savePrefs();
     render();
-    var g = document.getElementById('dir-group-' + when) || els.list;
+    var g = document.getElementById('dir-group-' + when);
+    if (!g) return;
     if (g.scrollIntoView) g.scrollIntoView({ block: 'start' });
-    var hd = g.querySelector && g.querySelector('.group-title');
+    var hd = g.querySelector('.group-title');
     if (hd) hd.focus({ preventScroll: true });
   }
 
@@ -3983,6 +3985,12 @@ main:focus { outline: none; }
     var seen = {}, n = 0;
     list.forEach(function (p) { var k = L.groupKey(p); if (!seen[k]) { seen[k] = true; n++; } });
     return n;
+  }
+
+  // The lead cards the list would show under the "when" sort with the current filters.
+  function collapseShown(pool) {
+    var opts = Object.assign({}, state, { state: profState(), hideOtherStates: stateInfo().hide });
+    return L.collapseGroups(L.sortPrograms(L.filterPrograms(pool, opts), 'when'));
   }
 
   function renderSummary(pool) {
@@ -4011,6 +4019,11 @@ main:focus { outline: none; }
       show.addEventListener('click', function () {
         state.trulyFree = true;
         state.openToAll = true;
+        state.query = '';
+        state.category = '';
+        state.offer = '';
+        state.emailOnly = false;
+        state.needsRegistry = false;
         savePrefs();
         syncControls();
         render();
@@ -4036,16 +4049,21 @@ main:focus { outline: none; }
     else head = plural(wk, 'week', 'weeks') + ' until your due date.';
     box.appendChild(h('p', { class: 'sum-main' }, [h('strong', { text: head })]));
     var defs = [['pregnancy', 'do now'], ['late-pregnancy', 'in the last weeks'], ['after-birth', 'after the birth']];
+    if (wk < 0) defs = [defs[2]];
+    var counts = {};
+    collapseShown(pool).forEach(function (g) { counts[g.lead.when] = (counts[g.lead.when] || 0) + 1; });
     var row = h('ul', { class: 'when-buttons' });
     defs.forEach(function (d) {
-      var n = pool.filter(function (p) { return p.when === d[0]; }).length;
-      var b = h('button', { type: 'button', class: 'btn btn-small', 'aria-label': n + ' programs best to ' + d[1] + '. Show them.' }, [
-        h('strong', { text: String(n) }), document.createTextNode(' ' + d[1])
+      var n = counts[d[0]] || 0;
+      if (!n) return;
+      var b = h('button', { type: 'button', class: 'btn btn-small' }, [
+        h('strong', { text: String(n) }), document.createTextNode(' ' + d[1]),
+        h('span', { class: 'visually-hidden', text: ', show ' + (n === 1 ? 'this program' : 'these programs') })
       ]);
       b.addEventListener('click', function () { goGroup(d[0]); });
       row.appendChild(h('li', null, [b]));
     });
-    box.appendChild(row);
+    if (row.childNodes.length) box.appendChild(row);
   }
 
   function appendGroup(grid, g, level, rankOf) {
@@ -4193,6 +4211,7 @@ main:focus { outline: none; }
   function taggedEmail(pr, prog) {
     var E = BFF.email;
     if (!E || !pr.usePlusTags || !prog || E.supportsPlus(pr.email) === false) return '';
+    if (E.inEmailFeatures && !E.inEmailFeatures(prog)) return '';
     return E.plusAddress(pr.email, BFF.plusTags ? BFF.plusTags.forProgram(prog) : E.tagFor(prog, progs()));
   }
   function detailList(p, prog) {
@@ -5351,6 +5370,12 @@ main:focus { outline: none; }
   function buildScript() {
     var p = readProfile();
     var map = p.usePlusTags && BFF.plusTags && BFF.plusTags.map ? BFF.plusTags.map() : {};
+    var E = BFF.email;
+    if (E && E.inEmailFeatures) {
+      var kept = {};
+      (BFF.programs || []).forEach(function (q) { if (q && map[q.id] && E.inEmailFeatures(q)) kept[q.id] = map[q.id]; });
+      map = kept;
+    }
     return BFF.fill.build({ profile: p, programs: BFF.programs || [], tagMap: map });
   }
 
