@@ -26,4 +26,4 @@ The repo's Link check workflow read 328 addresses (every sign-up and source link
 - Medela Mom's Room: now forwards to www.medela.com/en-us/breastfeeding-pumping/services/medela-family/newsletter-sign-up
 - Ohio Every Baby Sleeps Safe: no forwarding address given
 
-56 addresses refuse robots and stay at medium confidence or lower.
+In that run 56 addresses refused robots. After the fixes, the next run (run 7, same day) checked 309 addresses: 251 answered OK, none were broken and 58 refused robots. Those are listed in `docs/link-status.md` and stay at medium confidence or lower unless an official page was read directly earlier.

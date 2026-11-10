@@ -1,0 +1,53 @@
+# Code review: Phase G
+
+Read-only review of `git diff d6e57e7..HEAD` over `src/`, `tools/autofill/` and `scripts/check-links.mjs`, at commit `feb5ed6`. The contract is the Phase G sections of `ARCHITECTURE.md`. `node --test` passes (226 tests). The browser suite was not run. I checked claims with throwaway scripts that load `src/js/logic.js`, `src/js/email.js` and `data/programs.json`.
+
+No high-severity bugs found. 0 high, 2 medium, 5 low.
+
+## Findings
+
+1. **Medium** - `src/js/tracker.js:158-174` (`valueLine`). The "no known value" count mixes programs and groups.
+   - Scenario: the person marks the breast-pump main entry and its five `sameAs` doors as Signed up (6 programs). `totalValue` returns `count: 1` (one group with a value), so `missing = done.length - t.count = 5`. The tracker shows "about $150 to $300 (our estimate; 5 programs with no known value are not counted)". All six have a value, so the note is false.
+   - Fix: count missing as programs where `L.valueMid(p) === null` (or groups with no value, if that is the intent), not `done.length - t.count`. Add a test with two `sameAs` entries.
+
+2. **Medium** - `src/js/directory.js:418-427` (due-date buttons). The "do now / in the last weeks / after the birth" counts break the contract's "summary figures count distinct group keys" and do not match what the button shows.
+   - Scenario: no filters, no state. "In the last weeks" says 19, but `goGroup('late-pregnancy')` shows a section headed "(15)", because the five door entries of the breast-pump benefit collapse into one card. The count also includes `conditional` and `longshot` programs, so "do now" (26) is mostly not free things. The main entry has `when: 'anytime'` and its doors have `late-pregnancy`; with the `when` sort the lead is a door, so the main entry is hidden inside "N more ways" under the late-pregnancy section and is absent from the "Any time" section.
+   - If a filter hides the target section, `goGroup` (line 354-357) falls back to the first group heading in the list or to the list itself, with no message.
+   - Fix: count `distinctGroups(pool.filter(...))`, and either count only verdicts top, good and small or say "programs" for what is counted. Also pass the active filters, or say the counts ignore them. Make `goGroup` clear the filters that would hide the section, or disable the button when `document.getElementById('dir-group-' + when)` is missing after render.
+
+3. **Medium** - `src/js/guided.js:64-69`, `src/js/fillscript.js:217-229`, `src/js/phone.js:127`. The "one rule" `inEmailFeatures` is not used for plus-address tagging, so government and benefit programs still get a tagged address.
+   - Scenario: "Give each program its own plus address" is on. 114 of 142 programs fail `inEmailFeatures` (53 are on `.gov` or `.state.xx.us` domains, for example `tenncare-diaper-benefit`). The guided run still shows "Email for this program: name+tag@gmail.com" for them, and the iPhone fill script fills the plus address into their forms. Nothing in the app can match mail sent to those tags (filters, searches and labels skip them), and benefit offices may reject plus signs. `tracker.js` was fixed to hide "Sign up with:" for the same programs, so the three places now disagree.
+   - Fix: in `guided.taggedEmail` and `fillscript.programList`, tag only when `BFF.email.inEmailFeatures(p)`; otherwise use the plain address.
+
+4. **Low** - `tools/autofill/backup.mjs:70-76` (`selectTodo`). `--from-backup` ignores `states`, unlike `--all-free` and the app's guided run.
+   - Scenario: a profile in TX, backup with `baby2baby-golden-state-start` (CA), `al-dhr-baby-box-initiative` (AL) and `first5california-kit-for-new-parents` (CA) still To do. `isGuidedDefault` is true for all three, so the helper opens and fills them.
+   - Fix: filter with the same `hiddenByState` rule as `autofill.mjs:285`. Better, move the rule into `field-matcher.mjs` so both paths share it (it is currently written three times: `autofill.mjs`, `guided.js`, `logic.js`).
+
+5. **Low** - `src/js/directory.js:61` (`loadPrefs`). The saved `offer` is checked with `L.OFFER_LABELS[f.offer]`, which is truthy for inherited keys.
+   - Scenario: `bff.prefs.v1` has `filters.offer = "constructor"` or `"toString"` (hand-edited or imported). The select shows blank, but `offers(p).indexOf('constructor') === -1` removes every program: "No programs match" with no visible filter, and "Clear filters" is the only way out.
+   - Fix: use `Object.prototype.hasOwnProperty.call(L.OFFER_LABELS, f.offer)`. Same pattern in `card()` (`L.OFFER_LABELS[o]`, `L.CERTAINTY_LABELS[p.certainty]`) is harmless with the current data.
+
+6. **Low** - `src/js/directory.js:389-399`, `:422`. Two small mismatches in the summary controls.
+   - "Show these" turns on Truly free and Open to everyone, but keeps the search text, category, "What you get", Email only and Needs a registry. Scenario: Category "Registry boxes" is selected, summary says "9 truly free programs", tap "Show these": the list shows only that category, which may be 0 or 2. Fix: clear the other filters in the handler (as `clearFilters` does) or say "in this category".
+   - The when buttons set `aria-label="1 programs best to do now. Show them."` (wrong plural at n=1) and the label does not contain the visible text "1 do now" (WCAG 2.5.3 label in name). Fix: drop the `aria-label` and use visually hidden text after the visible label, or make the label start with the visible text and use `plural()`.
+
+7. **Low** - `src/js/directory.js:404-428`. Once the due date has passed (`wk < 0`), the summary still offers "do now" and "in the last weeks" buttons with counts.
+   - Scenario: due date 2026-10-01, today 2026-11-10: "Your due date has passed." followed by "26 do now, 19 in the last weeks, 19 after the birth". Fix: after the due date, show only the after-birth button (or say the other two no longer apply).
+
+## Not confirmed
+
+- Tie-break in `rankCmp` (`src/js/logic.js:166-171`) ends at name only. The data has two entries named "Baby Registry Welcome Box"; their order and `rankMap` numbers then depend on input order. The sort is stable and the data order is fixed, so the output is repeatable today. A last `id` comparison would make it independent of data order. Not a failing case.
+- `guided.js:142-149` (`loadRun`): if a removed id sat before the saved `index`, the index now points one program later and one program is skipped. It exists before Phase G and only matters after data removals, so it is not in scope.
+- Dead code: `logic.js` exports `isOtherState`, which nothing in `src/`, `tests/` or `tools/` uses (`hiddenByState` replaced it). Duplicated logic: the state-hide rule (see finding 4), and `directory.inMyState` re-implements `isOtherState`'s normalisation.
+
+## Checked and found fine
+
+- Truly free: `isTrulyFree` matches the contract (free, no `purchase` or `membership`, first offer `product`, not `chance`). It is used consistently by the Directory chip, the summary, `guidedDefault`, the guided "Truly free only" button, `fieldmatch.isGuidedDefault` and `autofill --all-free`. On the real data no truly free program has verdict `conditional` or `longshot`, and no `sweepstakes`, `coupons`, `points` or `testing` first-offer entry is truly free.
+- Ranking: `verdict` follows the contract order; `rankCmp` is a total order over verdict, expected value (nulls last), effort, confidence, name. `rankMap` gives no gaps and shares a number across a group. All group members have the same verdict on today's data. `collapseGroups` keeps first-appearance order; with the main entry filtered out, an alias leads and `programName` still finds the main name (the "another way" line then points at a card that is not shown, which is cosmetic).
+- `totalValue` counts a group once with the largest `valueHigh`; the Directory summary counts distinct group keys for both the count and the sum. "N more free if you qualify" also uses `distinctGroups`.
+- Due-date maths: `weeksUntil` uses UTC day numbers from local calendar dates, so no time-zone or DST drift. Same day gives 0, one day past gives -1, malformed or impossible dates (`2026-02-30`, `''`) give `null`, and the Directory then shows the "Add your due date" line.
+- Old saved data: `bff.prefs.v1` with `sort: 'recommended'`, or with no `offer`, `openToAll` or `showOtherStates`, loads without error and falls back to the defaults. A missing `profile.state` hides all state-limited programs and shows the "Add your state" line. `bff.tracker.v1` ids of removed programs are ignored by `counts`, `valueLine` and the list. `bff.guided.v1` ids are filtered in `loadRun`. I found no path that prints "undefined" (missing `freeStuff`, `offers`, `valueBasis`, `states` are all guarded).
+- State hiding: the Directory pool, `rankMap`, the summary, the guided list and its default selection, and `autofill --all-free` all use the same rule. "Show them" and "Hide them" keep focus on the button. Guided keeps a hidden program in the list only while it is selected.
+- Email features: `gmailFiltersXml`, `gmailSearchUrl`, `buildQueries`, `matchThreads`, `unsearchable` and the tracker's per-row address and Gmail link use `inEmailFeatures`. Shared-domain ownership is judged on the full list, so a government sender is never claimed by a brand. The checklist email, the reminders (.ics) and the guided run intentionally still use the full list. On today's data, no program with an `email` requirement is on a government domain.
+- Safety: no `innerHTML`, `insertAdjacentHTML`, `outerHTML` or `document.write` in `src/js`. No `fetch`, `XMLHttpRequest`, `sendBeacon` or `WebSocket`. No raw U+2028, U+2029 or U+FFFD in `src/`, `tools/`, `scripts/` or `data/`. Program text goes through `textContent` or `createTextNode`. Attributes from data (`href`, `data-program-id`, `data-group`) go through `setAttribute`; `signupUrl` and `sourceUrls` are https-only by the data test (the card does not re-check the scheme, which is fine while the data test holds). Nothing in the diff submits a form. The state-site domain change in `check-links.mjs`, `email.js` and `fieldmatch.js` is consistent across the three copies.
+- Accessibility: `h2` page heading, then `h3` group titles and `h4` cards (or `h3` cards without groups), no skipped levels. `details.same-group` and `details.more-details` use native `summary` with a 44px minimum. The result count is `aria-live="polite"` and takes focus after "Show these"; "Clear filters" returns focus to the search box. Controls have labels. New colours reuse the existing tokens in both themes: muted on surface and the success, warning and primary badge pairs all reach 4.5:1. The chip row now wraps instead of scrolling sideways.
