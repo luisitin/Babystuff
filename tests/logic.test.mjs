@@ -744,3 +744,81 @@ test('toClaim: leaves out optional and acted-on rows; money is apart; a group co
   assert.equal(twin.free.count, 1);
   assert.deepEqual(L.toClaim([]).free, { low: 0, high: 0, count: 0, missing: 0 });
 });
+
+// ---- Phase I part 3: what My info is missing ----
+import { readFileSync as readData } from 'node:fs';
+const DATA = JSON.parse(readData(new URL('../data/programs.json', import.meta.url), 'utf8'));
+
+test('missingInfo: exact rules on fixtures', () => {
+  const st = P({ id: 's', states: ['IL', 'TX'] });
+  assert.deepEqual(L.missingInfo(st, {}), ['state']);
+  assert.deepEqual(L.missingInfo(st, null), ['state']);
+  assert.deepEqual(L.missingInfo(st, 'junk'), ['state']);
+  assert.deepEqual(L.missingInfo(st, { state: 'tx' }), []);
+  assert.deepEqual(L.missingInfo(st, { state: 'DE' }), []);          // ruled out
+  assert.deepEqual(L.missingInfo(P({}), {}), []);                     // no audience, no states
+  assert.deepEqual(L.missingInfo(P({ audience: ['medicaid'] }), {}), ['cover']);
+  assert.deepEqual(L.missingInfo(P({ audience: ['medicaid'] }), { cover: 'private' }), []);   // ruled out
+  for (const t of ['insured', 'marketplace', 'military']) assert.deepEqual(L.missingInfo(P({ audience: [t] }), {}), ['cover'], t);
+  assert.deepEqual(L.missingInfo(P({ audience: ['wic'] }), {}), ['lowIncome']);
+  assert.deepEqual(L.missingInfo(P({ audience: ['low-income'] }), { cover: 'private' }), ['lowIncome']);
+  assert.deepEqual(L.missingInfo(P({ audience: ['wic'] }), { cover: 'medicaid' }), []);
+  assert.deepEqual(L.missingInfo(P({ audience: ['worker'] }), {}), ['job']);
+  assert.deepEqual(L.missingInfo(P({ audience: ['employer'] }), {}), ['job']);
+  assert.deepEqual(L.missingInfo(P({ audience: ['member'], insurer: 'Aetna' }), { cover: 'private' }), ['insurer']);
+  assert.deepEqual(L.missingInfo(P({ audience: ['member'], insurer: 'Aetna' }), { cover: 'none' }), []);
+  assert.deepEqual(L.missingInfo(P({ audience: ['local'] }), {}), []);
+  assert.deepEqual(L.missingInfo(P({ states: ['TX'], audience: ['worker', 'member', 'wic', 'insured'], insurer: 'Aetna' }), {}),
+    ['state', 'cover', 'insurer', 'lowIncome', 'job']);
+  assert.deepEqual(L.missingInfo(null, {}), []);
+});
+
+test('missingInfoCounts, missingInfoText, onlyInText', () => {
+  const list = [P({ id: 'a', states: ['TX'] }), P({ id: 'b', audience: ['medicaid'] }), P({ id: 'c', states: ['TX'], audience: ['insured'] }), P({ id: 'd' })];
+  const c = L.missingInfoCounts(list, {});
+  assert.deepEqual(c, { total: 3, keys: { state: 2, cover: 2, insurer: 0, lowIncome: 0, job: 0 } });
+  const done = L.missingInfoCounts(list, {}, (id) => (id === 'a' ? 'signed-up' : 'todo'));
+  assert.equal(done.total, 2);
+  assert.equal(L.missingInfoCounts(list, {}, () => 'todo').total, 3);
+  assert.equal(L.missingInfoCounts(null, {}).total, 0);
+  assert.equal(L.missingInfoText([]), '');
+  assert.equal(L.missingInfoText(['state']), 'your state');
+  assert.equal(L.missingInfoText(['state', 'insurer']), 'your state and your health plan');
+  assert.equal(L.missingInfoText(['state', 'cover', 'lowIncome']), 'your state, your health cover and the income question');
+  assert.equal(L.onlyInText({}), '');
+  assert.equal(L.onlyInText({ states: ['DE'] }), 'Only in DE');
+  assert.equal(L.onlyInText({ states: ['IL', 'TX'] }), 'Only in IL and TX');
+  assert.equal(L.onlyInText({ states: ['DE', 'FL', 'OH'] }), 'Only in DE, FL and OH');
+  assert.deepEqual(L.MISSING_KEYS, ['state', 'cover', 'insurer', 'lowIncome', 'job']);
+  for (const k of L.MISSING_KEYS) assert.ok(L.MISSING_LABELS[k] && L.MISSING_SHORT[k], k);
+});
+
+test('missingInfo invariants over the real data and a grid of profiles', () => {
+  const insurers = ['', ...new Set(DATA.map((p) => p.insurer).filter(Boolean)).values()].slice(0, 2).concat(['other']);
+  let n = 0;
+  for (const cover of ['', 'private', 'marketplace', 'medicaid', 'tricare', 'none'])
+    for (const lowIncome of ['', 'yes', 'no'])
+      for (const job of ['', 'yes', 'no'])
+        for (const insurer of insurers)
+          for (const state of ['', 'TX', 'DE']) {
+            const pr = { cover, lowIncome, job, insurer, state };
+            for (const p of DATA) {
+              n++;
+              const m = L.missingInfo(p, pr);
+              const idx = m.map((k) => L.MISSING_KEYS.indexOf(k));
+              assert.ok(idx.every((i) => i >= 0) && idx.every((i, j) => j === 0 || i > idx[j - 1]), 'order ' + p.id);
+              const limited = Array.isArray(p.states) && p.states.length > 0;
+              const outState = limited && state && !p.states.includes(state);
+              const f = L.fit(p, pr);
+              if (f === 'no' || outState) assert.deepEqual(m, [], 'ruled out ' + p.id);
+              if (m.length) assert.ok(f === 'maybe' || (limited && !state), 'maybe ' + p.id);
+              const tags = p.audience || [];
+              if (!m.length && f !== 'no' && !outState && !tags.includes('local') && !tags.includes('employer')) assert.equal(f, 'yes', 'yes ' + p.id);
+            }
+          }
+  assert.ok(n > 1000);
+  const insurerNames = [...new Set(DATA.map((p) => p.insurer).filter(Boolean))];
+  for (const insurer of insurerNames.concat(['other']))
+    for (const cover of ['private', 'marketplace', 'medicaid', 'tricare', 'none'])
+      for (const p of DATA) assert.deepEqual(L.missingInfo(p, { state: 'TX', cover, insurer, lowIncome: 'no', job: 'yes' }), [], p.id);
+});

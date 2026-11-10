@@ -446,3 +446,20 @@ A change made with a row's own control (status select or note) sets `view.localC
 
 ### Checklist
 `checklistPrograms()`: programs Signed up or Received first; otherwise the person's own to-do list in the order shown (Do now, Later, optional). The email code's length limits still apply.
+
+## Phase I part 3: what My info is missing (contract)
+
+Why: many programs are state, plan or income specific, and a badge "If you qualify" does not say which My info answer would settle it. Now a program says what is missing and links to that field. The state and the four "Your situation" answers are read only to hide and badge programs and to say what is missing; they never go into the fill script, bookmark, phone view, autofill helper, guided copy or email.
+
+### `BFF.logic`
+- `MISSING_KEYS = ['state','cover','insurer','lowIncome','job']` (the order of the fields in My info). `MISSING_LABELS` (sentences: your state, your health cover, your health plan, the income question, the paid job question) and `MISSING_SHORT` (chips: Your state, Health cover, Health plan, Income question, Paid job question).
+- `missingInfo(p, profile)` -> keys in `MISSING_KEYS` order, no duplicates. Rules in order: state-limited, the profile has a state and it is not one of them -> `[]`; `fit(p, profile) === 'no'` -> `[]`; state-limited and no state -> `state`. Then per audience tag: `medicaid`, `insured`, `marketplace`, `military` with no valid cover -> `cover`; `wic`, `low-income` with no `lowIncome` answer and cover not `medicaid` -> `lowIncome`; `worker`, `employer` with no `job` answer -> `job`; `member` with no `insurer` and cover not `none` -> `insurer`; `local` adds nothing. A null or garbage profile, or a program with no `audience` or `states`, is fine.
+- `missingInfoCounts(list, profile, statusOf)` -> `{total, keys: {state, cover, insurer, lowIncome, job}}`. With `statusOf(id)`, programs whose status is set and not `todo` are skipped.
+- `missingInfoText(keys)` -> `''`, `your state`, `your state and your health plan`, `your state, your health cover and the income question`.
+- `onlyInText(p)` -> `''` (nationwide) or `Only in DE`, `Only in IL and TX`, `Only in DE, FL and OH` (stored order).
+
+### `BFF.missing` (`src/js/missing.js`, loaded right after `store.js`; needs only `BFF.logic`)
+- `line(p, profile, opts)` -> element or `null`. `opts.tag` (default `p`), `opts.states` (default true: lead with the `onlyInText` sentence when `state` is missing). Markup: `<p class="miss-line" data-missing="state cover"><span class="miss-mark" aria-hidden="true">!</span><span class="miss-text">Only in IL and TX. My info is missing your state and your health cover.</span><a class="miss-add" href="#info" data-info-key="state">Add them<span class="fx-sr"> in My info</span></a></p>`. One key: "Add it". `data-info-key` is the first missing key.
+- `notice(counts, opts)` -> element or `null` when `counts.total` is 0. `div.miss-box[data-missing-total]` with `p.miss-lead` ("My info is missing details that <strong>N programs</strong> depend on."; singular "1 program ... depends on") and `ul.miss-chips` with one `li > a.miss-chip[href="#info"][data-info-key]` per key with a count above 0, in key order, each ending in `span.miss-n` (the count plus an `fx-sr` " program(s)").
+- Hand-off: one capture-phase click listener on `document` records `{key, from}` when the click is inside `a[data-info-key]` (`from` is the view in `location.hash`, `directory` if empty or unknown). It never prevents or stops the click, so the router still navigates. `take()` returns the pending `{key, from}` or `null` and clears it; My info calls it in `show()` to scroll to and focus the field. `want(key, from)` sets it by hand.
+- CSS (`features.css`): `.miss-line`, `.miss-mark`, `.miss-text`, `.miss-add`, `.miss-box`, `.miss-lead`, `.miss-chips`, `.miss-chip`, `.miss-n`. Links and chips are at least 44 px tall.

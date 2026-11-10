@@ -149,3 +149,16 @@
 .fx-undo { display: flex; flex-wrap: wrap; align-items: center; gap: var(--fx-s2) var(--fx-s3); background: var(--fx-surface); border: 1px solid var(--fx-border); border-radius: var(--fx-r); padding: var(--fx-s2) var(--fx-s3); margin: var(--fx-s2) 0; }
 .fx-undo span { flex: 1 1 10rem; }
 .fx-confirm { box-sizing: border-box; }
+
+/* Phase I part 3: "My info is missing ..." line and notice */
+.miss-line { display: flex; flex-wrap: wrap; align-items: center; gap: 0 var(--fx-s2, 8px); margin: var(--fx-s1, 4px) 0; font-size: .9em; color: var(--text, #1c2430); }
+.miss-mark { flex: none; display: inline-flex; align-items: center; justify-content: center; width: 1.35em; height: 1.35em; border-radius: 50%; border: 2px solid var(--warning-text, #6b4a00); background: var(--warning-bg, #fff4d6); color: var(--warning-text, #6b4a00); font-weight: 800; font-size: .85em; line-height: 1; }
+.miss-text { flex: 1 1 12rem; min-width: 0; overflow-wrap: anywhere; }
+.miss-add, .miss-chip { display: inline-flex; align-items: center; min-height: 44px; padding: 0 var(--fx-s3, 12px); font-weight: 600; color: var(--primary, #2457c5); text-decoration: underline; }
+.miss-add:focus-visible, .miss-chip:focus-visible { outline: 3px solid var(--primary, #2457c5); outline-offset: 2px; }
+.miss-box { background: var(--warning-bg, #fff4d6); color: var(--warning-text, #6b4a00); border: 1px solid var(--warning-text, #6b4a00); border-radius: var(--radius, 10px); padding: var(--fx-s2, 8px) var(--fx-s3, 12px); margin: var(--fx-s2, 8px) 0; max-width: 100%; }
+.miss-box .miss-mark { margin-right: var(--fx-s1, 4px); }
+.miss-lead { margin: 0; font-size: .95em; }
+.miss-chips { display: flex; flex-wrap: wrap; gap: var(--fx-s1, 4px) var(--fx-s2, 8px); list-style: none; margin: var(--fx-s1, 4px) 0 0; padding: 0; }
+.miss-chip { padding: 0 var(--fx-s3, 12px); background: var(--bg, #fff); color: var(--primary, #2457c5); border: 1px solid var(--border, #cfd6e0); border-radius: 999px; text-decoration: none; max-width: 100%; }
+.miss-n { margin-left: var(--fx-s2, 8px); font-weight: 700; color: var(--text, #1c2430); }

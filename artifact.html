@@ -626,6 +626,19 @@ details.dir-filters { margin: 0 0 var(--space-1); }
 .fx-undo { display: flex; flex-wrap: wrap; align-items: center; gap: var(--fx-s2) var(--fx-s3); background: var(--fx-surface); border: 1px solid var(--fx-border); border-radius: var(--fx-r); padding: var(--fx-s2) var(--fx-s3); margin: var(--fx-s2) 0; }
 .fx-undo span { flex: 1 1 10rem; }
 .fx-confirm { box-sizing: border-box; }
+
+/* Phase I part 3: "My info is missing ..." line and notice */
+.miss-line { display: flex; flex-wrap: wrap; align-items: center; gap: 0 var(--fx-s2, 8px); margin: var(--fx-s1, 4px) 0; font-size: .9em; color: var(--text, #1c2430); }
+.miss-mark { flex: none; display: inline-flex; align-items: center; justify-content: center; width: 1.35em; height: 1.35em; border-radius: 50%; border: 2px solid var(--warning-text, #6b4a00); background: var(--warning-bg, #fff4d6); color: var(--warning-text, #6b4a00); font-weight: 800; font-size: .85em; line-height: 1; }
+.miss-text { flex: 1 1 12rem; min-width: 0; overflow-wrap: anywhere; }
+.miss-add, .miss-chip { display: inline-flex; align-items: center; min-height: 44px; padding: 0 var(--fx-s3, 12px); font-weight: 600; color: var(--primary, #2457c5); text-decoration: underline; }
+.miss-add:focus-visible, .miss-chip:focus-visible { outline: 3px solid var(--primary, #2457c5); outline-offset: 2px; }
+.miss-box { background: var(--warning-bg, #fff4d6); color: var(--warning-text, #6b4a00); border: 1px solid var(--warning-text, #6b4a00); border-radius: var(--radius, 10px); padding: var(--fx-s2, 8px) var(--fx-s3, 12px); margin: var(--fx-s2, 8px) 0; max-width: 100%; }
+.miss-box .miss-mark { margin-right: var(--fx-s1, 4px); }
+.miss-lead { margin: 0; font-size: .95em; }
+.miss-chips { display: flex; flex-wrap: wrap; gap: var(--fx-s1, 4px) var(--fx-s2, 8px); list-style: none; margin: var(--fx-s1, 4px) 0 0; padding: 0; }
+.miss-chip { padding: 0 var(--fx-s3, 12px); background: var(--bg, #fff); color: var(--primary, #2457c5); border: 1px solid var(--border, #cfd6e0); border-radius: 999px; text-decoration: none; max-width: 100%; }
+.miss-n { margin-left: var(--fx-s2, 8px); font-weight: 700; color: var(--text, #1c2430); }
 /* inbox.css: the "Gmail connection" card. Tokens come from base.css. */
 .ib-card [hidden] { display: none !important; }
 .ib-card { overflow-wrap: anywhere; }
@@ -1127,6 +1140,59 @@ body::before {
     }).length;
   }
 
+  // ---- what My info is missing for a program ----
+  var MISSING_KEYS = ['state', 'cover', 'insurer', 'lowIncome', 'job'];
+  var MISSING_LABELS = { state: 'your state', cover: 'your health cover', insurer: 'your health plan', lowIncome: 'the income question', job: 'the paid job question' };
+  var MISSING_SHORT = { state: 'Your state', cover: 'Health cover', insurer: 'Health plan', lowIncome: 'Income question', job: 'Paid job question' };
+  // Keys (in MISSING_KEYS order) of the My info answers that would settle whether the program applies.
+  // [] when nothing is missing or the program is already ruled out.
+  function missingInfo(p, profile) {
+    if (!p || typeof p !== 'object') return [];
+    var st = statesOf(p);
+    var mine = profile && typeof profile === 'object' ? stateOf(profile.state) : '';
+    if (st.length && mine && !st.some(function (x) { return stateOf(x) === mine; })) return [];
+    if (fit(p, profile) === 'no') return [];
+    var need = {};
+    if (st.length && !mine) need.state = true;
+    var cover = coverOf(profile), low = yesNo(profile, 'lowIncome'), job = yesNo(profile, 'job'), ins = ans(profile, 'insurer');
+    var tags = Array.isArray(p.audience) ? p.audience : [];
+    tags.forEach(function (t) {
+      if ((t === 'medicaid' || t === 'insured' || t === 'marketplace' || t === 'military') && !cover) need.cover = true;
+      else if ((t === 'wic' || t === 'low-income') && !low && cover !== 'medicaid') need.lowIncome = true;
+      else if ((t === 'worker' || t === 'employer') && !job) need.job = true;
+      else if (t === 'member' && !ins && cover !== 'none') need.insurer = true;
+    });
+    return MISSING_KEYS.filter(function (k) { return need[k] === true; });
+  }
+  // { total, keys: {state, cover, ...} }. With statusOf, programs already acted on (not todo) are skipped.
+  function missingInfoCounts(list, profile, statusOf) {
+    var out = { total: 0, keys: {} };
+    MISSING_KEYS.forEach(function (k) { out.keys[k] = 0; });
+    (list || []).forEach(function (p) {
+      if (!p) return;
+      if (typeof statusOf === 'function') {
+        var s = statusOf(p.id);
+        if (s && s !== 'todo') return;
+      }
+      var m = missingInfo(p, profile);
+      if (!m.length) return;
+      out.total++;
+      m.forEach(function (k) { out.keys[k]++; });
+    });
+    return out;
+  }
+  function joinAnd(items) {
+    if (items.length < 2) return items.join('');
+    return items.slice(0, -1).join(', ') + ' and ' + items[items.length - 1];
+  }
+  function missingInfoText(keys) {
+    return joinAnd((keys || []).map(function (k) { return MISSING_LABELS[k]; }).filter(Boolean));
+  }
+  function onlyInText(p) {
+    var st = statesOf(p);
+    return st.length ? 'Only in ' + joinAnd(st.map(String)) : '';
+  }
+
   // ---- the Tracker's own list ----
   // One pass over the programs in rank order. Anything the person has acted on is its own row.
   // To-do programs for other states, ruled out by the answers, or covered by a same-thing sign-up
@@ -1373,6 +1439,13 @@ body::before {
     needsRegistry: needsRegistry,
     isEligibilityBased: isEligibilityBased,
     guidedDefault: guidedDefault,
+    MISSING_KEYS: MISSING_KEYS,
+    MISSING_LABELS: MISSING_LABELS,
+    MISSING_SHORT: MISSING_SHORT,
+    missingInfo: missingInfo,
+    missingInfoCounts: missingInfoCounts,
+    missingInfoText: missingInfoText,
+    onlyInText: onlyInText,
     trackerScope: trackerScope,
     readyNow: readyNow,
     trackerSections: trackerSections,
@@ -1532,6 +1605,110 @@ body::before {
     },
     closeConfirm: closePanel
   };
+})();
+(function () {
+  'use strict';
+  var BFF = (window.BFF = window.BFF || {});
+
+  var pending = null;
+
+  function el(tag, cls, text) {
+    var n = document.createElement(tag);
+    if (cls) n.className = cls;
+    if (text !== undefined) n.textContent = text;
+    return n;
+  }
+  function mark() {
+    var m = el('span', 'miss-mark', '!');
+    m.setAttribute('aria-hidden', 'true');
+    return m;
+  }
+  function srText(t) {
+    var s = el('span', 'fx-sr', t);
+    return s;
+  }
+  function plural(n, w) { return n + ' ' + w + (n === 1 ? '' : 's'); }
+
+  // One line for a program: what My info is missing, with a link to add it. null when nothing is missing.
+  function line(p, profile, opts) {
+    var L = BFF.logic;
+    opts = opts || {};
+    var keys = L && L.missingInfo ? L.missingInfo(p, profile) : [];
+    if (!keys.length) return null;
+    var lead = '';
+    if (opts.states !== false && keys.indexOf('state') !== -1) {
+      lead = L.onlyInText(p);
+      if (lead) lead += '. ';
+    }
+    var n = el(opts.tag || 'p', 'miss-line');
+    n.setAttribute('data-missing', keys.join(' '));
+    n.appendChild(mark());
+    n.appendChild(el('span', 'miss-text', lead + 'My info is missing ' + L.missingInfoText(keys) + '.'));
+    var a = el('a', 'miss-add', keys.length === 1 ? 'Add it' : 'Add them');
+    a.setAttribute('href', '#info');
+    a.setAttribute('data-info-key', keys[0]);
+    a.appendChild(srText(' in My info'));
+    n.appendChild(a);
+    return n;
+  }
+
+  // A box for a page header: how many programs depend on what, one chip per missing answer.
+  function notice(counts, opts) {
+    var L = BFF.logic;
+    if (!counts || !counts.total || !L) return null;
+    var box = el('div', 'miss-box');
+    box.setAttribute('data-missing-total', String(counts.total));
+    var lead = el('p', 'miss-lead');
+    lead.appendChild(mark());
+    lead.appendChild(document.createTextNode(' My info is missing details that '));
+    lead.appendChild(el('strong', '', plural(counts.total, 'program')));
+    lead.appendChild(document.createTextNode(counts.total === 1 ? ' depends on.' : ' depend on.'));
+    box.appendChild(lead);
+    var ul = el('ul', 'miss-chips');
+    L.MISSING_KEYS.forEach(function (k) {
+      var c = counts.keys && counts.keys[k];
+      if (!(c > 0)) return;
+      var a = el('a', 'miss-chip');
+      a.setAttribute('href', '#info');
+      a.setAttribute('data-info-key', k);
+      a.appendChild(document.createTextNode(L.MISSING_SHORT[k] + ' '));
+      var n = el('span', 'miss-n', String(c));
+      n.appendChild(srText(c === 1 ? ' program' : ' programs'));
+      a.appendChild(n);
+      var li = el('li');
+      li.appendChild(a);
+      ul.appendChild(li);
+    });
+    box.appendChild(ul);
+    return box;
+  }
+
+  function currentView() {
+    var name = String(location.hash || '').replace(/^#/, '');
+    var views = BFF.nav && BFF.nav.views;
+    if (!name) return 'directory';
+    if (views && views.indexOf(name) === -1) return 'directory';
+    return name;
+  }
+  function want(key, from) {
+    pending = key ? { key: String(key), from: from || currentView() } : null;
+  }
+  function take() {
+    var p = pending;
+    pending = null;
+    return p;
+  }
+
+  // Runs before the router's own click handler (capture phase) and changes nothing about the click.
+  document.addEventListener('click', function (e) {
+    var t = e && e.target;
+    if (t && t.nodeType === 3) t = t.parentNode;
+    if (!t || !t.closest) return;
+    var a = t.closest('a[data-info-key]');
+    if (a) want(a.getAttribute('data-info-key'), currentView());
+  }, true);
+
+  BFF.missing = { line: line, notice: notice, take: take, want: want };
 })();
 // Pure helpers for plus addresses, Gmail filters, a mailto checklist and calendar reminders.
 // Nothing here touches the network or the DOM. Loadable from Node tests as well as the browser.

@@ -11,7 +11,7 @@ const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const programs = JSON.parse(readFileSync(join(root, 'data', 'programs.json'), 'utf8'));
 
 // Source order from ARCHITECTURE.md ("New files, load order and owners").
-const JS_ORDER = ['logic', 'store', 'email', 'zip', 'host', 'fieldmatch', 'fillscript', 'inbox', 'tracker', 'profile', 'directory', 'guided', 'inboxview', 'phone', 'app'];
+const JS_ORDER = ['logic', 'store', 'missing', 'email', 'zip', 'host', 'fieldmatch', 'fillscript', 'inbox', 'tracker', 'profile', 'directory', 'guided', 'inboxview', 'phone', 'app'];
 const CSS_ORDER = ['base', 'features', 'inbox', 'phone'];
 
 // The inlined data block; everything else in a page is code or markup.
