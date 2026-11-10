@@ -98,7 +98,8 @@
   .fx-btn--big { width: auto; min-width: 20rem; }
 }
 /* Phase E: plus tags, shortcuts, email and calendar */
-.fx-plus-preview { font-weight: 600; word-break: break-all; }
+.fx-plus-preview { font-weight: 600; }
+.fx-plus-addr { display: block; overflow-wrap: anywhere; }
 .fx-trk-links { display: flex; flex-wrap: wrap; gap: var(--fx-s2); align-items: center; }
 .fx-link-btn--ghost { color: var(--fx-primary); background: var(--fx-bg); }
 .fx-link-btn--ghost[hidden], .fx-trk-addr[hidden] { display: none; }

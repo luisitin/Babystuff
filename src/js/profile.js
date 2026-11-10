@@ -102,7 +102,10 @@
       plusNote.textContent = '';
       return;
     }
-    plusPreview.textContent = 'Preview: ' + addr + (ex ? ' (for ' + ex.name + ')' : '');
+    plusPreview.textContent = '';
+    plusPreview.appendChild(document.createTextNode('Preview: '));
+    plusPreview.appendChild(h('span', { class: 'fx-plus-addr', text: addr }));
+    if (ex) plusPreview.appendChild(document.createTextNode(' (for ' + ex.name + ')'));
     if (sup === true) plusNote.textContent = 'Your email provider supports plus addresses. Mail to the tagged address still arrives in your normal inbox.';
     else if (sup === false) plusNote.textContent = 'Yahoo uses a hyphen instead of a plus sign (a different kind of address), so this app will not tag Yahoo addresses. Your plain email is used.';
     else plusNote.textContent = 'Check your provider: not every email service delivers plus addresses. Send yourself a test message before relying on this.';

@@ -316,8 +316,17 @@ main:focus { outline: none; }
 .dir-state { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2) var(--space-3); margin: var(--space-2) 0 0; font-size: .9375rem; }
 .dir-state p { margin: 0; }
 .dir-state .dir-note { margin: 0; }
-.when-buttons { display: flex; flex-wrap: wrap; gap: var(--space-2); }
-.when-buttons .btn { gap: var(--space-1); }
+.when-buttons { display: flex; gap: var(--space-2); list-style: none; margin: 0; padding: 0; }
+.when-buttons li { flex: 1 1 0; min-width: 0; }
+.when-buttons li:only-child { flex: 0 1 12rem; }
+.when-buttons .btn { gap: var(--space-1); width: 100%; height: 100%; flex-direction: column; justify-content: center; text-align: center; line-height: 1.25; padding: var(--space-2); }
+.when-buttons strong { font-size: 1.125rem; line-height: 1.2; }
+@media (min-width: 640px) {
+  .when-buttons { flex-wrap: wrap; }
+  .when-buttons li, .when-buttons li:only-child { flex: 0 1 auto; }
+  .when-buttons .btn { width: auto; height: auto; flex-direction: row; padding: 0 var(--space-3); }
+  .when-buttons strong { font-size: inherit; }
+}
 .dir-groups { display: grid; gap: var(--space-5); }
 .dir-group { display: grid; gap: var(--space-2); min-width: 0; scroll-margin-top: var(--space-3); }
 .group-title { font-size: 1.1875rem; margin: 0; }
@@ -466,7 +475,8 @@ main:focus { outline: none; }
   .fx-btn--big { width: auto; min-width: 20rem; }
 }
 /* Phase E: plus tags, shortcuts, email and calendar */
-.fx-plus-preview { font-weight: 600; word-break: break-all; }
+.fx-plus-preview { font-weight: 600; }
+.fx-plus-addr { display: block; overflow-wrap: anywhere; }
 .fx-trk-links { display: flex; flex-wrap: wrap; gap: var(--fx-s2); align-items: center; }
 .fx-link-btn--ghost { color: var(--fx-primary); background: var(--fx-bg); }
 .fx-link-btn--ghost[hidden], .fx-trk-addr[hidden] { display: none; }
@@ -3505,7 +3515,10 @@ main:focus { outline: none; }
       plusNote.textContent = '';
       return;
     }
-    plusPreview.textContent = 'Preview: ' + addr + (ex ? ' (for ' + ex.name + ')' : '');
+    plusPreview.textContent = '';
+    plusPreview.appendChild(document.createTextNode('Preview: '));
+    plusPreview.appendChild(h('span', { class: 'fx-plus-addr', text: addr }));
+    if (ex) plusPreview.appendChild(document.createTextNode(' (for ' + ex.name + ')'));
     if (sup === true) plusNote.textContent = 'Your email provider supports plus addresses. Mail to the tagged address still arrives in your normal inbox.';
     else if (sup === false) plusNote.textContent = 'Yahoo uses a hyphen instead of a plus sign (a different kind of address), so this app will not tag Yahoo addresses. Your plain email is used.';
     else plusNote.textContent = 'Check your provider: not every email service delivers plus addresses. Send yourself a test message before relying on this.';
