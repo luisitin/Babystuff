@@ -296,9 +296,9 @@ test('totalValue', () => {
     P({ valueLow: null, valueHigh: null }),
     P({})
   ];
-  assert.deepEqual(L.totalValue(list), { low: 15, high: 25, count: 2 });
-  assert.deepEqual(L.totalValue([]), { low: 0, high: 0, count: 0 });
-  assert.deepEqual(L.totalValue(undefined), { low: 0, high: 0, count: 0 });
+  assert.deepEqual(L.totalValue(list), { low: 15, high: 25, count: 2, missing: 2 });
+  assert.deepEqual(L.totalValue([]), { low: 0, high: 0, count: 0, missing: 0 });
+  assert.deepEqual(L.totalValue(undefined), { low: 0, high: 0, count: 0, missing: 0 });
 });
 
 test('weeksUntil', () => {
@@ -381,11 +381,36 @@ test('totalValue counts a sameAs group once with its largest value', () => {
     P({ id: 'other', valueLow: 10, valueHigh: 20 }),
     P({ id: 'none', valueLow: null, valueHigh: null })
   ];
-  assert.deepEqual(L.totalValue(list), { low: 160, high: 320, count: 2 });
+  assert.deepEqual(L.totalValue(list), { low: 160, high: 320, count: 2, missing: 1 });
   // a missing sameAs is the same as an empty one
-  assert.deepEqual(L.totalValue([P({ id: 'a', valueLow: 1, valueHigh: 2 }), P({ id: 'b', sameAs: '', valueLow: 1, valueHigh: 2 })]), { low: 2, high: 4, count: 2 });
+  assert.deepEqual(L.totalValue([P({ id: 'a', valueLow: 1, valueHigh: 2 }), P({ id: 'b', sameAs: '', valueLow: 1, valueHigh: 2 })]), { low: 2, high: 4, count: 2, missing: 0 });
   // a group whose main program is not in the list still collapses
-  assert.deepEqual(L.totalValue([P({ id: 'x', sameAs: 'gone', valueLow: 5, valueHigh: 9 }), P({ id: 'y', sameAs: 'gone', valueLow: 6, valueHigh: 7 })]), { low: 5, high: 9, count: 1 });
+  assert.deepEqual(L.totalValue([P({ id: 'x', sameAs: 'gone', valueLow: 5, valueHigh: 9 }), P({ id: 'y', sameAs: 'gone', valueLow: 6, valueHigh: 7 })]), { low: 5, high: 9, count: 1, missing: 0 });
+});
+
+test('totalValue missing counts groups with no value, not programs', () => {
+  const all = [
+    P({ id: 'main', sameAs: '', valueLow: 100, valueHigh: 200 }),
+    P({ id: 'd1', sameAs: 'main', valueLow: 100, valueHigh: 200 }),
+    P({ id: 'd2', sameAs: 'main', valueLow: 100, valueHigh: 200 })
+  ];
+  assert.equal(L.totalValue(all).missing, 0);
+  // one door has no value but another member does: the group has a value
+  assert.equal(L.totalValue([all[0], P({ id: 'd3', sameAs: 'main', valueLow: null, valueHigh: null })]).missing, 0);
+  // two doors with no value form one group with no value; one unknown loner is another
+  const mixed = all.concat([
+    P({ id: 'g1', sameAs: 'gmain', valueLow: null, valueHigh: null }),
+    P({ id: 'g2', sameAs: 'gmain', valueLow: null, valueHigh: null }),
+    P({ id: 'loner', valueLow: null, valueHigh: null })
+  ]);
+  assert.deepEqual(L.totalValue(mixed), { low: 100, high: 200, count: 1, missing: 2 });
+});
+
+test('rankPrograms ends on id, so data order does not matter', () => {
+  const a = P({ id: 'a-one', name: 'Same Name' }), b = P({ id: 'b-two', name: 'Same Name' });
+  assert.deepEqual(L.rankPrograms([a, b]).map((p) => p.id), ['a-one', 'b-two']);
+  assert.deepEqual(L.rankPrograms([b, a]).map((p) => p.id), ['a-one', 'b-two']);
+  assert.equal(L.rankMap([b, a])['a-one'], 1);
 });
 
 {

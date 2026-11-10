@@ -164,7 +164,7 @@
       });
       if (!done.length) return null;
       var t = L.totalValue(done);
-      var missing = done.length - t.count;
+      var missing = t.missing;
       var lead = 'Estimated value of what you have signed up for: ';
       if (!t.count) return lead + 'not known (' + plural(missing, 'program') + ' with no known value)';
       var lo = t.low, hi = t.high;

@@ -39,6 +39,8 @@
   var uid = 0;
   var openGroups = {};
 
+  function has(obj, key) { return Object.prototype.hasOwnProperty.call(obj, key); }
+
   function h(tag, attrs, kids) {
     var n = document.createElement(tag);
     if (attrs) Object.keys(attrs).forEach(function (k) {
@@ -58,7 +60,7 @@
     if (f && typeof f === 'object') {
       state.query = typeof f.query === 'string' ? f.query : '';
       state.category = L.CATEGORIES.some(function (c) { return c.id === f.category; }) ? f.category : '';
-      state.offer = typeof f.offer === 'string' && L.OFFER_LABELS[f.offer] ? f.offer : '';
+      state.offer = typeof f.offer === 'string' && has(L.OFFER_LABELS, f.offer) ? f.offer : '';
       state.openToAll = !!f.openToAll;
       state.trulyFree = !!f.trulyFree;
       state.emailOnly = !!f.emailOnly;
@@ -239,15 +241,15 @@
     var vb = [h('strong', { text: vt })];
     if (p.valueBasis) vb.push(h('span', { class: 'value-basis', text: ' ' + p.valueBasis }));
     kids.push(h('p', { class: 'value-line' }, vb));
-    var offs = Array.isArray(p.offers) ? p.offers.filter(function (o) { return L.OFFER_LABELS[o]; }) : [];
+    var offs = Array.isArray(p.offers) ? p.offers.filter(function (o) { return has(L.OFFER_LABELS, o); }) : [];
     if (offs.length) {
       kids.push(h('ul', { class: 'chips offer-chips', 'aria-label': 'What you get' }, offs.map(function (o) { return h('li', { class: 'chip', text: L.OFFER_LABELS[o] }); })));
     }
 
     var facts = [];
-    if (L.CERTAINTY_LABELS[p.certainty]) facts.push(['How sure', L.CERTAINTY_LABELS[p.certainty]]);
-    if (L.EFFORT_LABELS[p.effort]) facts.push(['Effort', L.EFFORT_LABELS[p.effort]]);
-    if (L.WHEN_LABELS[p.when]) facts.push(['Best time', L.WHEN_LABELS[p.when] + (p.whenNote ? '. ' + p.whenNote : '')]);
+    if (has(L.CERTAINTY_LABELS, p.certainty)) facts.push(['How sure', L.CERTAINTY_LABELS[p.certainty]]);
+    if (has(L.EFFORT_LABELS, p.effort)) facts.push(['Effort', L.EFFORT_LABELS[p.effort]]);
+    if (has(L.WHEN_LABELS, p.when)) facts.push(['Best time', L.WHEN_LABELS[p.when] + (p.whenNote ? '. ' + p.whenNote : '')]);
     if (Array.isArray(p.states) && p.states.length) facts.push(['Only in', p.states.join(', ')]);
     if (facts.length) {
       kids.push(h('dl', { class: 'facts' }, facts.map(function (f) {
@@ -351,9 +353,10 @@
     els.sort.value = 'when';
     savePrefs();
     render();
-    var g = document.getElementById('dir-group-' + when) || els.list;
+    var g = document.getElementById('dir-group-' + when);
+    if (!g) return;
     if (g.scrollIntoView) g.scrollIntoView({ block: 'start' });
-    var hd = g.querySelector && g.querySelector('.group-title');
+    var hd = g.querySelector('.group-title');
     if (hd) hd.focus({ preventScroll: true });
   }
 
@@ -363,6 +366,12 @@
     var seen = {}, n = 0;
     list.forEach(function (p) { var k = L.groupKey(p); if (!seen[k]) { seen[k] = true; n++; } });
     return n;
+  }
+
+  // The lead cards the list would show under the "when" sort with the current filters.
+  function collapseShown(pool) {
+    var opts = Object.assign({}, state, { state: profState(), hideOtherStates: stateInfo().hide });
+    return L.collapseGroups(L.sortPrograms(L.filterPrograms(pool, opts), 'when'));
   }
 
   function renderSummary(pool) {
@@ -391,6 +400,11 @@
       show.addEventListener('click', function () {
         state.trulyFree = true;
         state.openToAll = true;
+        state.query = '';
+        state.category = '';
+        state.offer = '';
+        state.emailOnly = false;
+        state.needsRegistry = false;
         savePrefs();
         syncControls();
         render();
@@ -416,16 +430,21 @@
     else head = plural(wk, 'week', 'weeks') + ' until your due date.';
     box.appendChild(h('p', { class: 'sum-main' }, [h('strong', { text: head })]));
     var defs = [['pregnancy', 'do now'], ['late-pregnancy', 'in the last weeks'], ['after-birth', 'after the birth']];
+    if (wk < 0) defs = [defs[2]];
+    var counts = {};
+    collapseShown(pool).forEach(function (g) { counts[g.lead.when] = (counts[g.lead.when] || 0) + 1; });
     var row = h('ul', { class: 'when-buttons' });
     defs.forEach(function (d) {
-      var n = pool.filter(function (p) { return p.when === d[0]; }).length;
-      var b = h('button', { type: 'button', class: 'btn btn-small', 'aria-label': n + ' programs best to ' + d[1] + '. Show them.' }, [
-        h('strong', { text: String(n) }), document.createTextNode(' ' + d[1])
+      var n = counts[d[0]] || 0;
+      if (!n) return;
+      var b = h('button', { type: 'button', class: 'btn btn-small' }, [
+        h('strong', { text: String(n) }), document.createTextNode(' ' + d[1]),
+        h('span', { class: 'visually-hidden', text: ', show ' + (n === 1 ? 'this program' : 'these programs') })
       ]);
       b.addEventListener('click', function () { goGroup(d[0]); });
       row.appendChild(h('li', null, [b]));
     });
-    box.appendChild(row);
+    if (row.childNodes.length) box.appendChild(row);
   }
 
   function appendGroup(grid, g, level, rankOf) {

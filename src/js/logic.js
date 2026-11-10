@@ -153,7 +153,8 @@
     var ea = expectedValue(a), eb = expectedValue(b);
     var evOrder = ea === eb ? 0 : ea === null ? 1 : eb === null ? -1 : eb - ea;
     return verdictIndex(a) - verdictIndex(b) || evOrder ||
-      effortRank(a) - effortRank(b) || confRank(a) - confRank(b) || byName(a, b);
+      effortRank(a) - effortRank(b) || confRank(a) - confRank(b) || byName(a, b) ||
+      (String(a.id || '') < String(b.id || '') ? -1 : String(a.id || '') > String(b.id || '') ? 1 : 0);
   }
   function rankPrograms(list) {
     return (list || []).filter(function (p) { return !!p; }).sort(rankCmp);
@@ -206,11 +207,6 @@
   }
   function statesOf(p) {
     return p && Array.isArray(p.states) ? p.states : [];
-  }
-  function isOtherState(p, state) {
-    var st = statesOf(p);
-    var s = stateOf(state);
-    return !!s && st.length > 0 && !st.some(function (x) { return stateOf(x) === s; });
   }
   // True when the program is limited to some states and the person's state is
   // unknown or not one of them.
@@ -309,15 +305,19 @@
   function totalValue(list) {
     var groups = {};
     var order = [];
+    var seenKeys = {};
+    var keyCount = 0;
     (list || []).forEach(function (p, i) {
-      var lo = p ? num(p.valueLow) : null, hi = p ? num(p.valueHigh) : null;
-      if (lo === null || hi === null) return;
+      if (!p) return;
+      var lo = num(p.valueLow), hi = num(p.valueHigh);
       var key = (p.sameAs || '') || p.id || ('#' + i);
+      if (!Object.prototype.hasOwnProperty.call(seenKeys, key)) { seenKeys[key] = true; keyCount++; }
+      if (lo === null || hi === null) return;
       var g = groups[key];
       if (!g) { groups[key] = { low: lo, high: hi }; order.push(key); }
       else if (hi > g.high) { g.low = lo; g.high = hi; }
     });
-    var t = { low: 0, high: 0, count: order.length };
+    var t = { low: 0, high: 0, count: order.length, missing: keyCount - order.length };
     order.forEach(function (k) { t.low += groups[k].low; t.high += groups[k].high; });
     return t;
   }
@@ -379,7 +379,6 @@
     groupKey: groupKey,
     collapseGroups: collapseGroups,
     freeNote: freeNote,
-    isOtherState: isOtherState,
     hiddenByState: hiddenByState,
     otherStateCount: otherStateCount,
     needsQualifying: needsQualifying,
