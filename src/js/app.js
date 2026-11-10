@@ -22,9 +22,10 @@
     memTheme = t;
     if (BFF.store) { var p = getPrefs(); p.theme = t; BFF.store.set('prefs.v1', p); }
   }
-  function applyTheme(t) {
+  // `touch` is false at boot while on System, so a theme the host page already chose is left alone.
+  function applyTheme(t, touch) {
     var root = document.documentElement;
-    if (t === 'system') root.removeAttribute('data-theme'); else root.setAttribute('data-theme', t);
+    if (touch !== false) { if (t === 'system') root.removeAttribute('data-theme'); else root.setAttribute('data-theme', t); }
     var btn = document.getElementById('theme-toggle');
     if (btn) {
       var icon = btn.querySelector('.theme-icon'), txt = btn.querySelector('.theme-text');
@@ -35,21 +36,20 @@
     }
   }
 
-  var current = 'directory';
-  // Unknown hashes (e.g. #main) keep the current view instead of jumping to Programs.
-  function currentView() {
+  // Only plain #name hashes are routes. Anything else (an empty hash, #main, a typo) shows the directory.
+  function viewFromHash() {
     var name = (location.hash || '').replace(/^#/, '');
-    if (VIEWS.indexOf(name) !== -1) current = name;
-    else if (!name) current = 'directory';
-    return current;
+    return VIEWS.indexOf(name) !== -1 ? name : 'directory';
   }
 
   function guarded(fn, name) {
     try { fn(); } catch (e) { if (window.console) console.error('Bad view "' + name + '":', e); }
   }
 
+  var shown = '';
   function route(moveFocus) {
-    var name = currentView();
+    var name = viewFromHash();
+    shown = name;
     VIEWS.forEach(function (v) {
       var el = document.getElementById('view-' + v);
       if (el) el.hidden = v !== name;
@@ -64,10 +64,33 @@
     if (el && view && typeof view.show === 'function') guarded(function () { view.show(el); }, name);
     if (el) {
       var h2 = el.querySelector('h2');
-      document.title = (h2 ? h2.textContent + ' · ' : '') + 'Baby Freebies Finder';
+      document.title = (h2 ? h2.textContent + ' \u00B7 ' : '') + 'Baby Freebies Finder';
       if (moveFocus && h2) h2.focus({ preventScroll: true });
       window.scrollTo(0, 0);
     }
+  }
+
+  // go(name): the one way the app changes views. Setting location.hash fires hashchange, which routes.
+  // If the frame never delivers that event (or the hash is already set), route directly after a beat.
+  var navTimer = null;
+  function go(name) {
+    if (VIEWS.indexOf(name) === -1) name = 'directory';
+    if (navTimer) clearTimeout(navTimer);
+    if (location.hash === '#' + name && shown === name) { route(true); return; }
+    try { location.hash = '#' + name; } catch (e) {}
+    navTimer = setTimeout(function () { navTimer = null; if (shown !== name) route(true); }, 60);
+  }
+  BFF.nav = { go: go, views: VIEWS.slice() };
+
+  // Route links (#info and so on) go through go(), so they work even where plain anchor navigation does not.
+  function onDocClick(e) {
+    if (e.defaultPrevented || e.button > 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+    var a = e.target && e.target.closest ? e.target.closest('a[href^="#"]') : null;
+    if (!a) return;
+    var name = a.getAttribute('href').slice(1);
+    if (VIEWS.indexOf(name) === -1) return;
+    e.preventDefault();
+    go(name);
   }
 
   function lastChecked() {
@@ -78,7 +101,7 @@
   }
 
   function boot() {
-    applyTheme(getTheme());
+    applyTheme(getTheme(), getTheme() !== 'system');
     var btn = document.getElementById('theme-toggle');
     btn.addEventListener('click', function () {
       var next = THEMES[(THEMES.indexOf(getTheme()) + 1) % THEMES.length];
@@ -116,8 +139,11 @@
       if (ref && !document.getElementById(ref) && window.console) console.warn('view-' + v + ': missing heading #' + ref);
     });
 
-    window.addEventListener('hashchange', function () { route(true); });
+    document.addEventListener('click', onDocClick);
+    window.addEventListener('hashchange', function () { if (navTimer) { clearTimeout(navTimer); navTimer = null; } route(true); });
     route(false);
+    // Ask the host about file saving after first paint, so the answer is ready before anyone taps Save.
+    if (BFF.host && BFF.host.warm) setTimeout(function () { try { BFF.host.warm(); } catch (e) {} }, 100);
   }
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);

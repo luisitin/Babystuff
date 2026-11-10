@@ -200,6 +200,9 @@
       });
       el.appendChild(clearRow);
       el.appendChild(statusEl);
+      var phoneNode = h('div', { id: 'info-phone' });
+      el.appendChild(phoneNode);
+      if (BFF.phoneView && BFF.phoneView.mount) BFF.phoneView.mount(phoneNode);
       fill();
       function flush() { if (timer) { clearTimeout(timer); saveNow(); } }
       window.addEventListener('pagehide', flush);

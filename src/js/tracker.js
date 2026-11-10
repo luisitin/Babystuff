@@ -321,16 +321,41 @@
     return el;
   }
 
-  function download(name, text, type) {
-    var blob = new Blob([text], { type: type || 'application/json' });
-    var url = URL.createObjectURL(blob);
-    var a = document.createElement('a');
-    a.href = url;
-    a.download = name;
-    a.style.display = 'none';
-    document.body.appendChild(a);
-    a.click();
-    setTimeout(function () { URL.revokeObjectURL(url); a.remove(); }, 1000);
+  // Every file goes through BFF.host.saveFile, then the message says what happened (see reportSave).
+  function hostOk() { return !!(BFF.host && BFF.host.saveFile); }
+  function clearShown(msg, key) {
+    var old = msg.parentNode ? msg.parentNode.querySelectorAll('[data-bff-shown="' + key + '"]') : [];
+    for (var i = 0; i < old.length; i++) old[i].remove();
+  }
+  // o: {msg, key, name, text, mime, what, button}
+  function saveFile(o) {
+    var btn = o.button;
+    if (btn) { btn.disabled = true; btn.setAttribute('aria-busy', 'true'); }
+    function finish() { if (btn) { btn.disabled = false; btn.removeAttribute('aria-busy'); } }
+    if (!hostOk()) { o.msg.textContent = 'This page cannot save files here.'; finish(); return; }
+    BFF.host.saveFile({ name: o.name, text: o.text, mime: o.mime }).then(function (res) {
+      finish();
+      reportSave(res, o);
+    }, function () {
+      finish();
+      reportSave({ status: 'shown', name: o.name }, o);
+    });
+  }
+  function reportSave(res, o) {
+    var msg = o.msg, inArt = BFF.host && BFF.host.inArtifact;
+    if (res.status !== 'shown') clearShown(msg, o.key);
+    if (res.status === 'saved') {
+      var t = inArt ? 'Saved ' + o.what + ' as ' + res.name + ' (in the place you picked).' : 'Downloaded ' + o.what + ' as ' + res.name + '. Look in your Downloads.';
+      if (res.zipped) t += ' The file is inside the zip: unzip it, then open ' + res.inner + '.';
+      msg.textContent = t;
+    } else if (res.status === 'declined') {
+      msg.textContent = 'Not saved. Tap the button again whenever you want the file.';
+    } else if (res.status === 'failed') {
+      msg.textContent = res.message || 'Could not save the file.';
+    } else {
+      msg.textContent = 'This page cannot save files here, so the text is below. Copy it and paste it into a new file named ' + o.name + '.';
+      if (BFF.host && BFF.host.showText) BFF.host.showText({ after: msg, key: o.key, label: 'Contents of ' + o.name, text: o.text, returnTo: o.button });
+    }
   }
 
   // ---- email and calendar helpers ----
@@ -361,31 +386,6 @@
     var d = new Date(t);
     return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate());
   }
-  function copyText(text) {
-    function fallback() {
-      var ta = h('textarea', { 'aria-hidden': 'true', tabindex: '-1', readonly: '' });
-      ta.style.cssText = 'position:fixed;top:0;left:0;width:1px;height:1px;opacity:0';
-      ta.value = text;
-      document.body.appendChild(ta);
-      ta.select();
-      var ok = false;
-      try { ok = document.execCommand('copy'); } catch (e) {}
-      ta.remove();
-      return ok;
-    }
-    if (navigator.clipboard && navigator.clipboard.writeText) {
-      return navigator.clipboard.writeText(text).then(function () { return true; }, function () { return fallback(); });
-    }
-    return Promise.resolve(fallback());
-  }
-  function openLink(href) {
-    var a = document.createElement('a');
-    a.href = href;
-    a.style.display = 'none';
-    document.body.appendChild(a);
-    a.click();
-    setTimeout(function () { a.remove(); }, 0);
-  }
   // Show or hide the per-row address and Gmail search link from the current profile.
   function syncEmailBits() {
     var pr = profileOf(), E = BFF.email, all = BFF.programs || [];
@@ -410,6 +410,31 @@
     if (view.acctRow) view.acctRow.hidden = !gmail;
     if (view.mailHint) view.mailHint.hidden = !!E.plusAddress(pr.email, 'x');
     if (view.gmailNote) view.gmailNote.hidden = !gmail;
+    refreshMailto();
+  }
+
+  function checklistMail(pr) {
+    var to = BFF.email.plusAddress(pr.email, 'x') ? String(pr.email).trim() : '';
+    return BFF.email.mailtoChecklist({
+      to: to, programs: checklistPrograms(),
+      statusOf: function (p) { return LABELS[tracker.getStatus(p.id)]; }
+    });
+  }
+  // Keep the mailto link current: it is a real link, so its address and text are set before it is tapped.
+  function refreshMailto() {
+    if (!view.mailLink) return;
+    var pr = profileOf(), ok = !!BFF.email.plusAddress(pr.email, 'x');
+    view.mailLink.hidden = !ok;
+    if (view.mailLinkNote) view.mailLinkNote.hidden = !ok;
+    if (!ok) { view.mailLink.removeAttribute('href'); view.mailTruncated = false; return; }
+    var r = checklistMail(pr);
+    view.mailTruncated = r.truncated;
+    view.mailLink.setAttribute('href', r.url);
+  }
+  // In the artifact a file is saved inside a zip when its type is not on the viewer's list.
+  function zipNote(what) {
+    if (!(BFF.host && BFF.host.inArtifact)) return null;
+    return h('p', { class: 'fx-small', text: 'From this page ' + what + ' arrive inside a zip file. Unzip it first, then use the file inside.' });
   }
 
   function buildEmailPanel() {
@@ -418,33 +443,35 @@
     view.mailHint = h('p', { class: 'fx-warn', hidden: '' }, [
       document.createTextNode('Add your email in '), h('a', { href: '#info', text: 'My info' }), document.createTextNode(' to email yourself the checklist.')
     ]);
-    // 1. checklist by email
-    var mailBtn = h('button', { type: 'button', class: 'fx-btn fx-btn--primary', text: 'Email me my checklist' });
-    mailBtn.addEventListener('click', function () {
-      var pr = profileOf();
-      if (!E.plusAddress(pr.email, 'x')) {
-        msg.textContent = 'Add your email in My info first.';
-        view.mailHint.hidden = false;
-        return;
-      }
-      var r = E.mailtoChecklist({
-        to: pr.email.trim(), programs: checklistPrograms(),
-        statusOf: function (p) { return LABELS[tracker.getStatus(p.id)]; }
-      });
-      if (r.truncated) {
-        copyText(r.fullText).then(function (ok) {
-          if (view.fallback) { view.fallback.remove(); view.fallback = null; }
-          if (ok) msg.textContent = 'The list was too long for an email link, so it is cut short there. The full list is copied to your clipboard: paste it into the message.';
+    // 1. checklist by email: a real mailto link (kept current by refreshMailto) plus a Copy button that always works.
+    var inArt = !!(BFF.host && BFF.host.inArtifact);
+    var mailLink = h('a', { class: 'fx-btn' + (inArt ? '' : ' fx-btn--primary'), href: 'mailto:', text: 'Email me my checklist' });
+    var mailNote = h('span', { class: 'fx-small', text: (BFF.host && BFF.host.mailtoNote) || '' });
+    var copyBtn = h('button', { type: 'button', class: 'fx-btn' + (inArt ? ' fx-btn--primary' : ''), text: 'Copy my checklist' });
+    view.mailLink = mailLink;
+    view.mailLinkNote = mailNote;
+    view.mailTruncated = false;
+    mailLink.addEventListener('click', function () {
+      clearShown(msg, 'checklist');
+      msg.textContent = (view.mailTruncated
+        ? 'The list was too long for an email link, so it is cut short there. Use Copy my checklist for the full list. '
+        : '') + 'If no mail app opens, this device may not have one set up here. Use Copy my checklist instead.';
+    });
+    copyBtn.addEventListener('click', function () {
+      var r = checklistMail(profileOf());
+      if (BFF.host && BFF.host.copyText) {
+        BFF.host.copyText(r.fullText).then(function (ok) {
+          clearShown(msg, 'checklist');
+          if (ok) msg.textContent = 'Checklist copied. Paste it into an email or a note. Nothing was sent.';
           else {
-            msg.textContent = 'The list was too long for an email link, so it is cut short there. Copying failed, so the full list is below: select it and copy it.';
-            view.fallback = h('textarea', { class: 'fx-textarea', readonly: '', rows: '6', 'aria-label': 'Full checklist text' });
-            view.fallback.value = r.fullText;
-            msg.parentNode.insertBefore(view.fallback, msg.nextSibling);
+            msg.textContent = 'Copying did not work here, so the checklist is below. Select it and copy it. Nothing was sent.';
+            BFF.host.showText({ after: msg, key: 'checklist', label: 'Your checklist', text: r.fullText, returnTo: copyBtn });
           }
         });
-      } else msg.textContent = 'Trying to open your email app with the checklist. If nothing opens, this device may have no mail app set up.';
-      openLink(r.url);
+      }
     });
+    view.mailCopy = copyBtn;
+    var mailRow = h('div', { class: 'fx-actions' }, inArt ? [copyBtn, mailLink, mailNote] : [mailLink, mailNote, copyBtn]);
     // 2. Gmail filters
     var arch = h('input', { type: 'checkbox', id: 'trk-archive' });
     view.archive = arch;
@@ -456,10 +483,7 @@
       var usePlus = plusOn(pr);
       var xml = E.gmailFiltersXml(activePrograms(), { email: pr.email, usePlus: usePlus, archive: usePlus && arch.checked, tagMap: usePlus ? tagMapNow() : null, allPrograms: BFF.programs || [] });
       var n = (xml.match(/<entry>/g) || []).length;
-      try {
-        download('baby-freebies-gmail-filters.xml', xml, 'application/xml');
-        msg.textContent = 'Downloaded ' + plural(n, 'filter') + ' in baby-freebies-gmail-filters.xml. Import it in Gmail with the steps below.';
-      } catch (e) { msg.textContent = 'Could not create the file: ' + e.message; }
+      saveFile({ msg: msg, key: 'filters', name: 'baby-freebies-gmail-filters.xml', text: xml, mime: 'application/xml', what: plural(n, 'filter'), button: fBtn });
     });
     var steps = h('details', { class: 'fx-about' }, [
       h('summary', { text: 'How to import the filters' }),
@@ -468,10 +492,12 @@
         h('li', { text: 'Choose Import filters, then Choose file, and pick the downloaded file.' }),
         h('li', { text: 'Select Open file, tick the filters you want, and choose Create filters.' })
       ]),
+      zipNote('the filters'),
       h('p', { class: 'fx-small', text: 'Each filter adds a label like Baby Freebies/Program name. With plus addresses on, it matches the tagged address exactly, so Skip the inbox is safe. Otherwise it matches the program\u2019s sender domain and never archives.' })
     ]);
     // 3. reminders
     var iBtn = h('button', { type: 'button', class: 'fx-btn', text: 'Download reminders (.ics)' });
+    var icsNote = zipNote('reminders');
     iBtn.addEventListener('click', function () {
       var entries = [];
       (BFF.programs || []).forEach(function (p) {
@@ -484,10 +510,7 @@
         msg.textContent = 'No programs are marked Signed up yet. Mark a program as Signed up, then come back: each reminder lands 28 days after the date you marked it.';
         return;
       }
-      try {
-        download('baby-freebies-reminders.ics', E.icsReminders(entries, { days: 28 }), 'text/calendar');
-        msg.textContent = 'Downloaded ' + plural(entries.length, 'reminder') + '. Open the file to add them to your calendar.';
-      } catch (e) { msg.textContent = 'Could not create the file: ' + e.message; }
+      saveFile({ msg: msg, key: 'reminders', name: 'baby-freebies-reminders.ics', text: E.icsReminders(entries, { days: 28 }), mime: 'text/calendar', what: plural(entries.length, 'reminder'), button: iBtn });
     });
     view.gmailNote = h('p', { class: 'fx-small', hidden: '', text: 'The Search my Gmail links on each row open your own Gmail in a new tab. This app never sees your mail.' });
     var acct = h('input', { type: 'number', id: 'trk-acct', class: 'fx-input fx-input--short', min: '0', max: '9', step: '1' });
@@ -509,12 +532,13 @@
       h('h3', { id: 'trk-mail-h', text: 'Email and calendar' }),
       h('p', { class: 'fx-muted', text: 'These hand off to your own mail app, Gmail or calendar. Nothing is sent from this app.' }),
       view.mailHint,
-      h('div', { class: 'fx-actions' }, [mailBtn]),
+      mailRow,
       h('div', { class: 'fx-check' }, [arch, h('label', { 'for': 'trk-archive', text: 'Skip the inbox (archive)' })]),
       view.plusHint,
       h('div', { class: 'fx-actions' }, [fBtn]),
       steps,
       h('div', { class: 'fx-actions' }, [iBtn]),
+      icsNote,
       view.gmailNote,
       view.acctRow,
       msg
@@ -544,6 +568,10 @@
     el.appendChild(view.msg);
     el.appendChild(view.live);
     el.appendChild(buildEmailPanel());
+    // Mount point for the Gmail connection panel (BFF.inboxView, optional).
+    var inboxNode = h('div', { id: 'trk-inbox' });
+    el.appendChild(inboxNode);
+    try { if (BFF.inboxView && typeof BFF.inboxView.mount === 'function') BFF.inboxView.mount(inboxNode); } catch (e) { if (window.console) console.error('Gmail panel failed to mount:', e); }
 
     var bar = h('div', { class: 'fx-tabs', role: 'group', 'aria-label': 'Filter by status' });
     [['all', 'All']].concat(STATUSES.map(function (s) { return [s, LABELS[s]]; })).forEach(function (f) {
@@ -567,13 +595,34 @@
     var msg = h('p', { class: 'fx-msg', role: 'status', 'aria-live': 'polite' });
     var dl = h('button', { type: 'button', class: 'fx-btn fx-btn--primary', text: 'Download backup (JSON)' });
     dl.addEventListener('click', function () {
-      try {
-        download('baby-freebies-backup-' + today() + '.json', tracker.exportJSON({ includeProfile: inc.checked }));
-        msg.textContent = 'Backup downloaded.';
-      } catch (e) { msg.textContent = 'Could not create the backup: ' + e.message; }
+      var text;
+      try { text = tracker.exportJSON({ includeProfile: inc.checked }); }
+      catch (e) { msg.textContent = 'Could not create the backup: ' + e.message; return; }
+      saveFile({ msg: msg, key: 'backup', name: 'baby-freebies-backup-' + today() + '.json', text: text, mime: 'application/json', what: 'your backup', button: dl });
     });
     var file = h('input', { type: 'file', id: 'trk-restore', accept: 'application/json,.json', class: 'fx-file' });
     var actions1 = h('div', { class: 'fx-actions' }, [dl]);
+    // Shared by the file picker and the paste box.
+    function restoreFrom(text, label, after, returnTo, done) {
+      var a;
+      try { a = tracker.analyzeImport(text); } catch (e) { msg.textContent = 'Restore failed: ' + e.message; done(); return; }
+      var q = 'Restore from ' + label + '? ' + plural(a.imported, 'program entry') + ' will be added or updated (newer changes win). ' +
+        plural(a.skipped, 'entry') + ' will be left as they are because yours are newer.' +
+        (a.unknown ? ' ' + plural(a.unknown, 'entry') + ' for programs not in this version will be kept.' : '') +
+        (a.hasProfile ? ' My info in the file will fill in blank fields only.' : '');
+      msg.textContent = '';
+      BFF.ui.confirm({
+        after: after, message: q, confirmLabel: 'Restore', returnTo: returnTo,
+        onConfirm: function () {
+          try {
+            var r = tracker.importJSON(text);
+            msg.textContent = (r.saved ? 'Restored: ' : 'Restored for this visit only, but it could not be saved on this device: ') + plural(r.imported, 'entry') + ' imported, ' + r.skipped + ' skipped.';
+          } catch (e) { msg.textContent = 'Restore failed: ' + e.message; }
+          done(true);
+        },
+        onCancel: function () { msg.textContent = 'Restore cancelled. Nothing changed.'; done(); }
+      });
+    }
     file.addEventListener('change', function () {
       var f = file.files && file.files[0];
       if (!f) return;
@@ -581,26 +630,23 @@
       var fr = new FileReader();
       fr.onerror = function () { msg.textContent = 'Could not read that file.'; };
       fr.onload = function () {
-        var text = String(fr.result), a;
-        try { a = tracker.analyzeImport(text); } catch (e) { msg.textContent = 'Restore failed: ' + e.message; file.value = ''; return; }
-        var q = 'Restore from "' + f.name + '"? ' + plural(a.imported, 'program entry') + ' will be added or updated (newer changes win). ' +
-          plural(a.skipped, 'entry') + ' will be left as they are because yours are newer.' +
-          (a.unknown ? ' ' + plural(a.unknown, 'entry') + ' for programs not in this version will be kept.' : '') +
-          (a.hasProfile ? ' My info in the file will fill in blank fields only.' : '');
-        msg.textContent = '';
-        BFF.ui.confirm({
-          after: file.parentNode, message: q, confirmLabel: 'Restore', returnTo: file,
-          onConfirm: function () {
-            try {
-              var r = tracker.importJSON(text);
-              msg.textContent = (r.saved ? 'Restored: ' : 'Restored for this visit only, but it could not be saved on this device: ') + plural(r.imported, 'entry') + ' imported, ' + r.skipped + ' skipped.';
-            } catch (e) { msg.textContent = 'Restore failed: ' + e.message; }
-            file.value = '';
-          },
-          onCancel: function () { msg.textContent = 'Restore cancelled. Nothing changed.'; file.value = ''; }
-        });
+        restoreFrom(String(fr.result), '"' + f.name + '"', file.parentNode, file, function () { file.value = ''; });
       };
       fr.readAsText(f);
+    });
+    // Paste box: for pages where the file picker is not available.
+    var pasteBox = h('textarea', { id: 'trk-paste', class: 'fx-textarea', rows: '4', placeholder: 'Paste the text of a backup file here' });
+    var pasteBtn = h('button', { type: 'button', class: 'fx-btn', text: 'Restore from pasted text' });
+    var paste = h('details', { class: 'fx-about' }, [
+      h('summary', { text: 'Restore from pasted text instead' }),
+      h('div', { class: 'fx-field' }, [h('label', { 'for': 'trk-paste', text: 'Backup text' }), pasteBox]),
+      h('div', { class: 'fx-actions' }, [pasteBtn])
+    ]);
+    pasteBtn.addEventListener('click', function () {
+      var text = pasteBox.value.trim();
+      if (!text) { msg.textContent = 'Paste the backup text into the box first.'; return; }
+      if (text.length > MAX_BYTES) { msg.textContent = 'Restore failed: that text is too large to be a backup (the limit is 1 MB).'; return; }
+      restoreFrom(text, 'the pasted text', paste, pasteBtn, function (ok) { if (ok) pasteBox.value = ''; });
     });
     var reset = h('button', { type: 'button', class: 'fx-btn fx-btn--danger', text: 'Reset tracker' });
     var actions2 = h('div', { class: 'fx-actions' }, [reset]);
@@ -619,6 +665,7 @@
       warn,
       actions1,
       h('div', { class: 'fx-field' }, [h('label', { 'for': 'trk-restore', text: 'Restore from backup' }), file]),
+      paste,
       actions2,
       msg
     ]));
@@ -629,6 +676,7 @@
       else (BFF.programs || []).forEach(function (p) { syncRow(p.id, true); });
       updateSummary();
       applyFilter();
+      refreshMailto();
     });
     document.addEventListener('bff:storage-failed', updateSummary);
     function flushAll() { view.flushers.forEach(function (f) { f(); }); }

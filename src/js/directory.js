@@ -110,7 +110,7 @@
     els.start.addEventListener('click', function () {
       if (!shownIds.length || !BFF.guided) return;
       var ids = shownIds.slice();
-      function go() { BFF.guided.preselect(ids); location.hash = '#guided'; }
+      function go() { BFF.guided.preselect(ids); if (BFF.nav) BFF.nav.go('guided'); else location.hash = '#guided'; }
       var ri = BFF.guided.runInfo && BFF.guided.runInfo();
       if (!ri || !BFF.ui) { go(); return; }
       BFF.ui.confirm({

@@ -94,6 +94,8 @@
     ta.remove();
     return ok;
   }
+  // The artifact frame cannot open pages from script, so nothing here depends on window.open there.
+  function canPopup() { return !(BFF.host && BFF.host.canPopup === false); }
   function copy(text, label, btn) {
     function done(ok) {
       announce(ok ? 'Copied ' + label : 'Could not copy ' + label + '. Select the text and copy it manually.');
@@ -104,17 +106,18 @@
         setTimeout(function () { btn.textContent = old; }, 1200);
       }
     }
-    if (navigator.clipboard && navigator.clipboard.writeText) {
+    if (BFF.host && BFF.host.copyText) BFF.host.copyText(text).then(done);
+    else if (navigator.clipboard && navigator.clipboard.writeText) {
       navigator.clipboard.writeText(text).then(function () { done(true); }, function () { done(fallbackCopy(text)); });
     } else done(fallbackCopy(text));
   }
 
   // ---- state ----
-  var el, body, selected = null, run = null, focusHeading = false;
+  var el, body, selected = null, run = null, focusHeading = false, focusOpen = false;
   var actions = null; // buttons of the program on screen, for keyboard shortcuts
   var undoInfo = null; // {id, entry, index, text}: lets the last Done or Skip be taken back
   var saved0 = store.get(KEY, null);
-  var autoOpen = !(saved0 && saved0.autoOpenNext === false);
+  var autoOpen = !(saved0 && saved0.autoOpenNext === false); // only used where canPopup() is true
   var shortcutsOn = !!(saved0 && saved0.shortcuts === true);
 
   function loadRun() {
@@ -157,6 +160,7 @@
     return h('div', { class: 'fx-check' }, [cb, h('label', { 'for': 'gd-shortcuts', text: 'Enable single-key shortcuts' })]);
   }
   function autoToggle(idSuffix) {
+    if (!canPopup()) return null; // the option cannot work here, so it is not offered
     var id = 'gd-auto-' + idSuffix;
     var cb = h('input', { type: 'checkbox', id: id });
     cb.checked = autoOpen;
@@ -177,6 +181,7 @@
   function renderSetup() {
     body.textContent = '';
     body.appendChild(h('p', { class: 'fx-lead', text: 'Pick the programs to work through. For each one you get a sign-up page to open and your details ready to copy. Nothing is ever submitted for you.' }));
+    body.appendChild(phoneHint());
     var pr = profile();
     if (!pr.firstName && !pr.email && !pr.address1) {
       var w = h('p', { class: 'fx-warn' }, [document.createTextNode('My info is empty, so there is nothing to copy yet. '), h('a', { href: '#info', text: 'Fill in My info' }), document.createTextNode(' first.')]);
@@ -204,7 +209,8 @@
       bar.appendChild(btn);
     });
     body.appendChild(bar);
-    body.appendChild(autoToggle('setup'));
+    var at = autoToggle('setup');
+    if (at) body.appendChild(at);
     body.appendChild(count);
     var list = h('ul', { class: 'fx-pick' });
     progs().forEach(function (p, i) {
@@ -241,8 +247,9 @@
     return h('div', { class: cls || 'fx-block' }, [h('h4', { text: title })].concat(items));
   }
 
-  function go(delta, keepUndo) {
+  function go(delta, keepUndo, focus) {
     if (!keepUndo) undoInfo = null;
+    focusOpen = focus === 'open';
     run.index += delta;
     if (run.index >= run.ids.length) { run.index = run.ids.length - 1; run.step = 'finish'; }
     if (run.index < 0) run.index = 0;
@@ -281,6 +288,10 @@
     return h('div', { class: 'fx-undo' }, [h('span', { class: 'fx-small', text: u.text }), btn]);
   }
 
+  function phoneHint() {
+    return h('p', { class: 'fx-small fx-tight' }, [document.createTextNode('Filling on your phone? '), h('a', { href: '#info', text: 'Set up the fill script in My info' }), document.createTextNode('.')]);
+  }
+
   function renderRun() {
     var p = byId(run.ids[run.index]);
     body.textContent = '';
@@ -304,20 +315,17 @@
     body.appendChild(title);
     body.appendChild(h('p', { class: 'fx-muted fx-tight', text: p.brand + ' · Status: ' + T().LABELS[st] }));
 
-    // (b) open button
-    var open = h('button', { type: 'button', class: 'fx-btn fx-btn--primary fx-btn--big', text: 'Open sign-up page ↗' });
+    // (b) open link: a real anchor, so it works wherever links work (no window.open)
+    var open = h('a', { class: 'fx-btn fx-btn--primary fx-btn--big', href: p.signupUrl, target: '_blank', rel: 'noopener noreferrer', text: 'Open sign-up page \u2197' });
+    open.setAttribute('aria-label', 'Open sign-up page for ' + p.name + ' (opens in a new tab)');
     open.addEventListener('click', function () {
-      var w = window.open(p.signupUrl, '_blank');
-      if (!w) { announce('Popup blocked, use the plain link below.'); return; }
-      try { w.opener = null; } catch (e) {}
       run.opened = Array.isArray(run.opened) ? run.opened : [];
       if (run.opened.indexOf(p.id) < 0) { run.opened.push(p.id); saveRun(); }
-      announce('Opened the ' + p.name + ' sign-up page in a new tab.');
+      announce('Opening the ' + p.name + ' sign-up page in a new tab.');
     });
     actions.open = open;
     body.appendChild(open);
-    body.appendChild(h('p', { class: 'fx-small fx-tight' }, [document.createTextNode('Popup blocked? '),
-      h('a', { href: p.signupUrl, target: '_blank', rel: 'noopener noreferrer', text: 'Use the plain link' })]));
+    body.appendChild(phoneHint());
 
     // (c) details
     var details = detailList(profile(), p);
@@ -353,7 +361,8 @@
     if (p.catches) about.appendChild(h('p', { class: 'fx-warn' }, [h('strong', { text: 'Catches: ' }), document.createTextNode(p.catches)]));
     if (p.notes) about.appendChild(h('p', {}, [h('strong', { text: 'Notes: ' }), document.createTextNode(p.notes)]));
     body.appendChild(about);
-    body.appendChild(autoToggle('run'));
+    var ar = autoToggle('run');
+    if (ar) body.appendChild(ar);
     body.appendChild(h('details', { class: 'fx-about fx-shortcuts' }, [
       h('summary', { text: 'Shortcuts' }),
       shortcutToggle(),
@@ -387,13 +396,14 @@
       else if (st === 'todo') saved(T().setStatus(p.id, 'skipped'));
       var msg = p.name + (kind === 'done' ? ' marked as signed up.' : ' skipped.');
       var nextP = last ? null : byId(run.ids[run.index + 1]);
-      if (autoOpen && nextP) {
+      if (autoOpen && canPopup() && nextP) {
         var r = openOnce(nextP);
         if (r === 'opened') msg += ' Opened the ' + nextP.name + ' sign-up page in a new tab.';
-        else if (r === 'blocked') msg += ' Popup blocked, use the Open button.';
+        else if (r === 'blocked') msg += ' Your browser blocked the popup, so use the Open sign-up page link.';
       }
+      if (nextP) msg += ' Next: ' + nextP.name + '. Focus is on its Open sign-up page link.';
       undoInfo = { id: p.id, entry: prev, index: run.index, text: msg };
-      go(1, true);
+      go(1, true, nextP ? 'open' : '');
       announce(msg + ' Undo is available.');
     }
     var done = h('button', { type: 'button', class: 'fx-btn fx-btn--primary', text: 'Done' });
@@ -415,7 +425,9 @@
     actions.back = back;
     actions.next = next;
     body.appendChild(h('div', { class: 'fx-actionbar fx-sticky' }, [pbox, h('div', { class: 'fx-actionbar-row' }, [done, skip, prob, back])]));
-    if (focusHeading) title.focus();
+    if (focusOpen && actions.open) actions.open.focus();
+    else if (focusHeading) title.focus();
+    focusOpen = false;
   }
 
   function renderFinish() {

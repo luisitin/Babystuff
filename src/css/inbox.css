@@ -1,1 +1,27 @@
-/* inbox.css: Phase F stub, replaced by its owner (see ARCHITECTURE.md, Phase F). */
+/* inbox.css: the "Gmail connection" card. Tokens come from base.css. */
+.ib-card [hidden] { display: none !important; }
+.ib-card { overflow-wrap: anywhere; }
+.ib-tight { margin-top: 0; margin-bottom: var(--space-1); }
+.ib-steps { margin: var(--space-3) 0; padding: var(--space-3) var(--space-4); background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--radius-sm); }
+.ib-steps ol { margin: var(--space-2) 0; padding-left: var(--space-5); }
+.ib-unavail { margin: var(--space-3) 0; padding: var(--space-3) var(--space-4) var(--space-3) var(--space-5); background: var(--warning-bg); color: var(--warning-text); border-radius: var(--radius-sm); }
+.ib-error { background: var(--warning-bg); color: var(--warning-text); border: 1px solid var(--warning-border); border-radius: var(--radius-sm); padding: var(--space-3) var(--space-4); }
+.ib-live:empty, .ib-done:empty, .ib-changed:empty { display: none; }
+.ib-changed:focus { outline: none; }
+.ib-group { margin: var(--space-3) 0; padding: var(--space-3); background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius-sm); }
+.ib-group-h { margin: 0 0 var(--space-1); font-size: 1em; }
+.ib-list, .ib-sugs { list-style: none; margin: var(--space-2) 0 0; padding: 0; }
+.ib-item { display: flex; flex-direction: column; gap: var(--space-1); align-items: flex-start; padding: var(--space-2) 0; border-top: 1px solid var(--border); }
+.ib-item:first-child { border-top: 0; }
+.ib-subject { color: var(--text); }
+.ib-meta { color: var(--muted); }
+.ib-badges { display: flex; flex-wrap: wrap; gap: var(--space-1) var(--space-2); }
+.ib-badge { display: inline-block; padding: 2px var(--space-2); border-radius: 999px; border: 1px solid var(--border-strong); background: var(--neutral-bg); color: var(--neutral-text); font-size: .8em; }
+.ib-badge--warn { background: var(--warning-bg); color: var(--warning-text); border-color: var(--warning-border); font-weight: 600; }
+.ib-badge--ok { background: var(--success-bg); color: var(--success); border-color: var(--success); }
+.ib-sug { display: flex; flex-direction: column; gap: var(--space-1); padding: var(--space-2) 0; border-top: 1px solid var(--border); }
+.ib-sug:first-child { border-top: 0; }
+.ib-sug-btn { width: 100%; justify-content: flex-start; text-align: left; height: auto; }
+.ib-open { min-height: 44px; }
+.ib-actions .ib-btn { max-width: 100%; }
+@media (max-width: 360px) { .ib-actions .ib-btn { width: 100%; } }

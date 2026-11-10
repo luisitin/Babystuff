@@ -420,6 +420,28 @@ main:focus { outline: none; }
 .fx-undo { display: flex; flex-wrap: wrap; align-items: center; gap: var(--fx-s2) var(--fx-s3); background: var(--fx-surface); border: 1px solid var(--fx-border); border-radius: var(--fx-r); padding: var(--fx-s2) var(--fx-s3); margin: var(--fx-s2) 0; }
 .fx-undo span { flex: 1 1 10rem; }
 .fx-confirm { box-sizing: border-box; }
+/* inbox.css: Phase F stub, replaced by its owner (see ARCHITECTURE.md, Phase F). */
+/* "Fill forms on your phone" card in My info. Tokens from base.css only. */
+.ph-card { overflow-wrap: anywhere; }
+.ph-card h3 { margin: 0 0 var(--space-2); }
+.ph-opt { margin: var(--space-4) 0; padding-top: var(--space-3); border-top: 1px solid var(--border); }
+.ph-opt h4 { margin: 0 0 var(--space-2); }
+.ph-card h4 { color: var(--text); }
+.ph-list { margin: var(--space-2) 0; padding-left: var(--space-5); }
+.ph-list li { margin: var(--space-2) 0; }
+.ph-warn { border: 1px solid var(--warning-border); background: var(--warning-bg); color: var(--warning-text); }
+.ph-empty { margin: var(--space-3) 0; padding: var(--space-3); border: 1px dashed var(--border-strong); border-radius: var(--radius-sm); background: var(--surface-2); color: var(--text); }
+.ph-actions { flex-direction: column; align-items: stretch; }
+.ph-actions .fx-btn { width: 100%; min-height: 48px; }
+.ph-status { min-height: 1.4em; margin: var(--space-2) 0; color: var(--text); font-weight: 600; }
+.ph-status:empty { display: none; }
+.ph-text { width: 100%; min-height: 120px; font-family: ui-monospace, Menlo, Consolas, monospace; font-size: .85em; }
+.ph-card .fx-btn:disabled { color: var(--muted); border-style: dashed; }
+.ph-card .fx-btn:focus-visible, .ph-text:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+@media (min-width: 560px) {
+  .ph-actions { flex-direction: row; }
+  .ph-actions .fx-btn { width: auto; }
+}
 </style>
 </head>
 <body>
@@ -1057,6 +1079,1219 @@ main:focus { outline: none; }
   if (typeof module === 'object' && module.exports) module.exports = api;
   else { root.BFF = root.BFF || {}; root.BFF.email = api; }
 })(typeof window !== 'undefined' ? window : globalThis);
+// BFF.zip: a tiny ZIP writer (stored, no compression). UMD so Node tests can load it.
+(function (root) {
+  'use strict';
+
+  var TABLE = null;
+  function table() {
+    if (TABLE) return TABLE;
+    TABLE = new Uint32Array(256);
+    for (var n = 0; n < 256; n++) {
+      var c = n;
+      for (var k = 0; k < 8; k++) c = c & 1 ? (0xEDB88320 ^ (c >>> 1)) : c >>> 1;
+      TABLE[n] = c >>> 0;
+    }
+    return TABLE;
+  }
+
+  // CRC-32 (the ZIP and gzip polynomial) of a Uint8Array, as an unsigned number.
+  function crc32(bytes) {
+    var t = table(), c = 0xFFFFFFFF;
+    for (var i = 0; i < bytes.length; i++) c = t[(c ^ bytes[i]) & 0xFF] ^ (c >>> 8);
+    return (c ^ 0xFFFFFFFF) >>> 0;
+  }
+
+  // UTF-8 bytes of a string. Lone surrogates become U+FFFD, like TextEncoder.
+  function utf8(s) {
+    s = String(s);
+    if (typeof TextEncoder === 'function') return new TextEncoder().encode(s);
+    var out = [];
+    for (var i = 0; i < s.length; i++) {
+      var c = s.charCodeAt(i);
+      if (c >= 0xD800 && c <= 0xDBFF && i + 1 < s.length) {
+        var d = s.charCodeAt(i + 1);
+        if (d >= 0xDC00 && d <= 0xDFFF) { c = 0x10000 + ((c - 0xD800) << 10) + (d - 0xDC00); i++; }
+      }
+      if (c >= 0xD800 && c <= 0xDFFF) c = 0xFFFD;
+      if (c < 0x80) out.push(c);
+      else if (c < 0x800) out.push(0xC0 | (c >> 6), 0x80 | (c & 63));
+      else if (c < 0x10000) out.push(0xE0 | (c >> 12), 0x80 | ((c >> 6) & 63), 0x80 | (c & 63));
+      else out.push(0xF0 | (c >> 18), 0x80 | ((c >> 12) & 63), 0x80 | ((c >> 6) & 63), 0x80 | (c & 63));
+    }
+    return Uint8Array.from(out);
+  }
+
+  var FLAGS = 0x0800;      // bit 11: file names are UTF-8
+  var DOS_TIME = 0;        // 00:00:00
+  var DOS_DATE = 0x0021;   // 1980-01-01, fixed so the output is deterministic
+
+  // store([{name, text}]) -> Uint8Array. An entry may carry `bytes` (a Uint8Array) instead of `text`.
+  function store(files) {
+    if (!Array.isArray(files)) throw new TypeError('store() needs an array of {name, text}');
+    if (files.length > 0xFFFF) throw new RangeError('Too many files for a zip');
+    var entries = files.map(function (f) {
+      if (!f || typeof f.name !== 'string' || !f.name) throw new TypeError('Every file needs a name');
+      var name = utf8(f.name);
+      if (name.length > 0xFFFF) throw new RangeError('File name too long');
+      var data = f.bytes instanceof Uint8Array ? f.bytes : utf8(f.text == null ? '' : f.text);
+      return { name: name, data: data, crc: crc32(data) };
+    });
+    var size = 22, i;
+    for (i = 0; i < entries.length; i++) size += 30 + 46 + 2 * entries[i].name.length + entries[i].data.length;
+    if (size > 0xFFFFFFFF) throw new RangeError('Zip too large');
+    var out = new Uint8Array(size), dv = new DataView(out.buffer), p = 0;
+    function u16(v) { dv.setUint16(p, v, true); p += 2; }
+    function u32(v) { dv.setUint32(p, v >>> 0, true); p += 4; }
+    function put(b) { out.set(b, p); p += b.length; }
+    for (i = 0; i < entries.length; i++) {
+      var e = entries[i];
+      e.offset = p;
+      u32(0x04034B50); u16(20); u16(FLAGS); u16(0); u16(DOS_TIME); u16(DOS_DATE);
+      u32(e.crc); u32(e.data.length); u32(e.data.length); u16(e.name.length); u16(0);
+      put(e.name); put(e.data);
+    }
+    var cdStart = p;
+    for (i = 0; i < entries.length; i++) {
+      var f2 = entries[i];
+      u32(0x02014B50); u16(20); u16(20); u16(FLAGS); u16(0); u16(DOS_TIME); u16(DOS_DATE);
+      u32(f2.crc); u32(f2.data.length); u32(f2.data.length); u16(f2.name.length);
+      u16(0); u16(0); u16(0); u16(0); u32(0); u32(f2.offset);
+      put(f2.name);
+    }
+    var cdSize = p - cdStart;
+    u32(0x06054B50); u16(0); u16(0); u16(entries.length); u16(entries.length); u32(cdSize); u32(cdStart); u16(0);
+    return out;
+  }
+
+  var api = { store: store, crc32: crc32 };
+  if (typeof module === 'object' && module.exports) module.exports = api;
+  else { root.BFF = root.BFF || {}; root.BFF.zip = api; }
+})(typeof window !== 'undefined' ? window : globalThis);
+// BFF.host: where the page runs (standalone or Claude artifact) and how files, copying and links behave there.
+// UMD so Node tests can load it; everything environment-specific is looked up at call time.
+(function (root) {
+  'use strict';
+
+  // Extensions the artifact's downloads capability accepts. Anything else is wrapped in a zip.
+  var ALLOWED = ('gif png jpg jpeg webp mp4 webm mov txt json md docx pptx epub csv ttf html svg pdf xlsx zip fig').split(' ');
+  var MIME_FALLBACK = 'text/plain';
+  var cache = {};
+  var panelSeq = 0;
+
+  function runtime() {
+    try {
+      var c = root.claude;
+      return c && typeof c.use === 'function' ? c : null;
+    } catch (e) { return null; }
+  }
+  function inArtifact() { return !!runtime(); }
+
+  // Promise of a capability namespace or null. Memoized per name. Never throws and never rejects.
+  function use(name) {
+    name = String(name);
+    if (Object.prototype.hasOwnProperty.call(cache, name)) return cache[name];
+    var p;
+    try {
+      var c = runtime();
+      p = c ? Promise.resolve(c.use(name)).then(function (ns) { return ns || null; }, function () { return null; }) : Promise.resolve(null);
+    } catch (e) { p = Promise.resolve(null); }
+    cache[name] = p;
+    return p;
+  }
+
+  function zipApi() {
+    if (root.BFF && root.BFF.zip) return root.BFF.zip;
+    if (typeof module === 'object' && typeof require === 'function') { try { return require('./zip.js'); } catch (e) {} }
+    return null;
+  }
+  function extOf(name) {
+    var m = /\.([A-Za-z0-9]+)$/.exec(String(name));
+    return m ? m[1].toLowerCase() : '';
+  }
+  function allowedExt(name) { return ALLOWED.indexOf(extOf(name)) >= 0; }
+  function baseOf(name) { return String(name).replace(/\.[A-Za-z0-9]+$/, '') || String(name); }
+
+  function standaloneSave(name, text, mime) {
+    var D = root.document, U = root.URL;
+    if (!D || typeof Blob === 'undefined' || !U || !U.createObjectURL) return { status: 'shown', name: name, reason: 'unavailable' };
+    try {
+      var url = U.createObjectURL(new Blob([text], { type: mime || MIME_FALLBACK }));
+      var a = D.createElement('a');
+      a.href = url;
+      a.download = name;
+      a.hidden = true;
+      D.body.appendChild(a);
+      a.click();
+      setTimeout(function () { try { U.revokeObjectURL(url); a.remove(); } catch (e) {} }, 1000);
+      return { status: 'saved', name: name, zipped: false };
+    } catch (e) {
+      return { status: 'shown', name: name, reason: 'unavailable' };
+    }
+  }
+
+  // saveFile({name, text, mime}) -> Promise<{status, name, zipped?, inner?, reason?, message?}>
+  //   saved: the file went to the person's device (zipped: it is inside <name>.zip, `inner` is the original name)
+  //   declined: the person said no in the save prompt (never retried here)
+  //   shown: nothing could be saved, so the caller should show the text (see showText)
+  //   failed: plain `message` for the person (rate limit, empty file)
+  function saveFile(opts) {
+    opts = opts || {};
+    var name = String(opts.name || 'file.txt');
+    var text = opts.text == null ? '' : String(opts.text);
+    if (!text) return Promise.resolve({ status: 'failed', name: name, reason: 'empty', message: 'There is nothing to save yet.' });
+    if (!inArtifact()) return Promise.resolve(standaloneSave(name, text, opts.mime));
+    return use('downloads').then(function (dl) {
+      if (!dl || typeof dl.save !== 'function') return { status: 'shown', name: name, reason: 'unavailable' };
+      var filename = name, data = text, zipped = false;
+      if (!allowedExt(name)) {
+        var Z = zipApi();
+        if (!Z) return { status: 'shown', name: name, reason: 'unavailable' };
+        try {
+          data = Z.store([{ name: name, text: text }]);
+          filename = baseOf(name) + '.zip';
+          zipped = true;
+        } catch (e) { return { status: 'shown', name: name, reason: 'unavailable' }; }
+      }
+      var call;
+      try { call = Promise.resolve(dl.save({ filename: filename, data: data })); } catch (e) { call = Promise.reject(e); }
+      return call.then(function () {
+        return { status: 'saved', name: filename, zipped: zipped, inner: name };
+      }, function (err) {
+        var code = err && typeof err === 'object' ? err.code : '';
+        if (code === 'declined') return { status: 'declined', name: filename, reason: code };
+        if (code === 'rate_limited') {
+          return { status: 'failed', name: filename, reason: code, message: 'Another save is waiting for you or you tried too many times. Wait a moment, then try again.' };
+        }
+        return { status: 'shown', name: name, reason: code || 'unavailable' };
+      });
+    }, function () { return { status: 'shown', name: name, reason: 'unavailable' }; });
+  }
+
+  // copyText(text) -> Promise<boolean>. Call it inside the click handler.
+  function copyText(text) {
+    text = String(text);
+    function fallback() {
+      var D = root.document;
+      if (!D || !D.body || typeof D.execCommand !== 'function') return false;
+      var ta = D.createElement('textarea');
+      ta.setAttribute('aria-hidden', 'true');
+      ta.setAttribute('tabindex', '-1');
+      ta.setAttribute('readonly', '');
+      ta.style.cssText = 'position:fixed;top:0;left:0;width:1px;height:1px;opacity:0';
+      ta.value = text;
+      D.body.appendChild(ta);
+      var ok = false;
+      try { ta.select(); ta.setSelectionRange(0, text.length); ok = !!D.execCommand('copy'); } catch (e) { ok = false; }
+      try { ta.remove(); } catch (e) {}
+      return ok;
+    }
+    try {
+      var nav = root.navigator;
+      if (nav && nav.clipboard && typeof nav.clipboard.writeText === 'function') {
+        return Promise.resolve(nav.clipboard.writeText(text)).then(function () { return true; }, function () { return fallback(); });
+      }
+    } catch (e) { /* fall through */ }
+    return Promise.resolve(fallback());
+  }
+
+  // showText({after, label, text, key}) inserts a labelled read-only text box with a Copy button after `after`.
+  // A second call with the same key replaces the first. Returns the panel element.
+  function showText(opts) {
+    var D = root.document;
+    opts = opts || {};
+    var after = opts.after, key = String(opts.key || 'text');
+    var parent = after && after.parentNode;
+    if (!D || !parent) return null;
+    var old = parent.querySelectorAll ? parent.querySelectorAll('[data-bff-shown="' + key + '"]') : [];
+    for (var i = 0; i < old.length; i++) old[i].remove();
+    var id = 'bff-shown-' + (++panelSeq);
+    var panel = D.createElement('div');
+    panel.className = 'fx-field bff-shown';
+    panel.setAttribute('data-bff-shown', key);
+    var label = D.createElement('label');
+    label.setAttribute('for', id);
+    label.textContent = opts.label || 'Text';
+    var ta = D.createElement('textarea');
+    ta.id = id;
+    ta.className = 'fx-textarea';
+    ta.readOnly = true;
+    ta.rows = 8;
+    ta.value = String(opts.text == null ? '' : opts.text);
+    ta.addEventListener('focus', function () { try { ta.select(); } catch (e) {} });
+    var row = D.createElement('div');
+    row.className = 'fx-actions';
+    var copy = D.createElement('button');
+    copy.type = 'button';
+    copy.className = 'fx-btn fx-btn--primary';
+    copy.textContent = 'Copy';
+    var hide = D.createElement('button');
+    hide.type = 'button';
+    hide.className = 'fx-btn';
+    hide.textContent = 'Hide';
+    var note = D.createElement('p');
+    note.className = 'fx-small';
+    note.setAttribute('role', 'status');
+    note.setAttribute('aria-live', 'polite');
+    copy.addEventListener('click', function () {
+      copyText(ta.value).then(function (ok) {
+        if (ok) note.textContent = 'Copied.';
+        else { note.textContent = 'Could not copy automatically. Tap inside the box, select all, and copy.'; try { ta.focus(); ta.select(); } catch (e) {} }
+      });
+    });
+    hide.addEventListener('click', function () {
+      var prev = panel.previousElementSibling;
+      panel.remove();
+      if (opts.returnTo && opts.returnTo.focus) opts.returnTo.focus();
+      else if (prev && prev.focus) prev.focus();
+    });
+    row.appendChild(copy);
+    row.appendChild(hide);
+    panel.appendChild(label);
+    panel.appendChild(ta);
+    panel.appendChild(row);
+    panel.appendChild(note);
+    parent.insertBefore(panel, after.nextSibling);
+    return panel;
+  }
+
+  var host = {
+    use: use,
+    saveFile: saveFile,
+    copyText: copyText,
+    showText: showText,
+    allowedExtension: allowedExt,
+    // Start the downloads lookup after first paint so it has answered by the time someone taps Save.
+    warm: function () { use('downloads'); }
+  };
+  Object.defineProperty(host, 'inArtifact', { enumerable: true, get: inArtifact });
+  Object.defineProperty(host, 'canPopup', { enumerable: true, get: function () { return !inArtifact(); } });
+  Object.defineProperty(host, 'mailtoNote', { enumerable: true, get: function () { return inArtifact() ? 'May not open from here' : ''; } });
+
+  if (typeof module === 'object' && module.exports) module.exports = host;
+  else { root.BFF = root.BFF || {}; root.BFF.host = host; }
+})(typeof window !== 'undefined' ? window : globalThis);
+/* Field matcher: decides what a form field is for and how to format the value.
+   One source of truth for the app, the fill script (which embeds the factory through
+   Function.prototype.toString) and tools/autofill. Pure: no DOM, no network, no storage.
+   Keep the factory self-contained, ES5 only, with no line comments (the script may be
+   pasted into places that strip newlines). */
+(function (root) {
+  'use strict';
+
+  function factory() {
+    var STATES = {
+      AL: 'Alabama', AK: 'Alaska', AZ: 'Arizona', AR: 'Arkansas', CA: 'California',
+      CO: 'Colorado', CT: 'Connecticut', DE: 'Delaware', DC: 'District of Columbia',
+      FL: 'Florida', GA: 'Georgia', HI: 'Hawaii', ID: 'Idaho', IL: 'Illinois',
+      IN: 'Indiana', IA: 'Iowa', KS: 'Kansas', KY: 'Kentucky', LA: 'Louisiana',
+      ME: 'Maine', MD: 'Maryland', MA: 'Massachusetts', MI: 'Michigan',
+      MN: 'Minnesota', MS: 'Mississippi', MO: 'Missouri', MT: 'Montana',
+      NE: 'Nebraska', NV: 'Nevada', NH: 'New Hampshire', NJ: 'New Jersey',
+      NM: 'New Mexico', NY: 'New York', NC: 'North Carolina', ND: 'North Dakota',
+      OH: 'Ohio', OK: 'Oklahoma', OR: 'Oregon', PA: 'Pennsylvania',
+      RI: 'Rhode Island', SC: 'South Carolina', SD: 'South Dakota', TN: 'Tennessee',
+      TX: 'Texas', UT: 'Utah', VT: 'Vermont', VA: 'Virginia', WA: 'Washington',
+      WV: 'West Virginia', WI: 'Wisconsin', WY: 'Wyoming'
+    };
+    var MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July',
+      'August', 'September', 'October', 'November', 'December'];
+
+    var SKIP_TYPES = {
+      hidden: 1, password: 1, search: 1, checkbox: 1, radio: 1, file: 1, submit: 1,
+      button: 1, reset: 1, image: 1, color: 1, range: 1
+    };
+
+    var SKIP_WORDS = /\b(password|passwd|pwd|passcode|pin|card|credit|debit|cc|ccnum|cvv|cvc|cvn|csc|security code|expir\w*|ssn|social security|insurance|insurer|member id|member number|policy|subscriber|medicaid|medicare|wic|case number|bank|routing|account number|search|captcha|promo|coupon|referral)\b/;
+    var OTHER_NAME = /\b(baby|child|children|infant|newborn|spouse|partner|friend|referr\w*|recipient|company|business|organization|employer|username|user name|nickname|pet|hospital|doctor|physician|provider)\b/;
+    var OTHER_PERSON = /\b(spouse|partner|husband|wife|fianc\w*|doctor|dr|physician|ob|obgyn|midwife|doula|provider|hospital|clinic|pediatrician|gift|recipient|friend|referr\w*|referral|emergency|contact person|guardian|grandparent\w*|grandmother|grandfather|sibling|sister|brother|relative|caregiver|nanny|sponsor|witness|manager|supervisor|teacher|employer|company|business|organization|work|other parent|second parent|mother s|father s|mom s|dad s)\b/;
+    var OTHER_THING = /\b(last menstrual\w*|menstrual|lmp|first time|phone type|mobile type|cell type|phone carrier|carrier|contact preference|preferred contact|best time|email type|address type|how did you hear)\b/;
+    var HONEYPOT = /\b(honeypot|honey pot|hp|hpot|leave blank|leave empty|do not fill|dont fill|bot trap|trap|url2|website2|fax)\b/;
+
+    var AUTOCOMPLETE = {
+      'given-name': 'firstName',
+      'family-name': 'lastName',
+      name: 'fullName',
+      email: 'email',
+      tel: 'phone',
+      'tel-national': 'phone',
+      'address-line1': 'address1',
+      'street-address': 'address1',
+      'address-line2': 'address2',
+      'address-level2': 'city',
+      'address-level1': 'state',
+      'postal-code': 'zip'
+    };
+
+    var SECOND_LEVEL = { co: 1, com: 1, org: 1, net: 1, gov: 1, edu: 1, ac: 1 };
+
+    function norm(s) {
+      return String(s == null ? '' : s)
+        .replace(/([a-z0-9])([A-Z])/g, '$1 $2')
+        .replace(/[^A-Za-z0-9]+/g, ' ')
+        .toLowerCase()
+        .replace(/^\s+|\s+$/g, '');
+    }
+
+    function fromText(t, type) {
+      if (!t) return null;
+      var has = function (re) { return re.test(t); };
+      var dueCtx = has(/\b(due|expected|edd|delivery|baby s birth|birth date of baby)\b/);
+      if (dueCtx) {
+        if (type === 'date') return 'dueDate';
+        if (has(/\bmonth\b|\bmm\b/)) return 'dueMonth';
+        if (has(/\bday\b|\bdd\b/)) return 'dueDay';
+        if (has(/\byear\b|\byyyy\b/)) return 'dueYear';
+        if (has(/\bdate\b|\bedd\b|\bdue\b|\bexpected\b/)) return 'dueDate';
+      }
+      if (has(/\be mail\b|\bemail\b/)) return 'email';
+      if (has(/\b(phone|mobile|cell|telephone|tel)\b/)) return 'phone';
+      if (has(/\b(zip|zipcode|postal|postcode)\b/)) return 'zip';
+      if (has(/\bcity\b|\btown\b/)) return 'city';
+      if (has(/\b(state|province)\b/) && !has(/\bstatement\b/)) return 'state';
+      if (has(/\b(address|addr|street)\b.*\b(2|two|line 2)\b|\baddress2\b|\baddr2\b|\b(apt|apartment|suite|unit)\b|\bline 2\b|\bline2\b/)) return 'address2';
+      if (has(/\b(address|addr|street)\b/)) return 'address1';
+      if (OTHER_NAME.test(t)) return null;
+      if (has(/\b(first name|firstname|fname|given name|forename)\b|^first$/)) return 'firstName';
+      if (has(/\b(last name|lastname|lname|surname|family name)\b|^last$/)) return 'lastName';
+      if (has(/\b(full name|your name|name)\b/)) return 'fullName';
+      return null;
+    }
+
+    function cleanText(s, max) {
+      if (max == null) max = 80;
+      var t = String(s == null ? '' : s)
+        .replace(/\u001b\][^\u0007\u001b]*(?:\u0007|\u001b\\)?/g, '')
+        .replace(/\u001b\[[0-9;?]*[ -\/]*[@-~]/g, '')
+        .replace(/[\u0000-\u001f\u007f-\u009f]/g, ' ')
+        .replace(/\s+/g, ' ')
+        .replace(/^\s+|\s+$/g, '');
+      if (t.length > max) t = t.slice(0, max - 3) + '...';
+      return t;
+    }
+
+    function registrableDomain(urlOrHost) {
+      var host = String(urlOrHost || '');
+      var m = /^[a-z][a-z0-9+.-]*:\/\/(?:[^\/?#@]*@)?(\[[^\]]*\]|[^\/?#:]*)/i.exec(host);
+      if (m) host = m[1];
+      var labels = host.toLowerCase().replace(/\.$/, '').split('.').filter(Boolean);
+      if (labels.length <= 2) return labels.join('.');
+      var tld = labels[labels.length - 1];
+      var take = tld.length === 2 && SECOND_LEVEL[labels[labels.length - 2]] === 1 ? 3 : 2;
+      return labels.slice(-take).join('.');
+    }
+    function sameSite(a, b) {
+      var x = registrableDomain(a);
+      return x !== '' && x === registrableDomain(b);
+    }
+
+    function isGuidedDefault(p) {
+      if (!p || p.costToClaim !== 'free') return false;
+      var r = Array.isArray(p.requirements) ? p.requirements : [];
+      if (r.indexOf('purchase') >= 0 || r.indexOf('membership') >= 0) return false;
+      if (p.category === 'health-benefits' || p.category === 'assistance') return false;
+      return !(r.indexOf('eligibility') >= 0 || r.indexOf('insurance') >= 0);
+    }
+
+    function classifyField(f) {
+      f = f || {};
+      var type = String(f.type || 'text').toLowerCase();
+      if (SKIP_TYPES[type] === 1) return null;
+
+      var ac = String(f.autocomplete || '').toLowerCase().split(/\s+/).filter(Boolean);
+      if (ac.some(function (t) { return t.indexOf('cc-') === 0 || t.indexOf('password') >= 0 || t === 'one-time-code' || t === 'username'; })) return null;
+      var acToken = ac.filter(function (t) { return !/^(section-|shipping|billing|home|work|mobile|fax|pager)/.test(t); }).pop();
+      var acKind = acToken ? AUTOCOMPLETE[acToken] : undefined;
+      var parts = [f.label, f.ariaLabel, f.name, f.id, f.placeholder].map(norm).filter(Boolean);
+      var all = parts.join(' ');
+      if (SKIP_WORDS.test(all) || OTHER_PERSON.test(all) || OTHER_THING.test(all) || HONEYPOT.test(all)) return null;
+
+      if (acKind) return acKind;
+      if (acToken === 'bday' || (acToken && acToken.indexOf('bday-') === 0)) return null;
+
+      if (type === 'email') return 'email';
+      if (type === 'tel') return 'phone';
+      if (type === 'date') {
+        return /\b(due|expected|edd|delivery|baby)\b/.test(all) ? 'dueDate' : null;
+      }
+      if (type === 'number' && !/\b(zip|postal|due|month|day|year|phone)\b/.test(all)) return null;
+
+      var order = [f.label, f.ariaLabel, f.name, f.id, f.placeholder];
+      for (var i = 0; i < order.length; i++) {
+        var k = fromText(norm(order[i]), type);
+        if (k) return k;
+      }
+      return fromText(all, type);
+    }
+
+    function parseDate(s) {
+      var m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(s || '').replace(/^\s+|\s+$/g, ''));
+      if (!m) return null;
+      return { y: m[1], m: m[2], d: m[3] };
+    }
+
+    function optList(options) {
+      return (options || []).map(function (o) {
+        if (typeof o === 'string') return { value: o, label: o };
+        var v = o.value == null ? '' : o.value;
+        var l = o.label != null ? o.label : (o.text != null ? o.text : (o.value != null ? o.value : ''));
+        return { value: String(v), label: String(l) };
+      });
+    }
+
+    function pickOption(options, predicate) {
+      var list = optList(options);
+      for (var i = 0; i < list.length; i++) {
+        var o = list[i];
+        if (o.value !== '' && (predicate(norm(o.value), o.value) || predicate(norm(o.label), o.label))) return o.value;
+      }
+      return null;
+    }
+
+    function valueFor(kind, profile, opts) {
+      opts = opts || {};
+      var inputType = opts.inputType || 'text';
+      var options = opts.options || null;
+      var isSelect = Array.isArray(options);
+      var p = profile || {};
+      var str = function (v) { return v == null ? '' : String(v).replace(/^\s+|\s+$/g, ''); };
+      var out = function (v) { return str(v) === '' ? null : str(v); };
+      var d;
+
+      switch (kind) {
+        case 'firstName': case 'lastName': case 'email': case 'phone':
+        case 'address1': case 'address2': case 'city': case 'zip':
+          return out(p[kind]);
+        case 'fullName':
+          return out([p.firstName, p.lastName].map(str).filter(Boolean).join(' '));
+        case 'state': {
+          var raw = str(p.state);
+          if (!raw) return null;
+          var upper = raw.toUpperCase();
+          var code = STATES[upper] ? upper : null;
+          if (!code) {
+            var keys = Object.keys(STATES);
+            for (var i = 0; i < keys.length; i++) {
+              if (STATES[keys[i]].toLowerCase() === raw.toLowerCase()) { code = keys[i]; break; }
+            }
+          }
+          if (!code) return isSelect ? null : raw;
+          if (!isSelect) return code;
+          var full = STATES[code].toLowerCase();
+          return pickOption(options, function (n, orig) { return n === code.toLowerCase() || n === full || norm(orig) === full; });
+        }
+        case 'dueDate':
+          d = parseDate(p.dueDate);
+          if (!d || isSelect) return null;
+          return inputType === 'date' ? d.y + '-' + d.m + '-' + d.d : d.m + '/' + d.d + '/' + d.y;
+        case 'dueMonth': {
+          d = parseDate(p.dueDate);
+          if (!d) return null;
+          var n = Number(d.m);
+          if (!isSelect) return d.m;
+          var name = MONTHS[n - 1].toLowerCase();
+          return pickOption(options, function (x) { return x === name || x === name.slice(0, 3) || x.indexOf(name + ' ') === 0 || (/^\d+$/.test(x) && Number(x) === n); });
+        }
+        case 'dueDay':
+          d = parseDate(p.dueDate);
+          if (!d) return null;
+          if (!isSelect) return d.d;
+          return pickOption(options, function (x) { return /^\d+$/.test(x) && Number(x) === Number(d.d); });
+        case 'dueYear':
+          d = parseDate(p.dueDate);
+          if (!d) return null;
+          if (!isSelect) return d.y;
+          return pickOption(options, function (x) { return x === d.y; });
+        default:
+          return null;
+      }
+    }
+
+    return {
+      cleanText: cleanText, registrableDomain: registrableDomain, sameSite: sameSite,
+      isGuidedDefault: isGuidedDefault, classifyField: classifyField, valueFor: valueFor
+    };
+  }
+
+  var api = factory();
+  api.factory = factory;
+  if (typeof module === 'object' && module.exports) module.exports = api;
+  else { root.BFF = root.BFF || {}; root.BFF.fieldmatch = api; }
+})(typeof window !== 'undefined' ? window : globalThis);
+/* BFF.fill: builds the fill script a person runs themselves on an official sign-up page
+   (Safari on iPhone through a Shortcut or a bookmarklet, or any desktop browser).
+   It fills the person's own details into empty fields and stops. It never submits, never
+   clicks, never ticks a box, never touches password, card, SSN or one-time-code fields, never
+   overwrites typed text, and does nothing on a site that is not an official program domain.
+   Pure string building: no DOM, no network, no storage at build time. UMD, Node-testable. */
+(function (root) {
+  'use strict';
+
+  function dep(name, file) {
+    if (typeof module === 'object' && module.exports && typeof require === 'function') {
+      try { return require(file); } catch (e) { /* fall through to the browser global */ }
+    }
+    return root.BFF && root.BFF[name];
+  }
+  function FM() { return dep('fieldmatch', './fieldmatch.js'); }
+  function EM() { return dep('email', './email.js'); }
+
+  /* The runner below is embedded with Function.prototype.toString(). It must stay
+     self-contained: ES5 only, no outer references, no line comments, explicit semicolons. */
+  function bffRun(D, FM, win) {
+    var BANNER_ID = 'bff-fill-banner';
+    var doc = win.document;
+    var TOUCH = { text: 1, email: 1, tel: 1, number: 1, date: 1, textarea: 1, select: 1 };
+    var IGNORE = { hidden: 1, password: 1, checkbox: 1, radio: 1, file: 1, submit: 1, button: 1, reset: 1, image: 1, color: 1, range: 1, search: 1 };
+
+    function removeBanner() {
+      var old = doc.getElementById(BANNER_ID);
+      if (old && old.parentNode) old.parentNode.removeChild(old);
+    }
+    function showBanner(text) {
+      try {
+        var host = doc.body || doc.documentElement;
+        if (!host) return;
+        var bar = doc.createElement('div');
+        bar.id = BANNER_ID;
+        bar.setAttribute('role', 'status');
+        bar.setAttribute('aria-live', 'polite');
+        bar.style.cssText = 'position:fixed;top:0;left:0;right:0;z-index:2147483647;box-sizing:border-box;display:flex;align-items:center;gap:12px;padding:10px 12px;padding-top:max(10px,env(safe-area-inset-top,0px));background:#1F2A2E;color:#FFFFFF;border-bottom:3px solid #8AB4F8;font:16px/1.35 system-ui,-apple-system,sans-serif;text-align:left;';
+        var msg = doc.createElement('span');
+        msg.style.cssText = 'flex:1 1 auto;color:#FFFFFF;';
+        msg.textContent = text;
+        var close = doc.createElement('button');
+        close.setAttribute('type', 'button');
+        close.textContent = 'Close';
+        close.style.cssText = 'flex:none;min-width:44px;min-height:44px;padding:8px 14px;font:inherit;font-weight:600;color:#1F2A2E;background:#FFFFFF;border:2px solid #FFFFFF;border-radius:8px;cursor:pointer;';
+        close.addEventListener('click', function () { removeBanner(); });
+        bar.appendChild(msg);
+        bar.appendChild(close);
+        host.appendChild(bar);
+      } catch (e) {}
+    }
+    function result(ok, filled, skipped, domain, message) {
+      return { ok: ok, filled: filled, skipped: skipped, domain: domain, message: message };
+    }
+
+    removeBanner();
+    var hostname = '', protocol = '';
+    try { hostname = String(win.location.hostname || ''); protocol = String(win.location.protocol || ''); } catch (e) {}
+    var domain = FM.registrableDomain(hostname);
+    var matches = [], i;
+    for (i = 0; i < D.programs.length; i++) if (D.programs[i].domain === domain) matches.push(D.programs[i]);
+    if (!domain || !matches.length) {
+      var m1 = 'This is not one of the official sign-up sites in your list. Nothing was filled. Page domain: ' + (domain || hostname || 'unknown') + '.';
+      showBanner(m1);
+      return result(false, 0, 0, domain, m1);
+    }
+    if (protocol !== 'https:') {
+      var m2 = 'This page does not use a secure https connection, so nothing was filled. Page domain: ' + domain + '.';
+      showBanner(m2);
+      return result(false, 0, 0, domain, m2);
+    }
+
+    var profile = {}, keys = Object.keys(D.profile);
+    for (i = 0; i < keys.length; i++) profile[keys[i]] = D.profile[keys[i]];
+    var plus = matches[0].email || '', same = !!plus;
+    for (i = 1; i < matches.length; i++) if ((matches[i].email || '') !== plus) same = false;
+    if (same) profile.email = plus;
+
+    function labelOf(d, el) {
+      var bits = [], j;
+      if (el.labels) for (j = 0; j < el.labels.length; j++) bits.push(el.labels[j].textContent);
+      var lb = el.getAttribute('aria-labelledby');
+      if (lb) {
+        var ids = lb.split(/\s+/);
+        for (j = 0; j < ids.length; j++) { var x = ids[j] ? d.getElementById(ids[j]) : null; if (x) bits.push(x.textContent); }
+      }
+      if (!bits.length && el.closest) { var l = el.closest('label'); if (l) bits.push(l.textContent); }
+      return bits.join(' ').replace(/\s+/g, ' ').replace(/^\s+|\s+$/g, '');
+    }
+
+    function usable(d, w, el) {
+      if (el.disabled || el.readOnly) return false;
+      var cs = w.getComputedStyle(el), r = el.getBoundingClientRect();
+      if (cs.visibility === 'hidden' || cs.display === 'none' || r.width < 2 || r.height < 2) return false;
+      if (typeof el.checkVisibility === 'function' && !el.checkVisibility({ checkOpacity: true, checkVisibilityCSS: true })) return false;
+      var hidden = false;
+      for (var a = el; a && a.nodeType === 1; a = a.parentElement) {
+        var s = w.getComputedStyle(a);
+        if (a.getAttribute('aria-hidden') === 'true' || a.hidden || parseFloat(s.opacity) === 0) hidden = true;
+        if (s.clip === 'rect(0px, 0px, 0px, 0px)' || /inset\(\s*(50|100)%/.test(s.clipPath || '')) hidden = true;
+        if (s.overflow === 'hidden' && (a.offsetWidth < 2 || a.offsetHeight < 2) && a !== d.body) hidden = true;
+      }
+      var de = d.documentElement || {};
+      var docW = Math.max(de.scrollWidth || 0, w.innerWidth || 0), docH = Math.max(de.scrollHeight || 0, w.innerHeight || 0);
+      var ax = r.left + (w.scrollX || 0), ay = r.top + (w.scrollY || 0);
+      if (ax + r.width <= 0 || ay + r.height <= 0 || ax >= docW || ay >= docH) hidden = true;
+      if (el.getAttribute('tabindex') === '-1' && !labelOf(d, el) && !el.getAttribute('aria-label')) hidden = true;
+      return !hidden;
+    }
+
+    function setValue(w, el, tag, value) {
+      var C = tag === 'select' ? w.HTMLSelectElement : tag === 'textarea' ? w.HTMLTextAreaElement : w.HTMLInputElement;
+      var desc = C && C.prototype ? Object.getOwnPropertyDescriptor(C.prototype, 'value') : null;
+      if (desc && desc.set) desc.set.call(el, value); else el.value = value;
+    }
+    function fire(d, w, el, name) {
+      var ev;
+      try { ev = new w.Event(name, { bubbles: true }); } catch (e) { ev = d.createEvent('Event'); ev.initEvent(name, true, false); }
+      el.dispatchEvent(ev);
+    }
+
+    var filled = 0, skipped = 0, seen = 0;
+    function scan(d, w, depth) {
+      var els = d.querySelectorAll('input, select, textarea'), j;
+      for (j = 0; j < els.length && seen < 600; j++) {
+        var el = els[j], tag = String(el.tagName || '').toLowerCase();
+        var type = tag === 'input' ? String(el.getAttribute('type') || 'text').toLowerCase() : tag;
+        if (IGNORE[type] === 1) continue;
+        if (!usable(d, w, el)) continue;
+        seen++;
+        if (!TOUCH[type] || (tag === 'select' && el.multiple)) { skipped++; continue; }
+        var form = el.form;
+        var hasBtn = !!(form && form.querySelector('button:not([type]), button[type=submit], input[type=submit], input[type=image]'));
+        var chg = (el.getAttribute('onchange') || '') + ' ' + (form ? form.getAttribute('onchange') || '' : '');
+        if (el.hasAttribute('data-auto-submit') || (!hasBtn && /submit/i.test(chg))) { skipped++; continue; }
+        var empty, options = null;
+        if (tag === 'select') {
+          var o = el.options[el.selectedIndex];
+          empty = !o || o.value === '' || (el.selectedIndex === 0 && o.disabled);
+          options = [];
+          for (var q = 0; q < el.options.length; q++) options.push({ value: el.options[q].value, label: String(el.options[q].textContent || '').replace(/^\s+|\s+$/g, '') });
+        } else empty = el.value === '';
+        if (!empty) { skipped++; continue; }
+        var kind = FM.classifyField({
+          type: type, autocomplete: el.getAttribute('autocomplete') || '', name: el.getAttribute('name') || '', id: el.id || '',
+          placeholder: el.getAttribute('placeholder') || '', ariaLabel: el.getAttribute('aria-label') || '', label: labelOf(d, el)
+        });
+        var value = kind ? FM.valueFor(kind, profile, { inputType: type, options: options }) : null;
+        if (value == null || value === '') { skipped++; continue; }
+        try {
+          setValue(w, el, tag, value);
+          if (tag === 'select' ? el.value !== value : el.value === '') { skipped++; continue; }
+          fire(d, w, el, 'input');
+          fire(d, w, el, 'change');
+          filled++;
+        } catch (e) { skipped++; }
+      }
+      if (depth < 3) {
+        var frames = d.querySelectorAll('iframe'), k;
+        for (k = 0; k < frames.length; k++) {
+          var cd = null;
+          try { cd = frames[k].contentDocument; } catch (e) { cd = null; }
+          if (cd && cd.defaultView && cd.querySelectorAll) scan(cd, cd.defaultView, depth + 1);
+        }
+      }
+    }
+    scan(doc, win, 0);
+
+    var message = filled > 0
+      ? 'Filled ' + filled + (filled === 1 ? ' field' : ' fields') + '. Check them, tick any boxes yourself, and submit when you are ready.'
+      : 'Filled 0 fields. No empty fields on this page matched your details, so fill it in by hand.';
+    showBanner(message);
+    return result(true, filled, skipped, domain, message);
+  }
+
+  var PROFILE_KEYS = ['firstName', 'lastName', 'email', 'phone', 'address1', 'address2', 'city', 'state', 'zip', 'dueDate'];
+
+  function pad(n) { return (n < 10 ? '0' : '') + n; }
+  function isoDate(y, m, d) {
+    if (m < 1 || m > 12 || d < 1 || y < 1900 || y > 2100) return '';
+    var dim = [31, (y % 4 === 0 && (y % 100 !== 0 || y % 400 === 0)) ? 29 : 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31][m - 1];
+    return d > dim ? '' : y + '-' + pad(m) + '-' + pad(d);
+  }
+  function normDate(s) {
+    s = String(s || '').trim();
+    var m = /^(\d{4})-(\d{1,2})-(\d{1,2})$/.exec(s);
+    if (m) return isoDate(+m[1], +m[2], +m[3]);
+    m = /^(\d{1,2})[\/.-](\d{1,2})[\/.-](\d{4})$/.exec(s);
+    return m ? isoDate(+m[3], +m[1], +m[2]) : '';
+  }
+
+  /* JSON that is also safe inside HTML and any text field: < > & and the two JS line
+     separators are written as unicode escapes, so no value can end a script or a string. */
+  function safeJson(v) {
+    return JSON.stringify(v)
+      .replace(/</g, '\\u003c').replace(/>/g, '\\u003e').replace(/&/g, '\\u0026')
+      .replace(/\u2028/g, '\\u2028').replace(/\u2029/g, '\\u2029');
+  }
+
+  function cleanProfile(profile) {
+    var out = {}, p = profile && typeof profile === 'object' ? profile : {};
+    PROFILE_KEYS.forEach(function (k) {
+      var v = typeof p[k] === 'string' ? p[k].trim() : '';
+      if (k === 'dueDate') v = normDate(v);
+      if (v) out[k] = v.slice(0, 300);
+    });
+    return out;
+  }
+
+  function programList(programs, profile, tagMap) {
+    var fm = FM(), em = EM();
+    var map = tagMap && typeof tagMap === 'object' ? tagMap : {};
+    var usePlus = profile.email && em && profile.usePlusTags !== false && em.supportsPlus(profile.email) !== false;
+    var seen = {}, out = [];
+    (Array.isArray(programs) ? programs : []).forEach(function (p) {
+      if (!p || typeof p.signupUrl !== 'string' || p.signupUrl.indexOf('https://') !== 0) return;
+      var domain = fm.registrableDomain(p.signupUrl);
+      if (!domain || !p.id || seen[p.id]) return;
+      seen[p.id] = true;
+      var email = usePlus && typeof map[p.id] === 'string' && map[p.id] ? em.plusAddress(profile.email, map[p.id]) : '';
+      out.push({ domain: domain, id: String(p.id), name: String(p.name || ''), email: email });
+    });
+    out.sort(function (a, b) { return a.domain < b.domain ? -1 : a.domain > b.domain ? 1 : a.id < b.id ? -1 : a.id > b.id ? 1 : 0; });
+    return out;
+  }
+
+  /* build({profile, programs, tagMap}) -> the script text. Deterministic. */
+  function build(opts) {
+    opts = opts || {};
+    var raw = opts.profile && typeof opts.profile === 'object' ? opts.profile : {};
+    var profile = cleanProfile(raw);
+    var data = { profile: profile, programs: programList(opts.programs, { email: profile.email, usePlusTags: raw.usePlusTags }, opts.tagMap) };
+    var fail = { ok: false, filled: 0, skipped: 0, domain: '', message: 'The fill script could not run on this page. Fill it in by hand.' };
+    return '(function(){' +
+      'var D=' + safeJson(data) + ';' +
+      'var FM=(' + FM().factory.toString() + ')();' +
+      'var R=' + bffRun.toString() + ';' +
+      'var res;' +
+      'try{res=R(D,FM,window);}catch(e){res=' + safeJson(fail) + ';}' +
+      'try{if(typeof completion==="function")completion(res);}catch(e){}' +
+      'return res;' +
+      '})();';
+  }
+
+  /* bookmarklet(script) -> a javascript: URL that ends in void 0 so the page never navigates. */
+  function bookmarklet(script) {
+    return 'javascript:' + encodeURIComponent(String(script) + '\nvoid 0;');
+  }
+
+  var api = { build: build, bookmarklet: bookmarklet, safeJson: safeJson };
+  if (typeof module === 'object' && module.exports) module.exports = api;
+  else { root.BFF = root.BFF || {}; root.BFF.fill = api; }
+})(typeof window !== 'undefined' ? window : globalThis);
+// BFF.inbox: pure logic for the optional Gmail connection (searches, matching, suggestions, drafts, error copy).
+// No DOM, no network. Everything that comes from a mailbox is untrusted text: it is cleaned here and the
+// view shows it with textContent only. Loadable from Node tests as well as the browser.
+(function (root) {
+  'use strict';
+
+  function EM() {
+    if (typeof module === 'object' && module.exports && typeof require === 'function') return require('./email.js');
+    return root.BFF && root.BFF.email;
+  }
+
+  var SERVER = 'Gmail';
+  var TOOLS = ['search_threads', 'list_labels', 'create_label', 'label_thread', 'create_draft'];
+  var FEATURE_TOOLS = {
+    check: ['search_threads'],
+    label: ['list_labels', 'create_label', 'label_thread'],
+    draft: ['create_draft']
+  };
+  var DEFAULT_DAYS = 120;
+  var MAX_QUERY = 1400; // Gmail accepts long searches, but short ones are safer
+  var MAX_TERMS = 25;
+  var ADDR_RE = /^[A-Za-z0-9._%+-]{1,64}@(?:[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?\.)+[A-Za-z]{2,}$/;
+  var DOMAIN_RE = /^(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z]{2,}$/;
+  var ID_RE = /^[A-Za-z0-9_-]{1,64}$/;
+
+  function str(v) { return typeof v === 'string' ? v : v == null ? '' : String(v); }
+  function isObj(v) { return !!v && typeof v === 'object' && !Array.isArray(v); }
+  function arr(v) { return Array.isArray(v) ? v : []; }
+
+  // Strip control, zero-width and bidi-override characters, squeeze whitespace, cap the length.
+  function clean(s, max) {
+    var t = str(s).replace(/[\u0000-\u001f\u007f-\u009f​-‏  ‪-‮⁦-⁩﻿]/g, ' ').replace(/\s+/g, ' ').trim();
+    if (max && t.length > max) {
+      t = t.slice(0, max);
+      var last = t.charCodeAt(t.length - 1);
+      if (last >= 0xd800 && last <= 0xdbff) t = t.slice(0, -1);
+    }
+    return t;
+  }
+
+  // One plain address, nothing else. Returns the trimmed address or ''.
+  function validAddress(s) {
+    var t = str(s).trim();
+    return t.length <= 254 && ADDR_RE.test(t) ? t : '';
+  }
+  function isId(s) { return typeof s === 'string' && ID_RE.test(s); }
+
+  // "Name <a@b.com>", "a@b.com" or {emailAddress}: lowercase address, or ''.
+  function extractAddress(v) {
+    var s;
+    if (isObj(v)) s = v.emailAddress || v.email || v.address;
+    else s = v;
+    s = str(s).trim();
+    var m = /<([^<>]+)>\s*$/.exec(s);
+    return validAddress(m ? m[1] : s).toLowerCase();
+  }
+
+  // ---- text ----
+  var NAMED = { amp: '&', lt: '<', gt: '>', quot: '"', apos: "'", nbsp: ' ', ndash: '–', mdash: '—', hellip: '…', rsquo: '’', lsquo: '‘', rdquo: '”', ldquo: '“', copy: '©', reg: '®', trade: '™', zwnj: '', zwj: '' };
+  // One pass, so "&amp;lt;" becomes "&lt;" and is never decoded twice. The result is plain text, shown with textContent.
+  function decodeEntities(text) {
+    return str(text).replace(/&(?:#(\d{1,7})|#[xX]([0-9a-fA-F]{1,6})|([A-Za-z][A-Za-z0-9]{1,8}));/g, function (all, dec, hex, name) {
+      if (name) return Object.prototype.hasOwnProperty.call(NAMED, name) ? NAMED[name] : all;
+      var cp = dec ? parseInt(dec, 10) : parseInt(hex, 16);
+      if (!(cp > 0) || cp > 0x10ffff || (cp >= 0xd800 && cp <= 0xdfff)) return '�';
+      return String.fromCodePoint(cp);
+    });
+  }
+
+  function safeViewUrl(url) {
+    if (typeof url !== 'string' || url.length > 2000) return '';
+    var u;
+    try { u = new URL(url.trim()); } catch (e) { return ''; }
+    if (u.protocol !== 'https:' || u.hostname !== 'mail.google.com' || u.port || u.username || u.password) return '';
+    if (u.pathname.indexOf('/mail/') !== 0) return '';
+    return u.href;
+  }
+
+  // The Gmail account a search result belongs to, from the authuser parameter of its viewUrl.
+  function accountFromViewUrl(url) {
+    var safe = safeViewUrl(url);
+    if (!safe) return '';
+    var a = '';
+    try { a = new URL(safe).searchParams.get('authuser') || ''; } catch (e) { return ''; }
+    return validAddress(a).toLowerCase();
+  }
+
+  // ---- programs ----
+  function progList(programs) {
+    return arr(programs).filter(function (p) { return isObj(p) && typeof p.id === 'string' && p.id; })
+      .slice().sort(function (a, b) { return a.id < b.id ? -1 : a.id > b.id ? 1 : 0; });
+  }
+  function domainOfProgram(p) {
+    var E = EM();
+    var d = E.registrableDomain(E.domainOfUrl(p.signupUrl));
+    return DOMAIN_RE.test(d) ? d : '';
+  }
+  // registrable domain -> ids of the programs that use it
+  function domainOwners(list) {
+    var owners = {};
+    list.forEach(function (p) {
+      var d = domainOfProgram(p);
+      if (!d) return;
+      var o = Object.prototype.hasOwnProperty.call(owners, d) ? owners[d] : (owners[d] = []);
+      if (o.indexOf(p.id) < 0) o.push(p.id);
+    });
+    return owners;
+  }
+  function plusOn(o, email) {
+    var E = EM();
+    return !!o.usePlus && !!email && E.supportsPlus(email) !== false && !!E.plusAddress(email, 'x');
+  }
+
+  // ---- searches ----
+  function termsFor(o) {
+    var E = EM();
+    o = o || {};
+    var list = progList(o.programs);
+    var email = validAddress(o.email);
+    var plus = plusOn(o, email);
+    var tags = isObj(o.tagMap) ? o.tagMap : {};
+    var owners = domainOwners(list);
+    var byText = {}, order = [], covered = {};
+    function add(text, id) {
+      if (!Object.prototype.hasOwnProperty.call(byText, text)) { byText[text] = []; order.push(text); }
+      if (byText[text].indexOf(id) < 0) byText[text].push(id);
+      covered[id] = true;
+    }
+    list.forEach(function (p) {
+      if (plus && typeof tags[p.id] === 'string' && tags[p.id]) {
+        var a = validAddress(E.plusAddress(email, tags[p.id])).toLowerCase();
+        if (a) add('to:' + a, p.id);
+      }
+      var d = domainOfProgram(p);
+      // A from: term is only worth running for a sender that points at exactly one program.
+      if (d && !E.isBroadDomain(d) && owners[d].length === 1) add('from:' + d, p.id);
+    });
+    return {
+      terms: order.map(function (t) { return { text: t, ids: byText[t] }; }),
+      uncovered: list.filter(function (p) { return !covered[p.id]; }).map(function (p) { return p.id; })
+    };
+  }
+
+  function buildQueries(o) {
+    o = o || {};
+    var days = parseInt(o.days, 10);
+    if (!(days >= 1 && days <= 3650)) days = DEFAULT_DAYS;
+    var suffix = ' newer_than:' + days + 'd';
+    var terms = termsFor(o).terms;
+    var out = [], cur = [], ids = [], len = 0;
+    function flush() {
+      if (!cur.length) return;
+      var q = (cur.length === 1 ? cur[0] : '{' + cur.join(' ') + '}') + suffix;
+      out.push({ query: q, programIds: ids.slice().sort() });
+      cur = []; ids = []; len = 0;
+    }
+    terms.forEach(function (t) {
+      if (cur.length && (cur.length >= MAX_TERMS || len + t.text.length + 1 > MAX_QUERY - suffix.length - 2)) flush();
+      cur.push(t.text);
+      len += t.text.length + 1;
+      t.ids.forEach(function (id) { if (ids.indexOf(id) < 0) ids.push(id); });
+    });
+    flush();
+    return out;
+  }
+  // Ids of programs no search can find (a broad or shared sender and no plus address).
+  function unsearchable(o) { return termsFor(o).uncovered; }
+
+  // ---- classify ----
+  function norm(s) { return str(s).toLowerCase().replace(/[‘’ʼ]/g, "'").replace(/\s+/g, ' '); }
+  // True when the first match of re is not preceded, in the same sentence, by a word that makes it hypothetical or negative.
+  var HEDGE = /\b(not|never|won't|will|would|once|when|until|after|if|unless|before|can't|cannot|unable|soon|to be|should|may|might|track|tracking|get|gets|receive)\b|n't\b/;
+  function affirmed(text, re) {
+    var m = re.exec(text);
+    if (!m) return false;
+    var before = text.slice(Math.max(0, m.index - 60), m.index);
+    var cut = Math.max(before.lastIndexOf('. '), before.lastIndexOf('! '), before.lastIndexOf('? '), before.lastIndexOf(': '));
+    if (cut >= 0) before = before.slice(cut + 2);
+    return !HEDGE.test(before);
+  }
+  var CONFIRM_RES = [
+    /\b(?:confirm|verify|validate|activate)\b[^.!?]{0,40}\b(?:e-?mail|address|subscription|account|sign-?\s?up|registration|membership)\b/,
+    /\bone more step\b/, /\bfinish (?:signing up|your (?:sign-?\s?up|registration))\b/, /\bplease (?:confirm|verify)\b/
+  ];
+  var SHIPPED_RES = [
+    /\b(?:has|have|just|now|been|was)\s+shipped\b/, /^shipped\b/, /\bshipped[!:]/, /\bon (?:its|the) way\b/, /\bout for delivery\b/, /\bis on the way\b/
+  ];
+  var DELIVERED_RES = [
+    /\b(?:was|were|has been|have been|just|successfully|now)\s+delivered\b/, /^delivered\b/, /\bdelivered[!:]/, /\b(?:order|package|box|shipment|parcel|delivery)\s+delivered\b/
+  ];
+  var WELCOME_RES = [
+    /\bwelcome (?:to|aboard)\b/, /^welcome\b/, /\bthanks?(?: you)? for (?:signing up|joining|subscribing|registering|your registration)\b/,
+    /\byou(?:'re| are) (?:in|all set|signed up|registered|subscribed)\b/, /\byou(?:'ve| have) (?:successfully )?(?:signed up|joined|registered|subscribed)\b/,
+    /\b(?:sign-?\s?up|registration) (?:is )?(?:complete|confirmed|successful)\b/
+  ];
+  function anyAffirmed(text, res) { return res.some(function (re) { return affirmed(text, re); }); }
+  function textOf(m) { return norm(decodeEntities(str(m && m.subject)) + ' . ' + decodeEntities(str(m && m.snippet))); }
+  function subjectNorm(m) { return norm(decodeEntities(str(m && m.subject))); }
+
+  function isDelivered(m) {
+    var t = textOf(m);
+    return anyAffirmed(t, DELIVERED_RES) && !/\b(?:not|never|failed|attempt(?:ed)?|unable|couldn't|could not)\b[^.!?]{0,30}\bdelivered\b/.test(t);
+  }
+  function classify(m) {
+    var t = textOf(m), s = subjectNorm(m);
+    if (anyAffirmed(t, CONFIRM_RES) || anyAffirmed(s, CONFIRM_RES)) return 'confirm';
+    if (isDelivered(m) || anyAffirmed(t, SHIPPED_RES)) return 'shipped';
+    if (anyAffirmed(t, WELCOME_RES)) return 'welcome';
+    return 'other';
+  }
+
+  // ---- matching ----
+  function msgTime(m) {
+    var n = Number(m && m.internalDate);
+    if (isFinite(n) && n > 0) return n;
+    var d = Date.parse(str(m && m.date));
+    return isNaN(d) ? -1 : d;
+  }
+  function newestMessage(msgs) {
+    var best = null, bt = -2;
+    msgs.forEach(function (m) { var t = msgTime(m); if (t >= bt) { best = m; bt = t; } });
+    return { msg: best, ts: bt };
+  }
+  function isoOf(m, ts) {
+    var d = Date.parse(str(m && m.date));
+    if (!isNaN(d)) return new Date(d).toISOString();
+    return ts > 0 ? new Date(ts).toISOString() : '';
+  }
+
+  function matchThreads(threads, o) {
+    var E = EM();
+    o = o || {};
+    var list = progList(o.programs);
+    var email = validAddress(o.email);
+    var tags = isObj(o.tagMap) ? o.tagMap : null;
+    var plusIds = {};
+    if (email && tags) list.forEach(function (p) {
+      if (typeof tags[p.id] !== 'string' || !tags[p.id]) return;
+      var a = validAddress(E.plusAddress(email, tags[p.id])).toLowerCase();
+      if (a) (plusIds[a] = plusIds[a] || []).push(p.id);
+    });
+    var owners = domainOwners(list);
+    var seen = {}, out = [];
+    arr(threads).forEach(function (th) {
+      if (!isObj(th)) return;
+      var msgs = arr(th.messages).filter(isObj);
+      if (!msgs.length) return;
+      var nw = newestMessage(msgs), m = nw.msg;
+      var threadId = th.id || m.threadId;
+      if (!isId(threadId) || seen[threadId]) return;
+      // exact: some message in the thread was addressed to a program's own plus address
+      var hit = {};
+      msgs.forEach(function (x) {
+        arr(x.toRecipients).concat(arr(x.ccRecipients)).forEach(function (r) {
+          var a = extractAddress(r);
+          if (a && Object.prototype.hasOwnProperty.call(plusIds, a) && plusIds[a].length === 1) hit[plusIds[a][0]] = true;
+        });
+      });
+      var ids = Object.keys(hit), programId = '', certainty = '';
+      var sender = extractAddress(m.sender);
+      if (ids.length === 1) { programId = ids[0]; certainty = 'exact'; }
+      else if (ids.length === 0 && sender) {
+        var d = E.registrableDomain(sender.split('@')[1]);
+        if (!E.isBroadDomain(d) && Object.prototype.hasOwnProperty.call(owners, d) && owners[d].length === 1) { programId = owners[d][0]; certainty = 'likely'; }
+      }
+      if (!programId) return;
+      seen[threadId] = true;
+      var name = '';
+      arr(m.addressDisplayNames).forEach(function (x) {
+        if (!name && isObj(x) && extractAddress(x) === sender) name = clean(decodeEntities(x.displayName), 80);
+      });
+      var subject = clean(decodeEntities(m.subject), 200), snippet = clean(decodeEntities(m.snippet), 300);
+      out.push({
+        programId: programId, threadId: threadId, subject: subject, snippet: snippet,
+        from: name || sender, fromAddress: sender, date: isoOf(m, nw.ts),
+        viewUrl: safeViewUrl(th.viewUrl) || safeViewUrl(m.viewUrl), certainty: certainty,
+        kind: classify({ subject: subject, snippet: snippet }), _ts: nw.ts
+      });
+    });
+    out.sort(function (a, b) { return b._ts - a._ts || (a.threadId < b.threadId ? -1 : a.threadId > b.threadId ? 1 : 0); });
+    out.forEach(function (x) { delete x._ts; });
+    return out;
+  }
+
+  // ---- suggestions ----
+  // One per program at most. Conservative: "received" needs an exact (plus address) match and a message that says it was
+  // delivered. Never moves a status backwards and never touches skipped.
+  function suggest(matches, statusOf) {
+    var st = typeof statusOf === 'function' ? statusOf : function () { return 'todo'; };
+    var byProg = {}, order = [];
+    arr(matches).forEach(function (m) {
+      if (!isObj(m) || !m.programId) return;
+      if (!byProg[m.programId]) { byProg[m.programId] = []; order.push(m.programId); }
+      byProg[m.programId].push(m);
+    });
+    var out = [];
+    order.forEach(function (id) {
+      var cur = str(st(id)) || 'todo';
+      if (cur === 'skipped' || cur === 'received') return;
+      var list = byProg[id], pick = null, s;
+      for (var i = 0; i < list.length && !pick; i++) {
+        if (list[i].kind === 'shipped' && list[i].certainty === 'exact' && isDelivered(list[i])) {
+          pick = { to: 'received', noteOnly: false, note: 'Delivered, per Gmail', m: list[i] };
+        }
+      }
+      for (i = 0; i < list.length && !pick; i++) {
+        if (list[i].kind === 'shipped') {
+          s = isDelivered(list[i]) ? 'Delivered' : 'Shipped';
+          pick = cur === 'todo' ? { to: 'signed-up', noteOnly: false, note: s + ', per Gmail', m: list[i] } : { to: 'signed-up', noteOnly: true, note: s + ', per Gmail', m: list[i] };
+        }
+      }
+      for (i = 0; i < list.length && !pick; i++) {
+        if ((list[i].kind === 'welcome' || list[i].kind === 'confirm') && cur === 'todo') pick = { to: 'signed-up', noteOnly: false, note: '', m: list[i] };
+      }
+      if (!pick) return;
+      if (pick.noteOnly && cur !== 'signed-up') return;
+      out.push({
+        programId: id, from: cur, to: pick.to, noteOnly: pick.noteOnly, note: pick.note,
+        kind: pick.m.kind, threadId: pick.m.threadId, subject: pick.m.subject, certainty: pick.m.certainty
+      });
+    });
+    return out;
+  }
+
+  // ---- drafts ----
+  // base64 of the UTF-8 bytes of a string; same result in browsers and in Node.
+  var B64 = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
+  function utf8Bytes(s) {
+    if (typeof TextEncoder === 'function') return new TextEncoder().encode(s);
+    var out = [];
+    for (var i = 0; i < s.length; i++) {
+      var c = s.codePointAt(i);
+      if (c > 0xffff) i++;
+      if (c < 0x80) out.push(c);
+      else if (c < 0x800) out.push(0xc0 | (c >> 6), 0x80 | (c & 63));
+      else if (c < 0x10000) out.push(0xe0 | (c >> 12), 0x80 | ((c >> 6) & 63), 0x80 | (c & 63));
+      else out.push(0xf0 | (c >> 18), 0x80 | ((c >> 12) & 63), 0x80 | ((c >> 6) & 63), 0x80 | (c & 63));
+    }
+    return out;
+  }
+  function utf8Base64(text) {
+    var b = utf8Bytes(str(text)), out = '';
+    for (var i = 0; i < b.length; i += 3) {
+      var n = (b[i] << 16) | ((i + 1 < b.length ? b[i + 1] : 0) << 8) | (i + 2 < b.length ? b[i + 2] : 0);
+      out += B64[(n >> 18) & 63] + B64[(n >> 12) & 63] + (i + 1 < b.length ? B64[(n >> 6) & 63] : '=') + (i + 2 < b.length ? B64[n & 63] : '=');
+    }
+    return out;
+  }
+
+  function checklistDraft(o) {
+    o = o || {};
+    var to = validAddress(o.email);
+    if (!to) return null;
+    var st = typeof o.statusOf === 'function' ? o.statusOf : function () { return ''; };
+    var lines = arr(o.programs).filter(isObj).map(function (p) {
+      var s = clean(st(p), 40), u = /^https:\/\//.test(str(p.signupUrl)) ? clean(p.signupUrl, 500) : '';
+      return '- ' + clean(p.name, 120) + (s ? ' [' + s + ']' : '') + (u ? '\n  ' + u : '');
+    });
+    var body = (lines.length ? lines.join('\n') : '(No programs in the list yet.)') +
+      '\n\nThis draft was made by the Baby Freebies Finder from your own list. It is saved in your drafts and has not been sent.';
+    return { to: [to], subject: 'Baby freebies checklist', body: body };
+  }
+
+  var MIME = { ics: 'text/calendar', xml: 'application/xml', txt: 'text/plain' };
+  function kitDraft(o) {
+    o = o || {};
+    var to = validAddress(o.email);
+    if (!to) return null;
+    var attachments = [], names = [];
+    arr(o.files).forEach(function (f) {
+      if (!isObj(f) || typeof f.text !== 'string' || !f.text) return;
+      var name = str(f.name).replace(/[^A-Za-z0-9._-]/g, '-').replace(/^\.+/, '').slice(0, 80);
+      if (!name) return;
+      var ext = (/\.([A-Za-z0-9]+)$/.exec(name) || [])[1];
+      var mime = typeof f.mimeType === 'string' && /^[a-z]+\/[a-z0-9.+-]+$/i.test(f.mimeType) ? f.mimeType : MIME[(ext || '').toLowerCase()] || 'text/plain';
+      attachments.push({ content: utf8Base64(f.text), filename: name, mimeType: mime });
+      names.push(name);
+    });
+    var body = 'Your Baby Freebies Finder setup kit.\n\n' +
+      (names.length ? names.map(function (n) { return '- ' + n; }).join('\n') + '\n\n' : '') +
+      'Gmail filters (.xml): on a computer, open Gmail > Settings > See all settings > Filters and Blocked Addresses > Import filters, then pick the file.\n' +
+      'Reminders (.ics): open the file to add the reminders to your calendar.\n\n' +
+      'These files were made on your device from your own list. This draft is saved in your drafts and has not been sent.';
+    return { to: [to], subject: 'Baby freebies setup kit', body: body, attachments: attachments };
+  }
+
+  // ---- errors ----
+  var GROUPS = {
+    consent_required: 'said-no', approval_required: 'said-no', not_granted: 'said-no',
+    needs_reauth: 'connect', server_not_connected: 'connect', server_not_found: 'connect', selection_required: 'connect',
+    rate_limited: 'later', server_unavailable: 'later', upstream_error: 'later',
+    blocked_by_policy: 'unavailable', not_in_manifest: 'unavailable', capability_disabled: 'unavailable', capability_removed: 'unavailable', self_only: 'unavailable', user_changed: 'unavailable',
+    tool_error: 'failed', bad_request: 'failed', cancelled: 'failed', transform_error: 'failed'
+  };
+  var COPY = {
+    'said-no': 'Gmail was not allowed for this page, so nothing was checked. You can allow it in this page’s permissions, then reopen the page.',
+    connect: 'Gmail is not connected in Claude. Open Claude, go to Settings and then Connectors, connect Gmail, then come back and try again.',
+    later: 'Gmail did not answer. Wait a moment and try again.',
+    unavailable: 'This is not available here, so this page will not use it. The rest of the app works as usual.',
+    failed: 'Gmail could not do that. Nothing was changed in this app.'
+  };
+  function errorGroup(code) {
+    if (typeof code !== 'string' || !code) return 'failed';
+    return Object.prototype.hasOwnProperty.call(GROUPS, code) ? GROUPS[code] : 'unavailable';
+  }
+  function errorCopy(code) { return COPY[errorGroup(code)]; }
+  // Codes after which nothing from the mailbox may stay on screen or in memory.
+  function clearsData(code) { var g = errorGroup(code); return g === 'said-no' || g === 'connect' || g === 'unavailable'; }
+
+  var api = {
+    SERVER: SERVER, TOOLS: TOOLS, FEATURE_TOOLS: FEATURE_TOOLS, DEFAULT_DAYS: DEFAULT_DAYS,
+    buildQueries: buildQueries, unsearchable: unsearchable, matchThreads: matchThreads, classify: classify, isDelivered: isDelivered, suggest: suggest,
+    accountFromViewUrl: accountFromViewUrl, safeViewUrl: safeViewUrl, decodeEntities: decodeEntities,
+    checklistDraft: checklistDraft, kitDraft: kitDraft, utf8Base64: utf8Base64,
+    errorCopy: errorCopy, errorGroup: errorGroup, clearsData: clearsData,
+    validAddress: validAddress, isId: isId, clean: clean
+  };
+  if (typeof module === 'object' && module.exports) module.exports = api;
+  else { root.BFF = root.BFF || {}; root.BFF.inbox = api; }
+})(typeof window !== 'undefined' ? window : globalThis);
 (function () {
   'use strict';
   var BFF = (window.BFF = window.BFF || {});
@@ -1380,16 +2615,41 @@ main:focus { outline: none; }
     return el;
   }
 
-  function download(name, text, type) {
-    var blob = new Blob([text], { type: type || 'application/json' });
-    var url = URL.createObjectURL(blob);
-    var a = document.createElement('a');
-    a.href = url;
-    a.download = name;
-    a.style.display = 'none';
-    document.body.appendChild(a);
-    a.click();
-    setTimeout(function () { URL.revokeObjectURL(url); a.remove(); }, 1000);
+  // Every file goes through BFF.host.saveFile, then the message says what happened (see reportSave).
+  function hostOk() { return !!(BFF.host && BFF.host.saveFile); }
+  function clearShown(msg, key) {
+    var old = msg.parentNode ? msg.parentNode.querySelectorAll('[data-bff-shown="' + key + '"]') : [];
+    for (var i = 0; i < old.length; i++) old[i].remove();
+  }
+  // o: {msg, key, name, text, mime, what, button}
+  function saveFile(o) {
+    var btn = o.button;
+    if (btn) { btn.disabled = true; btn.setAttribute('aria-busy', 'true'); }
+    function finish() { if (btn) { btn.disabled = false; btn.removeAttribute('aria-busy'); } }
+    if (!hostOk()) { o.msg.textContent = 'This page cannot save files here.'; finish(); return; }
+    BFF.host.saveFile({ name: o.name, text: o.text, mime: o.mime }).then(function (res) {
+      finish();
+      reportSave(res, o);
+    }, function () {
+      finish();
+      reportSave({ status: 'shown', name: o.name }, o);
+    });
+  }
+  function reportSave(res, o) {
+    var msg = o.msg, inArt = BFF.host && BFF.host.inArtifact;
+    if (res.status !== 'shown') clearShown(msg, o.key);
+    if (res.status === 'saved') {
+      var t = inArt ? 'Saved ' + o.what + ' as ' + res.name + ' (in the place you picked).' : 'Downloaded ' + o.what + ' as ' + res.name + '. Look in your Downloads.';
+      if (res.zipped) t += ' The file is inside the zip: unzip it, then open ' + res.inner + '.';
+      msg.textContent = t;
+    } else if (res.status === 'declined') {
+      msg.textContent = 'Not saved. Tap the button again whenever you want the file.';
+    } else if (res.status === 'failed') {
+      msg.textContent = res.message || 'Could not save the file.';
+    } else {
+      msg.textContent = 'This page cannot save files here, so the text is below. Copy it and paste it into a new file named ' + o.name + '.';
+      if (BFF.host && BFF.host.showText) BFF.host.showText({ after: msg, key: o.key, label: 'Contents of ' + o.name, text: o.text, returnTo: o.button });
+    }
   }
 
   // ---- email and calendar helpers ----
@@ -1420,31 +2680,6 @@ main:focus { outline: none; }
     var d = new Date(t);
     return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate());
   }
-  function copyText(text) {
-    function fallback() {
-      var ta = h('textarea', { 'aria-hidden': 'true', tabindex: '-1', readonly: '' });
-      ta.style.cssText = 'position:fixed;top:0;left:0;width:1px;height:1px;opacity:0';
-      ta.value = text;
-      document.body.appendChild(ta);
-      ta.select();
-      var ok = false;
-      try { ok = document.execCommand('copy'); } catch (e) {}
-      ta.remove();
-      return ok;
-    }
-    if (navigator.clipboard && navigator.clipboard.writeText) {
-      return navigator.clipboard.writeText(text).then(function () { return true; }, function () { return fallback(); });
-    }
-    return Promise.resolve(fallback());
-  }
-  function openLink(href) {
-    var a = document.createElement('a');
-    a.href = href;
-    a.style.display = 'none';
-    document.body.appendChild(a);
-    a.click();
-    setTimeout(function () { a.remove(); }, 0);
-  }
   // Show or hide the per-row address and Gmail search link from the current profile.
   function syncEmailBits() {
     var pr = profileOf(), E = BFF.email, all = BFF.programs || [];
@@ -1469,6 +2704,31 @@ main:focus { outline: none; }
     if (view.acctRow) view.acctRow.hidden = !gmail;
     if (view.mailHint) view.mailHint.hidden = !!E.plusAddress(pr.email, 'x');
     if (view.gmailNote) view.gmailNote.hidden = !gmail;
+    refreshMailto();
+  }
+
+  function checklistMail(pr) {
+    var to = BFF.email.plusAddress(pr.email, 'x') ? String(pr.email).trim() : '';
+    return BFF.email.mailtoChecklist({
+      to: to, programs: checklistPrograms(),
+      statusOf: function (p) { return LABELS[tracker.getStatus(p.id)]; }
+    });
+  }
+  // Keep the mailto link current: it is a real link, so its address and text are set before it is tapped.
+  function refreshMailto() {
+    if (!view.mailLink) return;
+    var pr = profileOf(), ok = !!BFF.email.plusAddress(pr.email, 'x');
+    view.mailLink.hidden = !ok;
+    if (view.mailLinkNote) view.mailLinkNote.hidden = !ok;
+    if (!ok) { view.mailLink.removeAttribute('href'); view.mailTruncated = false; return; }
+    var r = checklistMail(pr);
+    view.mailTruncated = r.truncated;
+    view.mailLink.setAttribute('href', r.url);
+  }
+  // In the artifact a file is saved inside a zip when its type is not on the viewer's list.
+  function zipNote(what) {
+    if (!(BFF.host && BFF.host.inArtifact)) return null;
+    return h('p', { class: 'fx-small', text: 'From this page ' + what + ' arrive inside a zip file. Unzip it first, then use the file inside.' });
   }
 
   function buildEmailPanel() {
@@ -1477,33 +2737,35 @@ main:focus { outline: none; }
     view.mailHint = h('p', { class: 'fx-warn', hidden: '' }, [
       document.createTextNode('Add your email in '), h('a', { href: '#info', text: 'My info' }), document.createTextNode(' to email yourself the checklist.')
     ]);
-    // 1. checklist by email
-    var mailBtn = h('button', { type: 'button', class: 'fx-btn fx-btn--primary', text: 'Email me my checklist' });
-    mailBtn.addEventListener('click', function () {
-      var pr = profileOf();
-      if (!E.plusAddress(pr.email, 'x')) {
-        msg.textContent = 'Add your email in My info first.';
-        view.mailHint.hidden = false;
-        return;
-      }
-      var r = E.mailtoChecklist({
-        to: pr.email.trim(), programs: checklistPrograms(),
-        statusOf: function (p) { return LABELS[tracker.getStatus(p.id)]; }
-      });
-      if (r.truncated) {
-        copyText(r.fullText).then(function (ok) {
-          if (view.fallback) { view.fallback.remove(); view.fallback = null; }
-          if (ok) msg.textContent = 'The list was too long for an email link, so it is cut short there. The full list is copied to your clipboard: paste it into the message.';
+    // 1. checklist by email: a real mailto link (kept current by refreshMailto) plus a Copy button that always works.
+    var inArt = !!(BFF.host && BFF.host.inArtifact);
+    var mailLink = h('a', { class: 'fx-btn' + (inArt ? '' : ' fx-btn--primary'), href: 'mailto:', text: 'Email me my checklist' });
+    var mailNote = h('span', { class: 'fx-small', text: (BFF.host && BFF.host.mailtoNote) || '' });
+    var copyBtn = h('button', { type: 'button', class: 'fx-btn' + (inArt ? ' fx-btn--primary' : ''), text: 'Copy my checklist' });
+    view.mailLink = mailLink;
+    view.mailLinkNote = mailNote;
+    view.mailTruncated = false;
+    mailLink.addEventListener('click', function () {
+      clearShown(msg, 'checklist');
+      msg.textContent = (view.mailTruncated
+        ? 'The list was too long for an email link, so it is cut short there. Use Copy my checklist for the full list. '
+        : '') + 'If no mail app opens, this device may not have one set up here. Use Copy my checklist instead.';
+    });
+    copyBtn.addEventListener('click', function () {
+      var r = checklistMail(profileOf());
+      if (BFF.host && BFF.host.copyText) {
+        BFF.host.copyText(r.fullText).then(function (ok) {
+          clearShown(msg, 'checklist');
+          if (ok) msg.textContent = 'Checklist copied. Paste it into an email or a note. Nothing was sent.';
           else {
-            msg.textContent = 'The list was too long for an email link, so it is cut short there. Copying failed, so the full list is below: select it and copy it.';
-            view.fallback = h('textarea', { class: 'fx-textarea', readonly: '', rows: '6', 'aria-label': 'Full checklist text' });
-            view.fallback.value = r.fullText;
-            msg.parentNode.insertBefore(view.fallback, msg.nextSibling);
+            msg.textContent = 'Copying did not work here, so the checklist is below. Select it and copy it. Nothing was sent.';
+            BFF.host.showText({ after: msg, key: 'checklist', label: 'Your checklist', text: r.fullText, returnTo: copyBtn });
           }
         });
-      } else msg.textContent = 'Trying to open your email app with the checklist. If nothing opens, this device may have no mail app set up.';
-      openLink(r.url);
+      }
     });
+    view.mailCopy = copyBtn;
+    var mailRow = h('div', { class: 'fx-actions' }, inArt ? [copyBtn, mailLink, mailNote] : [mailLink, mailNote, copyBtn]);
     // 2. Gmail filters
     var arch = h('input', { type: 'checkbox', id: 'trk-archive' });
     view.archive = arch;
@@ -1515,10 +2777,7 @@ main:focus { outline: none; }
       var usePlus = plusOn(pr);
       var xml = E.gmailFiltersXml(activePrograms(), { email: pr.email, usePlus: usePlus, archive: usePlus && arch.checked, tagMap: usePlus ? tagMapNow() : null, allPrograms: BFF.programs || [] });
       var n = (xml.match(/<entry>/g) || []).length;
-      try {
-        download('baby-freebies-gmail-filters.xml', xml, 'application/xml');
-        msg.textContent = 'Downloaded ' + plural(n, 'filter') + ' in baby-freebies-gmail-filters.xml. Import it in Gmail with the steps below.';
-      } catch (e) { msg.textContent = 'Could not create the file: ' + e.message; }
+      saveFile({ msg: msg, key: 'filters', name: 'baby-freebies-gmail-filters.xml', text: xml, mime: 'application/xml', what: plural(n, 'filter'), button: fBtn });
     });
     var steps = h('details', { class: 'fx-about' }, [
       h('summary', { text: 'How to import the filters' }),
@@ -1527,10 +2786,12 @@ main:focus { outline: none; }
         h('li', { text: 'Choose Import filters, then Choose file, and pick the downloaded file.' }),
         h('li', { text: 'Select Open file, tick the filters you want, and choose Create filters.' })
       ]),
+      zipNote('the filters'),
       h('p', { class: 'fx-small', text: 'Each filter adds a label like Baby Freebies/Program name. With plus addresses on, it matches the tagged address exactly, so Skip the inbox is safe. Otherwise it matches the program\u2019s sender domain and never archives.' })
     ]);
     // 3. reminders
     var iBtn = h('button', { type: 'button', class: 'fx-btn', text: 'Download reminders (.ics)' });
+    var icsNote = zipNote('reminders');
     iBtn.addEventListener('click', function () {
       var entries = [];
       (BFF.programs || []).forEach(function (p) {
@@ -1543,10 +2804,7 @@ main:focus { outline: none; }
         msg.textContent = 'No programs are marked Signed up yet. Mark a program as Signed up, then come back: each reminder lands 28 days after the date you marked it.';
         return;
       }
-      try {
-        download('baby-freebies-reminders.ics', E.icsReminders(entries, { days: 28 }), 'text/calendar');
-        msg.textContent = 'Downloaded ' + plural(entries.length, 'reminder') + '. Open the file to add them to your calendar.';
-      } catch (e) { msg.textContent = 'Could not create the file: ' + e.message; }
+      saveFile({ msg: msg, key: 'reminders', name: 'baby-freebies-reminders.ics', text: E.icsReminders(entries, { days: 28 }), mime: 'text/calendar', what: plural(entries.length, 'reminder'), button: iBtn });
     });
     view.gmailNote = h('p', { class: 'fx-small', hidden: '', text: 'The Search my Gmail links on each row open your own Gmail in a new tab. This app never sees your mail.' });
     var acct = h('input', { type: 'number', id: 'trk-acct', class: 'fx-input fx-input--short', min: '0', max: '9', step: '1' });
@@ -1568,12 +2826,13 @@ main:focus { outline: none; }
       h('h3', { id: 'trk-mail-h', text: 'Email and calendar' }),
       h('p', { class: 'fx-muted', text: 'These hand off to your own mail app, Gmail or calendar. Nothing is sent from this app.' }),
       view.mailHint,
-      h('div', { class: 'fx-actions' }, [mailBtn]),
+      mailRow,
       h('div', { class: 'fx-check' }, [arch, h('label', { 'for': 'trk-archive', text: 'Skip the inbox (archive)' })]),
       view.plusHint,
       h('div', { class: 'fx-actions' }, [fBtn]),
       steps,
       h('div', { class: 'fx-actions' }, [iBtn]),
+      icsNote,
       view.gmailNote,
       view.acctRow,
       msg
@@ -1603,6 +2862,10 @@ main:focus { outline: none; }
     el.appendChild(view.msg);
     el.appendChild(view.live);
     el.appendChild(buildEmailPanel());
+    // Mount point for the Gmail connection panel (BFF.inboxView, optional).
+    var inboxNode = h('div', { id: 'trk-inbox' });
+    el.appendChild(inboxNode);
+    try { if (BFF.inboxView && typeof BFF.inboxView.mount === 'function') BFF.inboxView.mount(inboxNode); } catch (e) { if (window.console) console.error('Gmail panel failed to mount:', e); }
 
     var bar = h('div', { class: 'fx-tabs', role: 'group', 'aria-label': 'Filter by status' });
     [['all', 'All']].concat(STATUSES.map(function (s) { return [s, LABELS[s]]; })).forEach(function (f) {
@@ -1626,13 +2889,34 @@ main:focus { outline: none; }
     var msg = h('p', { class: 'fx-msg', role: 'status', 'aria-live': 'polite' });
     var dl = h('button', { type: 'button', class: 'fx-btn fx-btn--primary', text: 'Download backup (JSON)' });
     dl.addEventListener('click', function () {
-      try {
-        download('baby-freebies-backup-' + today() + '.json', tracker.exportJSON({ includeProfile: inc.checked }));
-        msg.textContent = 'Backup downloaded.';
-      } catch (e) { msg.textContent = 'Could not create the backup: ' + e.message; }
+      var text;
+      try { text = tracker.exportJSON({ includeProfile: inc.checked }); }
+      catch (e) { msg.textContent = 'Could not create the backup: ' + e.message; return; }
+      saveFile({ msg: msg, key: 'backup', name: 'baby-freebies-backup-' + today() + '.json', text: text, mime: 'application/json', what: 'your backup', button: dl });
     });
     var file = h('input', { type: 'file', id: 'trk-restore', accept: 'application/json,.json', class: 'fx-file' });
     var actions1 = h('div', { class: 'fx-actions' }, [dl]);
+    // Shared by the file picker and the paste box.
+    function restoreFrom(text, label, after, returnTo, done) {
+      var a;
+      try { a = tracker.analyzeImport(text); } catch (e) { msg.textContent = 'Restore failed: ' + e.message; done(); return; }
+      var q = 'Restore from ' + label + '? ' + plural(a.imported, 'program entry') + ' will be added or updated (newer changes win). ' +
+        plural(a.skipped, 'entry') + ' will be left as they are because yours are newer.' +
+        (a.unknown ? ' ' + plural(a.unknown, 'entry') + ' for programs not in this version will be kept.' : '') +
+        (a.hasProfile ? ' My info in the file will fill in blank fields only.' : '');
+      msg.textContent = '';
+      BFF.ui.confirm({
+        after: after, message: q, confirmLabel: 'Restore', returnTo: returnTo,
+        onConfirm: function () {
+          try {
+            var r = tracker.importJSON(text);
+            msg.textContent = (r.saved ? 'Restored: ' : 'Restored for this visit only, but it could not be saved on this device: ') + plural(r.imported, 'entry') + ' imported, ' + r.skipped + ' skipped.';
+          } catch (e) { msg.textContent = 'Restore failed: ' + e.message; }
+          done(true);
+        },
+        onCancel: function () { msg.textContent = 'Restore cancelled. Nothing changed.'; done(); }
+      });
+    }
     file.addEventListener('change', function () {
       var f = file.files && file.files[0];
       if (!f) return;
@@ -1640,26 +2924,23 @@ main:focus { outline: none; }
       var fr = new FileReader();
       fr.onerror = function () { msg.textContent = 'Could not read that file.'; };
       fr.onload = function () {
-        var text = String(fr.result), a;
-        try { a = tracker.analyzeImport(text); } catch (e) { msg.textContent = 'Restore failed: ' + e.message; file.value = ''; return; }
-        var q = 'Restore from "' + f.name + '"? ' + plural(a.imported, 'program entry') + ' will be added or updated (newer changes win). ' +
-          plural(a.skipped, 'entry') + ' will be left as they are because yours are newer.' +
-          (a.unknown ? ' ' + plural(a.unknown, 'entry') + ' for programs not in this version will be kept.' : '') +
-          (a.hasProfile ? ' My info in the file will fill in blank fields only.' : '');
-        msg.textContent = '';
-        BFF.ui.confirm({
-          after: file.parentNode, message: q, confirmLabel: 'Restore', returnTo: file,
-          onConfirm: function () {
-            try {
-              var r = tracker.importJSON(text);
-              msg.textContent = (r.saved ? 'Restored: ' : 'Restored for this visit only, but it could not be saved on this device: ') + plural(r.imported, 'entry') + ' imported, ' + r.skipped + ' skipped.';
-            } catch (e) { msg.textContent = 'Restore failed: ' + e.message; }
-            file.value = '';
-          },
-          onCancel: function () { msg.textContent = 'Restore cancelled. Nothing changed.'; file.value = ''; }
-        });
+        restoreFrom(String(fr.result), '"' + f.name + '"', file.parentNode, file, function () { file.value = ''; });
       };
       fr.readAsText(f);
+    });
+    // Paste box: for pages where the file picker is not available.
+    var pasteBox = h('textarea', { id: 'trk-paste', class: 'fx-textarea', rows: '4', placeholder: 'Paste the text of a backup file here' });
+    var pasteBtn = h('button', { type: 'button', class: 'fx-btn', text: 'Restore from pasted text' });
+    var paste = h('details', { class: 'fx-about' }, [
+      h('summary', { text: 'Restore from pasted text instead' }),
+      h('div', { class: 'fx-field' }, [h('label', { 'for': 'trk-paste', text: 'Backup text' }), pasteBox]),
+      h('div', { class: 'fx-actions' }, [pasteBtn])
+    ]);
+    pasteBtn.addEventListener('click', function () {
+      var text = pasteBox.value.trim();
+      if (!text) { msg.textContent = 'Paste the backup text into the box first.'; return; }
+      if (text.length > MAX_BYTES) { msg.textContent = 'Restore failed: that text is too large to be a backup (the limit is 1 MB).'; return; }
+      restoreFrom(text, 'the pasted text', paste, pasteBtn, function (ok) { if (ok) pasteBox.value = ''; });
     });
     var reset = h('button', { type: 'button', class: 'fx-btn fx-btn--danger', text: 'Reset tracker' });
     var actions2 = h('div', { class: 'fx-actions' }, [reset]);
@@ -1678,6 +2959,7 @@ main:focus { outline: none; }
       warn,
       actions1,
       h('div', { class: 'fx-field' }, [h('label', { 'for': 'trk-restore', text: 'Restore from backup' }), file]),
+      paste,
       actions2,
       msg
     ]));
@@ -1688,6 +2970,7 @@ main:focus { outline: none; }
       else (BFF.programs || []).forEach(function (p) { syncRow(p.id, true); });
       updateSummary();
       applyFilter();
+      refreshMailto();
     });
     document.addEventListener('bff:storage-failed', updateSummary);
     function flushAll() { view.flushers.forEach(function (f) { f(); }); }
@@ -1909,6 +3192,9 @@ main:focus { outline: none; }
       });
       el.appendChild(clearRow);
       el.appendChild(statusEl);
+      var phoneNode = h('div', { id: 'info-phone' });
+      el.appendChild(phoneNode);
+      if (BFF.phoneView && BFF.phoneView.mount) BFF.phoneView.mount(phoneNode);
       fill();
       function flush() { if (timer) { clearTimeout(timer); saveNow(); } }
       window.addEventListener('pagehide', flush);
@@ -2031,7 +3317,7 @@ main:focus { outline: none; }
     els.start.addEventListener('click', function () {
       if (!shownIds.length || !BFF.guided) return;
       var ids = shownIds.slice();
-      function go() { BFF.guided.preselect(ids); location.hash = '#guided'; }
+      function go() { BFF.guided.preselect(ids); if (BFF.nav) BFF.nav.go('guided'); else location.hash = '#guided'; }
       var ri = BFF.guided.runInfo && BFF.guided.runInfo();
       if (!ri || !BFF.ui) { go(); return; }
       BFF.ui.confirm({
@@ -2271,6 +3557,8 @@ main:focus { outline: none; }
     ta.remove();
     return ok;
   }
+  // The artifact frame cannot open pages from script, so nothing here depends on window.open there.
+  function canPopup() { return !(BFF.host && BFF.host.canPopup === false); }
   function copy(text, label, btn) {
     function done(ok) {
       announce(ok ? 'Copied ' + label : 'Could not copy ' + label + '. Select the text and copy it manually.');
@@ -2281,17 +3569,18 @@ main:focus { outline: none; }
         setTimeout(function () { btn.textContent = old; }, 1200);
       }
     }
-    if (navigator.clipboard && navigator.clipboard.writeText) {
+    if (BFF.host && BFF.host.copyText) BFF.host.copyText(text).then(done);
+    else if (navigator.clipboard && navigator.clipboard.writeText) {
       navigator.clipboard.writeText(text).then(function () { done(true); }, function () { done(fallbackCopy(text)); });
     } else done(fallbackCopy(text));
   }
 
   // ---- state ----
-  var el, body, selected = null, run = null, focusHeading = false;
+  var el, body, selected = null, run = null, focusHeading = false, focusOpen = false;
   var actions = null; // buttons of the program on screen, for keyboard shortcuts
   var undoInfo = null; // {id, entry, index, text}: lets the last Done or Skip be taken back
   var saved0 = store.get(KEY, null);
-  var autoOpen = !(saved0 && saved0.autoOpenNext === false);
+  var autoOpen = !(saved0 && saved0.autoOpenNext === false); // only used where canPopup() is true
   var shortcutsOn = !!(saved0 && saved0.shortcuts === true);
 
   function loadRun() {
@@ -2334,6 +3623,7 @@ main:focus { outline: none; }
     return h('div', { class: 'fx-check' }, [cb, h('label', { 'for': 'gd-shortcuts', text: 'Enable single-key shortcuts' })]);
   }
   function autoToggle(idSuffix) {
+    if (!canPopup()) return null; // the option cannot work here, so it is not offered
     var id = 'gd-auto-' + idSuffix;
     var cb = h('input', { type: 'checkbox', id: id });
     cb.checked = autoOpen;
@@ -2354,6 +3644,7 @@ main:focus { outline: none; }
   function renderSetup() {
     body.textContent = '';
     body.appendChild(h('p', { class: 'fx-lead', text: 'Pick the programs to work through. For each one you get a sign-up page to open and your details ready to copy. Nothing is ever submitted for you.' }));
+    body.appendChild(phoneHint());
     var pr = profile();
     if (!pr.firstName && !pr.email && !pr.address1) {
       var w = h('p', { class: 'fx-warn' }, [document.createTextNode('My info is empty, so there is nothing to copy yet. '), h('a', { href: '#info', text: 'Fill in My info' }), document.createTextNode(' first.')]);
@@ -2381,7 +3672,8 @@ main:focus { outline: none; }
       bar.appendChild(btn);
     });
     body.appendChild(bar);
-    body.appendChild(autoToggle('setup'));
+    var at = autoToggle('setup');
+    if (at) body.appendChild(at);
     body.appendChild(count);
     var list = h('ul', { class: 'fx-pick' });
     progs().forEach(function (p, i) {
@@ -2418,8 +3710,9 @@ main:focus { outline: none; }
     return h('div', { class: cls || 'fx-block' }, [h('h4', { text: title })].concat(items));
   }
 
-  function go(delta, keepUndo) {
+  function go(delta, keepUndo, focus) {
     if (!keepUndo) undoInfo = null;
+    focusOpen = focus === 'open';
     run.index += delta;
     if (run.index >= run.ids.length) { run.index = run.ids.length - 1; run.step = 'finish'; }
     if (run.index < 0) run.index = 0;
@@ -2458,6 +3751,10 @@ main:focus { outline: none; }
     return h('div', { class: 'fx-undo' }, [h('span', { class: 'fx-small', text: u.text }), btn]);
   }
 
+  function phoneHint() {
+    return h('p', { class: 'fx-small fx-tight' }, [document.createTextNode('Filling on your phone? '), h('a', { href: '#info', text: 'Set up the fill script in My info' }), document.createTextNode('.')]);
+  }
+
   function renderRun() {
     var p = byId(run.ids[run.index]);
     body.textContent = '';
@@ -2481,20 +3778,17 @@ main:focus { outline: none; }
     body.appendChild(title);
     body.appendChild(h('p', { class: 'fx-muted fx-tight', text: p.brand + ' · Status: ' + T().LABELS[st] }));
 
-    // (b) open button
-    var open = h('button', { type: 'button', class: 'fx-btn fx-btn--primary fx-btn--big', text: 'Open sign-up page ↗' });
+    // (b) open link: a real anchor, so it works wherever links work (no window.open)
+    var open = h('a', { class: 'fx-btn fx-btn--primary fx-btn--big', href: p.signupUrl, target: '_blank', rel: 'noopener noreferrer', text: 'Open sign-up page \u2197' });
+    open.setAttribute('aria-label', 'Open sign-up page for ' + p.name + ' (opens in a new tab)');
     open.addEventListener('click', function () {
-      var w = window.open(p.signupUrl, '_blank');
-      if (!w) { announce('Popup blocked, use the plain link below.'); return; }
-      try { w.opener = null; } catch (e) {}
       run.opened = Array.isArray(run.opened) ? run.opened : [];
       if (run.opened.indexOf(p.id) < 0) { run.opened.push(p.id); saveRun(); }
-      announce('Opened the ' + p.name + ' sign-up page in a new tab.');
+      announce('Opening the ' + p.name + ' sign-up page in a new tab.');
     });
     actions.open = open;
     body.appendChild(open);
-    body.appendChild(h('p', { class: 'fx-small fx-tight' }, [document.createTextNode('Popup blocked? '),
-      h('a', { href: p.signupUrl, target: '_blank', rel: 'noopener noreferrer', text: 'Use the plain link' })]));
+    body.appendChild(phoneHint());
 
     // (c) details
     var details = detailList(profile(), p);
@@ -2530,7 +3824,8 @@ main:focus { outline: none; }
     if (p.catches) about.appendChild(h('p', { class: 'fx-warn' }, [h('strong', { text: 'Catches: ' }), document.createTextNode(p.catches)]));
     if (p.notes) about.appendChild(h('p', {}, [h('strong', { text: 'Notes: ' }), document.createTextNode(p.notes)]));
     body.appendChild(about);
-    body.appendChild(autoToggle('run'));
+    var ar = autoToggle('run');
+    if (ar) body.appendChild(ar);
     body.appendChild(h('details', { class: 'fx-about fx-shortcuts' }, [
       h('summary', { text: 'Shortcuts' }),
       shortcutToggle(),
@@ -2564,13 +3859,14 @@ main:focus { outline: none; }
       else if (st === 'todo') saved(T().setStatus(p.id, 'skipped'));
       var msg = p.name + (kind === 'done' ? ' marked as signed up.' : ' skipped.');
       var nextP = last ? null : byId(run.ids[run.index + 1]);
-      if (autoOpen && nextP) {
+      if (autoOpen && canPopup() && nextP) {
         var r = openOnce(nextP);
         if (r === 'opened') msg += ' Opened the ' + nextP.name + ' sign-up page in a new tab.';
-        else if (r === 'blocked') msg += ' Popup blocked, use the Open button.';
+        else if (r === 'blocked') msg += ' Your browser blocked the popup, so use the Open sign-up page link.';
       }
+      if (nextP) msg += ' Next: ' + nextP.name + '. Focus is on its Open sign-up page link.';
       undoInfo = { id: p.id, entry: prev, index: run.index, text: msg };
-      go(1, true);
+      go(1, true, nextP ? 'open' : '');
       announce(msg + ' Undo is available.');
     }
     var done = h('button', { type: 'button', class: 'fx-btn fx-btn--primary', text: 'Done' });
@@ -2592,7 +3888,9 @@ main:focus { outline: none; }
     actions.back = back;
     actions.next = next;
     body.appendChild(h('div', { class: 'fx-actionbar fx-sticky' }, [pbox, h('div', { class: 'fx-actionbar-row' }, [done, skip, prob, back])]));
-    if (focusHeading) title.focus();
+    if (focusOpen && actions.open) actions.open.focus();
+    else if (focusHeading) title.focus();
+    focusOpen = false;
   }
 
   function renderFinish() {
@@ -2687,6 +3985,252 @@ main:focus { outline: none; }
     }
   };
 })();
+/* inboxview.js: Phase F stub, replaced by its owner (see ARCHITECTURE.md, Phase F). */
+/* BFF.phoneView: the "Fill forms on your phone" card in My info.
+   The fill script is generated at tap time from the current My info and is never stored. */
+(function () {
+  'use strict';
+  var BFF = (window.BFF = window.BFF || {});
+
+  /* STEPS: all the wording for the three options, in order of effort. Generic on purpose (no menu
+     paths that may have moved). The orchestrator replaces this wording once current iOS research lands. */
+  var STEPS = {
+    title: 'Fill forms on your phone',
+    intro: 'Sign-up pages ask for the same details again and again. These three ways put your details from My info into a form for you. They are listed from least effort to most. Each one only fills empty boxes. You check everything and press the final button yourself.',
+    options: [
+      {
+        id: 'autofill',
+        title: '1. Safari AutoFill from your contact card',
+        lead: 'Least effort, and nothing to install. Safari can fill your name, address, phone and email from your own contact card.',
+        steps: [
+          'Make sure your own contact card has your name, address, phone and email.',
+          'In your phone’s settings, find Safari and look for its AutoFill options. Turn on filling from your contact info and choose your own card.',
+          'On a sign-up page, tap a field, then tap the AutoFill suggestion that appears above the keyboard.'
+        ],
+        note: 'AutoFill does not know your due date or your tagged plus address. Use option 2 or 3 if you want those filled too.'
+      },
+      {
+        id: 'shortcut',
+        title: '2. A Shortcut that fills the page',
+        lead: 'One tap from Safari’s Share button. It runs the fill script on the page you are looking at.',
+        steps: [
+          'Tap “Copy fill script” below.',
+          'Open the Shortcuts app and make a new shortcut.',
+          'Add the action “Run JavaScript on Web Page”. Paste the script into its text box, replacing anything already there.',
+          'In the shortcut’s details, turn on showing it in the Share Sheet, and limit it to Safari web pages.',
+          'Open an official sign-up page in Safari, tap Share, then tap your shortcut. If your phone asks whether the shortcut may run on that site, allow it only for the official sign-up sites.',
+          'If it does not run, check the Advanced area of the Shortcuts settings for a setting that allows running scripts.'
+        ],
+        note: 'Optional: add a “Show Result” action after it to see how many fields were filled.'
+      },
+      {
+        id: 'bookmarklet',
+        title: '3. A bookmark that fills the page',
+        lead: 'Works in Safari and in most desktop browsers. It is a bookmark whose address is the fill script.',
+        steps: [
+          'Tap “Copy bookmarklet” below.',
+          'Bookmark any page in your browser, then edit that bookmark. Give it a name like “Fill my details” and replace its address with the text you copied.',
+          'Open an official sign-up page, then open your bookmarks and tap the new one.'
+        ],
+        note: 'The address is long. If your browser will not keep it, use option 2.'
+      }
+    ],
+    does: [
+      'Fills your name, email, phone, address, city, state, ZIP and due date into boxes that are empty and match.',
+      'Uses the tagged plus address for that program when you turned plus addresses on in My info.',
+      'Shows a short message at the top of the page saying how many boxes it filled. Tap Close to dismiss it.'
+    ],
+    doesNot: [
+      'Never presses Submit or any other button, and never ticks a box. Consent and newsletter boxes are yours to tick.',
+      'Never touches password, card, bank, ID, security-question or one-time-code boxes, and never overwrites what you already typed.',
+      'Does nothing on a site that is not an official sign-up site from this app’s list. It tells you so and stops.',
+      'Has nothing to do with “I am not a robot” checks. You complete those yourself.',
+      'Sends nothing anywhere. It runs only in the page you run it on.'
+    ],
+    privacy: 'The fill script and the bookmarklet contain your details in plain text. Keep them private. Do not share your Shortcut or bookmark, and do not paste the script into chats or posts. After you change My info, make a new one and replace the old.'
+  };
+
+  var FILE_NAME = 'baby-freebies-fill.txt';
+  var KEY = 'profile.v1';
+  var mounted = [];
+  var listening = false;
+
+  function h(tag, attrs, kids) {
+    var n = document.createElement(tag);
+    if (attrs) Object.keys(attrs).forEach(function (k) {
+      if (k === 'text') n.textContent = attrs[k];
+      else if (k === 'class') n.className = attrs[k];
+      else n.setAttribute(k, attrs[k]);
+    });
+    (kids || []).forEach(function (c) { if (c) n.appendChild(c); });
+    return n;
+  }
+  function list(tag, items) {
+    return h(tag, { class: 'ph-list' }, items.map(function (t) { return h('li', { text: t }); }));
+  }
+
+  function readProfile() {
+    var p = BFF.store && BFF.store.get ? BFF.store.get(KEY, {}) : {};
+    return p && typeof p === 'object' && !Array.isArray(p) ? p : {};
+  }
+  function hasDetails(p) {
+    return ['firstName', 'lastName', 'email', 'phone', 'address1', 'city', 'state', 'zip', 'dueDate'].some(function (k) {
+      return typeof p[k] === 'string' && p[k].trim() !== '';
+    });
+  }
+  function buildScript() {
+    var p = readProfile();
+    var map = p.usePlusTags && BFF.plusTags && BFF.plusTags.map ? BFF.plusTags.map() : {};
+    return BFF.fill.build({ profile: p, programs: BFF.programs || [], tagMap: map });
+  }
+
+  function fallbackCopy(text) {
+    return new Promise(function (resolve) {
+      var done = false;
+      function legacy() {
+        var ok = false, ta = null;
+        try {
+          ta = document.createElement('textarea');
+          ta.value = text;
+          ta.setAttribute('readonly', '');
+          ta.style.cssText = 'position:fixed;top:0;left:0;opacity:0;';
+          document.body.appendChild(ta);
+          ta.select();
+          ta.setSelectionRange(0, text.length);
+          ok = !!document.execCommand('copy');
+        } catch (e) { ok = false; }
+        if (ta && ta.parentNode) ta.parentNode.removeChild(ta);
+        return ok;
+      }
+      try {
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(text).then(function () { if (!done) { done = true; resolve(true); } },
+            function () { if (!done) { done = true; resolve(legacy()); } });
+          return;
+        }
+      } catch (e) {}
+      resolve(legacy());
+    });
+  }
+  function copyText(text) {
+    if (BFF.host && typeof BFF.host.copyText === 'function') {
+      try { return Promise.resolve(BFF.host.copyText(text)).catch(function () { return false; }); } catch (e) { return Promise.resolve(false); }
+    }
+    return fallbackCopy(text);
+  }
+
+  function render(el) {
+    el.textContent = '';
+    var p = readProfile();
+    var ready = hasDetails(p) && !!(BFF.fill && BFF.fill.build);
+
+    var status = h('p', { class: 'ph-status', role: 'status', 'aria-live': 'polite' });
+    var shown = h('div', { class: 'ph-shown' });
+
+    function say(text) { status.textContent = text; }
+    function clearShown() { shown.textContent = ''; }
+    function showText(text, label) {
+      clearShown();
+      var id = 'ph-text-' + Math.floor(Math.random() * 1e9);
+      var ta = h('textarea', { id: id, class: 'fx-textarea ph-text', readonly: '', rows: '6', 'aria-label': label, spellcheck: 'false', autocapitalize: 'off', autocomplete: 'off' });
+      ta.value = text;
+      var copy = h('button', { type: 'button', class: 'fx-btn', text: 'Copy' });
+      copy.addEventListener('click', function () {
+        ta.focus(); ta.select();
+        try { ta.setSelectionRange(0, text.length); } catch (e) {}
+        fallbackCopy(text).then(function (ok) { say(ok ? 'Copied.' : 'Could not copy by itself. The text is selected: use your device’s Copy command.'); });
+      });
+      shown.appendChild(h('p', { class: 'fx-muted', text: 'Select all of this text and copy it. It contains your details, so keep it private.' }));
+      shown.appendChild(ta);
+      shown.appendChild(h('div', { class: 'fx-actions' }, [copy]));
+      ta.focus(); ta.select();
+    }
+
+    function guarded(fn) {
+      return function () {
+        clearShown();
+        say('');
+        var script;
+        try { script = buildScript(); } catch (e) { say('Could not make the fill script. Check My info above and try again.'); return; }
+        fn(script);
+      };
+    }
+    function doCopy(text, what) {
+      copyText(text).then(function (ok) {
+        if (ok) say('Copied the ' + what + '. Paste it where the steps above say, and keep it private.');
+        else { say('Your browser would not copy automatically. Copy the text below instead.'); showText(text, 'The ' + what); }
+      });
+    }
+
+    var bScript = h('button', { type: 'button', class: 'fx-btn fx-btn--primary', text: 'Copy fill script' });
+    var bMark = h('button', { type: 'button', class: 'fx-btn', text: 'Copy bookmarklet' });
+    var bFile = h('button', { type: 'button', class: 'fx-btn', text: 'Save fill script as a file' });
+    [bScript, bMark, bFile].forEach(function (b) { if (!ready) b.disabled = true; });
+
+    bScript.addEventListener('click', guarded(function (s) { doCopy(s, 'fill script'); }));
+    bMark.addEventListener('click', guarded(function (s) { doCopy(BFF.fill.bookmarklet(s), 'bookmarklet'); }));
+    bFile.addEventListener('click', guarded(function (s) {
+      if (BFF.host && typeof BFF.host.saveFile === 'function') {
+        var r;
+        try { r = Promise.resolve(BFF.host.saveFile({ name: FILE_NAME, text: s, mime: 'text/plain' })); } catch (e) { r = Promise.resolve({ status: 'failed' }); }
+        r.then(function (res) {
+          var st = res && res.status;
+          if (st === 'saved') say('Saved ' + FILE_NAME + '. It contains your details, so keep it private.');
+          else if (st === 'declined') say('Save cancelled. Nothing was saved.');
+          else { say('The file could not be saved here. Copy the text below instead.'); showText(s, 'The fill script'); }
+        }, function () { say('The file could not be saved here. Copy the text below instead.'); showText(s, 'The fill script'); });
+      } else {
+        say('This page cannot save files here. Copy the text below instead.');
+        showText(s, 'The fill script');
+      }
+    }));
+
+    var kids = [
+      h('h3', { id: 'info-phone-h', text: STEPS.title }),
+      h('p', { text: STEPS.intro })
+    ];
+    STEPS.options.forEach(function (o) {
+      kids.push(h('section', { class: 'ph-opt', 'aria-labelledby': 'ph-' + o.id }, [
+        h('h4', { id: 'ph-' + o.id, text: o.title }),
+        h('p', { text: o.lead }),
+        list('ol', o.steps),
+        o.note ? h('p', { class: 'fx-muted', text: o.note }) : null
+      ]));
+    });
+    kids.push(h('div', { class: 'fx-warn ph-warn', role: 'note' }, [h('strong', { text: 'Keep it private. ' }), document.createTextNode(STEPS.privacy)]));
+    if (!ready) {
+      kids.push(h('p', { class: 'ph-empty', text: 'Fill in My info above first (at least your name, email and address). The buttons turn on once there is something to fill.' }));
+    }
+    kids.push(h('div', { class: 'fx-actions ph-actions' }, [bScript, bMark, bFile]));
+    kids.push(status);
+    kids.push(shown);
+    kids.push(h('h4', { text: 'What the script does' }));
+    kids.push(list('ul', STEPS.does));
+    kids.push(h('h4', { text: 'What it will not do' }));
+    kids.push(list('ul', STEPS.doesNot));
+    kids.push(h('p', { class: 'fx-muted', text: 'The script is made from your current My info each time you tap a button. It is not stored anywhere in this app.' }));
+
+    el.appendChild(h('section', { class: 'fx-card ph-card', 'aria-labelledby': 'info-phone-h' }, kids));
+  }
+
+  function mount(el) {
+    if (!el || !el.appendChild) return;
+    if (mounted.indexOf(el) < 0) mounted.push(el);
+    if (!listening) {
+      listening = true;
+      document.addEventListener('bff:profile-changed', function () {
+        mounted = mounted.filter(function (n) { return n.isConnected !== false; });
+        mounted.forEach(render);
+      });
+    }
+    render(el);
+  }
+
+  BFF.phoneView = { mount: mount, STEPS: STEPS, FILE_NAME: FILE_NAME };
+
+  var pre = document.getElementById('info-phone');
+  if (pre && mounted.indexOf(pre) < 0 && !pre.firstChild) mount(pre);
+})();
 (function () {
   'use strict';
   window.BFF = window.BFF || {};
@@ -2711,9 +4255,10 @@ main:focus { outline: none; }
     memTheme = t;
     if (BFF.store) { var p = getPrefs(); p.theme = t; BFF.store.set('prefs.v1', p); }
   }
-  function applyTheme(t) {
+  // `touch` is false at boot while on System, so a theme the host page already chose is left alone.
+  function applyTheme(t, touch) {
     var root = document.documentElement;
-    if (t === 'system') root.removeAttribute('data-theme'); else root.setAttribute('data-theme', t);
+    if (touch !== false) { if (t === 'system') root.removeAttribute('data-theme'); else root.setAttribute('data-theme', t); }
     var btn = document.getElementById('theme-toggle');
     if (btn) {
       var icon = btn.querySelector('.theme-icon'), txt = btn.querySelector('.theme-text');
@@ -2724,21 +4269,20 @@ main:focus { outline: none; }
     }
   }
 
-  var current = 'directory';
-  // Unknown hashes (e.g. #main) keep the current view instead of jumping to Programs.
-  function currentView() {
+  // Only plain #name hashes are routes. Anything else (an empty hash, #main, a typo) shows the directory.
+  function viewFromHash() {
     var name = (location.hash || '').replace(/^#/, '');
-    if (VIEWS.indexOf(name) !== -1) current = name;
-    else if (!name) current = 'directory';
-    return current;
+    return VIEWS.indexOf(name) !== -1 ? name : 'directory';
   }
 
   function guarded(fn, name) {
     try { fn(); } catch (e) { if (window.console) console.error('Bad view "' + name + '":', e); }
   }
 
+  var shown = '';
   function route(moveFocus) {
-    var name = currentView();
+    var name = viewFromHash();
+    shown = name;
     VIEWS.forEach(function (v) {
       var el = document.getElementById('view-' + v);
       if (el) el.hidden = v !== name;
@@ -2753,10 +4297,33 @@ main:focus { outline: none; }
     if (el && view && typeof view.show === 'function') guarded(function () { view.show(el); }, name);
     if (el) {
       var h2 = el.querySelector('h2');
-      document.title = (h2 ? h2.textContent + ' · ' : '') + 'Baby Freebies Finder';
+      document.title = (h2 ? h2.textContent + ' \u00B7 ' : '') + 'Baby Freebies Finder';
       if (moveFocus && h2) h2.focus({ preventScroll: true });
       window.scrollTo(0, 0);
     }
+  }
+
+  // go(name): the one way the app changes views. Setting location.hash fires hashchange, which routes.
+  // If the frame never delivers that event (or the hash is already set), route directly after a beat.
+  var navTimer = null;
+  function go(name) {
+    if (VIEWS.indexOf(name) === -1) name = 'directory';
+    if (navTimer) clearTimeout(navTimer);
+    if (location.hash === '#' + name && shown === name) { route(true); return; }
+    try { location.hash = '#' + name; } catch (e) {}
+    navTimer = setTimeout(function () { navTimer = null; if (shown !== name) route(true); }, 60);
+  }
+  BFF.nav = { go: go, views: VIEWS.slice() };
+
+  // Route links (#info and so on) go through go(), so they work even where plain anchor navigation does not.
+  function onDocClick(e) {
+    if (e.defaultPrevented || e.button > 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+    var a = e.target && e.target.closest ? e.target.closest('a[href^="#"]') : null;
+    if (!a) return;
+    var name = a.getAttribute('href').slice(1);
+    if (VIEWS.indexOf(name) === -1) return;
+    e.preventDefault();
+    go(name);
   }
 
   function lastChecked() {
@@ -2767,7 +4334,7 @@ main:focus { outline: none; }
   }
 
   function boot() {
-    applyTheme(getTheme());
+    applyTheme(getTheme(), getTheme() !== 'system');
     var btn = document.getElementById('theme-toggle');
     btn.addEventListener('click', function () {
       var next = THEMES[(THEMES.indexOf(getTheme()) + 1) % THEMES.length];
@@ -2805,8 +4372,11 @@ main:focus { outline: none; }
       if (ref && !document.getElementById(ref) && window.console) console.warn('view-' + v + ': missing heading #' + ref);
     });
 
-    window.addEventListener('hashchange', function () { route(true); });
+    document.addEventListener('click', onDocClick);
+    window.addEventListener('hashchange', function () { if (navTimer) { clearTimeout(navTimer); navTimer = null; } route(true); });
     route(false);
+    // Ask the host about file saving after first paint, so the answer is ready before anyone taps Save.
+    if (BFF.host && BFF.host.warm) setTimeout(function () { try { BFF.host.warm(); } catch (e) {} }, 100);
   }
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
