@@ -381,10 +381,10 @@ test('kitDraft works with the real Phase E generators', () => {
 
 // ---- errors ----
 const GROUPS = {
-  'said-no': ['consent_required', 'approval_required', 'not_granted'],
+  'said-no': ['consent_required', 'approval_required', 'not_granted', 'not_in_manifest'],
   connect: ['needs_reauth', 'server_not_connected', 'server_not_found', 'selection_required'],
   later: ['rate_limited', 'server_unavailable', 'upstream_error'],
-  unavailable: ['blocked_by_policy', 'not_in_manifest', 'capability_disabled', 'capability_removed', 'self_only', 'user_changed'],
+  unavailable: ['blocked_by_policy', 'capability_disabled', 'capability_removed', 'self_only', 'user_changed'],
   failed: ['tool_error', 'bad_request', 'cancelled', 'transform_error']
 };
 test('errorCopy: every code has one short sentence, one per group', () => {
@@ -423,4 +423,40 @@ test('validAddress and clean', () => {
   assert.equal(I.validAddress(null), '');
   assert.equal(I.clean('a\u0000b‮c\n d', 10), 'a b c d');
   assert.equal(I.clean('x\u{1F600}', 2), 'x');
+});
+
+test('marketing and baby-is-coming wording is not shipping or delivery news', () => {
+  const c = (subject, snippet = '') => I.classify({ subject, snippet });
+  assert.equal(c('Your baby is on the way', 'Congratulations, mama'), 'other');
+  assert.equal(c('Delivered right to your door', 'Save 20% on diapers'), 'other');
+  assert.equal(c('Fresh diapers just delivered to you'), 'other');
+  assert.equal(c('Now delivered nationwide'), 'other');
+  assert.equal(c('Your order is on the way'), 'shipped');
+  assert.equal(c('Delivered: your sample box'), 'shipped');
+  assert.equal(I.isDelivered({ subject: 'Delivered right to your door', snippet: 'Free shipping' }), false);
+  // so a marketing email to the program's own plus address cannot suggest "received"
+  const th = thread('tm1', [msg({ subject: 'Delivered right to your door', snippet: 'Shop now', toRecipients: [E.plusAddress(ME, TAGS['alpha-box'])] })]);
+  const m = I.matchThreads([th], { programs: P, email: ME, tagMap: TAGS });
+  assert.deepEqual(I.suggest(m, () => 'todo'), []);
+});
+
+test('errorGroup: a page that was switched off for this view reads as not allowed, not as broken', () => {
+  assert.equal(I.errorGroup('not_in_manifest'), 'said-no');
+  assert.equal(I.clearsData('not_in_manifest'), true);
+  assert.match(I.errorCopy('not_in_manifest'), /not allowed/);
+});
+
+test('copy never promises that labels or drafts work, and never says mail was sent', () => {
+  const src = readFileSync(new URL('../src/js/inboxview.js', import.meta.url), 'utf8') + readFileSync(new URL('../src/js/inbox.js', import.meta.url), 'utf8');
+  assert.doesNotMatch(src, /\bwas sent\b|\bhas been sent\b|\bwe sent\b|\bsent to you\b/i);
+  assert.match(readFileSync(new URL('../src/js/inboxview.js', import.meta.url), 'utf8'), /THREAD_VIEW_SUMMARY/);
+});
+
+test('buildQueries: a +tag already on the address is not stacked, and a Yahoo address gets no to: terms', () => {
+  const tagged = 'sam.rivera+old@gmail.com';
+  const qs = I.buildQueries({ programs: P, email: tagged, tagMap: E.tagMap(P), usePlus: true });
+  qs.forEach((q) => assert.doesNotMatch(q.query, /\+old\+/));
+  const y = I.buildQueries({ programs: P, email: 'sam.rivera@yahoo.com', tagMap: E.tagMap(P), usePlus: true });
+  y.forEach((q) => assert.doesNotMatch(q.query, /to:/));
+  assert.deepEqual(I.buildQueries({ programs: [], email: ME, tagMap: {}, usePlus: true }), []);
 });

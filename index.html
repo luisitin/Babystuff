@@ -457,7 +457,8 @@ main:focus { outline: none; }
 .ph-list li { margin: var(--space-2) 0; }
 .ph-warn { border: 1px solid var(--warning-border); background: var(--warning-bg); color: var(--warning-text); }
 .ph-empty { margin: var(--space-3) 0; padding: var(--space-3); border: 1px dashed var(--border-strong); border-radius: var(--radius-sm); background: var(--surface-2); color: var(--text); }
-.ph-actions { flex-direction: column; align-items: stretch; }
+.ph-actions { flex-direction: column; align-items: stretch; margin: var(--space-2) 0; }
+.ph-group { margin: var(--space-2) 0; }
 .ph-actions .fx-btn { width: 100%; min-height: 48px; }
 .ph-status { min-height: 1.4em; margin: var(--space-2) 0; color: var(--text); font-weight: 600; }
 .ph-status:empty { display: none; }
@@ -1429,8 +1430,8 @@ main:focus { outline: none; }
       button: 1, reset: 1, image: 1, color: 1, range: 1
     };
 
-    var SKIP_WORDS = /\b(password|passwd|pwd|passcode|pin|card|credit|debit|cc|ccnum|cvv|cvc|cvn|csc|security code|expir\w*|ssn|social security|insurance|insurer|member id|member number|policy|subscriber|medicaid|medicare|wic|case number|bank|routing|account number|search|captcha|promo|coupon|referral)\b/;
-    var OTHER_NAME = /\b(baby|child|children|infant|newborn|spouse|partner|friend|referr\w*|recipient|company|business|organization|employer|username|user name|nickname|pet|hospital|doctor|physician|provider)\b/;
+    var SKIP_WORDS = /\b(password|passwd|pwd|passcode|pin|card|credit|debit|cc|ccnum|cvv|cvc|cvn|csc|security code|expir\w*|ssn|social security|insurance|insurer|member id|member number|policy|subscriber|medicaid|medicare|wic|case number|bank|routing|account number|search|query|keyword|keywords|locator|find a store|store finder|captcha|promo|coupon|voucher|offer code|discount|referral|cardholder|iban|passport|license|licence|driver s|dob|birth ?date|date of birth|birthday|age|gender|sex|race|ethnicity|income|salary|tax|ein|vin)\b/;
+    var OTHER_NAME = /\b(baby|child|children|infant|newborn|spouse|partner|friend|referr\w*|recipient|company|business|organization|employer|username|user name|nickname|pet|hospital|doctor|physician|provider|middle|maiden|preferred|display|screen|account|holder|file|product|school|store|team|group|facility|event|list|login|gift)\b/;
     var OTHER_PERSON = /\b(spouse|partner|husband|wife|fianc\w*|doctor|dr|physician|ob|obgyn|midwife|doula|provider|hospital|clinic|pediatrician|gift|recipient|friend|referr\w*|referral|emergency|contact person|guardian|grandparent\w*|grandmother|grandfather|sibling|sister|brother|relative|caregiver|nanny|sponsor|witness|manager|supervisor|teacher|employer|company|business|organization|work|other parent|second parent|mother s|father s|mom s|dad s)\b/;
     var OTHER_THING = /\b(last menstrual\w*|menstrual|lmp|first time|phone type|mobile type|cell type|phone carrier|carrier|contact preference|preferred contact|best time|email type|address type|how did you hear)\b/;
     var HONEYPOT = /\b(honeypot|honey pot|hp|hpot|leave blank|leave empty|do not fill|dont fill|bot trap|trap|url2|website2|fax)\b/;
@@ -1450,7 +1451,7 @@ main:focus { outline: none; }
       'postal-code': 'zip'
     };
 
-    var SECOND_LEVEL = { co: 1, com: 1, org: 1, net: 1, gov: 1, edu: 1, ac: 1 };
+    var SECOND_LEVEL = { co: 1, com: 1, org: 1, net: 1, gov: 1, edu: 1, ac: 1, ne: 1, or: 1, go: 1, gob: 1, gouv: 1, mil: 1, sch: 1, nom: 1, ltd: 1, plc: 1, nhs: 1 };
 
     function norm(s) {
       return String(s == null ? '' : s)
@@ -1463,7 +1464,7 @@ main:focus { outline: none; }
     function fromText(t, type) {
       if (!t) return null;
       var has = function (re) { return re.test(t); };
-      var dueCtx = has(/\b(due|expected|edd|delivery|baby s birth|birth date of baby)\b/);
+      var dueCtx = has(/\b(due|expected|edd)\b/);
       if (dueCtx) {
         if (type === 'date') return 'dueDate';
         if (has(/\bmonth\b|\bmm\b/)) return 'dueMonth';
@@ -1499,10 +1500,11 @@ main:focus { outline: none; }
 
     function registrableDomain(urlOrHost) {
       var host = String(urlOrHost || '');
-      var m = /^[a-z][a-z0-9+.-]*:\/\/(?:[^\/?#@]*@)?(\[[^\]]*\]|[^\/?#:]*)/i.exec(host);
+      var m = /^[a-z][a-z0-9+.-]*:[\/\\]{2}(?:[^\/\\?#@]*@)?(\[[^\]]*\]|[^\/\\?#:]*)/i.exec(host);
       if (m) host = m[1];
       var labels = host.toLowerCase().replace(/\.$/, '').split('.').filter(Boolean);
       if (labels.length <= 2) return labels.join('.');
+      if (/^[0-9]+$/.test(labels[labels.length - 1])) return labels.join('.');
       var tld = labels[labels.length - 1];
       var take = tld.length === 2 && SECOND_LEVEL[labels[labels.length - 2]] === 1 ? 3 : 2;
       return labels.slice(-take).join('.');
@@ -1533,13 +1535,16 @@ main:focus { outline: none; }
       var all = parts.join(' ');
       if (SKIP_WORDS.test(all) || OTHER_PERSON.test(all) || OTHER_THING.test(all) || HONEYPOT.test(all)) return null;
 
-      if (acKind) return acKind;
+      if (acKind) {
+        if ((acKind === 'firstName' || acKind === 'lastName' || acKind === 'fullName') && OTHER_NAME.test(all)) return null;
+        return acKind;
+      }
       if (acToken === 'bday' || (acToken && acToken.indexOf('bday-') === 0)) return null;
 
       if (type === 'email') return 'email';
       if (type === 'tel') return 'phone';
       if (type === 'date') {
-        return /\b(due|expected|edd|delivery|baby)\b/.test(all) ? 'dueDate' : null;
+        return /\b(due|expected|edd)\b/.test(all) ? 'dueDate' : null;
       }
       if (type === 'number' && !/\b(zip|postal|due|month|day|year|phone)\b/.test(all)) return null;
 
@@ -1775,6 +1780,9 @@ main:focus { outline: none; }
         var type = tag === 'input' ? String(el.getAttribute('type') || 'text').toLowerCase() : tag;
         if (IGNORE[type] === 1) continue;
         if (!usable(d, w, el)) continue;
+        var inSearch = false;
+        try { inSearch = !!(el.closest && el.closest('[role="search"], search, [role="combobox"]')); } catch (e) { inSearch = true; }
+        if (inSearch) { skipped++; continue; }
         seen++;
         if (!TOUCH[type] || (tag === 'select' && el.multiple)) { skipped++; continue; }
         var form = el.form;
@@ -1855,6 +1863,9 @@ main:focus { outline: none; }
     return out;
   }
 
+  /* Hosting platforms where anyone can get a sub-domain. A program on one of these is never a safe gate. */
+  var SHARED_HOSTS = /^(?:github\.io|githubusercontent\.com|gitlab\.io|herokuapp\.com|blogspot\.com|wordpress\.com|myshopify\.com|wixsite\.com|weebly\.com|squarespace\.com|netlify\.app|vercel\.app|pages\.dev|workers\.dev|web\.app|firebaseapp\.com|azurewebsites\.net|cloudfront\.net|amazonaws\.com|appspot\.com|force\.com|salesforce\.com|typeform\.com|forms\.gle|google\.com|googleusercontent\.com|facebook\.com|instagram\.com|linkedin\.com|medium\.com|substack\.com|bit\.ly|tinyurl\.com|[a-z]{2}\.us|co\.uk|com\.au)$/;
+
   function programList(programs, profile, tagMap) {
     var fm = FM(), em = EM();
     var map = tagMap && typeof tagMap === 'object' ? tagMap : {};
@@ -1863,7 +1874,7 @@ main:focus { outline: none; }
     (Array.isArray(programs) ? programs : []).forEach(function (p) {
       if (!p || typeof p.signupUrl !== 'string' || p.signupUrl.indexOf('https://') !== 0) return;
       var domain = fm.registrableDomain(p.signupUrl);
-      if (!domain || !p.id || seen[p.id]) return;
+      if (!domain || !p.id || seen[p.id] || SHARED_HOSTS.test(domain)) return;
       seen[p.id] = true;
       var email = usePlus && typeof map[p.id] === 'string' && map[p.id] ? em.plusAddress(profile.email, map[p.id]) : '';
       out.push({ domain: domain, id: String(p.id), name: String(p.name || ''), email: email });
@@ -2083,11 +2094,16 @@ main:focus { outline: none; }
     /\b(?:confirm|verify|validate|activate)\b[^.!?]{0,40}\b(?:e-?mail|address|subscription|account|sign-?\s?up|registration|membership)\b/,
     /\bone more step\b/, /\bfinish (?:signing up|your (?:sign-?\s?up|registration))\b/, /\bplease (?:confirm|verify)\b/
   ];
+  // "on the way" alone is not shipping news ("your baby is on the way"): it needs a parcel word in front of it.
+  var PARCEL = '(?:order|package|box|shipment|parcel|samples?|kit|delivery|items?|gift|formula|diapers?)';
   var SHIPPED_RES = [
-    /\b(?:has|have|just|now|been|was)\s+shipped\b/, /^shipped\b/, /\bshipped[!:]/, /\bon (?:its|the) way\b/, /\bout for delivery\b/, /\bis on the way\b/
+    /\b(?:has|have|just|now|been|was)\s+shipped\b/, /^shipped\b/, /\bshipped[!:]/, new RegExp('\\b' + PARCEL + '\\s+(?:is|are|was|were)?\\s*on (?:its|their|the) way\\b'), /\bout for delivery\b/
   ];
+  // Delivery wording must name the parcel. "Delivered to your door", "now delivered nationwide" and "just delivered" are advertising.
   var DELIVERED_RES = [
-    /\b(?:was|were|has been|have been|just|successfully|now)\s+delivered\b/, /^delivered\b/, /\bdelivered[!:]/, /\b(?:order|package|box|shipment|parcel|delivery)\s+delivered\b/
+    new RegExp('\\b' + PARCEL + '\\s+(?:was|were|has been|have been|is)\\s+(?:successfully\\s+)?delivered\\b'),
+    new RegExp('\\b' + PARCEL + '\\s+delivered\\b'),
+    /^delivered\s*[:!\-\u2013\u2014]/, /\bdelivered[!:]\s/, /\b(?:was|were|has been|have been)\s+(?:successfully\s+)?delivered\b/
   ];
   var WELCOME_RES = [
     /\bwelcome (?:to|aboard)\b/, /^welcome\b/, /\bthanks?(?: you)? for (?:signing up|joining|subscribing|registering|your registration)\b/,
@@ -2287,10 +2303,10 @@ main:focus { outline: none; }
 
   // ---- errors ----
   var GROUPS = {
-    consent_required: 'said-no', approval_required: 'said-no', not_granted: 'said-no',
+    consent_required: 'said-no', approval_required: 'said-no', not_granted: 'said-no', not_in_manifest: 'said-no',
     needs_reauth: 'connect', server_not_connected: 'connect', server_not_found: 'connect', selection_required: 'connect',
     rate_limited: 'later', server_unavailable: 'later', upstream_error: 'later',
-    blocked_by_policy: 'unavailable', not_in_manifest: 'unavailable', capability_disabled: 'unavailable', capability_removed: 'unavailable', self_only: 'unavailable', user_changed: 'unavailable',
+    blocked_by_policy: 'unavailable', capability_disabled: 'unavailable', capability_removed: 'unavailable', self_only: 'unavailable', user_changed: 'unavailable',
     tool_error: 'failed', bad_request: 'failed', cancelled: 'failed', transform_error: 'failed'
   };
   var COPY = {
@@ -4160,7 +4176,7 @@ main:focus { outline: none; }
       btnClear.hidden = !(matches && (matches.length || checkedPrompted));
       var notes = [];
       if (ready && off.check) notes.push('Searching is not available in this Gmail connection.');
-      if (ready && (off.label || off.draft)) notes.push('Claude only lets a page use Gmail tools that are allowed without asking each time. Labels and drafts are off for this page; checking your mail still works.');
+      if (ready && (off.label || off.draft)) notes.push('This Gmail connection does not offer labels or drafts to this page, so those buttons are hidden. Checking your mail still works.');
       unavailable.textContent = '';
       notes.forEach(function (t) { unavailable.appendChild(h('li', { text: t })); });
       unavailable.hidden = !notes.length;
@@ -4219,7 +4235,8 @@ main:focus { outline: none; }
       var code = codeOf(e), g = I().errorGroup(code);
       showErr(I().errorCopy(code));
       say('');
-      if (g === 'said-no') noRetry = true;
+      // Only a refusal that will not change on its own switches the card off. A declined prompt may be answered differently on the next tap.
+      if (code === 'not_granted' || code === 'not_in_manifest') noRetry = true;
       if (g === 'connect') needConnect = true;
       if (I().clearsData(code)) clearData();
       if (g === 'unavailable') { if (code === 'blocked_by_policy') off[feature] = true; else dead = true; }
@@ -4246,7 +4263,7 @@ main:focus { outline: none; }
         var token = '';
         for (var page = 0; page < MAX_PAGES; page++) {
           say('Searching ' + (q + 1) + ' of ' + qs.length + (page ? ', page ' + (page + 1) : '') + '…');
-          var input = { query: qs[q].query, pageSize: PAGE_SIZE, view: 'SUMMARY' };
+          var input = { query: qs[q].query, pageSize: PAGE_SIZE, view: 'THREAD_VIEW_SUMMARY' };
           if (token) input.pageToken = token;
           var p = await call('search_threads', input, true);
           (Array.isArray(p.threads) ? p.threads : []).forEach(function (t) {
@@ -4417,8 +4434,9 @@ main:focus { outline: none; }
         try { await call('label_thread', { threadId: ids[i], labelIds: [labelId] }, false); ok++; }
         catch (e) {
           bad++; if (!firstBad) firstBad = e;
-          // Stop at once when the page is no longer allowed to write; keep going on a one-off failure.
-          if (I().clearsData(codeOf(e))) { fail(e, 'label'); return; }
+          // Stop at once when the page is not allowed to write or Gmail is busy; keep going only on a one-off failure of one thread.
+          // fail() clears the screen for refusals, so the count is shown again after it.
+          if (I().errorGroup(codeOf(e)) !== 'failed') { fail(e, 'label'); if (ok) done.textContent = 'Labelled ' + ok + ' of ' + plural(ids.length, 'conversation') + ' before it stopped.'; return; }
         }
       }
       say('');
@@ -4542,7 +4560,7 @@ main:focus { outline: none; }
   var STEPS = {
     title: 'Fill forms on your phone',
     intro: 'Sign-up pages ask for the same details again and again. These ways put your details from My info into a form for you. They only fill empty boxes. You check everything and press the final button yourself.',
-    menuNote: 'Menu names are from Apple’s help pages for iOS 26 and 27 (November 2026). Other versions may differ slightly.',
+    menuNote: 'Menu names come from summaries of Apple’s help pages for iOS 26 and 27 (November 2026). We could not open the pages or try this on a phone, so names may differ on your iPhone. If a step does not match what you see, type the name, such as “Shortcuts”, into the search box at the top of Settings.',
     options: [
       {
         id: 'autofill',
@@ -4550,41 +4568,43 @@ main:focus { outline: none; }
         tag: 'No script at all',
         lead: '',
         steps: [
-          'Open Settings, then Apps, then Safari, then AutoFill. (On iOS 17 and earlier: Settings, then Safari, then AutoFill.)',
-          'Turn on Use Contact Info.',
-          'Tap My Info and choose your own contact card. Check in Contacts that the card has your name, address, phone and email.',
-          'On a sign-up page, tap an empty field, then tap AutoFill Contact above the keyboard. Check every field before you submit.'
+          { text: 'Open Settings, then Apps, then Safari, then AutoFill. (On iOS 18 and older: Settings, then Safari, then AutoFill.)' },
+          { text: 'Turn on Use Contact Info.' },
+          { text: 'Tap My Info and choose your own contact card. Check in Contacts that the card has your name, address, phone and email.' },
+          { text: 'On a sign-up page, tap an empty field, then tap AutoFill Contact above the keyboard. Check every field before you submit. Which fields it fills is Apple’s choice.' }
         ],
         note: ''
       },
       {
         id: 'shortcut',
         title: 'Fill with a Shortcut',
-        tag: 'Recommended',
-        lead: 'Fills the page you are looking at from Safari’s Share menu. Tap “Copy fill script” below first.',
+        tag: 'Recommended, not tested on a phone yet',
+        lead: 'Fills the page you are looking at from Safari’s Share menu.',
         steps: [
-          'In Settings, open Shortcuts (on recent iOS it is under Apps), tap Advanced and turn on Allow Running Scripts.',
-          'Open the Shortcuts app and tap + to start a new shortcut.',
-          'Search the actions for “Run JavaScript” and add Run JavaScript on Web Page.',
-          'Tap the script box in that action, clear what is there and paste the script you copied from this page.',
-          'Open the shortcut’s details (the info button) and turn on Show in Share Sheet. Then set what it accepts to Safari web pages only (untick the other types).',
-          'Name it, for example “Baby form fill”, and tap Done.',
-          'In Safari, open the official sign-up page, tap Share, then tap “Baby form fill”. The first time, iPhone asks whether the shortcut may use that website: allow it for the official site only.',
-          'Check every field, fill in anything it skipped, and press the site’s own submit button yourself.'
+          { text: 'Copy the script. If copying does not work, save it as a file or select the text that appears.', action: 'script' },
+          { text: 'Open Settings, tap Shortcuts, then Advanced, and turn on Allow Running Scripts.' },
+          { text: 'Open the Shortcuts app and tap + to start a new shortcut.' },
+          { text: 'Search the actions for “Run JavaScript” and add Run JavaScript on Web Page.' },
+          { text: 'Tap the script box in that action, clear what is there and paste the script you copied.' },
+          { text: 'Open the shortcut’s details (the info button) and turn on Show in Share Sheet. Then untick every accepted type except Safari web pages.' },
+          { text: 'Name it, for example “Baby form fill”, and tap Done.' },
+          { text: 'In Safari, open the official sign-up page, tap Share, then tap “Baby form fill”. iPhone may ask whether the shortcut can use that website. Allow it for the official site only.' },
+          { text: 'Check every field, fill in anything it skipped, and press the site’s own submit button yourself.' }
         ],
-        note: 'Changed your details in My info? Copy the script again and paste it over the old one in the shortcut.'
+        note: 'Changed your details in My info? Copy the script again and paste it over the old one in the shortcut. We have not confirmed how Apple lets you edit it.'
       },
       {
         id: 'bookmarklet',
         title: 'Or use a bookmark',
-        tag: 'Apple does not document this; test it once',
-        lead: 'Tap “Copy bookmarklet” below first.',
+        tag: 'Apple does not document this. Test it once.',
+        lead: '',
         steps: [
-          'In Safari, open any page, tap Share, then Add Bookmark. Name it “Baby fill” and save it.',
-          'Open Bookmarks, tap Edit, then tap “Baby fill”.',
-          'Delete the address and paste the code you copied from this page. It starts with javascript:.',
-          'Tap Done. On a sign-up page, open Bookmarks and tap “Baby fill”.',
-          'If nothing happens, that site blocks bookmark scripts. Use the Shortcut or AutoFill instead.'
+          { text: 'Copy the bookmark code.', action: 'bookmarklet' },
+          { text: 'In Safari, open any page, tap Share, then Add Bookmark. Name it “Baby fill” and save it.' },
+          { text: 'Open Bookmarks, tap Edit, then tap “Baby fill”.' },
+          { text: 'Delete the address and paste the code you copied. It starts with javascript:.' },
+          { text: 'Tap Done. On a sign-up page, open Bookmarks and tap “Baby fill”.' },
+          { text: 'If nothing happens, the site may block bookmark scripts, or a Safari update may have changed how they are saved. Use the Shortcut or AutoFill instead.' }
         ],
         note: ''
       }
@@ -4599,12 +4619,15 @@ main:focus { outline: none; }
       ]
     },
     warnTitle: 'Keep it private. ',
-    warnings: [
-      'The script contains the details you saved in My info. Keep the shortcut to yourself: do not share or export it. If Shortcuts sync is on in iCloud, it also appears on your other Apple devices.',
-      'Apple’s own warning: a shortcut that runs JavaScript on a page can read everything on that page. Run it only on the official sign-up page. The script checks the site address and does nothing on other sites.',
-      'It works from Safari’s Share menu only, not inside other apps’ built-in browsers.',
+    warningsBefore: [
+      'The script contains the details you saved in My info. Keep the shortcut to yourself: do not share or export it. If Shortcuts sync is on in iCloud, it may also appear on your other Apple devices.',
+      'Apple warns that a shortcut that runs JavaScript on a page can access all of the information on that page. Run it only on the official sign-up page. The script checks the site address and does nothing on other sites.',
+      'The script does not send your details anywhere, but the official page you run it on can see what is filled in, as it can for anything you type there.'
+    ],
+    warningsAfter: [
+      'Use it from Safari’s Share menu. Other apps’ built-in browsers are not confirmed to work, so do not count on them.',
       'It only fills fields. It never presses submit, never ticks consent boxes for you and never touches password, payment or ID fields. It has nothing to do with “I am not a robot” checks.',
-      'Safari can clear a website’s saved data after about a week without a visit. Save a backup from the Tracker now and then.',
+      'Safari can clear a website’s saved data after about a week of Safari use without a visit to it. Save a backup from the Tracker now and then.',
       'Some sites will not let scripts run. If nothing fills, use AutoFill or type.',
       'After you change My info, make a new script and replace the old one.'
     ],
@@ -4694,78 +4717,99 @@ main:focus { outline: none; }
     el.textContent = '';
     var p = readProfile();
     var ready = hasDetails(p) && !!(BFF.fill && BFF.fill.build);
+    var seq = 0;
 
-    var status = h('p', { class: 'ph-status', role: 'status', 'aria-live': 'polite' });
-    var shown = h('div', { class: 'ph-shown' });
-
-    function say(text) { status.textContent = text; }
-    function clearShown() { shown.textContent = ''; }
-    function showText(text, label) {
-      clearShown();
-      var id = 'ph-text-' + Math.floor(Math.random() * 1e9);
-      var ta = h('textarea', { id: id, class: 'fx-textarea ph-text', readonly: '', rows: '6', 'aria-label': label, spellcheck: 'false', autocapitalize: 'off', autocomplete: 'off' });
-      ta.value = text;
-      var copy = h('button', { type: 'button', class: 'fx-btn', text: 'Copy' });
-      copy.addEventListener('click', function () {
-        ta.focus(); ta.select();
-        try { ta.setSelectionRange(0, text.length); } catch (e) {}
-        fallbackCopy(text).then(function (ok) { say(ok ? 'Copied.' : 'Could not copy by itself. The text is selected: use your device’s Copy command.'); });
-      });
-      shown.appendChild(h('p', { class: 'fx-muted', text: 'Select all of this text and copy it. It contains your details, so keep it private.' }));
-      shown.appendChild(ta);
-      shown.appendChild(h('div', { class: 'fx-actions' }, [copy]));
-      ta.focus(); ta.select();
-    }
-
-    function guarded(fn) {
-      return function () {
+    // Each group of buttons gets its own status line and text box right under it, so the answer
+    // to a tap is never off screen on a phone.
+    function actionGroup(kind) {
+      var status = h('p', { class: 'ph-status', role: 'status', 'aria-live': 'polite' });
+      var shown = h('div', { class: 'ph-shown' });
+      var gid = ++seq;
+      function say(text) { status.textContent = text; }
+      function clearShown() { shown.textContent = ''; }
+      function showText(text, label) {
         clearShown();
-        say('');
-        var script;
-        try { script = buildScript(); } catch (e) { say('Could not make the fill script. Check My info above and try again.'); return; }
-        fn(script);
-      };
-    }
-    function doCopy(text, what) {
-      copyText(text).then(function (ok) {
-        if (ok) say('Copied the ' + what + '. Paste it where the steps above say, and keep it private.');
-        else { say('Your browser would not copy automatically. Copy the text below instead.'); showText(text, 'The ' + what); }
-      });
-    }
-
-    var bScript = h('button', { type: 'button', class: 'fx-btn fx-btn--primary', text: 'Copy fill script' });
-    var bMark = h('button', { type: 'button', class: 'fx-btn', text: 'Copy bookmarklet' });
-    var bFile = h('button', { type: 'button', class: 'fx-btn', text: 'Save fill script as a file' });
-    [bScript, bMark, bFile].forEach(function (b) { if (!ready) b.disabled = true; });
-
-    bScript.addEventListener('click', guarded(function (s) { doCopy(s, 'fill script'); }));
-    bMark.addEventListener('click', guarded(function (s) { doCopy(BFF.fill.bookmarklet(s), 'bookmarklet'); }));
-    bFile.addEventListener('click', guarded(function (s) {
-      if (BFF.host && typeof BFF.host.saveFile === 'function') {
-        var r;
-        try { r = Promise.resolve(BFF.host.saveFile({ name: FILE_NAME, text: s, mime: 'text/plain' })); } catch (e) { r = Promise.resolve({ status: 'failed' }); }
-        r.then(function (res) {
-          var st = res && res.status;
-          if (st === 'saved') say('Saved ' + FILE_NAME + '. It contains your details, so keep it private.');
-          else if (st === 'declined') say('Save cancelled. Nothing was saved.');
-          else { say('The file could not be saved here. Copy the text below instead.'); showText(s, 'The fill script'); }
-        }, function () { say('The file could not be saved here. Copy the text below instead.'); showText(s, 'The fill script'); });
-      } else {
-        say('This page cannot save files here. Copy the text below instead.');
-        showText(s, 'The fill script');
+        var id = 'ph-text-' + gid;
+        var ta = h('textarea', { id: id, class: 'fx-textarea ph-text', readonly: '', rows: '6', 'aria-label': label, spellcheck: 'false', autocapitalize: 'off', autocomplete: 'off' });
+        ta.value = text;
+        var copy = h('button', { type: 'button', class: 'fx-btn', text: 'Copy' });
+        copy.addEventListener('click', function () {
+          ta.focus(); ta.select();
+          try { ta.setSelectionRange(0, text.length); } catch (e) {}
+          fallbackCopy(text).then(function (ok) { say(ok ? 'Copied.' : 'Could not copy by itself. The text is selected: use your device’s Copy command.'); });
+        });
+        shown.appendChild(h('p', { class: 'fx-muted', text: 'Select all of this text and copy it. It contains your details, so keep it private.' }));
+        shown.appendChild(ta);
+        shown.appendChild(h('div', { class: 'fx-actions' }, [copy]));
+        ta.focus(); ta.select();
       }
-    }));
+      // The script is built inside the tap and the copy starts in the same tick, so the tap still counts.
+      function guarded(fn) {
+        return function () {
+          clearShown();
+          say('');
+          var script;
+          try { script = buildScript(); } catch (e) { say('Could not make the fill script. Check My info above and try again.'); return; }
+          fn(script);
+        };
+      }
+      function doCopy(text, what) {
+        copyText(text).then(function (ok) {
+          if (ok) say('Copied the ' + what + '. Paste it where the steps say, and keep it private.');
+          else { say('Your browser would not copy automatically. Copy the text below instead.'); showText(text, 'The ' + what); }
+        });
+      }
+      var btns = [];
+      if (kind === 'script') {
+        var bScript = h('button', { type: 'button', class: 'fx-btn fx-btn--primary', text: 'Copy fill script' });
+        bScript.addEventListener('click', guarded(function (s) { doCopy(s, 'fill script'); }));
+        var bFile = h('button', { type: 'button', class: 'fx-btn', text: 'Save fill script as a file' });
+        bFile.addEventListener('click', guarded(function (s) {
+          if (BFF.host && typeof BFF.host.saveFile === 'function') {
+            var r;
+            try { r = Promise.resolve(BFF.host.saveFile({ name: FILE_NAME, text: s, mime: 'text/plain' })); } catch (e) { r = Promise.resolve({ status: 'shown' }); }
+            r.then(function (res) {
+              var st = res && res.status;
+              if (st === 'saved') say('Saved ' + (res.name || FILE_NAME) + '. It contains your details, so keep it private.');
+              else if (st === 'declined') say('Save cancelled. Nothing was saved.');
+              else if (st === 'failed' && res.message) say(res.message);
+              else { say('The file could not be saved here. Copy the text below instead.'); showText(s, 'The fill script'); }
+            }, function () { say('The file could not be saved here. Copy the text below instead.'); showText(s, 'The fill script'); });
+          } else {
+            say('This page cannot save files here. Copy the text below instead.');
+            showText(s, 'The fill script');
+          }
+        }));
+        btns = [bScript, bFile];
+      } else {
+        var bMark = h('button', { type: 'button', class: 'fx-btn fx-btn--primary', text: 'Copy bookmark code' });
+        bMark.addEventListener('click', guarded(function (s) { doCopy(BFF.fill.bookmarklet(s), 'bookmark code'); }));
+        btns = [bMark];
+      }
+      btns.forEach(function (b) { if (!ready) b.disabled = true; });
+      return h('div', { class: 'ph-group' }, [h('div', { class: 'fx-actions ph-actions' }, btns), status, shown]);
+    }
+
+    function stepsList(o) {
+      return h('ol', { class: 'ph-list' }, o.steps.map(function (st) {
+        return h('li', {}, [h('span', { text: st.text }), st.action ? actionGroup(st.action) : null]);
+      }));
+    }
 
     var kids = [
       h('h3', { id: 'info-phone-h', text: STEPS.title }),
-      h('p', { text: STEPS.intro })
+      h('p', { text: STEPS.intro }),
+      h('div', { class: 'fx-warn ph-warn', role: 'note' }, [h('strong', { text: STEPS.warnTitle }), list('ul', STEPS.warningsBefore)])
     ];
+    if (!ready) {
+      kids.push(h('p', { class: 'ph-empty', text: 'Fill in My info above first (at least your name, email and address). The Copy buttons turn on once there is something to fill.' }));
+    }
     STEPS.options.forEach(function (o) {
       kids.push(h('section', { class: 'ph-opt', 'aria-labelledby': 'ph-' + o.id }, [
         h('h4', { id: 'ph-' + o.id, text: o.title }),
         o.tag ? h('p', { class: 'ph-tag', text: o.tag }) : null,
         o.lead ? h('p', { text: o.lead }) : null,
-        list('ol', o.steps),
+        stepsList(o),
         o.note ? h('p', { class: 'fx-muted', text: o.note }) : null
       ]));
     });
@@ -4776,13 +4820,8 @@ main:focus { outline: none; }
         list('ol', STEPS.homeScreen.steps)
       ]));
     }
-    kids.push(h('div', { class: 'fx-warn ph-warn', role: 'note' }, [h('strong', { text: STEPS.warnTitle }), list('ul', STEPS.warnings)]));
-    if (!ready) {
-      kids.push(h('p', { class: 'ph-empty', text: 'Fill in My info above first (at least your name, email and address). The buttons turn on once there is something to fill.' }));
-    }
-    kids.push(h('div', { class: 'fx-actions ph-actions' }, [bScript, bMark, bFile]));
-    kids.push(status);
-    kids.push(shown);
+    kids.push(h('h4', { text: 'Good to know' }));
+    kids.push(list('ul', STEPS.warningsAfter));
     kids.push(h('h4', { text: 'What the script does' }));
     kids.push(list('ul', STEPS.does));
     kids.push(h('h4', { text: 'What it will not do' }));

@@ -182,11 +182,16 @@
     /\b(?:confirm|verify|validate|activate)\b[^.!?]{0,40}\b(?:e-?mail|address|subscription|account|sign-?\s?up|registration|membership)\b/,
     /\bone more step\b/, /\bfinish (?:signing up|your (?:sign-?\s?up|registration))\b/, /\bplease (?:confirm|verify)\b/
   ];
+  // "on the way" alone is not shipping news ("your baby is on the way"): it needs a parcel word in front of it.
+  var PARCEL = '(?:order|package|box|shipment|parcel|samples?|kit|delivery|items?|gift|formula|diapers?)';
   var SHIPPED_RES = [
-    /\b(?:has|have|just|now|been|was)\s+shipped\b/, /^shipped\b/, /\bshipped[!:]/, /\bon (?:its|the) way\b/, /\bout for delivery\b/, /\bis on the way\b/
+    /\b(?:has|have|just|now|been|was)\s+shipped\b/, /^shipped\b/, /\bshipped[!:]/, new RegExp('\\b' + PARCEL + '\\s+(?:is|are|was|were)?\\s*on (?:its|their|the) way\\b'), /\bout for delivery\b/
   ];
+  // Delivery wording must name the parcel. "Delivered to your door", "now delivered nationwide" and "just delivered" are advertising.
   var DELIVERED_RES = [
-    /\b(?:was|were|has been|have been|just|successfully|now)\s+delivered\b/, /^delivered\b/, /\bdelivered[!:]/, /\b(?:order|package|box|shipment|parcel|delivery)\s+delivered\b/
+    new RegExp('\\b' + PARCEL + '\\s+(?:was|were|has been|have been|is)\\s+(?:successfully\\s+)?delivered\\b'),
+    new RegExp('\\b' + PARCEL + '\\s+delivered\\b'),
+    /^delivered\s*[:!\-\u2013\u2014]/, /\bdelivered[!:]\s/, /\b(?:was|were|has been|have been)\s+(?:successfully\s+)?delivered\b/
   ];
   var WELCOME_RES = [
     /\bwelcome (?:to|aboard)\b/, /^welcome\b/, /\bthanks?(?: you)? for (?:signing up|joining|subscribing|registering|your registration)\b/,
@@ -386,10 +391,10 @@
 
   // ---- errors ----
   var GROUPS = {
-    consent_required: 'said-no', approval_required: 'said-no', not_granted: 'said-no',
+    consent_required: 'said-no', approval_required: 'said-no', not_granted: 'said-no', not_in_manifest: 'said-no',
     needs_reauth: 'connect', server_not_connected: 'connect', server_not_found: 'connect', selection_required: 'connect',
     rate_limited: 'later', server_unavailable: 'later', upstream_error: 'later',
-    blocked_by_policy: 'unavailable', not_in_manifest: 'unavailable', capability_disabled: 'unavailable', capability_removed: 'unavailable', self_only: 'unavailable', user_changed: 'unavailable',
+    blocked_by_policy: 'unavailable', capability_disabled: 'unavailable', capability_removed: 'unavailable', self_only: 'unavailable', user_changed: 'unavailable',
     tool_error: 'failed', bad_request: 'failed', cancelled: 'failed', transform_error: 'failed'
   };
   var COPY = {

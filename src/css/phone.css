@@ -8,7 +8,8 @@
 .ph-list li { margin: var(--space-2) 0; }
 .ph-warn { border: 1px solid var(--warning-border); background: var(--warning-bg); color: var(--warning-text); }
 .ph-empty { margin: var(--space-3) 0; padding: var(--space-3); border: 1px dashed var(--border-strong); border-radius: var(--radius-sm); background: var(--surface-2); color: var(--text); }
-.ph-actions { flex-direction: column; align-items: stretch; }
+.ph-actions { flex-direction: column; align-items: stretch; margin: var(--space-2) 0; }
+.ph-group { margin: var(--space-2) 0; }
 .ph-actions .fx-btn { width: 100%; min-height: 48px; }
 .ph-status { min-height: 1.4em; margin: var(--space-2) 0; color: var(--text); font-weight: 600; }
 .ph-status:empty { display: none; }

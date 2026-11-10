@@ -379,3 +379,96 @@ test('fieldmatch: one source, same API as the helper wrapper', async () => {
   assert.equal(FM.classifyField({ type: 'text', autocomplete: 'cc-number' }), null);
   assert.ok(!FM.factory.toString().includes('\n//'), 'no line comments in the embedded factory');
 });
+
+// ---- review V1 additions ----
+test('registrableDomain: odd hosts cannot pass for an official domain', () => {
+  const R = FM.registrableDomain;
+  assert.equal(R('https://evil.example\\@similac.com/'), 'evil.example'); // backslash ends the host
+  assert.equal(R('https://similac.com@evil.example/'), 'evil.example');
+  assert.equal(R('https://user:pw@www.similac.com:8443/x'), 'similac.com');
+  assert.equal(R('WWW.Similac.COM.'), 'similac.com');
+  assert.equal(R('1.2.3.4'), '1.2.3.4'); // an IP literal is never a "domain" of two labels
+  assert.equal(R('[::1]'), '[::1]');
+  assert.equal(R('xn--simlac-9wa.com'), 'xn--simlac-9wa.com');
+  assert.equal(R('evil.example.co.uk'), 'example.co.uk');
+  assert.equal(R('shop.example.com.au'), 'example.com.au');
+  assert.equal(R('x.example.or.jp'), 'example.or.jp');
+  for (const href of ['blob:https://www.similac.com/uuid', 'data:text/html,similac.com', 'about:blank', 'javascript:0']) {
+    const r = run(script(), { href: 'https://www.similac.com/', setup: standard });
+    assert.equal(r.result.ok, true);
+    const w = makeWindow('https://www.similac.com/');
+    w.location.hostname = ''; w.location.protocol = new URL(href).protocol;
+    const doc = w.document; doc.fields.length = 0;
+    const ctx = { window: w, document: doc, completion() { } };
+    vm.createContext(ctx);
+    assert.equal(vm.runInContext(script(), ctx).ok, false, href);
+  }
+});
+
+test('a program on a shared hosting domain never becomes a gate', () => {
+  const s = F.build({ profile: PROFILE, programs: [
+    { id: 'shop', name: 'Shop', signupUrl: 'https://brand.myshopify.com/' },
+    { id: 'pages', name: 'Pages', signupUrl: 'https://brand.github.io/signup' },
+    { id: 'ok', name: 'Ok', signupUrl: 'https://www.similac.com/a' }] });
+  assert.equal(run(s, { href: 'https://evil.myshopify.com/', setup: standard }).result.ok, false);
+  assert.equal(run(s, { href: 'https://evil.github.io/', setup: standard }).result.ok, false);
+  assert.equal(run(s, { href: 'https://www.similac.com/', setup: standard }).result.ok, true);
+});
+
+test('classification: fields for another person or another purpose stay empty', () => {
+  const c = (o) => FM.classifyField(o);
+  assert.equal(c({ label: 'Middle name', name: 'middle' }), null);
+  assert.equal(c({ label: 'Name on card' }), null);
+  assert.equal(c({ label: 'Cardholder name' }), null);
+  assert.equal(c({ label: 'Maiden name' }), null);
+  assert.equal(c({ label: 'Preferred name' }), null);
+  assert.equal(c({ label: 'Friend’s email', type: 'email' }), null);
+  assert.equal(c({ label: 'Promo code' }), null);
+  assert.equal(c({ label: 'Search', type: 'text' }), null);
+  assert.equal(c({ name: 'q', placeholder: 'Search or enter keyword' }), null);
+  assert.equal(c({ label: 'Find a store near you: ZIP' }), null);
+  assert.equal(c({ label: 'Preferred delivery date', type: 'date' }), null);
+  assert.equal(c({ label: 'Baby’s birthday', type: 'date' }), null);
+  assert.equal(c({ label: 'Date of birth' }), null);
+  assert.equal(c({ label: 'Baby name', autocomplete: 'given-name' }), null);
+  assert.equal(c({ label: 'Username' }), null);
+  assert.equal(c({ label: 'Baby due date', type: 'date' }), 'dueDate');
+  assert.equal(c({ label: 'Expected delivery date (due date)' }), 'dueDate');
+  assert.equal(c({ label: 'Full name' }), 'fullName');
+  assert.equal(c({ label: 'First name' }), 'firstName');
+});
+
+test('search forms and autocomplete boxes are never filled', () => {
+  const r = run(script(), {
+    setup(win) {
+      const a = field(win, { label: 'ZIP code' });
+      const b = field(win, { label: 'ZIP code' });
+      a.closest = (sel) => (/role="search"/.test(sel) ? {} : null);
+      return { a, b };
+    }
+  });
+  assert.equal(r.els.a.events.length, 0);
+  assert.ok(r.els.b.events.length > 0);
+});
+
+test('the embedded script holds no raw line or paragraph separator, even for a hostile profile', () => {
+  const hostile = { ...PROFILE, firstName: 'a' + String.fromCharCode(0x2028) + 'b' + String.fromCharCode(0x2029) + '</script>%22"\\\'' };
+  const s = F.build({ profile: hostile, programs: progs });
+  assert.ok(!s.includes(String.fromCharCode(0x2028)) && !s.includes(String.fromCharCode(0x2029)));
+  assert.ok(!/<\/script/i.test(s));
+  const b = F.bookmarklet(s);
+  assert.ok(/^javascript:[A-Za-z0-9%._~!*'()-]*$/.test(b));
+  assert.equal(decodeURIComponent(b.slice(11)).startsWith(s), true);
+  for (const f of ['../src/js/fillscript.js', '../src/js/fieldmatch.js', '../src/js/inbox.js', '../src/js/inboxview.js', '../src/js/phone.js']) {
+    const t = readFileSync(new URL(f, import.meta.url), 'utf8');
+    assert.ok(!t.includes(String.fromCharCode(0x2028)) && !t.includes(String.fromCharCode(0x2029)), f);
+  }
+});
+
+test('phone card: warnings come before the first button and each button sits inside its step', () => {
+  const src = readFileSync(new URL('../src/js/phone.js', import.meta.url), 'utf8');
+  assert.ok(src.indexOf('warningsBefore)') < src.indexOf('STEPS.options.forEach'));
+  assert.doesNotMatch(src, /Settings, then Apps, then Shortcuts/);
+  assert.match(src, /iOS 18 and older/);
+  assert.match(src, /Settings, tap Shortcuts, then Advanced/);
+});

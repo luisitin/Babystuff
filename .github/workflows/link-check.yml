@@ -112,8 +112,18 @@ jobs:
               }
             } else if (existing) {
               const date = new Date().toISOString().slice(0, 10);
+              let summaryLine = `No broken links found on ${date}.`;
+              try {
+                const data = JSON.parse(fs.readFileSync('link-report.json', 'utf8'));
+                const ok = data.summary.byClass.OK;
+                const blocked = data.summary.byClass.BLOCKED;
+                const total = data.summary.total;
+                if (![ok, blocked, total].every(Number.isFinite)) throw new Error('unexpected link-report.json shape');
+                summaryLine = `No broken links on ${date}: ${ok} of ${total} links answered OK.`;
+                if (blocked > 0) summaryLine += ` ${blocked} could not be checked automatically because the site refuses robots; open those by hand.`;
+              } catch (e) { /* counts unavailable: keep the generic line */ }
               await github.rest.issues.createComment({
-                owner, repo, issue_number: existing.number, body: `All links OK on ${date}`,
+                owner, repo, issue_number: existing.number, body: `${summaryLine}\nWorkflow run: ${runUrl}`,
               });
               await github.rest.issues.update({
                 owner, repo, issue_number: existing.number, state: 'closed', state_reason: 'completed',

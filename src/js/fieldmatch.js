@@ -29,8 +29,8 @@
       button: 1, reset: 1, image: 1, color: 1, range: 1
     };
 
-    var SKIP_WORDS = /\b(password|passwd|pwd|passcode|pin|card|credit|debit|cc|ccnum|cvv|cvc|cvn|csc|security code|expir\w*|ssn|social security|insurance|insurer|member id|member number|policy|subscriber|medicaid|medicare|wic|case number|bank|routing|account number|search|captcha|promo|coupon|referral)\b/;
-    var OTHER_NAME = /\b(baby|child|children|infant|newborn|spouse|partner|friend|referr\w*|recipient|company|business|organization|employer|username|user name|nickname|pet|hospital|doctor|physician|provider)\b/;
+    var SKIP_WORDS = /\b(password|passwd|pwd|passcode|pin|card|credit|debit|cc|ccnum|cvv|cvc|cvn|csc|security code|expir\w*|ssn|social security|insurance|insurer|member id|member number|policy|subscriber|medicaid|medicare|wic|case number|bank|routing|account number|search|query|keyword|keywords|locator|find a store|store finder|captcha|promo|coupon|voucher|offer code|discount|referral|cardholder|iban|passport|license|licence|driver s|dob|birth ?date|date of birth|birthday|age|gender|sex|race|ethnicity|income|salary|tax|ein|vin)\b/;
+    var OTHER_NAME = /\b(baby|child|children|infant|newborn|spouse|partner|friend|referr\w*|recipient|company|business|organization|employer|username|user name|nickname|pet|hospital|doctor|physician|provider|middle|maiden|preferred|display|screen|account|holder|file|product|school|store|team|group|facility|event|list|login|gift)\b/;
     var OTHER_PERSON = /\b(spouse|partner|husband|wife|fianc\w*|doctor|dr|physician|ob|obgyn|midwife|doula|provider|hospital|clinic|pediatrician|gift|recipient|friend|referr\w*|referral|emergency|contact person|guardian|grandparent\w*|grandmother|grandfather|sibling|sister|brother|relative|caregiver|nanny|sponsor|witness|manager|supervisor|teacher|employer|company|business|organization|work|other parent|second parent|mother s|father s|mom s|dad s)\b/;
     var OTHER_THING = /\b(last menstrual\w*|menstrual|lmp|first time|phone type|mobile type|cell type|phone carrier|carrier|contact preference|preferred contact|best time|email type|address type|how did you hear)\b/;
     var HONEYPOT = /\b(honeypot|honey pot|hp|hpot|leave blank|leave empty|do not fill|dont fill|bot trap|trap|url2|website2|fax)\b/;
@@ -50,7 +50,7 @@
       'postal-code': 'zip'
     };
 
-    var SECOND_LEVEL = { co: 1, com: 1, org: 1, net: 1, gov: 1, edu: 1, ac: 1 };
+    var SECOND_LEVEL = { co: 1, com: 1, org: 1, net: 1, gov: 1, edu: 1, ac: 1, ne: 1, or: 1, go: 1, gob: 1, gouv: 1, mil: 1, sch: 1, nom: 1, ltd: 1, plc: 1, nhs: 1 };
 
     function norm(s) {
       return String(s == null ? '' : s)
@@ -63,7 +63,7 @@
     function fromText(t, type) {
       if (!t) return null;
       var has = function (re) { return re.test(t); };
-      var dueCtx = has(/\b(due|expected|edd|delivery|baby s birth|birth date of baby)\b/);
+      var dueCtx = has(/\b(due|expected|edd)\b/);
       if (dueCtx) {
         if (type === 'date') return 'dueDate';
         if (has(/\bmonth\b|\bmm\b/)) return 'dueMonth';
@@ -99,10 +99,11 @@
 
     function registrableDomain(urlOrHost) {
       var host = String(urlOrHost || '');
-      var m = /^[a-z][a-z0-9+.-]*:\/\/(?:[^\/?#@]*@)?(\[[^\]]*\]|[^\/?#:]*)/i.exec(host);
+      var m = /^[a-z][a-z0-9+.-]*:[\/\\]{2}(?:[^\/\\?#@]*@)?(\[[^\]]*\]|[^\/\\?#:]*)/i.exec(host);
       if (m) host = m[1];
       var labels = host.toLowerCase().replace(/\.$/, '').split('.').filter(Boolean);
       if (labels.length <= 2) return labels.join('.');
+      if (/^[0-9]+$/.test(labels[labels.length - 1])) return labels.join('.');
       var tld = labels[labels.length - 1];
       var take = tld.length === 2 && SECOND_LEVEL[labels[labels.length - 2]] === 1 ? 3 : 2;
       return labels.slice(-take).join('.');
@@ -133,13 +134,16 @@
       var all = parts.join(' ');
       if (SKIP_WORDS.test(all) || OTHER_PERSON.test(all) || OTHER_THING.test(all) || HONEYPOT.test(all)) return null;
 
-      if (acKind) return acKind;
+      if (acKind) {
+        if ((acKind === 'firstName' || acKind === 'lastName' || acKind === 'fullName') && OTHER_NAME.test(all)) return null;
+        return acKind;
+      }
       if (acToken === 'bday' || (acToken && acToken.indexOf('bday-') === 0)) return null;
 
       if (type === 'email') return 'email';
       if (type === 'tel') return 'phone';
       if (type === 'date') {
-        return /\b(due|expected|edd|delivery|baby)\b/.test(all) ? 'dueDate' : null;
+        return /\b(due|expected|edd)\b/.test(all) ? 'dueDate' : null;
       }
       if (type === 'number' && !/\b(zip|postal|due|month|day|year|phone)\b/.test(all)) return null;
 

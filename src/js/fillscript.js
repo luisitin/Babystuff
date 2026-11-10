@@ -128,6 +128,9 @@
         var type = tag === 'input' ? String(el.getAttribute('type') || 'text').toLowerCase() : tag;
         if (IGNORE[type] === 1) continue;
         if (!usable(d, w, el)) continue;
+        var inSearch = false;
+        try { inSearch = !!(el.closest && el.closest('[role="search"], search, [role="combobox"]')); } catch (e) { inSearch = true; }
+        if (inSearch) { skipped++; continue; }
         seen++;
         if (!TOUCH[type] || (tag === 'select' && el.multiple)) { skipped++; continue; }
         var form = el.form;
@@ -208,6 +211,9 @@
     return out;
   }
 
+  /* Hosting platforms where anyone can get a sub-domain. A program on one of these is never a safe gate. */
+  var SHARED_HOSTS = /^(?:github\.io|githubusercontent\.com|gitlab\.io|herokuapp\.com|blogspot\.com|wordpress\.com|myshopify\.com|wixsite\.com|weebly\.com|squarespace\.com|netlify\.app|vercel\.app|pages\.dev|workers\.dev|web\.app|firebaseapp\.com|azurewebsites\.net|cloudfront\.net|amazonaws\.com|appspot\.com|force\.com|salesforce\.com|typeform\.com|forms\.gle|google\.com|googleusercontent\.com|facebook\.com|instagram\.com|linkedin\.com|medium\.com|substack\.com|bit\.ly|tinyurl\.com|[a-z]{2}\.us|co\.uk|com\.au)$/;
+
   function programList(programs, profile, tagMap) {
     var fm = FM(), em = EM();
     var map = tagMap && typeof tagMap === 'object' ? tagMap : {};
@@ -216,7 +222,7 @@
     (Array.isArray(programs) ? programs : []).forEach(function (p) {
       if (!p || typeof p.signupUrl !== 'string' || p.signupUrl.indexOf('https://') !== 0) return;
       var domain = fm.registrableDomain(p.signupUrl);
-      if (!domain || !p.id || seen[p.id]) return;
+      if (!domain || !p.id || seen[p.id] || SHARED_HOSTS.test(domain)) return;
       seen[p.id] = true;
       var email = usePlus && typeof map[p.id] === 'string' && map[p.id] ? em.plusAddress(profile.email, map[p.id]) : '';
       out.push({ domain: domain, id: String(p.id), name: String(p.name || ''), email: email });

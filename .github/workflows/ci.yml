@@ -23,9 +23,9 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-      - name: Build index.html
+      - name: Build index.html and artifact.html
         run: node scripts/build.mjs
-      - name: Check index.html is up to date
+      - name: Check the built files are up to date
         run: |
           if ! git diff --exit-code; then
             echo "::error::index.html is stale. Run 'node scripts/build.mjs' locally and commit the result."

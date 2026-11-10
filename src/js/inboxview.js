@@ -146,7 +146,7 @@
       btnClear.hidden = !(matches && (matches.length || checkedPrompted));
       var notes = [];
       if (ready && off.check) notes.push('Searching is not available in this Gmail connection.');
-      if (ready && (off.label || off.draft)) notes.push('Claude only lets a page use Gmail tools that are allowed without asking each time. Labels and drafts are off for this page; checking your mail still works.');
+      if (ready && (off.label || off.draft)) notes.push('This Gmail connection does not offer labels or drafts to this page, so those buttons are hidden. Checking your mail still works.');
       unavailable.textContent = '';
       notes.forEach(function (t) { unavailable.appendChild(h('li', { text: t })); });
       unavailable.hidden = !notes.length;
@@ -205,7 +205,8 @@
       var code = codeOf(e), g = I().errorGroup(code);
       showErr(I().errorCopy(code));
       say('');
-      if (g === 'said-no') noRetry = true;
+      // Only a refusal that will not change on its own switches the card off. A declined prompt may be answered differently on the next tap.
+      if (code === 'not_granted' || code === 'not_in_manifest') noRetry = true;
       if (g === 'connect') needConnect = true;
       if (I().clearsData(code)) clearData();
       if (g === 'unavailable') { if (code === 'blocked_by_policy') off[feature] = true; else dead = true; }
@@ -232,7 +233,7 @@
         var token = '';
         for (var page = 0; page < MAX_PAGES; page++) {
           say('Searching ' + (q + 1) + ' of ' + qs.length + (page ? ', page ' + (page + 1) : '') + '…');
-          var input = { query: qs[q].query, pageSize: PAGE_SIZE, view: 'SUMMARY' };
+          var input = { query: qs[q].query, pageSize: PAGE_SIZE, view: 'THREAD_VIEW_SUMMARY' };
           if (token) input.pageToken = token;
           var p = await call('search_threads', input, true);
           (Array.isArray(p.threads) ? p.threads : []).forEach(function (t) {
@@ -403,8 +404,9 @@
         try { await call('label_thread', { threadId: ids[i], labelIds: [labelId] }, false); ok++; }
         catch (e) {
           bad++; if (!firstBad) firstBad = e;
-          // Stop at once when the page is no longer allowed to write; keep going on a one-off failure.
-          if (I().clearsData(codeOf(e))) { fail(e, 'label'); return; }
+          // Stop at once when the page is not allowed to write or Gmail is busy; keep going only on a one-off failure of one thread.
+          // fail() clears the screen for refusals, so the count is shown again after it.
+          if (I().errorGroup(codeOf(e)) !== 'failed') { fail(e, 'label'); if (ok) done.textContent = 'Labelled ' + ok + ' of ' + plural(ids.length, 'conversation') + ' before it stopped.'; return; }
         }
       }
       say('');
