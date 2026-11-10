@@ -29,6 +29,20 @@
     { key: 'job', label: 'Do you or your partner have a paid job?', options: [['yes', 'Yes'], ['no', 'No']] }
   ];
   var sitSel = {}, sitField = {};
+  var phoneFold = null;
+
+  // bff.prefs.v1.infoFillOpen: whether the phone fold is open. Read the object, change the key, write it back.
+  function readFillOpen() {
+    var p = store.get('prefs.v1', {});
+    return !!(p && typeof p === 'object' && p.infoFillOpen === true);
+  }
+  function writeFillOpen(open) {
+    var p = store.get('prefs.v1', {});
+    if (!p || typeof p !== 'object') p = {};
+    if (!!p.infoFillOpen === !!open) return;
+    p.infoFillOpen = !!open;
+    store.set('prefs.v1', p);
+  }
 
   var CHECKS = {
     email: { re: /^[^\s@]+@[^\s@]+\.[^\s@]+$/, msg: 'This does not look like an email address. You can still save it.' },
@@ -264,7 +278,15 @@
       el.appendChild(clearRow);
       el.appendChild(statusEl);
       var phoneNode = h('div', { id: 'info-fill' });
-      el.appendChild(phoneNode);
+      // The phone section is long and most people open it once, so it sits in a fold that remembers its state.
+      // phone.js redraws only the inside of #info-fill, so a redraw never closes the fold.
+      phoneFold = h('details', { class: 'fx-card ph-fold', id: 'info-fill-fold' }, [
+        h('summary', { class: 'ph-fold-sum', id: 'info-fill-sum', text: 'Fill forms on your phone (iPhone shortcut or bookmark)' }),
+        phoneNode
+      ]);
+      phoneFold.open = readFillOpen();
+      phoneFold.addEventListener('toggle', function () { writeFillOpen(phoneFold.open); });
+      el.appendChild(phoneFold);
       if (BFF.phoneView && BFF.phoneView.mount) BFF.phoneView.mount(phoneNode);
       fill();
       function flush() { if (timer) { clearTimeout(timer); saveNow(); } }
@@ -273,6 +295,20 @@
     },
     show: function () {
       if (!timer) fill();
+      // Arrived through the guided page's "Set up the fill script" link: open the fold, scroll to it, focus its summary.
+      // Done after the router has moved focus and scrolled to the top.
+      if (BFF.openInfoFill) {
+        BFF.openInfoFill = false;
+        setTimeout(function () {
+          if (!phoneFold) return;
+          phoneFold.open = true;
+          var reduce = false;
+          try { reduce = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches); } catch (e) {}
+          var sum = phoneFold.querySelector('summary');
+          try { phoneFold.scrollIntoView({ block: 'start', behavior: reduce ? 'auto' : 'smooth' }); } catch (e) { phoneFold.scrollIntoView(); }
+          if (sum) sum.focus({ preventScroll: true });
+        }, 0);
+      }
     }
   };
 })();

@@ -445,6 +445,45 @@ details.dir-filters { display: block; background: var(--surface); border: 1px so
 .card-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0 var(--space-2); }
 .card-head h3, .card-head h4 { flex: 0 1 auto; max-width: 100%; }
 .card-head .card-brand { flex: 0 1 auto; min-width: 0; }
+
+/* Guided setup list: grouped rows, folds for alternates and for purchase-only offers */
+.fx-pick-item.fx-grp { flex-direction: column; align-items: stretch; gap: 0; padding: var(--space-1) 0; }
+.fx-pick-row { display: flex; align-items: flex-start; gap: var(--space-3); }
+.fx-pick-row label { display: flex; flex-direction: column; min-height: 44px; justify-content: center; flex: 1; min-width: 0; cursor: pointer; gap: 0; line-height: 1.3; }
+.fx-pick-row input { width: 24px; height: 24px; flex: none; margin-top: 10px; accent-color: var(--primary); }
+.fx-pick-row input:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+.fx-pick-free { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; line-clamp: 2; overflow: hidden; }
+.fx-pick-meta { font-size: .8125rem; }
+.fx-alt, .fx-side { margin: 0; }
+.fx-alt { margin-left: calc(24px + var(--space-3)); }
+.fx-alt > summary, .fx-side > summary { display: flex; align-items: center; min-height: 44px; cursor: pointer; font-weight: 600; color: var(--primary); }
+.fx-alt > summary:focus-visible, .fx-side > summary:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+.fx-alt-list { border-left: 2px solid var(--border); padding-left: var(--space-3); margin-bottom: var(--space-1); }
+.fx-pick-alt { padding: var(--space-1) 0; }
+.fx-side { margin-top: var(--space-3); border-top: 1px solid var(--border); }
+
+/* Programs page header: fewer, tighter lines above the first card */
+.dir-summary { padding: var(--space-2) var(--space-3); gap: var(--space-2); margin: 0 0 var(--space-2); }
+.sum-top { display: flex; align-items: center; gap: var(--space-3); }
+.sum-top .sum-main { flex: 1 1 0; min-width: 0; font-size: .9375rem; line-height: 1.35; }
+.sum-top .sum-show { flex: none; }
+.sum-due { display: grid; gap: var(--space-1); }
+.sum-due-head { font-size: .9375rem; }
+.sum-due .when-buttons { gap: var(--space-2); }
+.sum-due .when-buttons .btn { display: block; width: 100%; height: 100%; min-height: 44px; padding: var(--space-1) var(--space-2); font-size: .8125rem; line-height: 1.2; text-align: center; }
+.sum-due .when-buttons strong { font-size: inherit; }
+.filters-search .field > label { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+.filters-search { margin: 0 0 var(--space-1); }
+.kind-tabs { margin: 0 0 var(--space-1); }
+details.dir-filters { margin: 0 0 var(--space-1); }
+.dir-state { flex-wrap: nowrap; margin: var(--space-1) 0 0; padding: 0 var(--space-3); min-height: 44px; border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--surface); font-size: .875rem; gap: var(--space-2); }
+.dir-state p { flex: 1 1 0; min-width: 0; padding: var(--space-1) 0; line-height: 1.3; }
+.dir-state .btn { flex: none; }
+.result-row { margin: var(--space-1) 0; }
+.start-row { margin: 0 0 var(--space-2); }
+@media (min-width: 640px) {
+  .sum-due .when-buttons .btn { width: auto; display: inline-flex; align-items: center; padding: 0 var(--space-3); font-size: .9375rem; }
+}
 /* Styles for My info, Tracker and Do it for me. Uses base.css tokens, with fallbacks. */
 .fx-view, .fx-confirm { --fx-bg: var(--bg, #fff); --fx-surface: var(--surface, #f6f7f9); --fx-text: var(--text, #1c2430); --fx-muted: var(--muted, #5b6676);
   --fx-primary: var(--primary, #2457c5); --fx-pc: var(--primary-contrast, #fff); --fx-border: var(--border, #cfd6e0);
@@ -647,6 +686,14 @@ details.dir-filters { display: block; background: var(--surface); border: 1px so
 }
 .ph-tag { margin: 0 0 var(--space-2); color: var(--muted); font-size: .9em; font-weight: 600; }
 .ph-warn .ph-list { padding-left: var(--space-4); }
+
+/* The phone section sits in a fold in My info. The summary names it, so its own heading is read but not shown twice. */
+.ph-fold { padding: 0 var(--space-4); }
+.ph-fold-sum { display: flex; align-items: center; min-height: 48px; cursor: pointer; font-weight: 600; color: var(--primary); }
+.ph-fold-sum:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+.ph-fold[open] > .ph-fold-sum { border-bottom: 1px solid var(--border); margin-bottom: var(--space-2); }
+.ph-fold .ph-card { border: 0; padding: 0 0 var(--space-3); margin: 0; background: none; box-shadow: none; }
+.ph-fold .ph-card > h3 { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
 </style>
 </head>
 <body>
@@ -4014,6 +4061,20 @@ details.dir-filters { display: block; background: var(--surface); border: 1px so
     { key: 'job', label: 'Do you or your partner have a paid job?', options: [['yes', 'Yes'], ['no', 'No']] }
   ];
   var sitSel = {}, sitField = {};
+  var phoneFold = null;
+
+  // bff.prefs.v1.infoFillOpen: whether the phone fold is open. Read the object, change the key, write it back.
+  function readFillOpen() {
+    var p = store.get('prefs.v1', {});
+    return !!(p && typeof p === 'object' && p.infoFillOpen === true);
+  }
+  function writeFillOpen(open) {
+    var p = store.get('prefs.v1', {});
+    if (!p || typeof p !== 'object') p = {};
+    if (!!p.infoFillOpen === !!open) return;
+    p.infoFillOpen = !!open;
+    store.set('prefs.v1', p);
+  }
 
   var CHECKS = {
     email: { re: /^[^\s@]+@[^\s@]+\.[^\s@]+$/, msg: 'This does not look like an email address. You can still save it.' },
@@ -4249,7 +4310,15 @@ details.dir-filters { display: block; background: var(--surface); border: 1px so
       el.appendChild(clearRow);
       el.appendChild(statusEl);
       var phoneNode = h('div', { id: 'info-fill' });
-      el.appendChild(phoneNode);
+      // The phone section is long and most people open it once, so it sits in a fold that remembers its state.
+      // phone.js redraws only the inside of #info-fill, so a redraw never closes the fold.
+      phoneFold = h('details', { class: 'fx-card ph-fold', id: 'info-fill-fold' }, [
+        h('summary', { class: 'ph-fold-sum', id: 'info-fill-sum', text: 'Fill forms on your phone (iPhone shortcut or bookmark)' }),
+        phoneNode
+      ]);
+      phoneFold.open = readFillOpen();
+      phoneFold.addEventListener('toggle', function () { writeFillOpen(phoneFold.open); });
+      el.appendChild(phoneFold);
       if (BFF.phoneView && BFF.phoneView.mount) BFF.phoneView.mount(phoneNode);
       fill();
       function flush() { if (timer) { clearTimeout(timer); saveNow(); } }
@@ -4258,6 +4327,20 @@ details.dir-filters { display: block; background: var(--surface); border: 1px so
     },
     show: function () {
       if (!timer) fill();
+      // Arrived through the guided page's "Set up the fill script" link: open the fold, scroll to it, focus its summary.
+      // Done after the router has moved focus and scrolled to the top.
+      if (BFF.openInfoFill) {
+        BFF.openInfoFill = false;
+        setTimeout(function () {
+          if (!phoneFold) return;
+          phoneFold.open = true;
+          var reduce = false;
+          try { reduce = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches); } catch (e) {}
+          var sum = phoneFold.querySelector('summary');
+          try { phoneFold.scrollIntoView({ block: 'start', behavior: reduce ? 'auto' : 'smooth' }); } catch (e) { phoneFold.scrollIntoView(); }
+          if (sum) sum.focus({ preventScroll: true });
+        }, 0);
+      }
     }
   };
 })();
@@ -4737,16 +4820,15 @@ details.dir-filters { display: block; background: var(--surface); border: 1px so
     var freeGroups = distinctGroups(free);
     var tv = L.totalValue(free);
     var lo = L.roundTotal(tv.low), hi = L.roundTotal(tv.high);
-    var worth = '.';
-    if (tv.count) worth = ', worth about ' + (lo === hi ? L.money(lo) : L.money(lo) + ' to ' + L.money(hi)) + ' together.';
-    box.appendChild(h('p', { class: 'sum-main' }, [
+    var noValue = free.filter(function (p) { return L.valueMid(p) === null; }).length;
+    var worth = '. No dollar value is known for these programs yet.';
+    var skipNote = noValue ? '; ' + noValue + (noValue === 1 ? ' has' : ' have') + ' no known value and ' + (noValue === 1 ? 'is' : 'are') + ' not counted' : '';
+    if (tv.count) worth = ', worth about ' + (lo === hi ? L.money(lo) : L.money(lo) + ' to ' + L.money(hi)) + ' together (our estimate, from ordinary shelf prices' + skipNote + ').';
+    var mainKids = [
       h('strong', { text: freeGroups + ' truly free ' + (freeGroups === 1 ? 'program' : 'programs') + ' open to everyone' }),
       document.createTextNode(worth)
-    ]));
-    var noValue = free.filter(function (p) { return L.valueMid(p) === null; }).length;
-    box.appendChild(h('p', { class: 'dir-note', text: tv.count
-      ? 'This is our estimate, from ordinary shelf prices.' + (noValue ? ' ' + noValue + (noValue === 1 ? ' has' : ' have') + ' no known value and ' + (noValue === 1 ? 'is' : 'are') + ' not counted.' : '')
-      : 'No dollar value is known for these programs yet.' }));
+    ];
+    var top = h('div', { class: 'sum-top' }, [h('p', { class: 'sum-main' }, mainKids)]);
     var more = distinctGroups(pool.filter(function (p) {
       var v = L.verdict(p);
       return L.needsQualifying(p) && (v === 'top' || v === 'good' || v === 'small') && L.fit(p, L.hasSituation(profile) ? profile : {}) !== 'no';
@@ -4768,18 +4850,12 @@ details.dir-filters { display: block; background: var(--surface); border: 1px so
         render();
         els.count.focus();
       });
-      box.appendChild(h('p', { class: 'sum-show' }, [show]));
+      top.appendChild(h('p', { class: 'sum-show' }, [show]));
     }
-    box.appendChild(h('p', { class: 'sum-more', text: more + ' more ' + (more === 1 ? 'is' : 'are') + ' free if you qualify (income, insurance or where you live).' }));
-    var money = distinctGroups(pool.filter(function (p) { return L.kindOf(p) === 'money'; }));
-    if (money > 0) {
-      box.appendChild(h('p', { class: 'sum-money', text: money + ' money ' + (money === 1 ? 'program (tax credits, savings deposits, paid leave) is' : 'programs (tax credits, savings deposits, paid leave) are') + ' under Money.' }));
-    }
-    if (L.hasSituation(profile)) {
-      var fits = pool.filter(function (p) { return L.fit(p, profile) === 'yes'; }).length;
-      var hid = fInfo.hidden;
-      box.appendChild(h('p', { class: 'sum-situation', text: fits + (fits === 1 ? ' program fits' : ' programs fit') + ' your answers; ' + hid + ' hidden.' }));
-    } else {
+    box.appendChild(top);
+    box.appendChild(h('p', { class: 'sum-more', text: more + ' more ' + (more === 1 ? 'is' : 'are') + ' free if you qualify.' }));
+    // With answers given, the fit box below says how many programs they hide, so only the prompt is shown here.
+    if (!L.hasSituation(profile)) {
       box.appendChild(h('p', { class: 'sum-situation' }, [
         document.createTextNode('Answer four quick questions in '),
         h('a', { href: '#info', text: 'My info' }),
@@ -4801,7 +4877,7 @@ details.dir-filters { display: block; background: var(--surface); border: 1px so
     if (wk < 0) head = 'Your due date has passed.';
     else if (wk === 0) head = 'Your due date is less than a week away.';
     else head = plural(wk, 'week', 'weeks') + ' until your due date.';
-    box.appendChild(h('p', { class: 'sum-main' }, [h('strong', { text: head })]));
+    var dueBox = h('div', { class: 'sum-due' }, [h('p', { class: 'sum-main sum-due-head' }, [h('strong', { text: head })])]);
     var defs = [['pregnancy', 'do now'], ['late-pregnancy', 'in the last weeks'], ['after-birth', 'after the birth']];
     if (wk < 0) defs = [defs[2]];
     var counts = {};
@@ -4817,7 +4893,8 @@ details.dir-filters { display: block; background: var(--surface); border: 1px so
       b.addEventListener('click', function () { goGroup(d[0]); });
       row.appendChild(h('li', null, [b]));
     });
-    if (row.childNodes.length) box.appendChild(row);
+    if (row.childNodes.length) dueBox.appendChild(row);
+    box.appendChild(dueBox);
   }
 
   function appendGroup(grid, g, level, rankOf, ctx) {
@@ -4977,7 +5054,6 @@ details.dir-filters { display: block; background: var(--surface); border: 1px so
     var r = p.requirements || [];
     return trulyFree(p) && p.category !== 'health-benefits' && p.category !== 'assistance' && r.indexOf('eligibility') < 0 && r.indexOf('insurance') < 0;
   }
-  var NO_FREE = 'Nothing arrives free without a purchase or a win.';
   // Best first. Falls back to the data order when the shared logic is missing.
   function ranked(list) {
     return BFF.logic && BFF.logic.rankPrograms ? BFF.logic.rankPrograms(list) : list.slice();
@@ -4994,7 +5070,13 @@ details.dir-filters { display: block; background: var(--surface); border: 1px so
     var vt = BFF.logic && BFF.logic.valueText ? BFF.logic.valueText(p) : '';
     return [vl, vt].filter(Boolean).join(' \u00b7 ');
   }
-  function freeLine(p) { return p.freeStuff ? p.freeStuff : NO_FREE; }
+  // What arrives free, or the plain sentence for why nothing does (it differs for a tax credit and a prize draw).
+  function freeLine(p) {
+    if (p.freeStuff) return p.freeStuff;
+    return BFF.logic && BFF.logic.freeNote ? BFF.logic.freeNote(p) : 'What arrives is not stated.';
+  }
+  function gkey(p) { return BFF.logic && BFF.logic.groupKey ? BFF.logic.groupKey(p) : (p.sameAs || p.id); }
+  function isSide(p) { var v = BFF.logic && BFF.logic.verdict ? BFF.logic.verdict(p) : ''; return v === 'conditional' || v === 'longshot'; }
   function handled(p) { return T().getStatus(p.id) !== 'todo'; }
   function profile() {
     var p = store.get('profile.v1', {});
@@ -5160,10 +5242,21 @@ details.dir-filters { display: block; background: var(--surface); border: 1px so
     return progs().filter(function (p) { return !hiddenHere(p) || !!(selected && selected[p.id]); });
   }
 
+  // At most one program per group of the same thing (the best ranked one that qualifies),
+  // and none in a group where another member is already signed up or received.
   function initSelection() {
     selected = {};
     preorder = null;
-    progs().forEach(function (p) { if (!handled(p) && !hiddenHere(p) && defaultOn(p)) selected[p.id] = true; });
+    var done = {}, taken = {};
+    progs().forEach(function (p) {
+      var st = T().getStatus(p.id);
+      if (st === 'signed-up' || st === 'received') done[gkey(p)] = true;
+    });
+    ranked(progs()).forEach(function (p) {
+      var k = gkey(p);
+      if (done[k] || taken[k]) return;
+      if (!handled(p) && !hiddenHere(p) && defaultOn(p)) { selected[p.id] = true; taken[k] = true; }
+    });
   }
 
   // ---- views ----
@@ -5178,32 +5271,51 @@ details.dir-filters { display: block; background: var(--surface); border: 1px so
     }
     var count = h('p', { class: 'fx-count', role: 'status', 'aria-live': 'polite' });
     var start = h('button', { type: 'button', class: 'fx-btn fx-btn--primary' });
-    var boxes = [];
-    var shownList = ranked(setupProgs());
+    var boxes = {};
+    var groups = BFF.logic.collapseGroups(ranked(setupProgs()));
+    var mainGroups = groups.filter(function (g) { return !isSide(g.lead); });
+    var sideGroups = groups.filter(function (g) { return isSide(g.lead); });
+    var sideDet = null;
+    var altDets = [];
+    function ids(g) { return [g.lead].concat(g.others); }
     function refresh() {
       var n = Object.keys(selected).length;
-      count.textContent = n + ' of ' + shownList.length + ' selected';
+      var gn = groups.filter(function (g) { return ids(g).some(function (p) { return selected[p.id]; }); }).length;
+      count.textContent = gn + ' of ' + groups.length + ' selected';
       start.textContent = 'Start (' + n + ' program' + (n === 1 ? '' : 's') + ')';
       start.disabled = n === 0;
     }
-    function setAll(fn) {
-      selected = {};
-      shownList.forEach(function (p, i) { var on = fn(p); boxes[i].checked = on; if (on) selected[p.id] = true; });
+    // Folds only ever open here, so nothing is ticked out of sight.
+    function openTicked() {
+      altDets.forEach(function (d) {
+        if (!d.det.open && d.g.others.some(function (p) { return selected[p.id]; })) d.det.open = true;
+      });
+      if (sideDet && !sideDet.open && sideGroups.some(function (g) { return ids(g).some(function (p) { return selected[p.id]; }); })) sideDet.open = true;
+    }
+    function setBox(p, on) { if (on) selected[p.id] = true; else delete selected[p.id]; if (boxes[p.id]) boxes[p.id].checked = !!on; }
+    // leadFn decides each lead; altFn each alternate (null leaves it as it is).
+    function apply(leadFn, altFn) {
+      groups.forEach(function (g) {
+        setBox(g.lead, leadFn(g.lead));
+        g.others.forEach(function (o) { var v = altFn(o); setBox(o, v === null ? !!selected[o.id] : v); });
+      });
+      openTicked();
       refresh();
     }
     var bar = h('div', { class: 'fx-actions' });
-    [['Select all', function () { return true; }], ['Select none', function () { return false; }],
-     ['Truly free only', function (p) { return !handled(p) && trulyFree(p); }]].forEach(function (b) {
+    [['Select all', function () { apply(function () { return true; }, function () { return null; }); }],
+     ['Select none', function () { apply(function () { return false; }, function () { return false; }); }],
+     ['Truly free only', function () { apply(function (p) { return !handled(p) && trulyFree(p); }, function () { return false; }); }]].forEach(function (b) {
       var btn = h('button', { type: 'button', class: 'fx-btn', text: b[0] });
-      btn.addEventListener('click', function () { setAll(b[1]); });
+      btn.addEventListener('click', b[1]);
       bar.appendChild(btn);
     });
     body.appendChild(bar);
     var at = autoToggle('setup');
     if (at) body.appendChild(at);
     body.appendChild(count);
-    var list = h('ul', { class: 'fx-pick' });
-    shownList.forEach(function (p, i) {
+
+    function pickRow(p, cls) {
       var id = 'gd-pick-' + p.id;
       var cb = h('input', { type: 'checkbox', id: id });
       cb.checked = !!selected[p.id];
@@ -5211,29 +5323,49 @@ details.dir-filters { display: block; background: var(--surface); border: 1px so
         if (cb.checked) selected[p.id] = true; else delete selected[p.id];
         refresh();
       });
-      boxes.push(cb);
+      boxes[p.id] = cb;
       var st = T().getStatus(p.id);
-      var extra = st !== 'todo' ? ' · ' + T().LABELS[st] : '';
-      var cost = BFF.logic && BFF.logic.COST_LABELS ? BFF.logic.COST_LABELS[p.costToClaim] || p.costToClaim : p.costToClaim;
-      list.appendChild(h('li', { class: 'fx-pick-item' }, [cb, h('label', { 'for': id }, [
+      var muted = [p.brand, verdictLabel(p), BFF.logic.valueText ? BFF.logic.valueText(p) : '', st !== 'todo' ? T().LABELS[st] : ''].filter(Boolean).join(' · ');
+      return h('div', { class: cls }, [cb, h('label', { 'for': id }, [
         h('strong', { text: p.name }),
-        h('span', { class: 'fx-muted', text: (p.brand || '') + ' · ' + cost + extra }),
-        h('span', { class: 'fx-small', text: worthLine(p) }),
-        h('span', { class: 'fx-small', text: freeLine(p) })
-      ])]));
-    });
+        h('span', { class: 'fx-small fx-pick-free', text: freeLine(p) }),
+        h('span', { class: 'fx-muted fx-pick-meta', text: muted })
+      ])]);
+    }
+    function groupItem(g) {
+      var kids = [pickRow(g.lead, 'fx-pick-row')];
+      if (g.others.length) {
+        var n = g.others.length;
+        var det = h('details', { class: 'fx-alt' }, [
+          h('summary', { text: n === 1 ? '1 more way to get the same thing' : n + ' more ways to get the same thing' }),
+          h('div', { class: 'fx-alt-list' }, g.others.map(function (o) { return pickRow(o, 'fx-pick-row fx-pick-alt'); }))
+        ]);
+        altDets.push({ g: g, det: det });
+        kids.push(det);
+      }
+      return h('li', { class: 'fx-pick-item fx-grp' }, kids);
+    }
+    var list = h('ul', { class: 'fx-pick' }, mainGroups.map(groupItem));
     body.appendChild(list);
+    if (sideGroups.length) {
+      sideDet = h('details', { class: 'fx-side' }, [
+        h('summary', { text: 'Only if you would buy anyway, and long shots (' + sideGroups.length + ')' }),
+        h('ul', { class: 'fx-pick' }, sideGroups.map(groupItem))
+      ]);
+      body.appendChild(sideDet);
+    }
+    openTicked();
     start.addEventListener('click', function () {
       var chosen = ranked(progs().filter(function (p) { return selected[p.id]; })).map(function (p) { return p.id; });
-      var ids = chosen;
+      var ids2 = chosen;
       if (preorder) {
         var first = preorder.filter(function (id) { return selected[id]; });
         var seen = {};
         first.forEach(function (id) { seen[id] = true; });
-        ids = first.concat(chosen.filter(function (id) { return !seen[id]; }));
+        ids2 = first.concat(chosen.filter(function (id) { return !seen[id]; }));
       }
-      if (!ids.length) return;
-      run = { ids: ids, index: 0, step: 'run' };
+      if (!ids2.length) return;
+      run = { ids: ids2, index: 0, step: 'run' };
       saveRun();
       focusHeading = true;
       render();
@@ -5288,7 +5420,10 @@ details.dir-filters { display: block; background: var(--surface); border: 1px so
   }
 
   function phoneHint() {
-    return h('p', { class: 'fx-small fx-tight' }, [document.createTextNode('Filling on your phone? '), h('a', { href: '#info', text: 'Set up the fill script in My info' }), document.createTextNode('.')]);
+    var a = h('a', { href: '#info', text: 'Set up the fill script in My info' });
+    // My info reads this flag after the route change, opens its phone fold and moves focus there.
+    a.addEventListener('click', function () { BFF.openInfoFill = true; });
+    return h('p', { class: 'fx-small fx-tight' }, [document.createTextNode('Filling on your phone? '), a, document.createTextNode('.')]);
   }
 
   function renderRun() {

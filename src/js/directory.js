@@ -474,16 +474,15 @@
     var freeGroups = distinctGroups(free);
     var tv = L.totalValue(free);
     var lo = L.roundTotal(tv.low), hi = L.roundTotal(tv.high);
-    var worth = '.';
-    if (tv.count) worth = ', worth about ' + (lo === hi ? L.money(lo) : L.money(lo) + ' to ' + L.money(hi)) + ' together.';
-    box.appendChild(h('p', { class: 'sum-main' }, [
+    var noValue = free.filter(function (p) { return L.valueMid(p) === null; }).length;
+    var worth = '. No dollar value is known for these programs yet.';
+    var skipNote = noValue ? '; ' + noValue + (noValue === 1 ? ' has' : ' have') + ' no known value and ' + (noValue === 1 ? 'is' : 'are') + ' not counted' : '';
+    if (tv.count) worth = ', worth about ' + (lo === hi ? L.money(lo) : L.money(lo) + ' to ' + L.money(hi)) + ' together (our estimate, from ordinary shelf prices' + skipNote + ').';
+    var mainKids = [
       h('strong', { text: freeGroups + ' truly free ' + (freeGroups === 1 ? 'program' : 'programs') + ' open to everyone' }),
       document.createTextNode(worth)
-    ]));
-    var noValue = free.filter(function (p) { return L.valueMid(p) === null; }).length;
-    box.appendChild(h('p', { class: 'dir-note', text: tv.count
-      ? 'This is our estimate, from ordinary shelf prices.' + (noValue ? ' ' + noValue + (noValue === 1 ? ' has' : ' have') + ' no known value and ' + (noValue === 1 ? 'is' : 'are') + ' not counted.' : '')
-      : 'No dollar value is known for these programs yet.' }));
+    ];
+    var top = h('div', { class: 'sum-top' }, [h('p', { class: 'sum-main' }, mainKids)]);
     var more = distinctGroups(pool.filter(function (p) {
       var v = L.verdict(p);
       return L.needsQualifying(p) && (v === 'top' || v === 'good' || v === 'small') && L.fit(p, L.hasSituation(profile) ? profile : {}) !== 'no';
@@ -505,18 +504,12 @@
         render();
         els.count.focus();
       });
-      box.appendChild(h('p', { class: 'sum-show' }, [show]));
+      top.appendChild(h('p', { class: 'sum-show' }, [show]));
     }
-    box.appendChild(h('p', { class: 'sum-more', text: more + ' more ' + (more === 1 ? 'is' : 'are') + ' free if you qualify (income, insurance or where you live).' }));
-    var money = distinctGroups(pool.filter(function (p) { return L.kindOf(p) === 'money'; }));
-    if (money > 0) {
-      box.appendChild(h('p', { class: 'sum-money', text: money + ' money ' + (money === 1 ? 'program (tax credits, savings deposits, paid leave) is' : 'programs (tax credits, savings deposits, paid leave) are') + ' under Money.' }));
-    }
-    if (L.hasSituation(profile)) {
-      var fits = pool.filter(function (p) { return L.fit(p, profile) === 'yes'; }).length;
-      var hid = fInfo.hidden;
-      box.appendChild(h('p', { class: 'sum-situation', text: fits + (fits === 1 ? ' program fits' : ' programs fit') + ' your answers; ' + hid + ' hidden.' }));
-    } else {
+    box.appendChild(top);
+    box.appendChild(h('p', { class: 'sum-more', text: more + ' more ' + (more === 1 ? 'is' : 'are') + ' free if you qualify.' }));
+    // With answers given, the fit box below says how many programs they hide, so only the prompt is shown here.
+    if (!L.hasSituation(profile)) {
       box.appendChild(h('p', { class: 'sum-situation' }, [
         document.createTextNode('Answer four quick questions in '),
         h('a', { href: '#info', text: 'My info' }),
@@ -538,7 +531,7 @@
     if (wk < 0) head = 'Your due date has passed.';
     else if (wk === 0) head = 'Your due date is less than a week away.';
     else head = plural(wk, 'week', 'weeks') + ' until your due date.';
-    box.appendChild(h('p', { class: 'sum-main' }, [h('strong', { text: head })]));
+    var dueBox = h('div', { class: 'sum-due' }, [h('p', { class: 'sum-main sum-due-head' }, [h('strong', { text: head })])]);
     var defs = [['pregnancy', 'do now'], ['late-pregnancy', 'in the last weeks'], ['after-birth', 'after the birth']];
     if (wk < 0) defs = [defs[2]];
     var counts = {};
@@ -554,7 +547,8 @@
       b.addEventListener('click', function () { goGroup(d[0]); });
       row.appendChild(h('li', null, [b]));
     });
-    if (row.childNodes.length) box.appendChild(row);
+    if (row.childNodes.length) dueBox.appendChild(row);
+    box.appendChild(dueBox);
   }
 
   function appendGroup(grid, g, level, rankOf, ctx) {
