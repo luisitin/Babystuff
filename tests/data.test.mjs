@@ -16,7 +16,7 @@ const EXPECTED_KEYS = [
 ];
 const STRING_KEYS = EXPECTED_KEYS.filter((k) => !['requirements', 'sourceUrls'].includes(k));
 const CATEGORIES = ['formula', 'diapers-wipes', 'registry-box', 'feeding', 'baby-care', 'rewards',
-  'health-benefits', 'assistance', 'product-testing'];
+  'health-benefits', 'assistance', 'money', 'product-testing'];
 const COST_TO_CLAIM = ['free', 'shipping-fee', 'purchase-required', 'membership-required'];
 const CONFIDENCE = ['high', 'medium', 'low'];
 const REQUIREMENTS = ['email', 'address', 'phone', 'due-date', 'registry', 'app', 'purchase',

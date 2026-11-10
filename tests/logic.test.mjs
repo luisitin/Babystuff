@@ -7,10 +7,12 @@ new Function('module', readFileSync(new URL('../src/js/logic.js', import.meta.ur
 const L = mod.exports;
 
 const P = (o) => Object.assign({ name: 'X', brand: 'B', category: 'formula', costToClaim: 'free',
-  requirements: ['email'], whatYouGet: '', notes: '', eligibility: '', verifiedOn: '2026-01-01', confidence: 'high' }, o);
+  requirements: ['email'], offers: ['product'], certainty: 'guaranteed', whatYouGet: '', notes: '', eligibility: '', verifiedOn: '2026-01-01', confidence: 'high' }, o);
 
 test('constants', () => {
-  assert.equal(L.CATEGORIES.length, 9);
+  assert.equal(L.CATEGORIES.length, 10);
+  assert.equal(L.CATEGORIES[L.CATEGORIES.findIndex((c) => c.id === 'assistance') + 1].id, 'money');
+  assert.equal(L.CATEGORIES.find((c) => c.id === 'money').label, 'Money and savings');
   assert.equal(L.CATEGORIES[0].id, 'formula');
   assert.equal(L.COST_LABELS['shipping-fee'], 'Shipping fee');
   assert.equal(L.COST_LABELS['purchase-required'], 'Purchase needed');
@@ -24,6 +26,115 @@ test('isTrulyFree', () => {
   assert.equal(L.isTrulyFree(P({ requirements: ['email', 'purchase'] })), false);
   assert.equal(L.isTrulyFree(P({ requirements: ['membership'] })), false);
   assert.equal(L.isTrulyFree(P({ requirements: undefined })), true);
+});
+
+test('isTrulyFree: the complaint (sweepstakes, coupons, points, testing are not truly free)', () => {
+  for (const first of ['sweepstakes', 'coupons', 'points', 'testing'])
+    assert.equal(L.isTrulyFree(P({ offers: [first, 'product'] })), false, first);
+  assert.equal(L.isTrulyFree(P({ certainty: 'chance' })), false);
+  for (const c of ['guaranteed', 'likely', 'if-eligible'])
+    assert.equal(L.isTrulyFree(P({ certainty: c })), true, c);
+  assert.equal(L.isTrulyFree(P({ requirements: ['email', 'purchase'] })), false);
+  assert.equal(L.isTrulyFree(P({ requirements: ['membership'] })), false);
+  assert.equal(L.isTrulyFree(P({ offers: undefined })), false);
+  assert.equal(L.isTrulyFree(P({ offers: [] })), false);
+  assert.equal(L.isTrulyFree(P({ offers: 'product' })), false);
+  assert.equal(L.isTrulyFree(null), false);
+});
+
+test('isOpenToAll', () => {
+  assert.equal(L.isOpenToAll(P({})), true);
+  assert.equal(L.isOpenToAll(P({ certainty: 'if-eligible' })), false);
+  assert.equal(L.isOpenToAll(P({ category: 'assistance' })), false);
+  assert.equal(L.isOpenToAll(P({ requirements: ['insurance'] })), false);
+  assert.equal(L.isOpenToAll(P({ certainty: 'chance' })), true);
+  assert.equal(L.isOpenToAll(null), false);
+});
+
+test('label maps and orders', () => {
+  assert.equal(Object.keys(L.OFFER_LABELS).length, 8);
+  assert.equal(L.OFFER_LABELS.sweepstakes, 'Prize draw');
+  assert.equal(L.CERTAINTY_LABELS.chance, 'Only if you are picked or win');
+  assert.equal(L.EFFORT_LABELS.quick, 'About 5 minutes');
+  assert.deepEqual(L.WHEN_ORDER, ['pregnancy', 'late-pregnancy', 'after-birth', 'anytime']);
+  for (const k of L.WHEN_ORDER) assert.ok(L.WHEN_LABELS[k], k);
+  assert.deepEqual(L.VERDICTS.map((v) => v.id), ['top', 'good', 'small', 'conditional', 'longshot']);
+  assert.equal(L.VERDICTS[0].label, 'Top pick');
+  assert.equal(L.VERDICTS[3].label, 'Only if you would buy anyway');
+});
+
+test('valueMid and expectedValue', () => {
+  assert.equal(L.valueMid(P({ valueLow: 40, valueHigh: 60 })), 50);
+  assert.equal(L.valueMid(P({ valueLow: null, valueHigh: null })), null);
+  assert.equal(L.valueMid(P({ valueLow: '40', valueHigh: 60 })), null);
+  assert.equal(L.valueMid(P({})), null);
+  assert.equal(L.valueMid(null), null);
+  const v = { valueLow: 100, valueHigh: 100 };
+  assert.equal(L.expectedValue(P({ ...v, certainty: 'guaranteed' })), 100);
+  assert.equal(L.expectedValue(P({ ...v, certainty: 'if-eligible' })), 100);
+  assert.equal(L.expectedValue(P({ ...v, certainty: 'likely' })), 70);
+  assert.equal(L.expectedValue(P({ ...v, certainty: 'chance' })), 10);
+  assert.equal(L.expectedValue(P({})), null);
+});
+
+const V = (o) => P(Object.assign({ valueLow: 100, valueHigh: 100 }, o));
+test('verdict branches in order', () => {
+  assert.equal(L.verdict(V({ certainty: 'chance' })), 'longshot');
+  assert.equal(L.verdict(V({ offers: ['sweepstakes'] })), 'longshot');
+  assert.equal(L.verdict(V({ offers: ['testing'] })), 'longshot');
+  // longshot beats conditional
+  assert.equal(L.verdict(V({ certainty: 'chance', costToClaim: 'shipping-fee' })), 'longshot');
+  assert.equal(L.verdict(V({ costToClaim: 'shipping-fee' })), 'conditional');
+  assert.equal(L.verdict(V({ costToClaim: 'purchase-required' })), 'conditional');
+  assert.equal(L.verdict(V({ requirements: ['purchase'] })), 'conditional');
+  assert.equal(L.verdict(V({ requirements: ['membership'] })), 'conditional');
+  assert.equal(L.verdict(V({ offers: ['coupons'] })), 'conditional');
+  assert.equal(L.verdict(V({ offers: ['points'] })), 'conditional');
+  assert.equal(L.verdict(V({})), 'top');
+  assert.equal(L.verdict(V({ valueLow: 99, valueHigh: 99 })), 'good');
+  assert.equal(L.verdict(V({ valueLow: 20, valueHigh: 20 })), 'good');
+  assert.equal(L.verdict(V({ valueLow: 19, valueHigh: 19 })), 'small');
+  assert.equal(L.verdict(V({ certainty: 'likely', valueLow: 143, valueHigh: 143 })), 'top');
+  assert.equal(L.verdict(V({ certainty: 'likely', valueLow: 142, valueHigh: 142 })), 'good');
+  assert.equal(L.verdict(P({ valueLow: null, valueHigh: null })), 'small');
+  assert.equal(L.verdict(P({ offers: undefined })), 'small');
+  assert.equal(L.verdict({}), 'conditional', 'no costToClaim is not free');
+});
+
+test('rankPrograms and rankMap tie-breaks', () => {
+  const list = [
+    V({ id: 'long', name: 'A long', certainty: 'chance' }),
+    V({ id: 'cond', name: 'A cond', offers: ['coupons'] }),
+    V({ id: 'small', name: 'A small', valueLow: 5, valueHigh: 5 }),
+    V({ id: 'small-null', name: 'A null', valueLow: null, valueHigh: null }),
+    V({ id: 'good', name: 'A good', valueLow: 50, valueHigh: 50 }),
+    V({ id: 'top-high', name: 'Top high', valueLow: 300, valueHigh: 500 }),
+    V({ id: 'top', name: 'Top' })
+  ];
+  assert.deepEqual(L.rankPrograms(list).map((p) => p.id),
+    ['top-high', 'top', 'good', 'small', 'small-null', 'cond', 'long']);
+  const map = L.rankMap(list);
+  assert.equal(map['top-high'], 1);
+  assert.equal(map.long, 7);
+  assert.equal(map.good, 3);
+  const copy = list.slice();
+  L.rankPrograms(list);
+  assert.deepEqual(list, copy, 'input not mutated');
+  assert.deepEqual(L.rankPrograms(undefined), []);
+  assert.deepEqual(L.rankMap(undefined), {});
+});
+
+test('rankPrograms: effort, confidence, then name break ties', () => {
+  const list = [
+    V({ id: 'n-b', name: 'Bravo' }),
+    V({ id: 'n-a', name: 'Alpha' }),
+    V({ id: 'conf', name: 'Aaa', confidence: 'low' }),
+    V({ id: 'inv', name: 'Aaa', effort: 'involved' }),
+    V({ id: 'some', name: 'Zzz', effort: 'some' }),
+    V({ id: 'quick', name: 'Zzz', effort: 'quick' })
+  ];
+  assert.deepEqual(L.rankPrograms(list).map((p) => p.id),
+    ['quick', 'some', 'inv', 'n-a', 'n-b', 'conf']);
 });
 
 test('isEmailOnly', () => {
@@ -108,22 +219,99 @@ test('escapeHtml', () => {
   assert.equal(L.escapeHtml(5), '5');
 });
 
-test('sortPrograms recommended', () => {
+test('sortPrograms recommended is an alias of best (saved preferences keep working)', () => {
   const list = [
-    P({ name: 'z-guided-high-email', category: 'formula', confidence: 'high' }),
-    P({ name: 'a-assistance', category: 'assistance', confidence: 'high' }),
-    P({ name: 'b-guided-addr-high', requirements: ['email', 'address'], confidence: 'high' }),
-    P({ name: 'c-guided-email-low', confidence: 'low' }),
-    P({ name: 'd-guided-email-med-rewards', category: 'rewards', confidence: 'medium' }),
-    P({ name: 'e-guided-email-med-formula', category: 'formula', confidence: 'medium' }),
-    P({ name: 'f-ship', costToClaim: 'shipping-fee', confidence: 'high' }),
-    P({ name: 'A-guided-email-med-formula', category: 'formula', confidence: 'medium' })
+    P({ name: 'z-small', valueLow: 5, valueHigh: 5 }),
+    P({ name: 'a-ship', costToClaim: 'shipping-fee' }),
+    P({ name: 'b-top', valueLow: 200, valueHigh: 200 }),
+    P({ name: 'c-chance', certainty: 'chance' }),
+    P({ name: 'd-good', valueLow: 40, valueHigh: 40, effort: 'quick' })
   ];
-  assert.deepEqual(L.sortPrograms(list, 'recommended').map((p) => p.name), [
-    'z-guided-high-email', 'A-guided-email-med-formula', 'e-guided-email-med-formula',
-    'd-guided-email-med-rewards', 'c-guided-email-low', 'b-guided-addr-high',
-    'f-ship', 'a-assistance'
-  ]);
+  const want = ['b-top', 'd-good', 'z-small', 'a-ship', 'c-chance'];
+  assert.deepEqual(L.sortPrograms(list, 'recommended').map((p) => p.name), want);
+  assert.deepEqual(L.sortPrograms(list, 'best').map((p) => p.name), want);
   assert.deepEqual(L.sortPrograms([], 'recommended'), []);
   assert.deepEqual(L.sortPrograms([P({ category: 'zzz', confidence: undefined })], 'recommended').length, 1);
+});
+
+test('sortPrograms best, when and the recommended alias', () => {
+  const list = [
+    V({ id: 'l', name: 'L', certainty: 'chance', when: 'pregnancy' }),
+    V({ id: 'a', name: 'A', when: 'after-birth' }),
+    V({ id: 'b', name: 'B', valueLow: 30, valueHigh: 30, when: 'pregnancy' }),
+    V({ id: 'c', name: 'C', when: 'late-pregnancy' }),
+    V({ id: 'd', name: 'D', when: 'anytime' }),
+    V({ id: 'e', name: 'E', when: undefined })
+  ];
+  const best = ['a', 'c', 'd', 'e', 'b', 'l'];
+  assert.deepEqual(L.sortPrograms(list, 'best').map((p) => p.id), best);
+  assert.deepEqual(L.sortPrograms(list, 'recommended').map((p) => p.id), best);
+  assert.deepEqual(L.sortPrograms(list, 'when').map((p) => p.id), ['b', 'l', 'c', 'a', 'd', 'e']);
+  assert.deepEqual(L.sortPrograms([], 'best'), []);
+  assert.deepEqual(L.sortPrograms([{}], 'when').length, 1);
+});
+
+test('filterPrograms offer, openToAll, state, freeStuff', () => {
+  const list = [
+    P({ name: 'Alpha', offers: ['product', 'coupons'], freeStuff: 'Two sample cans' }),
+    P({ name: 'Beta', offers: ['coupons'], certainty: 'if-eligible' }),
+    P({ name: 'Gamma', offers: ['service'], states: ['TX'] }),
+    P({ name: 'Delta', offers: undefined, states: [] }),
+    P({ name: 'Eps', states: ['ca', 'DC'] })
+  ];
+  const names = (o) => L.filterPrograms(list, o).map((p) => p.name);
+  assert.deepEqual(names({ offer: 'coupons' }), ['Alpha', 'Beta']);
+  assert.deepEqual(names({ offer: 'service' }), ['Gamma']);
+  assert.deepEqual(names({ offer: 'cash' }), []);
+  assert.deepEqual(names({ openToAll: true }), ['Alpha', 'Gamma', 'Delta', 'Eps']);
+  assert.deepEqual(names({ query: 'sample cans' }), ['Alpha']);
+  // state is ignored unless hideOtherStates is on
+  assert.equal(names({ state: 'NY' }).length, 5);
+  assert.equal(names({ hideOtherStates: true }).length, 5);
+  assert.deepEqual(names({ state: 'NY', hideOtherStates: true }), ['Alpha', 'Beta', 'Delta']);
+  assert.deepEqual(names({ state: 'TX', hideOtherStates: true }), ['Alpha', 'Beta', 'Gamma', 'Delta']);
+  assert.deepEqual(names({ state: 'CA', hideOtherStates: true }), ['Alpha', 'Beta', 'Delta', 'Eps']);
+  assert.equal(L.otherStateCount(list, 'NY'), 2);
+  assert.equal(L.otherStateCount(list, 'TX'), 1);
+  assert.equal(L.otherStateCount(list, ''), 0);
+  assert.equal(L.otherStateCount(null, 'NY'), 0);
+  assert.deepEqual(names({ trulyFree: true }), ['Alpha', 'Eps']);
+});
+
+test('valueText', () => {
+  assert.equal(L.valueText(P({ valueLow: 40, valueHigh: 60, valueSource: 'estimate' })), 'Worth about $40 to $60 (our estimate)');
+  assert.equal(L.valueText(P({ valueLow: 400, valueHigh: 400, valueSource: 'official' })), "Worth about $400 (the program's figure)");
+  assert.equal(L.valueText(P({ valueLow: 25, valueHigh: 25, valueSource: 'estimate' })), 'Worth about $25 (our estimate)');
+  assert.equal(L.valueText(P({ valueLow: 10, valueHigh: 30, valueSource: 'official' })), "Worth about $10 to $30 (the program's figure)");
+  assert.equal(L.valueText(P({ valueLow: null, valueHigh: null, valueSource: 'none' })), 'Value not known');
+  assert.equal(L.valueText(P({})), 'Value not known');
+  assert.equal(L.valueText(null), 'Value not known');
+});
+
+test('totalValue', () => {
+  const list = [
+    P({ valueLow: 10, valueHigh: 20 }),
+    P({ valueLow: 5, valueHigh: 5 }),
+    P({ valueLow: null, valueHigh: null }),
+    P({})
+  ];
+  assert.deepEqual(L.totalValue(list), { low: 15, high: 25, count: 2 });
+  assert.deepEqual(L.totalValue([]), { low: 0, high: 0, count: 0 });
+  assert.deepEqual(L.totalValue(undefined), { low: 0, high: 0, count: 0 });
+});
+
+test('weeksUntil', () => {
+  assert.equal(L.weeksUntil('2026-12-01', '2026-11-10'), 3);
+  assert.equal(L.weeksUntil('2026-11-16', '2026-11-10'), 0);
+  assert.equal(L.weeksUntil('2026-11-17', '2026-11-10'), 1);
+  assert.equal(L.weeksUntil('2026-11-10', '2026-11-10'), 0);
+  assert.equal(L.weeksUntil('2026-11-07', '2026-11-10'), -1);
+  assert.equal(L.weeksUntil('2026-10-20', '2026-11-10'), -3);
+  assert.equal(L.weeksUntil('2027-03-01', new Date(2026, 10, 10, 23, 59)), 15);
+  assert.equal(L.weeksUntil('soon', '2026-11-10'), null);
+  assert.equal(L.weeksUntil('2026-02-30', '2026-11-10'), null);
+  assert.equal(L.weeksUntil('', '2026-11-10'), null);
+  assert.equal(L.weeksUntil(undefined, '2026-11-10'), null);
+  assert.equal(L.weeksUntil('2026-11-10', 'bad'), null);
+  assert.equal(typeof L.weeksUntil('2099-01-01'), 'number');
 });
