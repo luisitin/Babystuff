@@ -1,0 +1,1110 @@
+[
+  {
+    "category": "money",
+    "costToClaim": "free",
+    "requirements": [
+      "eligibility"
+    ],
+    "states": [],
+    "region": "US",
+    "verifiedOn": "2026-11-10",
+    "confidence": "medium",
+    "offers": [
+      "cash"
+    ],
+    "certainty": "if-eligible",
+    "freeStuff": "",
+    "effort": "some",
+    "when": "after-birth",
+    "whenNote": "A baby born in late 2026 is first claimed on the 2026 return filed in 2027. A baby born in early 2027 is first claimed on the 2027 return, filed in 2028. The baby needs a Social Security number by the filing due date.",
+    "catches": "The $2,200 figure is for tax year 2026; the 2027 amount is not known yet. The refundable part is capped at $1,700 per child. Not tax advice.",
+    "notes": "Updated from 2025 ($2,200) to the 2026 figure shown in IRS Schedule 8812 and Form 1040-ES search results.",
+    "valueLow": 1700,
+    "valueHigh": 2200,
+    "valueSource": "official",
+    "valueBasis": "$2,200 per child for tax year 2026, of which up to $1,700 is refundable",
+    "id": "irs-child-tax-credit",
+    "name": "Child Tax Credit",
+    "brand": "IRS",
+    "whatYouGet": "A federal tax credit of $2,200 per qualifying child under 17 for tax year 2026, partly refundable.",
+    "costDetail": "No cost; claimed on the federal tax return (Schedule 8812).",
+    "eligibility": "Child under 17 at year end with a Social Security number valid for work, issued by the return due date (including extensions). Full credit up to $200,000 income ($400,000 joint); refundable part needs $2,500 earned income. A child without the SSN can still bring the $500 Credit for Other Dependents.",
+    "signupUrl": "https://www.irs.gov/credits-deductions/individuals/child-tax-credit",
+    "sourceUrls": [
+      "https://www.irs.gov/credits-deductions/individuals/child-tax-credit",
+      "https://www.irs.gov/pub/irs-prior/f1040s8--2026.pdf",
+      "https://www.irs.gov/pub/irs-pdf/f1040es.pdf"
+    ]
+  },
+  {
+    "category": "money",
+    "costToClaim": "free",
+    "requirements": [
+      "eligibility"
+    ],
+    "states": [],
+    "region": "US",
+    "verifiedOn": "2026-11-10",
+    "confidence": "medium",
+    "offers": [
+      "cash"
+    ],
+    "certainty": "if-eligible",
+    "freeStuff": "",
+    "effort": "some",
+    "when": "after-birth",
+    "whenNote": "Claimed on the return for the year the child is born or lives with you; a baby born in 2027 counts on the 2027 return filed in 2028.",
+    "catches": "Maximum for 2026 is $4,427 with one child; the actual amount shrinks as income rises and many families get less. The 2026 limits come from an IRS eligibility questionnaire and Notice 797 (shown as Rev. December 2026), not the main 2026 tables page. Form 8862 may be needed after a past denial.",
+    "notes": "valueLow of 0 is deliberate: the credit is 0 for families over the limit. 2025 limit was $50,434 ($57,554 joint) per Publication 596.",
+    "valueLow": 0,
+    "valueHigh": 4427,
+    "valueSource": "official",
+    "valueBasis": "$0 above the income limit; up to the $4,427 IRS maximum for one child in tax year 2026 for lower earners",
+    "id": "irs-earned-income-tax-credit",
+    "name": "Earned Income Tax Credit (with a child)",
+    "brand": "IRS",
+    "whatYouGet": "A refundable federal tax credit for working families with income below set limits, larger with a qualifying child.",
+    "costDetail": "No cost; claimed on the federal tax return.",
+    "eligibility": "Earned income and AGI under the limit for filing status and children. For tax year 2026 with one child: $51,593 ($58,863 married filing jointly); investment income up to $12,200. The child and the filer need valid Social Security numbers.",
+    "signupUrl": "https://www.irs.gov/credits-deductions/individuals/earned-income-tax-credit-eitc",
+    "sourceUrls": [
+      "https://www.irs.gov/pub/irs-access/p3524_accessible.pdf",
+      "https://www.irs.gov/pub/irs-pdf/n797.pdf",
+      "https://www.irs.gov/publications/p596"
+    ]
+  },
+  {
+    "category": "money",
+    "costToClaim": "free",
+    "requirements": [
+      "eligibility"
+    ],
+    "states": [
+      "CA"
+    ],
+    "region": "California",
+    "verifiedOn": "2026-11-10",
+    "confidence": "medium",
+    "offers": [
+      "cash"
+    ],
+    "certainty": "if-eligible",
+    "freeStuff": "",
+    "effort": "involved",
+    "when": "late-pregnancy",
+    "whenNote": "Disability claims can start up to 4 weeks before the due date; bonding leave must fall within 1 year of birth.",
+    "catches": "Weekly maximum shown by EDD is $1,765 (minimum $50), but one result did not say which year it starts. The first 7 days of a disability claim are unpaid. Bonding benefits are only in the first year after birth. Some results gave 4 weeks before and 6 to 8 weeks after birth for pregnancy disability.",
+    "notes": "Pregnancy disability value is not counted in the estimate.",
+    "valueLow": 7060,
+    "valueHigh": 7060,
+    "valueSource": "estimate",
+    "valueBasis": "8 weeks of bonding at half the $1,765 weekly maximum; actual pay depends on wages",
+    "costDetail": "Funded by payroll contributions; no sign-up fee.",
+    "id": "ca-paid-family-leave-sdi",
+    "name": "California Paid Family Leave and SDI pregnancy disability",
+    "brand": "California EDD",
+    "whatYouGet": "Partial pay for up to 8 weeks to bond with a new child (Paid Family Leave), plus State Disability Insurance pay for the pregnancy and recovery period.",
+    "eligibility": "Worked in California and paid into State Disability Insurance in the base period (about 5 to 18 months before the claim). Pay is about 70% to 90% of wages depending on income, up to the maximum.",
+    "signupUrl": "https://edd.ca.gov/en/disability/paid-family-leave/",
+    "sourceUrls": [
+      "https://edd.ca.gov/en/disability/paid-family-leave/",
+      "https://edd.ca.gov/en/disability/Calculating_PFL_Benefit_Payment_Amounts/",
+      "https://edd.ca.gov/Mothers"
+    ]
+  },
+  {
+    "category": "money",
+    "costToClaim": "free",
+    "requirements": [
+      "eligibility"
+    ],
+    "states": [
+      "NJ"
+    ],
+    "region": "New Jersey",
+    "verifiedOn": "2026-11-10",
+    "confidence": "medium",
+    "offers": [
+      "cash"
+    ],
+    "certainty": "if-eligible",
+    "freeStuff": "",
+    "effort": "involved",
+    "when": "after-birth",
+    "whenNote": "Must be used before the child turns 1 for the 12-week block.",
+    "catches": "2026 weekly maximum is $1,119 (up from $1,081 in 2025). Pregnancy and recovery are paid through the separate Temporary Disability program.",
+    "notes": "Application timing was not in the results.",
+    "valueLow": 6714,
+    "valueHigh": 6714,
+    "valueSource": "estimate",
+    "valueBasis": "12 weeks at half the $1,119 weekly maximum",
+    "costDetail": "Funded by payroll contributions; no sign-up fee.",
+    "id": "nj-family-leave-insurance",
+    "name": "New Jersey Family Leave Insurance",
+    "brand": "New Jersey Dept. of Labor",
+    "whatYouGet": "Pay for up to 12 weeks in one block (or up to 56 days spread out) to bond with a new child, at 85% of average weekly wage up to the maximum.",
+    "eligibility": "Earned at least $310 a week for 20 weeks, or $15,500 in the base year (2026 test). Total benefits are the lesser of 12 times the weekly rate or one-third of base-year earnings.",
+    "signupUrl": "https://www.nj.gov/labor/myleavebenefits/worker/fli/",
+    "sourceUrls": [
+      "https://www.nj.gov/labor/myleavebenefits/worker/fli/",
+      "https://myleavebenefits.nj.gov/help/faq/fli.shtml",
+      "https://www.nj.gov/labor/myleavebenefits/worker/maternity/"
+    ]
+  },
+  {
+    "category": "money",
+    "costToClaim": "free",
+    "requirements": [
+      "eligibility"
+    ],
+    "states": [
+      "NY"
+    ],
+    "region": "New York",
+    "verifiedOn": "2026-11-10",
+    "confidence": "medium",
+    "offers": [
+      "cash"
+    ],
+    "certainty": "if-eligible",
+    "freeStuff": "",
+    "effort": "involved",
+    "when": "after-birth",
+    "whenNote": "Bonding leave can be taken any time in the first 12 months after birth.",
+    "catches": "Employee contribution in 2026 is 0.432% of gross wages. Pregnancy disability is a separate New York benefit not covered here. Application timing was not in the results.",
+    "notes": "",
+    "valueLow": 7371,
+    "valueHigh": 7371,
+    "valueSource": "estimate",
+    "valueBasis": "12 weeks at half the $1,228.53 weekly maximum",
+    "costDetail": "Funded by payroll contributions; no sign-up fee.",
+    "id": "ny-paid-family-leave",
+    "name": "New York Paid Family Leave",
+    "brand": "New York Paid Family Leave",
+    "whatYouGet": "Up to 12 weeks of pay at 67% of average weekly wage, up to a cap, to bond with a new child.",
+    "eligibility": "Employed in New York with a covered employer and meeting the program's work-time rules. 2026 weekly maximum is $1,228.53 and total maximum is $14,742.36.",
+    "signupUrl": "https://paidfamilyleave.ny.gov/bonding-leave-birth-child",
+    "sourceUrls": [
+      "https://paidfamilyleave.ny.gov/bonding-leave-birth-child",
+      "https://paidfamilyleave.ny.gov/2026",
+      "https://paidfamilyleave.ny.gov/benefits"
+    ]
+  },
+  {
+    "category": "money",
+    "costToClaim": "free",
+    "requirements": [
+      "eligibility"
+    ],
+    "states": [
+      "RI"
+    ],
+    "region": "Rhode Island",
+    "verifiedOn": "2026-11-10",
+    "confidence": "low",
+    "offers": [
+      "cash"
+    ],
+    "certainty": "if-eligible",
+    "freeStuff": "",
+    "effort": "involved",
+    "when": "after-birth",
+    "whenNote": "Bonding claims are allowed only in the first 12 months of parenting.",
+    "catches": "Official pages disagree on length: the 2026 FAQ says up to 8 weeks, a June 2026 bulletin says 7. The lower figure (7) is used. The $1,150 figure is stated for TDI and applied to TCI by the FAQ.",
+    "notes": "Confidence low because of the conflict.",
+    "valueLow": 3860,
+    "valueHigh": 3860,
+    "valueSource": "estimate",
+    "valueBasis": "7 weeks (lower of 7 or 8) at half the $1,103 weekly maximum",
+    "costDetail": "Funded by payroll contributions; no sign-up fee.",
+    "id": "ri-temporary-caregiver-insurance",
+    "name": "Rhode Island Temporary Caregiver Insurance",
+    "brand": "Rhode Island Dept. of Labor and Training",
+    "whatYouGet": "Pay for several weeks to bond with a new child in the first 12 months of parenting.",
+    "eligibility": "Rhode Island workers who paid into the program and meet its earnings test. Official materials give a weekly maximum of $1,103, rising to $1,150 for benefit years starting July 1, 2026 or later.",
+    "signupUrl": "https://dlt.ri.gov/individuals/temporary-disability-caregiver-insurance",
+    "sourceUrls": [
+      "https://dlt.ri.gov/individuals/temporary-disability-caregiver-insurance/claimants/tditci-frequently-asked-questions",
+      "https://dlt.ri.gov/individuals/temporary-disability-caregiver-insurance"
+    ]
+  },
+  {
+    "category": "money",
+    "costToClaim": "free",
+    "requirements": [
+      "eligibility"
+    ],
+    "states": [
+      "WA"
+    ],
+    "region": "Washington",
+    "verifiedOn": "2026-11-10",
+    "confidence": "medium",
+    "offers": [
+      "cash"
+    ],
+    "certainty": "if-eligible",
+    "freeStuff": "",
+    "effort": "involved",
+    "when": "after-birth",
+    "whenNote": "Bonding leave is for the first year after the birth.",
+    "catches": "Can be taken in full weeks or intermittently. Application timing was not in the results.",
+    "notes": "",
+    "valueLow": 9882,
+    "valueHigh": 9882,
+    "valueSource": "estimate",
+    "valueBasis": "12 weeks at half the $1,647 weekly maximum",
+    "costDetail": "Funded by payroll contributions; no sign-up fee.",
+    "id": "wa-paid-family-medical-leave",
+    "name": "Washington Paid Family and Medical Leave",
+    "brand": "Washington Employment Security Department",
+    "whatYouGet": "Up to 12 weeks of pay to bond with a new child, up to 90% of weekly pay, with a 2026 weekly maximum of $1,647.",
+    "eligibility": "At least 820 hours worked in the qualifying period. Up to 16 weeks combined medical and family leave in a claim year, or 18 with pregnancy or birth complications. Minimum benefit is $100 a week in 2026.",
+    "signupUrl": "https://paidleave.wa.gov/how-paid-leave-works/",
+    "sourceUrls": [
+      "https://paidleave.wa.gov/how-paid-leave-works/",
+      "https://paidleave.wa.gov/find-out-how-paid-leave-works/"
+    ]
+  },
+  {
+    "category": "money",
+    "costToClaim": "free",
+    "requirements": [
+      "eligibility"
+    ],
+    "states": [
+      "MA"
+    ],
+    "region": "Massachusetts",
+    "verifiedOn": "2026-11-10",
+    "confidence": "medium",
+    "offers": [
+      "cash"
+    ],
+    "certainty": "if-eligible",
+    "freeStuff": "",
+    "effort": "involved",
+    "when": "after-birth",
+    "whenNote": "Bonding leave must fall within 12 months after the birth.",
+    "catches": "Payments can be lower if other income or benefits are reported. Application timing was not in the results.",
+    "notes": "",
+    "valueLow": 7382,
+    "valueHigh": 7382,
+    "valueSource": "estimate",
+    "valueBasis": "12 weeks at half the $1,230.39 weekly maximum",
+    "costDetail": "Funded by payroll contributions; no sign-up fee.",
+    "id": "ma-paid-family-medical-leave",
+    "name": "Massachusetts Paid Family and Medical Leave",
+    "brand": "Massachusetts Dept. of Family and Medical Leave",
+    "whatYouGet": "Up to 12 weeks of pay to bond with a new child; 80% of wages up to half the state average wage plus 50% above that, capped at $1,230.39 a week in 2026.",
+    "eligibility": "Massachusetts workers who paid into the program and meet its earnings test. The cap is $1,284.61 in 2027, but a benefit year that starts in 2026 keeps the 2026 cap.",
+    "signupUrl": "https://www.mass.gov/info-details/paid-family-and-medical-leave-pfml-overview-and-benefits",
+    "sourceUrls": [
+      "https://www.mass.gov/info-details/paid-family-and-medical-leave-pfml-overview-and-benefits",
+      "https://www.mass.gov/info-details/how-pfml-weekly-benefit-amounts-are-calculated-andor-changed"
+    ]
+  },
+  {
+    "category": "money",
+    "costToClaim": "free",
+    "requirements": [
+      "eligibility"
+    ],
+    "states": [
+      "CT"
+    ],
+    "region": "Connecticut",
+    "verifiedOn": "2026-11-10",
+    "confidence": "medium",
+    "offers": [
+      "cash"
+    ],
+    "certainty": "if-eligible",
+    "freeStuff": "",
+    "effort": "involved",
+    "when": "after-birth",
+    "whenNote": "Leave must be used within 12 months of the birth.",
+    "catches": "Pays money but does not give job protection (that comes from FMLA). Apply online or by phone; proof such as a hospital discharge paper or birth certificate is needed.",
+    "notes": "",
+    "valueLow": 6098,
+    "valueHigh": 6098,
+    "valueSource": "estimate",
+    "valueBasis": "12 weeks at half the $1,016.40 weekly cap",
+    "costDetail": "Funded by payroll contributions; no sign-up fee.",
+    "id": "ct-paid-leave",
+    "name": "Connecticut Paid Leave",
+    "brand": "Connecticut Paid Leave Authority",
+    "whatYouGet": "Up to 12 weeks of pay in 12 months to bond with a new child: 95% of weekly wage up to $677.60, plus 60% of the excess, capped at $1,016.40 a week (2026).",
+    "eligibility": "Connecticut workers who paid into the program. Pay is based on the two highest quarters of the base period.",
+    "signupUrl": "https://www.ctpaidleave.org/how-ct-paid-leave-works/qualifying-reasons/i-m-starting-or-expanding-my-family",
+    "sourceUrls": [
+      "https://www.ctpaidleave.org/how-ct-paid-leave-works/qualifying-reasons/i-m-starting-or-expanding-my-family",
+      "https://www.ctpaidleave.org/claims/before-you-apply"
+    ]
+  },
+  {
+    "category": "money",
+    "costToClaim": "free",
+    "requirements": [
+      "eligibility"
+    ],
+    "states": [
+      "OR"
+    ],
+    "region": "Oregon",
+    "verifiedOn": "2026-11-10",
+    "confidence": "medium",
+    "offers": [
+      "cash"
+    ],
+    "certainty": "if-eligible",
+    "freeStuff": "",
+    "effort": "involved",
+    "when": "late-pregnancy",
+    "whenNote": "You can apply up to 30 days before leave begins or up to 30 days after it begins.",
+    "catches": "The extra 2 weeks are for pregnancy conditions, not bonding.",
+    "notes": "",
+    "valueLow": 10153,
+    "valueHigh": 10153,
+    "valueSource": "estimate",
+    "valueBasis": "12 weeks at half the $1,692.16 weekly maximum",
+    "costDetail": "Funded by payroll contributions; no sign-up fee.",
+    "id": "or-paid-leave-oregon",
+    "name": "Paid Leave Oregon",
+    "brand": "Oregon Employment Department",
+    "whatYouGet": "Up to 12 weeks of pay to bond with a child in the first year, plus up to 2 more weeks for pregnancy-related conditions.",
+    "eligibility": "Oregon workers who paid into the program. Maximum weekly benefit is $1,692.16 for benefit years starting June 28, 2026 or later; earlier claims keep $1,636.56. Workers earning 65% or less of the state average get 100% of wages.",
+    "signupUrl": "https://paidleave.oregon.gov/employees/",
+    "sourceUrls": [
+      "https://paidleave.oregon.gov/employees/",
+      "https://paidleave.oregon.gov/resources/common-questions.html",
+      "https://www.oregon.gov/employ/NewsAndMedia/Documents/2026-05-29-Minimum-Maximum-Weekly-Benefit-Amounts.pdf"
+    ]
+  },
+  {
+    "category": "money",
+    "costToClaim": "free",
+    "requirements": [
+      "eligibility"
+    ],
+    "states": [
+      "CO"
+    ],
+    "region": "Colorado",
+    "verifiedOn": "2026-11-10",
+    "confidence": "medium",
+    "offers": [
+      "cash"
+    ],
+    "certainty": "if-eligible",
+    "freeStuff": "",
+    "effort": "involved",
+    "when": "late-pregnancy",
+    "whenNote": "Give 30 days' notice when possible; the application can start up to 30 days before leave.",
+    "catches": "Apply on the My FAMLI+ portal. A claim started before the birth stays a draft until proof of birth is uploaded. Bonding leave cannot start until a neonatal claim ends.",
+    "notes": "",
+    "valueLow": 8688,
+    "valueHigh": 8688,
+    "valueSource": "estimate",
+    "valueBasis": "12 weeks at half the $1,448.02 weekly maximum",
+    "costDetail": "Funded by payroll contributions; no sign-up fee.",
+    "id": "co-famli-paid-leave",
+    "name": "Colorado FAMLI paid family leave",
+    "brand": "Colorado FAMLI",
+    "whatYouGet": "Up to 12 weeks of pay to bond with a new child (up to 4 more with pregnancy or birth complications), and up to 12 weeks of neonatal care leave for a baby in a NICU.",
+    "eligibility": "Earned at least $2,500 in Colorado in the past year. From July 1, 2026 the maximum is $1,448.02 a week: 90% of the first $804.46 of weekly wage, 50% above that.",
+    "signupUrl": "https://famli.colorado.gov/individuals-and-families/reasons-to-take-famli-leave/parental-bonding-leave",
+    "sourceUrls": [
+      "https://famli.colorado.gov/individuals-and-families/reasons-to-take-famli-leave/parental-bonding-leave",
+      "https://famli.colorado.gov/individuals-and-families/reasons-to-take-famli-leave/neonatal-care-leave",
+      "https://famli.colorado.gov/individuals-and-families/how-famli-works/premium-and-benefits-calculator"
+    ]
+  },
+  {
+    "category": "money",
+    "costToClaim": "free",
+    "requirements": [
+      "eligibility"
+    ],
+    "states": [
+      "DC"
+    ],
+    "region": "District of Columbia",
+    "verifiedOn": "2026-11-10",
+    "confidence": "low",
+    "offers": [
+      "cash"
+    ],
+    "certainty": "if-eligible",
+    "freeStuff": "",
+    "effort": "involved",
+    "when": "after-birth",
+    "whenNote": "",
+    "catches": "Official DC pages say 12 weeks of parental leave; an older DOES one-pager says 8. The lower figure (8) is used for the estimate. Medical and family-caregiving leave were cut on Oct. 1, 2026, not parental leave.",
+    "notes": "Application timing was not in the results.",
+    "valueLow": 4400,
+    "valueHigh": 4400,
+    "valueSource": "estimate",
+    "valueBasis": "8 weeks (lower of 8 or 12) at half the $1,100 weekly maximum",
+    "costDetail": "Funded by payroll contributions; no sign-up fee.",
+    "id": "dc-paid-family-leave",
+    "name": "DC Paid Family Leave",
+    "brand": "DC Department of Employment Services",
+    "whatYouGet": "Paid parental leave to bond with a new child: 90% of wages up to 1.5 times DC minimum wage and 50% above that, with a $1,100 weekly maximum.",
+    "eligibility": "Workers covered by a DC employer under the Paid Family Leave Act and meeting its earnings rules.",
+    "signupUrl": "https://does.dc.gov/page/dc-paid-family-leave",
+    "sourceUrls": [
+      "https://does.dc.gov/page/dc-paid-family-leave",
+      "https://dcpaidfamilyleave.dc.gov/frequently-asked-questions/"
+    ]
+  },
+  {
+    "category": "money",
+    "costToClaim": "free",
+    "requirements": [
+      "eligibility"
+    ],
+    "states": [
+      "DE"
+    ],
+    "region": "Delaware",
+    "verifiedOn": "2026-11-10",
+    "confidence": "medium",
+    "offers": [
+      "cash"
+    ],
+    "certainty": "if-eligible",
+    "freeStuff": "",
+    "effort": "involved",
+    "when": "late-pregnancy",
+    "whenNote": "Apply as soon as you know you need leave; if unforeseen, within 30 days after the first day of leave.",
+    "catches": "The first payment takes about 2 weeks to process. The signup URL is the state claims guide; the apply page was not named in the results.",
+    "notes": "",
+    "valueLow": 5400,
+    "valueHigh": 5400,
+    "valueSource": "estimate",
+    "valueBasis": "12 weeks at half the $900 weekly maximum",
+    "costDetail": "Funded by payroll contributions; no sign-up fee.",
+    "id": "de-paid-leave",
+    "name": "Delaware Paid Leave",
+    "brand": "Delaware Department of Labor",
+    "whatYouGet": "Up to 12 weeks of parental leave pay at 80% of average weekly wage, capped at $900 a week; benefits began January 1, 2026.",
+    "eligibility": "Employer with 10 or more employees (employers with 10 to 24 may offer a minimum of 6 weeks until 2031), 12 months with the employer, 1,250 hours in the past year, and mostly working in Delaware.",
+    "signupUrl": "https://laborfiles.delaware.gov/main/pfl/FAQ_DelawarePaidLeave_ClaimsProcess_R1.pdf",
+    "sourceUrls": [
+      "https://laborfiles.delaware.gov/main/pfl/FAQ_DelawarePaidLeave_ClaimsProcess_R1.pdf",
+      "https://laborfiles.delaware.gov/main/pfl/Employer_and_TPAs_Guide_to_DPL.pdf"
+    ]
+  },
+  {
+    "category": "money",
+    "costToClaim": "free",
+    "requirements": [
+      "eligibility"
+    ],
+    "states": [
+      "MN"
+    ],
+    "region": "Minnesota",
+    "verifiedOn": "2026-11-10",
+    "confidence": "medium",
+    "offers": [
+      "cash"
+    ],
+    "certainty": "if-eligible",
+    "freeStuff": "",
+    "effort": "involved",
+    "when": "late-pregnancy",
+    "whenNote": "You can apply up to 60 days before leave; certification is added after the birth.",
+    "catches": "Benefits began January 1, 2026. Tell your employer at least 30 days ahead when you can. Medical plus family leave combined is up to 20 weeks.",
+    "notes": "",
+    "valueLow": 8538,
+    "valueHigh": 8538,
+    "valueSource": "estimate",
+    "valueBasis": "12 weeks at half the $1,423 weekly maximum",
+    "costDetail": "Funded by payroll contributions; no sign-up fee.",
+    "id": "mn-paid-leave",
+    "name": "Minnesota Paid Leave",
+    "brand": "Minnesota Paid Leave",
+    "whatYouGet": "Up to 12 weeks of family leave pay to welcome a new child; most people get 55% to 90% of wages, up to the weekly maximum.",
+    "eligibility": "Earned at least $3,900 in the last year in Minnesota. Weekly maximum is $1,423 in most sources (one source says $1,432); the lower figure is used.",
+    "signupUrl": "https://paidleave.mn.gov/",
+    "sourceUrls": [
+      "https://pl.mn.gov/sites/default/files/2026-04/2026_04_Factsheet_PaidLeaveOverview_IndFam_Final_ACC.pdf",
+      "https://mn.gov/deed/assets/paid-leave-bonding-presentation-2025-12-acc_tcm1045-715256.pdf"
+    ]
+  },
+  {
+    "category": "money",
+    "costToClaim": "free",
+    "requirements": [
+      "eligibility"
+    ],
+    "states": [
+      "ME"
+    ],
+    "region": "Maine",
+    "verifiedOn": "2026-11-10",
+    "confidence": "low",
+    "offers": [
+      "cash"
+    ],
+    "certainty": "if-eligible",
+    "freeStuff": "",
+    "effort": "involved",
+    "when": "after-birth",
+    "whenNote": "Application is due in advance when the need is known, or as soon as you know.",
+    "catches": "The weekly maximum for 2026 and the exact upper-tier rate were not confirmed (results disagree), so no dollar value is given. Whether you can apply before the birth was not confirmed.",
+    "notes": "",
+    "valueLow": null,
+    "valueHigh": null,
+    "valueSource": "none",
+    "valueBasis": "",
+    "costDetail": "Funded by payroll contributions; no sign-up fee.",
+    "id": "me-paid-family-medical-leave",
+    "name": "Maine Paid Family and Medical Leave",
+    "brand": "Maine Department of Labor",
+    "whatYouGet": "Up to 12 weeks of pay in a benefit year to bond with a new child; benefits have been paid since May 1, 2026.",
+    "eligibility": "Earned at least six times the state average weekly wage in the past year. Pay replaces 90% of wages up to half the state average and a share above that.",
+    "signupUrl": "https://www.maine.gov/paidleave/workers/index.shtml",
+    "sourceUrls": [
+      "https://www.maine.gov/paidleave/",
+      "https://www.maine.gov/paidleave/workers/index.shtml",
+      "https://legislature.maine.gov/statutes/26/title26sec850-B.pdf"
+    ]
+  },
+  {
+    "category": "money",
+    "costToClaim": "free",
+    "requirements": [
+      "eligibility"
+    ],
+    "states": [],
+    "region": "US",
+    "verifiedOn": "2026-11-10",
+    "confidence": "medium",
+    "offers": [
+      "cash"
+    ],
+    "certainty": "if-eligible",
+    "freeStuff": "$1,000 deposited into the child's account by the Treasury.",
+    "effort": "some",
+    "when": "after-birth",
+    "whenNote": "The SSN must be issued before the election. The IRS says if you elect after a qualifying event such as a birth and have already filed your tax return, use the online options at trumpaccounts.gov.",
+    "catches": "The parent must elect it; it is not automatic even if Treasury enrolls the child. File Form 4547 on the Trump Accounts website or app, in your IRS Individual Online Account, on paper, or with a tax return, and tick the $1,000 pilot box. After the election the trustee contacts you to claim the account and verify identity. For a baby born in 2027 the SSN must exist first, so this follows the birth.",
+    "notes": "Changed: signupUrl now the IRS Trump Accounts page; account opening confirmed (contributions opened July 4, 2026; election online since mid-2026); added timing and SSN-first rule.",
+    "valueLow": 1000,
+    "valueHigh": 1000,
+    "valueSource": "official",
+    "valueBasis": "Pilot deposit of $1,000 stated by the IRS",
+    "id": "treasury-trump-account-pilot-deposit",
+    "name": "Trump Account $1,000 pilot deposit",
+    "brand": "U.S. Treasury / IRS",
+    "whatYouGet": "A one-time $1,000 Treasury deposit into a Trump Account for eligible US citizen children born 2025 through 2028.",
+    "costDetail": "No cost; the election is made with Form 4547.",
+    "eligibility": "Child born Jan 1, 2025 to Dec 31, 2028, a US citizen with a Social Security number valid for work that was issued before the election, and expected to be a qualifying child of the parent who elects. One pilot election per child.",
+    "signupUrl": "https://www.irs.gov/trumpaccounts",
+    "sourceUrls": [
+      "https://www.irs.gov/trumpaccounts",
+      "https://www.irs.gov/forms-pubs/about-form-4547",
+      "https://www.irs.gov/instructions/i4547",
+      "https://www.irs.gov/faqs/trump-accounts-frequently-asked-questions",
+      "https://www.irs.gov/newsroom/heres-how-to-claim-trump-account-seed-money-for-your-child"
+    ]
+  },
+  {
+    "category": "money",
+    "costToClaim": "free",
+    "requirements": [
+      "eligibility"
+    ],
+    "states": [
+      "MI"
+    ],
+    "region": "Participating Michigan cities and counties only",
+    "verifiedOn": "2026-11-10",
+    "confidence": "medium",
+    "offers": [
+      "cash"
+    ],
+    "certainty": "if-eligible",
+    "freeStuff": "Cash of $1,500 in pregnancy and $500 a month after birth.",
+    "effort": "involved",
+    "when": "pregnancy",
+    "whenNote": "Apply from 16 weeks of pregnancy; the $1,500 is lost if you apply after the birth, though monthly payments can still start until the baby is 6 months old.",
+    "catches": "Only certain communities (for example Flint, Detroit, many Upper Peninsula and other counties); start dates and months paid differ by place. The $1,500 needs an application before the baby is born. You need ID, proof of address and a pregnancy or birth document; staff reply in 2 to 4 weeks and the application is rejected if not verified in 60 days. After birth you fill in another form to start monthly payments.",
+    "notes": "Results from several county pages were months old; check your community page. Value low end is 6 months only with no prenatal payment.",
+    "valueLow": 3000,
+    "valueHigh": 4500,
+    "valueSource": "estimate",
+    "valueBasis": "$500 x 6 months at the low end; $1,500 plus $500 x 6 months at the high end",
+    "id": "mi-rx-kids",
+    "name": "Rx Kids (Michigan)",
+    "brand": "Rx Kids",
+    "whatYouGet": "Cash with no strings: $1,500 during pregnancy and $500 a month for 6 months after birth in most communities (some pay 12 months, some only the monthly part).",
+    "costDetail": "Free; paid by direct deposit or prepaid card.",
+    "eligibility": "Live in a participating community (by where you physically live), be 18 or older (16 to 17 with a guardian's consent), and be at least 16 weeks pregnant or have a baby 6 months or younger born after the community's start date.",
+    "signupUrl": "https://rxkids.org/",
+    "sourceUrls": [
+      "https://rxkids.org/about/faq/",
+      "https://rxkids.org/guide/",
+      "https://rxkids.org/michigan/detroit/"
+    ]
+  },
+  {
+    "category": "money",
+    "costToClaim": "free",
+    "requirements": [
+      "eligibility"
+    ],
+    "states": [
+      "OR"
+    ],
+    "region": "Multnomah County, Oregon only",
+    "verifiedOn": "2026-11-10",
+    "confidence": "low",
+    "offers": [
+      "cash"
+    ],
+    "certainty": "chance",
+    "freeStuff": "",
+    "effort": "some",
+    "when": "pregnancy",
+    "whenNote": "Must apply at 27 weeks of pregnancy or earlier.",
+    "catches": "Applications were set to open February 4, 2026; the results did not say whether slots remain. A lottery, so most applicants may get nothing.",
+    "notes": "Left value null because selection is a draw. NYC Bridge Project phase has no current application; Philadelphia Joy Bank only seen on a news site.",
+    "valueLow": null,
+    "valueHigh": null,
+    "valueSource": "none",
+    "valueBasis": "",
+    "id": "or-bridge-project-multnomah",
+    "name": "Bridge Project cash stipend (Multnomah County)",
+    "brand": "The Bridge Project",
+    "whatYouGet": "A $1,125 prenatal stipend, then $750 a month for 15 months and $375 a month for 21 months, for people selected by lottery.",
+    "costDetail": "Free; research study with a lottery.",
+    "eligibility": "Pregnant, 27 weeks or fewer (priority for 20 to 27 weeks), household income under $39,000, living in Multnomah County. 100 slots.",
+    "signupUrl": "https://www.bridgeproject.org/apply",
+    "sourceUrls": [
+      "https://www.bridgeproject.org/press/cash-stipend-program-for-pregnant-moms-expands-to-multnomah-county"
+    ]
+  },
+  {
+    "category": "money",
+    "costToClaim": "free",
+    "requirements": [
+      "eligibility"
+    ],
+    "states": [
+      "CA"
+    ],
+    "region": "California",
+    "verifiedOn": "2026-11-10",
+    "confidence": "medium",
+    "offers": [
+      "cash"
+    ],
+    "certainty": "if-eligible",
+    "freeStuff": "",
+    "effort": "some",
+    "when": "after-birth",
+    "whenNote": "Claimed on the state return for the year of the birth.",
+    "catches": "The amount is per return, not per child, and shrinks as earnings pass $27,425.",
+    "notes": "Latest year shown is 2025 ($1,154 in 2024).",
+    "valueLow": 0,
+    "valueHigh": 1189,
+    "valueSource": "official",
+    "valueBasis": "Up to $1,189 per return for tax year 2025; $0 above the income limit",
+    "id": "ca-young-child-tax-credit",
+    "name": "California Young Child Tax Credit",
+    "brand": "California Franchise Tax Board",
+    "whatYouGet": "A refundable state tax credit of up to $1,189 per return (tax year 2025) for filers with a child under 6, on top of the CalEITC.",
+    "costDetail": "No cost; claimed on the California return with form FTB 3514.",
+    "eligibility": "Qualify for CalEITC with a child younger than 6 on Dec 31; earned income generally $32,900 or less (phase-out starts at $27,425). The child may have an ITIN instead of an SSN.",
+    "signupUrl": "https://www.ftb.ca.gov/file/personal/credits/young-child-tax-credit.html",
+    "sourceUrls": [
+      "https://www.ftb.ca.gov/file/personal/credits/young-child-tax-credit.html",
+      "https://www.ftb.ca.gov/forms/2025/2025-3514-booklet.html"
+    ]
+  },
+  {
+    "category": "money",
+    "costToClaim": "free",
+    "requirements": [
+      "eligibility"
+    ],
+    "states": [
+      "NY"
+    ],
+    "region": "New York",
+    "verifiedOn": "2026-11-10",
+    "confidence": "medium",
+    "offers": [
+      "cash"
+    ],
+    "certainty": "if-eligible",
+    "freeStuff": "",
+    "effort": "some",
+    "when": "after-birth",
+    "whenNote": "A baby born in 2027 counts under 4 on the 2027 return filed in 2028.",
+    "catches": "File a New York return to get it. The credit for children 4 to 16 is $330 in 2025 and $500 in 2026 and 2027.",
+    "notes": "One page snippet gave $500 for 2025 ages 4 to 16, others $330; not relevant to newborns.",
+    "valueLow": 0,
+    "valueHigh": 1000,
+    "valueSource": "official",
+    "valueBasis": "$1,000 per child under 4; reduced to $0 at higher incomes",
+    "id": "ny-empire-state-child-credit",
+    "name": "Empire State Child Credit (New York)",
+    "brand": "New York State Tax Department",
+    "whatYouGet": "A refundable state credit of $1,000 per child under 4 for tax years 2025 through 2027.",
+    "costDetail": "No cost; claimed on the New York return with form IT-213.",
+    "eligibility": "New York resident with a child under 17 at year end; reduced by $16.50 per $1,000 of federal AGI above $75,000 (single or head of household), $110,000 (joint) or $55,000 (married filing separately).",
+    "signupUrl": "https://www.tax.ny.gov/pit/credits/empire_state_child_credit.htm",
+    "sourceUrls": [
+      "https://www.tax.ny.gov/pit/credits/empire_state_child_credit.htm",
+      "https://www.tax.ny.gov/forms/current-forms/it/it213i.htm",
+      "https://otda.ny.gov/programs/empire-state-child-credit/"
+    ]
+  },
+  {
+    "category": "money",
+    "costToClaim": "free",
+    "requirements": [
+      "eligibility"
+    ],
+    "states": [
+      "NJ"
+    ],
+    "region": "New Jersey",
+    "verifiedOn": "2026-11-10",
+    "confidence": "medium",
+    "offers": [
+      "cash"
+    ],
+    "certainty": "if-eligible",
+    "freeStuff": "",
+    "effort": "some",
+    "when": "after-birth",
+    "whenNote": "Claimed on the state return for the year the child is born.",
+    "catches": "Part-year residents get a prorated amount.",
+    "notes": "",
+    "valueLow": 200,
+    "valueHigh": 1000,
+    "valueSource": "official",
+    "valueBasis": "$200 to $1,000 per child by taxable income, for tax year 2025",
+    "id": "nj-child-tax-credit",
+    "name": "New Jersey Child Tax Credit",
+    "brand": "New Jersey Division of Taxation",
+    "whatYouGet": "A refundable credit of up to $1,000 per child age 5 or younger for tax year 2025.",
+    "costDetail": "No cost; claimed on the New Jersey return.",
+    "eligibility": "NJ resident with taxable income of $80,000 or less, not filing married separately. Amount by taxable income: $1,000 up to $30,000; $800 to $40,000; $600 to $50,000; $400 to $60,000; $200 to $80,000.",
+    "signupUrl": "https://www.nj.gov/treasury/taxation/individuals/childtaxcredit.shtml",
+    "sourceUrls": [
+      "https://www.nj.gov/treasury/taxation/individuals/childtaxcredit.shtml",
+      "https://www.nj.gov/treasury/taxation/pdf/help/2025-update-handout.pdf"
+    ]
+  },
+  {
+    "category": "money",
+    "costToClaim": "free",
+    "requirements": [
+      "eligibility"
+    ],
+    "states": [
+      "MN"
+    ],
+    "region": "Minnesota",
+    "verifiedOn": "2026-11-10",
+    "confidence": "medium",
+    "offers": [
+      "cash"
+    ],
+    "certainty": "if-eligible",
+    "freeStuff": "",
+    "effort": "some",
+    "when": "after-birth",
+    "whenNote": "Claimed on the return for the year the child is born.",
+    "catches": "Higher-income families get a reduced or no credit. The Working Family Credit is separate.",
+    "notes": "Used the 2025 figure as the modest estimate.",
+    "valueLow": 0,
+    "valueHigh": 1750,
+    "valueSource": "official",
+    "valueBasis": "Up to $1,750 per child for tax year 2025; reduced above the income threshold",
+    "id": "mn-child-tax-credit",
+    "name": "Minnesota Child Tax Credit",
+    "brand": "Minnesota Department of Revenue",
+    "whatYouGet": "A refundable state credit of $1,750 per child under 18 for tax year 2025 ($1,800 in 2026 materials), with no cap on number of children.",
+    "costDetail": "No cost; claimed on the Minnesota return.",
+    "eligibility": "Credit begins to phase out at $31,950 (single) or $37,910 (joint) for 2025; for 2026 at $32,680 or $38,770.",
+    "signupUrl": "https://www.revenue.state.mn.us/child-tax-credit",
+    "sourceUrls": [
+      "https://www.revenue.state.mn.us/child-tax-credit",
+      "https://www.revenue.state.mn.us/sites/default/files/2026-01/minnesota-child-tax-credit-2026.pdf"
+    ]
+  },
+  {
+    "category": "money",
+    "costToClaim": "free",
+    "requirements": [
+      "eligibility"
+    ],
+    "states": [
+      "VT"
+    ],
+    "region": "Vermont",
+    "verifiedOn": "2026-11-10",
+    "confidence": "medium",
+    "offers": [
+      "cash"
+    ],
+    "certainty": "if-eligible",
+    "freeStuff": "",
+    "effort": "some",
+    "when": "after-birth",
+    "whenNote": "Claimed on the return for the year the child is born.",
+    "catches": "Age limit rose from 5 to 6 for 2025 under Act 71 of 2025.",
+    "notes": "",
+    "valueLow": 0,
+    "valueHigh": 1000,
+    "valueSource": "official",
+    "valueBasis": "Up to $1,000 per child for tax year 2025; reduced above $125,000 AGI",
+    "id": "vt-child-tax-credit",
+    "name": "Vermont Child Tax Credit",
+    "brand": "Vermont Department of Taxes",
+    "whatYouGet": "A fully refundable credit of up to $1,000 per child age 6 or younger for tax year 2025.",
+    "costDetail": "No cost; claimed on the Vermont return.",
+    "eligibility": "Vermont resident; reduced by $20 per $1,000 of AGI above $125,000 and gone at $175,000. A Social Security number or ITIN is not required.",
+    "signupUrl": "https://tax.vermont.gov/individuals/personal-income-tax/tax-credits",
+    "sourceUrls": [
+      "https://tax.vermont.gov/individuals/personal-income-tax/tax-credits",
+      "https://legislature.vermont.gov/statutes/section/32/151/05830f"
+    ]
+  },
+  {
+    "category": "money",
+    "costToClaim": "free",
+    "requirements": [
+      "eligibility"
+    ],
+    "states": [
+      "MA"
+    ],
+    "region": "Massachusetts",
+    "verifiedOn": "2026-11-10",
+    "confidence": "medium",
+    "offers": [
+      "cash"
+    ],
+    "certainty": "if-eligible",
+    "freeStuff": "",
+    "effort": "some",
+    "when": "after-birth",
+    "whenNote": "Claimed on the return for the year the child is born.",
+    "catches": "Income limits were not in the results.",
+    "notes": "Signup URL is the state flyer.",
+    "valueLow": 440,
+    "valueHigh": 440,
+    "valueSource": "official",
+    "valueBasis": "$440 per dependent stated in the 2025 Form 1 instructions",
+    "id": "ma-child-family-tax-credit",
+    "name": "Massachusetts Child and Family Tax Credit",
+    "brand": "Massachusetts Department of Revenue",
+    "whatYouGet": "A state tax credit of $440 per qualifying dependent under 13 for tax year 2025, with no limit on number of dependents.",
+    "costDetail": "No cost; claimed on Massachusetts Form 1.",
+    "eligibility": "Dependent under 13 for federal purposes; file as single, head of household or joint (not married filing separately).",
+    "signupUrl": "https://www.mass.gov/doc/child-family-tax-credit-flyer/download",
+    "sourceUrls": [
+      "https://www.mass.gov/doc/2025-form-1-instructions/download",
+      "https://www.mass.gov/doc/child-family-tax-credit-flyer/download"
+    ]
+  },
+  {
+    "category": "money",
+    "costToClaim": "free",
+    "requirements": [
+      "eligibility"
+    ],
+    "states": [
+      "OR"
+    ],
+    "region": "Oregon",
+    "verifiedOn": "2026-11-10",
+    "confidence": "medium",
+    "offers": [
+      "cash"
+    ],
+    "certainty": "if-eligible",
+    "freeStuff": "",
+    "effort": "some",
+    "when": "after-birth",
+    "whenNote": "Claimed on the return for the year the child is born.",
+    "catches": "Tax software had errors in early 2026; check the amount. Some state pages still show older figures.",
+    "notes": "",
+    "valueLow": 0,
+    "valueHigh": 1050,
+    "valueSource": "official",
+    "valueBasis": "Up to $1,050 per child for tax year 2025; $0 above $31,550",
+    "id": "or-kids-credit",
+    "name": "Oregon Kids Credit",
+    "brand": "Oregon Department of Revenue",
+    "whatYouGet": "A refundable credit of up to $1,050 per child age 5 or younger for tax year 2025 (up to 5 children).",
+    "costDetail": "No cost; claimed on the Oregon return.",
+    "eligibility": "Full credit at modified AGI of $26,550 or less, reduced to $0 at $31,550.",
+    "signupUrl": "https://www.oregon.gov/dor/programs/individuals/pages/credits.aspx",
+    "sourceUrls": [
+      "https://www.oregon.gov/dor/programs/individuals/pages/credits.aspx",
+      "https://apps.oregon.gov/oregon-newsroom/OR/DOR/Posts/Post/oregon-kids-credit-offers-big-boost-for-lowest-income-families-91560"
+    ]
+  },
+  {
+    "category": "money",
+    "costToClaim": "free",
+    "requirements": [
+      "eligibility"
+    ],
+    "states": [
+      "ME"
+    ],
+    "region": "Maine",
+    "verifiedOn": "2026-11-10",
+    "confidence": "low",
+    "offers": [
+      "cash"
+    ],
+    "certainty": "if-eligible",
+    "freeStuff": "",
+    "effort": "some",
+    "when": "after-birth",
+    "whenNote": "Claimed on the return for the year the child is born.",
+    "catches": "The rule changes for tax years beginning in 2026 and those details were not checked, so the amount for a 2027 birth is unknown. Phase-out thresholds differed slightly between sources.",
+    "notes": "",
+    "valueLow": 0,
+    "valueHigh": 610,
+    "valueSource": "official",
+    "valueBasis": "Up to $610 per child under 6 for tax year 2025; reduced at higher incomes",
+    "id": "me-dependent-exemption-tax-credit",
+    "name": "Maine dependent exemption tax credit (under 6)",
+    "brand": "Maine Revenue Services",
+    "whatYouGet": "A refundable credit of up to $610 for each child under 6 (twice the $305 base) for tax year 2025.",
+    "costDetail": "No cost; the worksheet goes with the Maine return.",
+    "eligibility": "Maine resident or part-year resident; reduced above $100,000 (single), $125,000 (head of household) or $150,000 (joint) per a fiscal note.",
+    "signupUrl": "https://www.maine.gov/revenue/sites/maine.gov.revenue/files/inline-files/25_dependent_exemption_tx_cr_fillable.pdf",
+    "sourceUrls": [
+      "https://www.maine.gov/revenue/sites/maine.gov.revenue/files/inline-files/25_dependent_exemption_tx_cr_fillable.pdf",
+      "https://legislature.maine.gov/statutes/36/title36sec5219-SS.html"
+    ]
+  },
+  {
+    "category": "money",
+    "costToClaim": "free",
+    "requirements": [
+      "eligibility"
+    ],
+    "states": [
+      "IL"
+    ],
+    "region": "Illinois",
+    "verifiedOn": "2026-11-10",
+    "confidence": "medium",
+    "offers": [
+      "cash"
+    ],
+    "certainty": "if-eligible",
+    "freeStuff": "",
+    "effort": "some",
+    "when": "after-birth",
+    "whenNote": "Claimed on the return for the year the child is born.",
+    "catches": "No fixed dollar amount, so no value is given. It was 20% of the EITC when first created.",
+    "notes": "",
+    "valueLow": null,
+    "valueHigh": null,
+    "valueSource": "none",
+    "valueBasis": "",
+    "id": "il-child-tax-credit",
+    "name": "Illinois Child Tax Credit",
+    "brand": "Illinois Department of Revenue",
+    "whatYouGet": "A state credit equal to 40% of your Illinois EITC when you have a child under 12 (tax year 2025).",
+    "costDetail": "No cost; worked out on Schedule IL-E/EITC.",
+    "eligibility": "You must qualify for the Illinois EITC and have a dependent under 12 on Dec 31.",
+    "signupUrl": "https://tax.illinois.gov/individuals/credits/child-tax-credit.html",
+    "sourceUrls": [
+      "https://tax.illinois.gov/individuals/credits/child-tax-credit.html",
+      "https://tax.illinois.gov/content/dam/soi/en/web/tax/forms/incometax/documents/currentyear/individual/il-1040-schedule-il-e-eic.pdf"
+    ]
+  },
+  {
+    "category": "money",
+    "costToClaim": "free",
+    "requirements": [
+      "eligibility"
+    ],
+    "states": [
+      "NM"
+    ],
+    "region": "New Mexico",
+    "verifiedOn": "2026-11-10",
+    "confidence": "low",
+    "offers": [
+      "cash"
+    ],
+    "certainty": "if-eligible",
+    "freeStuff": "",
+    "effort": "some",
+    "when": "after-birth",
+    "whenNote": "Claimed on the return for the year the child is born.",
+    "catches": "Results disagree: $622 (January 2026 release) and $637 (state chart); the lower is used. Not limited to young children.",
+    "notes": "",
+    "valueLow": 0,
+    "valueHigh": 622,
+    "valueSource": "official",
+    "valueBasis": "Up to $622 per child (lower of $622 and $637); less at higher incomes",
+    "id": "nm-child-tax-credit",
+    "name": "New Mexico Child Tax Credit",
+    "brand": "New Mexico Taxation and Revenue Department",
+    "whatYouGet": "A refundable state credit of up to $622 per qualifying child (tax year 2025), larger for lower incomes.",
+    "costDetail": "No cost; claimed on the New Mexico return (PIT-RC).",
+    "eligibility": "New Mexico resident with a qualifying child, not a dependent of someone else; the credit shrinks as income rises.",
+    "signupUrl": "https://www.tax.newmexico.gov/new-mexico-child-tax-credit/",
+    "sourceUrls": [
+      "https://www.tax.newmexico.gov/new-mexico-child-tax-credit/",
+      "https://realfile.tax.newmexico.gov/2025pit-rc-ins.pdf"
+    ]
+  },
+  {
+    "category": "money",
+    "costToClaim": "free",
+    "requirements": [
+      "eligibility"
+    ],
+    "states": [
+      "CT"
+    ],
+    "region": "Connecticut",
+    "verifiedOn": "2026-11-10",
+    "confidence": "low",
+    "offers": [
+      "cash"
+    ],
+    "certainty": "likely",
+    "freeStuff": "$100 deposit into a 529 account.",
+    "effort": "some",
+    "when": "after-birth",
+    "whenNote": "Open the account by the first birthday or within a year of adoption.",
+    "catches": "A 2025 bill (SB 1462) would have ended the program, and the results did not show whether it passed. The older $150 second payment is no longer offered per a 2025 bill summary.",
+    "notes": "Confirm with the Treasurer's office.",
+    "valueLow": 100,
+    "valueHigh": 100,
+    "valueSource": "official",
+    "valueBasis": "$100 contribution stated by the Treasurer",
+    "id": "ct-chet-baby-scholars",
+    "name": "CHET Baby Scholars (Connecticut)",
+    "brand": "Connecticut Office of the Treasurer",
+    "whatYouGet": "A one-time $100 contribution into a CHET Direct 529 account opened by the child's first birthday.",
+    "costDetail": "No cost; no deposit stated as needed.",
+    "eligibility": "Connecticut resident; one $100 per child regardless of the number of accounts.",
+    "signupUrl": "https://www.aboutchet.com/buzz/baby.shtml",
+    "sourceUrls": [
+      "https://www.aboutchet.com/buzz/baby.shtml",
+      "https://portal.ct.gov/ott/financial-wellness/chet/connecticut-higher-education-trust---chet"
+    ]
+  }
+]

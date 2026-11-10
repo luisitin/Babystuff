@@ -1,0 +1,275 @@
+[
+ {
+  "id": "buybuy-baby-registry-welcome-bag",
+  "name": "Registry welcome bag",
+  "brand": "buybuy BABY",
+  "category": "registry-box",
+  "whatYouGet": "Goody bag with free samples, coupons and a Registry Guide.",
+  "costToClaim": "free",
+  "costDetail": "Free with a registry; store pickup only. No purchase is stated, but a store personal-shop appointment is mentioned.",
+  "requirements": [
+   "registry"
+  ],
+  "eligibility": "Baby registrants who ask for it in a participating store; details not confirmed.",
+  "region": "US",
+  "signupUrl": "https://www.buybuybaby.com/store/page/BabyRegistry",
+  "sourceUrls": [
+   "https://www.buybuybaby.com/store/page/BabyRegistry"
+  ],
+  "verifiedOn": "2026-11-10",
+  "confidence": "low",
+  "catches": "Official pages disagree: older registry and store pages offer a free goody bag with samples, coupons and a Registry Guide (ask in store or get it at an in-store personal shop), while the newer registry page lists other perks and does not mention the bag. A buybuy BABY FAQ says the old stores and site were liquidated after bankruptcy and a new owner was relaunching. Call a store first.",
+  "notes": "Today's official-domain results (buybuybaby.com and stores.buybuybaby.com) show the bag only on older and store pages; the current registry page lists group gifting, a percentage off remaining items, price match and 365-day returns. Cannot fetch, so left at low confidence.",
+  "offers": [
+   "product",
+   "coupons"
+  ],
+  "certainty": "likely",
+  "freeStuff": "A bag of free samples, coupons and a Registry Guide, picked up in a store when you register.",
+  "valueLow": 5,
+  "valueHigh": 15,
+  "valueSource": "estimate",
+  "valueBasis": "A few samples and a guide; the contents are not listed",
+  "effort": "some",
+  "when": "pregnancy",
+  "whenNote": "",
+  "states": []
+ },
+ {
+  "category": "registry-box",
+  "costToClaim": "free",
+  "region": "US",
+  "offers": [
+   "product",
+   "coupons"
+  ],
+  "certainty": "likely",
+  "freeStuff": "A welcome box with baby and parent items, free with the coupon once you have a registry.",
+  "valueSource": "estimate",
+  "effort": "some",
+  "states": [],
+  "verifiedOn": "2026-11-10",
+  "confidence": "medium",
+  "id": "kohls-babies-r-us-welcome-box",
+  "name": "Babies \"R\" Us Welcome Box",
+  "brand": "Kohl's",
+  "whatYouGet": "Welcome box of skincare, feeding essentials and accessories, listed at $20 and free with a coupon.",
+  "costDetail": "Box is listed at $20 and free once you add the coupon from your Kohl's digital wallet at checkout. The product page lists standard shipping rates ($8.95, or free at $49) and does not say whether the box adds shipping, so ask before checkout.",
+  "requirements": [
+   "email",
+   "registry"
+  ],
+  "eligibility": "Primary registry owner with a free Kohl's Rewards account; one box per customer per year; coupon expires after 365 days.",
+  "signupUrl": "https://www.kohls.com/babyregistry",
+  "sourceUrls": [
+   "https://www.kohls.com/product/prd-7344513/babies-r-us-welcome-box.jsp",
+   "https://www.kohls.com/babyregistry"
+  ],
+  "valueLow": 10,
+  "valueHigh": 20,
+  "valueBasis": "Box listed at $20; contents not itemized, so the low end is taken",
+  "when": "pregnancy",
+  "whenNote": "",
+  "catches": "Limited time, while supplies last. Not returnable or refundable, and not eligible for other coupons. Box contents are not itemized. Shipping on the box is not stated. An old Kohl's mobile page says the registry may be discontinued, but the registry page, FAQ and product page all describe it as active.",
+  "notes": "Today's Kohl's results (registry page, FAQ 4278, product page) all describe the welcome box with a registry; only a stale mobile page says the registry may end. Registry also gives 15% off remaining items after the shower."
+ },
+ {
+  "id": "macrobaby-gift-box",
+  "name": "MacroBaby Gift Box",
+  "brand": "MacroBaby",
+  "category": "registry-box",
+  "whatYouGet": "Free welcome box of baby samples, coupons and products from trusted brands, est. value $80+; contents are random and seasonal. Added to your shipment after your first qualifying registry purchase.",
+  "costToClaim": "purchase-required",
+  "costDetail": "Box is added at no extra cost, but you must add at least 20 items to a registry and make a first qualifying purchase of $15 or more from it.",
+  "requirements": [
+   "registry",
+   "purchase"
+  ],
+  "eligibility": "One box per qualifying registry.",
+  "region": "US",
+  "signupUrl": "https://www.macrobaby.com/pages/macrobaby-gift-box",
+  "sourceUrls": [
+   "https://www.macrobaby.com/pages/macrobaby-gift-box",
+   "https://www.macrobaby.com/pages/baby-registry"
+  ],
+  "verifiedOn": "2026-11-08",
+  "confidence": "high",
+  "catches": "Contents can't be requested; if the qualifying items are returned the box must be returned or an $80 fee applies; program can change or end without notice.",
+  "notes": "Re-checked with macrobaby.com results today: terms unchanged (20 items on a registry, first qualifying purchase of $15 or more, one box per registry, contents random, $80 fee if qualifying items are returned without the box, program can end without notice). Not in-store: MacroBaby is online. Registry also advertises 5% back as store credit 30 days after the shower.",
+  "offers": [
+   "product",
+   "coupons"
+  ],
+  "certainty": "likely",
+  "freeStuff": "",
+  "valueLow": 80,
+  "valueHigh": 80,
+  "valueSource": "official",
+  "valueBasis": "MacroBaby gives an est. value of $80+; contents are random and seasonal",
+  "effort": "some",
+  "when": "pregnancy",
+  "whenNote": "",
+  "states": []
+ },
+ {
+  "id": "target-registry-welcome-kit",
+  "name": "Registry Welcome Kit (Target Baby Box)",
+  "brand": "Target",
+  "category": "registry-box",
+  "whatYouGet": "Welcome kit valued at $100, a mix of samples and a Target Circle Bonus.",
+  "costToClaim": "purchase-required",
+  "costDetail": "Free kit, but shipping and handling fees apply (amount not stated). Needs a free Target Circle account, a baby registry with 10 unique items, and over $10 purchased from the registry by you or a guest.",
+  "requirements": [
+   "email",
+   "registry",
+   "purchase"
+  ],
+  "eligibility": "Active baby registries created after 08/15/2023 that haven't claimed a previous kit; one kit per year.",
+  "region": "US",
+  "signupUrl": "https://www.target.com/gift-registry/create-baby-registry",
+  "sourceUrls": [
+   "https://www.target.com/help/article/000062588"
+  ],
+  "verifiedOn": "2026-11-10",
+  "confidence": "medium",
+  "catches": "Online only, as a Target Circle Bonus that must be accepted; shipping and handling fees apply; limit one kit per year; registries that claimed a previous kit aren't eligible. Allow 24-48 hours for the bonus to be issued.",
+  "notes": "Confirmed purchase-required on today's Target help article: join Target Circle, create a registry, add 10 unique items, and have over $10 purchased from it. The bonus shows after 24 to 48 hours and must be accepted. Not an in-store item. Kit page and help article both say shipping and handling fees apply; amount not stated.",
+  "offers": [
+   "product",
+   "coupons"
+  ],
+  "certainty": "likely",
+  "freeStuff": "",
+  "valueLow": 15,
+  "valueHigh": 40,
+  "valueSource": "estimate",
+  "valueBasis": "Target labels it a $100 value, but that mixes samples with a Circle Bonus; samples at low end, bonus counted as a saving",
+  "effort": "some",
+  "when": "pregnancy",
+  "whenNote": "",
+  "states": []
+ },
+ {
+  "valueSource": "estimate",
+  "states": [
+   "IL",
+   "IN",
+   "KY",
+   "MI",
+   "OH",
+   "WI"
+  ],
+  "whenNote": "",
+  "verifiedOn": "2026-11-10",
+  "confidence": "low",
+  "id": "meijer-free-prenatal-vitamins",
+  "name": "Free prenatal vitamin prescriptions",
+  "brand": "Meijer",
+  "category": "health-benefits",
+  "whatYouGet": "Meijer pharmacies list prenatal vitamins in their free prescription program, so an eligible prenatal prescription is filled at no cost, with or without insurance.",
+  "costToClaim": "free",
+  "costDetail": "Free for covered prenatal vitamin prescriptions; the covered list and any quantity limit are not stated on the pages found.",
+  "requirements": [
+   "eligibility"
+  ],
+  "eligibility": "Needs a prescription for a covered prenatal vitamin; a 2011 Meijer release says any customer qualifies regardless of insurance or co-pay.",
+  "region": "Meijer stores in Illinois, Indiana, Kentucky, Michigan, Ohio and Wisconsin",
+  "signupUrl": "https://newsroom.meijer.com/specialty-teams",
+  "sourceUrls": [
+   "https://newsroom.meijer.com/specialty-teams",
+   "https://community.meijer.com/meijer/b/mediarelations/posts/june-29-2011-meijer-delivers-one-million-free-pre-natal-vitamin-prescriptions-to-women-throughout-the-midwest",
+   "https://www.meijer.com/shopping/services/pharmacy/pharmacy-services"
+  ],
+  "catches": "The newsroom page is undated and the detailed terms are from a 2011 release, so the covered brands may have changed (the 2011 list named TriAdvance, Trinatal GT, Trinatal Ultra, Vol-Nate, Vol-Plus, Vol-Tab). Meijer's current quality page only says to ask the pharmacist about free select prescriptions. Needs a prescription from a clinician. Call the pharmacy first.",
+  "notes": "Not fetchable; based on official-domain search results only.",
+  "offers": [
+   "product"
+  ],
+  "certainty": "likely",
+  "freeStuff": "Covered prenatal vitamin prescriptions filled at no cost at a Meijer pharmacy.",
+  "valueLow": 13,
+  "valueHigh": 26,
+  "valueBasis": "One to two bottles at Meijer's about $13 for 100 prenatal tablets; covered brands may differ",
+  "effort": "some",
+  "when": "pregnancy"
+ },
+ {
+  "valueSource": "estimate",
+  "states": [
+   "CT",
+   "MA",
+   "NH",
+   "NY",
+   "PA",
+   "VT"
+  ],
+  "whenNote": "",
+  "verifiedOn": "2026-11-10",
+  "confidence": "low",
+  "id": "price-chopper-free-prenatal-vitamins",
+  "name": "Free prenatal and children's vitamins",
+  "brand": "Price Chopper / Market 32",
+  "category": "health-benefits",
+  "whatYouGet": "A Price Chopper blog post lists free prenatal and children's vitamins among its pharmacy savings programs.",
+  "costToClaim": "free",
+  "costDetail": "Listed as free; the post gives no sign-up steps, covered products or limits.",
+  "requirements": [
+   "eligibility"
+  ],
+  "eligibility": "Not stated; likely needs a prescription filled at a Price Chopper or Market 32 pharmacy. Ask the pharmacist.",
+  "region": "Price Chopper and Market 32 pharmacies in Connecticut, Massachusetts, New Hampshire, New York, Pennsylvania and Vermont",
+  "signupUrl": "https://www.pricechopper.com/blog/tag/flu-shot/",
+  "sourceUrls": [
+   "https://www.pricechopper.com/blog/tag/flu-shot/"
+  ],
+  "catches": "Only one undated blog post (found under a flu-shot tag) mentions it; no eligibility rules or product list were found, and store pages do not mention it. Confirm with the pharmacy before relying on it.",
+  "notes": "Official-domain search only. Left at low confidence because the program is mentioned in one place.",
+  "offers": [
+   "product"
+  ],
+  "certainty": "likely",
+  "freeStuff": "Free prenatal vitamins at a Price Chopper or Market 32 pharmacy, if the program still runs.",
+  "valueLow": 10,
+  "valueHigh": 20,
+  "valueBasis": "One to two bottles of store-brand prenatal vitamins at about $10 each; the program's terms are not stated",
+  "effort": "some",
+  "when": "pregnancy"
+ },
+ {
+  "valueSource": "estimate",
+  "states": [],
+  "whenNote": "Starts two months before the arrival date and runs six months after",
+  "verifiedOn": "2026-11-10",
+  "confidence": "medium",
+  "id": "bloomingdales-baby-registry-completion-discount",
+  "name": "Baby Registry Completion Discount (20%)",
+  "brand": "Bloomingdale's",
+  "category": "registry-box",
+  "whatYouGet": "20% off eligible items still on your baby registry, plus a registry expert; some brand partners add a bonus gift at a spending threshold.",
+  "costToClaim": "free",
+  "costDetail": "Free to use; baby gear, strollers and some designer and leased brands are excluded.",
+  "requirements": [
+   "registry"
+  ],
+  "eligibility": "Registry owner.",
+  "region": "US",
+  "signupUrl": "https://www.bloomingdales.com/registry/baby",
+  "sourceUrls": [
+   "https://www.bloomingdales.com/customer-service/articles/general-baby-gift-registry-information",
+   "https://www.bloomingdales.com/registry/baby",
+   "https://www.bloomingdales.com/c/editorial/registry/baby-bonus-gifts/"
+  ],
+  "catches": "Cannot be combined with other promotions and does not apply to earlier purchases. Brand bonus gifts need a spend (one listing asks $750 for a UPPAbaby blanket), so they are not free. Terms read from search results only.",
+  "notes": "Results also mention 20% off maternity clothing and fine jewelry for registrants.",
+  "offers": [
+   "coupons"
+  ],
+  "certainty": "guaranteed",
+  "freeStuff": "",
+  "valueLow": 20,
+  "valueHigh": 100,
+  "valueBasis": "20% of about $100 to $500 of eligible items you would still buy; baby gear is excluded",
+  "effort": "some",
+  "when": "late-pregnancy"
+ }
+]
