@@ -9,10 +9,10 @@ const E = require('../src/js/email.js');
 
 const ME = 'alex.sample@gmail.com';
 const P = [
-  { id: 'alpha-box', name: 'Alpha Box', brand: 'Alpha', signupUrl: 'https://www.alpha.example.com/join' },
-  { id: 'beta-club', name: 'Beta Club', brand: 'Beta', signupUrl: 'https://register.beta-club.example.org/x' },
-  { id: 'gamma-one', name: 'Gamma One', brand: 'Gamma', signupUrl: 'https://shared.example.net/a' },
-  { id: 'gamma-two', name: 'Gamma Two', brand: 'Gamma', signupUrl: 'https://shared.example.net/b' },
+  { id: 'alpha-box', name: 'Alpha Box', brand: 'Alpha', signupUrl: 'https://www.alphabox.com/join' },
+  { id: 'beta-club', name: 'Beta Club', brand: 'Beta', signupUrl: 'https://register.betaclub.org/x' },
+  { id: 'gamma-one', name: 'Gamma One', brand: 'Gamma', signupUrl: 'https://shared-site.net/a' },
+  { id: 'gamma-two', name: 'Gamma Two', brand: 'Gamma', signupUrl: 'https://shared-site.net/b' },
   { id: 'big-store', name: 'Big Store', brand: 'Target', signupUrl: 'https://www.target.com/registry' },
   { id: 'agency', name: 'Agency', brand: 'Agency', signupUrl: 'https://www.hrsa.gov/x' }
 ];
@@ -21,7 +21,7 @@ const TAGS = E.tagMap(P);
 function msg(o = {}) {
   return Object.assign({
     id: 'm1', threadId: 't1', date: '2026-10-01T10:00:00Z', internalDate: String(Date.parse('2026-10-01T10:00:00Z')),
-    labelIds: [], sender: 'hello@alpha.example.com', addressDisplayNames: [], snippet: '', subject: 'Hi', toRecipients: [ME]
+    labelIds: [], sender: 'hello@alphabox.com', addressDisplayNames: [], snippet: '', subject: 'Hi', toRecipients: [ME]
   }, o);
 }
 function thread(id, msgs, extra = {}) {
@@ -46,9 +46,9 @@ test('source mentions no tool other than the five declared and no network API', 
 test('buildQueries: from terms only for single-owner, non-broad domains; deterministic', () => {
   const q = I.buildQueries({ programs: P, email: ME, tagMap: TAGS, usePlus: false });
   const text = q.map((x) => x.query).join('\n');
-  assert.match(text, /from:alpha\.example\.com/);
-  assert.match(text, /from:beta-club\.example\.org/);
-  assert.doesNotMatch(text, /shared\.example\.net/);
+  assert.match(text, /from:alphabox\.com/);
+  assert.match(text, /from:betaclub\.org/);
+  assert.doesNotMatch(text, /shared-site\.net/);
   assert.doesNotMatch(text, /target\.com/);
   assert.doesNotMatch(text, /hrsa\.gov/);
   assert.doesNotMatch(text, /to:/);
@@ -81,13 +81,13 @@ test('buildQueries: hostile input is skipped, never quoted into the query', () =
     { id: 'e1', signupUrl: 'https://evil.example.com"} OR {from:victim.com/x' },
     { id: 'e2', signupUrl: 'https://a b.example.com/' },
     { id: 'e3', signupUrl: 'javascript:alert(1)' },
-    { id: 'e4' }, null, 'x', { id: '' }, { id: 'e5', signupUrl: 'https://ok-site.example.com/' }
+    { id: 'e4' }, null, 'x', { id: '' }, { id: 'e5', signupUrl: 'https://ok-site.com/' }
   ];
   const q = I.buildQueries({ programs: evil, email: 'a"b@x.com\nfrom:evil.com', tagMap: { e5: 'x" OR a' }, usePlus: true });
   const text = q.map((x) => x.query).join('\n');
   assert.doesNotMatch(text, /["\n\r(){}]{1}.*victim/);
   assert.doesNotMatch(text, /victim|a b|javascript/);
-  assert.match(text, /from:ok-site\.example\.com/);
+  assert.match(text, /from:ok-site\.com/);
   assert.doesNotMatch(text, /to:/);
   const q2 = I.buildQueries({ programs: [{ id: 'z', signupUrl: 'https://ok.example.com' }], email: ME, tagMap: { z: 'x" OR "y' }, usePlus: true });
   assert.doesNotMatch(q2[0].query, /"/);
@@ -199,19 +199,19 @@ test('matchThreads: exact by plus address, case-insensitive, any message in the 
 
 test('matchThreads: likely by sender domain only when the domain is unique and not broad', () => {
   const ts = [
-    thread('t1', [msg({ sender: 'News <hello@mail.alpha.example.com>' })]),
-    thread('t2', [msg({ sender: 'x@shared.example.net' })]),
+    thread('t1', [msg({ sender: 'News <hello@mail.alphabox.com>' })]),
+    thread('t2', [msg({ sender: 'x@shared-site.net' })]),
     thread('t3', [msg({ sender: 'x@target.com' })]),
     thread('t4', [msg({ sender: 'x@hrsa.gov' })]),
-    thread('t5', [msg({ sender: 'x@alpha.example.com.evil.example' })]),
-    thread('t6', [msg({ sender: 'x@evilalpha.example.com' })])
+    thread('t5', [msg({ sender: 'x@alphabox.com.evil.example' })]),
+    thread('t6', [msg({ sender: 'x@evilalphabox.com' })])
   ];
   const r = I.matchThreads(ts, { programs: P, email: ME });
   assert.deepEqual(r.map((x) => [x.threadId, x.programId, x.certainty]), [['t1', 'alpha-box', 'likely']]);
 });
 
 test('matchThreads: shared domain matches only through the plus address', () => {
-  const t = thread('t9', [msg({ sender: 'x@shared.example.net', toRecipients: [E.plusAddress(ME, TAGS['gamma-two'])] })]);
+  const t = thread('t9', [msg({ sender: 'x@shared-site.net', toRecipients: [E.plusAddress(ME, TAGS['gamma-two'])] })]);
   assert.deepEqual(I.matchThreads([t], { programs: P, email: ME, tagMap: TAGS }).map((x) => [x.programId, x.certainty]), [['gamma-two', 'exact']]);
   assert.deepEqual(I.matchThreads([t], { programs: P, email: ME }), []); // plus off
 });
@@ -224,7 +224,7 @@ test('matchThreads: broad domain with plus address matches; wrong or stripped pl
 });
 
 test('matchThreads: exact wins over a different sender domain; two programs in one thread are dropped', () => {
-  const t = thread('tt', [msg({ sender: 'x@alpha.example.com', toRecipients: [E.plusAddress(ME, TAGS['beta-club'])] })]);
+  const t = thread('tt', [msg({ sender: 'x@alphabox.com', toRecipients: [E.plusAddress(ME, TAGS['beta-club'])] })]);
   assert.equal(I.matchThreads([t], { programs: P, email: ME, tagMap: TAGS })[0].programId, 'beta-club');
   const both = thread('tb', [msg({ toRecipients: [E.plusAddress(ME, TAGS['beta-club']), E.plusAddress(ME, TAGS['alpha-box'])] })]);
   assert.deepEqual(I.matchThreads([both], { programs: P, email: ME, tagMap: TAGS }), []);
@@ -241,12 +241,12 @@ test('matchThreads: newest first, one per thread, duplicates dropped', () => {
 test('matchThreads: uses the newest message for subject, sender and date', () => {
   const t = thread('n1', [
     msg({ id: 'm1', sender: 'x@elsewhere.example.com', subject: 'old', internalDate: '1000', date: '2026-01-01T00:00:00Z' }),
-    msg({ id: 'm2', sender: 'y@alpha.example.com', subject: 'new', internalDate: '5000', date: '2026-03-01T00:00:00Z', addressDisplayNames: [{ displayName: 'Alpha Team', emailAddress: 'y@alpha.example.com' }] })
+    msg({ id: 'm2', sender: 'y@alphabox.com', subject: 'new', internalDate: '5000', date: '2026-03-01T00:00:00Z', addressDisplayNames: [{ displayName: 'Alpha Team', emailAddress: 'y@alphabox.com' }] })
   ]);
   const r = I.matchThreads([t], { programs: P, email: ME });
   assert.equal(r[0].subject, 'new');
   assert.equal(r[0].from, 'Alpha Team');
-  assert.equal(r[0].fromAddress, 'y@alpha.example.com');
+  assert.equal(r[0].fromAddress, 'y@alphabox.com');
 });
 
 test('matchThreads: empty payload, junk and missing fields never throw', () => {
@@ -254,28 +254,28 @@ test('matchThreads: empty payload, junk and missing fields never throw', () => {
   assert.deepEqual(I.matchThreads(undefined), []);
   assert.deepEqual(I.matchThreads({}, {}), []);
   assert.deepEqual(I.matchThreads([null, 5, 'x', [], {}, { id: 't' }, { id: 't', messages: [] }, { id: 't', messages: [null] }, { messages: [{}] }], { programs: P, email: ME, tagMap: TAGS }), []);
-  const weird = thread('w1', [{ sender: 'a@alpha.example.com' }]);
+  const weird = thread('w1', [{ sender: 'a@alphabox.com' }]);
   const r = I.matchThreads([weird], { programs: P });
   assert.equal(r[0].subject, '');
   assert.equal(r[0].date, '');
   assert.equal(r[0].viewUrl, 'https://mail.google.com/mail/?authuser=alex.sample%40gmail.com#all/thread-f:w1');
-  const bad = thread('w2', [msg({ sender: 'a@alpha.example.com', toRecipients: 'not-an-array', addressDisplayNames: 'x', date: 'garbage', internalDate: 'zzz' })], { viewUrl: 'javascript:alert(1)' });
+  const bad = thread('w2', [msg({ sender: 'a@alphabox.com', toRecipients: 'not-an-array', addressDisplayNames: 'x', date: 'garbage', internalDate: 'zzz' })], { viewUrl: 'javascript:alert(1)' });
   const r2 = I.matchThreads([bad], { programs: P });
   assert.equal(r2[0].viewUrl, '');
   assert.equal(r2[0].date, '');
-  assert.deepEqual(I.matchThreads([thread('bad id!', [msg({ sender: 'a@alpha.example.com' })])], { programs: P }), []);
+  assert.deepEqual(I.matchThreads([thread('bad id!', [msg({ sender: 'a@alphabox.com' })])], { programs: P }), []);
 });
 
 test('matchThreads: hostile subjects and snippets stay plain text', () => {
   const t = thread('h1', [msg({
-    sender: 'a@alpha.example.com', subject: '&lt;img src=x onerror=alert(1)&gt;‮{"} OR from:me\n\r', snippet: '&#60;script&#62;alert(1)&#60;/script&#62;'.repeat(50)
+    sender: 'a@alphabox.com', subject: '&lt;img src=x onerror=alert(1)&gt;‮{"} OR from:me\n\r', snippet: '&#60;script&#62;alert(1)&#60;/script&#62;'.repeat(50)
   })]);
   const r = I.matchThreads([t], { programs: P })[0];
   assert.doesNotMatch(r.subject, /[\n\r‮]/);
   assert.ok(r.subject.startsWith('<img src=x onerror=alert(1)>'));
   assert.ok(r.snippet.length <= 300);
-  assert.equal(r.fromAddress, 'a@alpha.example.com');
-  const longSender = thread('h2', [msg({ sender: 'a@alpha.example.com', subject: 'x'.repeat(1000) })]);
+  assert.equal(r.fromAddress, 'a@alphabox.com');
+  const longSender = thread('h2', [msg({ sender: 'a@alphabox.com', subject: 'x'.repeat(1000) })]);
   assert.equal(I.matchThreads([longSender], { programs: P })[0].subject.length, 200);
 });
 
@@ -333,7 +333,7 @@ test('checklistDraft: to is exactly the person, body lists programs', () => {
   const d = I.checklistDraft({ email: ' ' + ME + ' ', programs: P.slice(0, 2), statusOf: (p) => (p.id === 'alpha-box' ? 'Signed up' : '') });
   assert.deepEqual(d.to, [ME]);
   assert.equal(d.subject, 'Baby freebies checklist');
-  assert.match(d.body, /- Alpha Box \[Signed up\]\n {2}https:\/\/www\.alpha\.example\.com\/join/);
+  assert.match(d.body, /- Alpha Box \[Signed up\]\n {2}https:\/\/www\.alphabox\.com\/join/);
   assert.match(d.body, /- Beta Club\n/);
   assert.doesNotMatch(d.body, /\bsent\b/);
   assert.deepEqual(I.checklistDraft({ email: ME, programs: [] }).to, [ME]);
@@ -363,7 +363,7 @@ test('kitDraft: attachments are base64 of the UTF-8 text with safe names and typ
   assert.equal(d.attachments[0].filename, 'baby-freebies-reminders.ics');
   assert.equal(d.attachments[0].mimeType, 'text/calendar');
   assert.equal(FROM_B64(d.attachments[0].content), ics);
-  assert.equal(d.attachments[1].filename, '..-evil-name.xml'.replace(/^\.+/, ''));
+  assert.equal(d.attachments[1].filename, 'evil-name.xml');
   assert.doesNotMatch(d.attachments[1].filename, /[\/\\ ]/);
   assert.equal(d.attachments[1].mimeType, 'application/xml');
   assert.equal(FROM_B64(d.attachments[1].content), '<feed>é</feed>');

@@ -200,7 +200,7 @@
       });
       el.appendChild(clearRow);
       el.appendChild(statusEl);
-      var phoneNode = h('div', { id: 'info-phone' });
+      var phoneNode = h('div', { id: 'info-fill' });
       el.appendChild(phoneNode);
       if (BFF.phoneView && BFF.phoneView.mount) BFF.phoneView.mount(phoneNode);
       fill();

@@ -277,6 +277,6 @@
 
   window.addEventListener('hashchange', function () { mounted.forEach(render); });
 
-  var pre = document.getElementById('info-phone');
+  var pre = document.getElementById('info-fill');
   if (pre && mounted.indexOf(pre) < 0 && !pre.firstChild) mount(pre);
 })();

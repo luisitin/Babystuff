@@ -1,4 +1,4 @@
-// Checks on the built index.html: determinism, no external resources, CSP, no network APIs, links.
+// Checks on both built outputs (index.html and artifact.html): determinism, no external resources, CSP or fragment shape, no network APIs, links.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
@@ -8,12 +8,14 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
-const html = readFileSync(join(root, 'index.html'), 'utf8');
 const programs = JSON.parse(readFileSync(join(root, 'data', 'programs.json'), 'utf8'));
 
-// The inlined data block; everything else in the page is code or markup.
+// Source order from ARCHITECTURE.md ("New files, load order and owners").
+const JS_ORDER = ['logic', 'store', 'email', 'zip', 'host', 'fieldmatch', 'fillscript', 'inbox', 'tracker', 'profile', 'directory', 'guided', 'inboxview', 'phone', 'app'];
+const CSS_ORDER = ['base', 'features', 'inbox', 'phone'];
+
+// The inlined data block; everything else in a page is code or markup.
 const DATA_BLOCK = /<script id="programs-data"[^>]*>[\s\S]*?<\/script>/;
-const htmlWithoutData = html.replace(DATA_BLOCK, '');
 
 // Inline <script> blocks without a src (the JS we ship).
 function inlineScripts(text) {
@@ -25,43 +27,102 @@ function inlineScripts(text) {
   }
   return out.join('\n');
 }
+const part = (rel) => readFileSync(join(root, rel), 'utf8').replace(/\r\n/g, '\n').replace(/\n+$/, '');
 
-test('index.html matches a fresh build from a clean copy', () => {
+const OUTPUTS = {
+  'index.html': readFileSync(join(root, 'index.html'), 'utf8'),
+  'artifact.html': readFileSync(join(root, 'artifact.html'), 'utf8'),
+};
+
+test('both outputs match a fresh build from a clean copy', () => {
   const tmp = mkdtempSync(join(tmpdir(), 'bff-build-'));
   try {
     for (const dir of ['scripts', 'src', 'data']) {
       cpSync(join(root, dir), join(tmp, dir), { recursive: true });
     }
     execFileSync(process.execPath, ['scripts/build.mjs'], { cwd: tmp, stdio: 'pipe' });
-    const fresh = readFileSync(join(tmp, 'index.html'));
-    const committed = readFileSync(join(root, 'index.html'));
-    assert.ok(fresh.equals(committed), 'index.html differs from a fresh build; run `node scripts/build.mjs`');
+    for (const name of Object.keys(OUTPUTS)) {
+      const fresh = readFileSync(join(tmp, name));
+      const committed = readFileSync(join(root, name));
+      assert.ok(fresh.equals(committed), name + ' differs from a fresh build; run `node scripts/build.mjs`');
+    }
   } finally {
     rmSync(tmp, { recursive: true, force: true });
   }
 });
 
-test('index.html has no external resources', () => {
-  // A <link href> is allowed only when it is an inline data: URI (the favicon).
-  const externalLinks = [...htmlWithoutData.matchAll(/<link\b[^>]*\bhref\s*=\s*["']?([^"'\s>]*)/gi)]
-    .map((m) => m[1])
-    .filter((href) => !/^data:/i.test(href));
-  assert.deepEqual(externalLinks, [], 'found <link href> that is not a data: URI');
-  const checks = [
-    [/<script\b[^>]*\bsrc\s*=/i, '<script src>'],
-    [/@import\b/i, '@import'],
-    [/url\(\s*['"]?https?:/i, 'url() pointing at http(s)'],
-    [/<iframe\b/i, '<iframe'],
-    [/<object\b/i, '<object'],
-    [/<embed\b/i, '<embed'],
-    [/<img\b[^>]*\bsrc\s*=\s*['"]?https?:/i, '<img> with http(s) src'],
-  ];
-  for (const [re, label] of checks) {
-    assert.doesNotMatch(htmlWithoutData, re, `found ${label}`);
-  }
-});
+for (const [name, html] of Object.entries(OUTPUTS)) {
+  const withoutData = html.replace(DATA_BLOCK, '');
 
-test('CSP meta blocks network requests and referrer is no-referrer', () => {
+  test(name + ' has no external resources', () => {
+    // A <link href> is allowed only when it is an inline data: URI (the favicon).
+    const externalLinks = [...withoutData.matchAll(/<link\b[^>]*\bhref\s*=\s*["']?([^"'\s>]*)/gi)]
+      .map((m) => m[1])
+      .filter((href) => !/^data:/i.test(href));
+    assert.deepEqual(externalLinks, [], 'found <link href> that is not a data: URI');
+    const checks = [
+      [/<script\b[^>]*\bsrc\s*=/i, '<script src>'],
+      [/@import\b/i, '@import'],
+      [/url\(\s*['"]?https?:/i, 'url() pointing at http(s)'],
+      [/<iframe\b/i, '<iframe'],
+      [/<object\b/i, '<object'],
+      [/<embed\b/i, '<embed'],
+      [/<img\b[^>]*\bsrc\s*=\s*['"]?https?:/i, '<img> with http(s) src'],
+    ];
+    for (const [re, label] of checks) {
+      assert.doesNotMatch(withoutData, re, `found ${label}`);
+    }
+  });
+
+  test(name + ' inline JS uses no network APIs', () => {
+    const js = inlineScripts(html);
+    assert.ok(js.length > 0, 'expected inline script content');
+    const banned = [
+      [/\bfetch\s*\(/, 'fetch('],
+      [/\bXMLHttpRequest\b/, 'XMLHttpRequest'],
+      [/\bsendBeacon\b/, 'sendBeacon'],
+      [/\bnew\s+WebSocket\b/, 'new WebSocket'],
+      [/\bEventSource\b/, 'EventSource'],
+      [/\bimportScripts\b/, 'importScripts'],
+      [/\bnavigator\s*\.\s*serviceWorker\b/, 'navigator.serviceWorker'],
+    ];
+    for (const [re, label] of banned) {
+      assert.doesNotMatch(js, re, `inline JS uses ${label}`);
+    }
+  });
+
+  test(name + ': every http(s) URL outside the data block is a namespace, a Gmail link base, or a program link', () => {
+    // Namespaces are identifiers that are never fetched; the Gmail bases open the person's own Gmail.
+    const allowed = new Set([
+      'http://www.w3.org/2000/svg',
+      'http://www.w3.org/2005/Atom',
+      'http://schemas.google.com/apps/2006',
+    ]);
+    const prefixes = ['https://mail.google.com/mail/'];
+    for (const p of programs) {
+      allowed.add(p.signupUrl);
+      for (const s of p.sourceUrls) allowed.add(s);
+    }
+    const found = withoutData.match(/https?:\/\/[^\s"'<>()`]+/g) || [];
+    const unexpected = [...new Set(found.map((u) => u.replace(/[.,;:]+$/, '')))]
+      .filter((u) => !allowed.has(u) && !allowed.has(u.replace(/&amp;/g, '&')) && !prefixes.some((p) => u.startsWith(p)));
+    assert.deepEqual(unexpected, [], 'unexpected http(s) URLs in ' + name);
+  });
+
+  test(name + ': inlined CSS and JS follow the contract order', () => {
+    const css = CSS_ORDER.map((f) => part('src/css/' + f + '.css'));
+    if (name === 'artifact.html') css.push(part('src/css/artifact.css'));
+    const styles = [...html.matchAll(/<style>\n([\s\S]*?)\n<\/style>/g)].map((m) => m[1]);
+    assert.equal(styles.length, 1, 'expected exactly one <style>');
+    assert.equal(styles[0], css.join('\n'), 'CSS differs from the contract order');
+    assert.equal(inlineScripts(withoutData).replace(/^\n|\n$/g, ''), JS_ORDER.map((f) => part('src/js/' + f + '.js')).join('\n'), 'JS differs from the contract order');
+    assert.equal((html.match(DATA_BLOCK) || []).length, 1, 'expected one data block');
+  });
+}
+
+test('index.html is a full document with the CSP meta and a no-referrer policy', () => {
+  const html = OUTPUTS['index.html'];
+  assert.match(html, /^<!doctype html>/i);
   const csp = html.match(/<meta\b[^>]*http-equiv\s*=\s*["']Content-Security-Policy["'][^>]*>/i);
   assert.ok(csp, 'missing Content-Security-Policy meta');
   const content = (csp[0].match(/content\s*=\s*"([^"]*)"/i) || csp[0].match(/content\s*=\s*'([^']*)'/i) || [])[1] || '';
@@ -73,37 +134,28 @@ test('CSP meta blocks network requests and referrer is no-referrer', () => {
   assert.match(ref[0], /content\s*=\s*["']no-referrer["']/);
 });
 
-test('inline JS uses no network APIs', () => {
-  const js = inlineScripts(html);
-  assert.ok(js.length > 0, 'expected inline script content');
-  const banned = [
-    [/\bfetch\s*\(/, 'fetch('],
-    [/\bXMLHttpRequest\b/, 'XMLHttpRequest'],
-    [/\bsendBeacon\b/, 'sendBeacon'],
-    [/\bnew\s+WebSocket\b/, 'new WebSocket'],
-    [/\bEventSource\b/, 'EventSource'],
-    [/\bimportScripts\b/, 'importScripts'],
-    [/\bnavigator\s*\.\s*serviceWorker\b/, 'navigator.serviceWorker'],
-  ];
-  for (const [re, label] of banned) {
-    assert.doesNotMatch(js, re, `inline JS uses ${label}`);
+test('artifact.html is a fragment: title first, viewport-fit-sides meta, no document skeleton or CSP', () => {
+  const html = OUTPUTS['artifact.html'];
+  assert.ok(html.startsWith('<title>Baby Freebies Finder</title>'), 'must start with the title');
+  const idx = html.indexOf('<meta name="claude:viewport-fit-sides" content="cover">');
+  assert.ok(idx >= 0 && idx < 1000, 'viewport-fit-sides meta must be in the first 1,000 characters');
+  for (const [re, label] of [[/<!doctype/i, 'doctype'], [/<html[\s>]/i, '<html'], [/<head[\s>]/i, '<head'], [/<body[\s>]/i, '<body'], [/http-equiv/i, 'http-equiv'], [/<meta\b[^>]*name\s*=\s*["']viewport["']/i, 'viewport meta']]) {
+    assert.doesNotMatch(html, re, 'artifact.html must not contain ' + label);
+  }
+  assert.equal((html.slice(0, html.indexOf('<script')).match(/<title>/g) || []).length, 1, 'one <title> in the markup');
+  assert.equal((html.match(/class="bff-shell"/g) || []).length, 1, 'one outer wrapper');
+  assert.match(OUTPUTS['artifact.html'], /\.bff-shell\s*\{[^}]*padding-left:\s*max\(16px, env\(safe-area-inset-left, 0px\)\)[^}]*padding-right:\s*max\(16px, env\(safe-area-inset-right, 0px\)\)/);
+  // The wrapper closes before the data block and the script, and contains the app markup.
+  const wrapStart = html.indexOf('<div class="bff-shell"');
+  const wrapEnd = html.indexOf('</div>\n<script id="programs-data"');
+  assert.ok(wrapStart > 0 && wrapEnd > wrapStart, 'wrapper must close right before the data block');
+  for (const id of ['view-directory', 'view-info', 'view-tracker', 'view-guided', 'view-safety']) {
+    const at = html.indexOf('id="' + id + '"');
+    assert.ok(at > wrapStart && at < wrapEnd, id + ' must be inside the wrapper');
   }
 });
 
-test('every http(s) URL outside the data block is a namespace, the Gmail search base, or a program link', () => {
-  // Namespaces are identifiers that are never fetched; the Gmail base opens the person's own Gmail search.
-  const allowed = new Set([
-    'http://www.w3.org/2000/svg',
-    'http://www.w3.org/2005/Atom',
-    'http://schemas.google.com/apps/2006',
-    'https://mail.google.com/mail/u/0/#search/',
-  ]);
-  for (const p of programs) {
-    allowed.add(p.signupUrl);
-    for (const s of p.sourceUrls) allowed.add(s);
-  }
-  const found = htmlWithoutData.match(/https?:\/\/[^\s"'<>()`]+/g) || [];
-  const unexpected = [...new Set(found.map((u) => u.replace(/[.,;:]+$/, '')))]
-    .filter((u) => !allowed.has(u) && !allowed.has(u.replace(/&amp;/g, '&')));
-  assert.deepEqual(unexpected, [], 'unexpected http(s) URLs in index.html');
+test('artifact.html carries no theme-fighting inline display styles', () => {
+  const markup = OUTPUTS['artifact.html'].replace(DATA_BLOCK, '');
+  assert.doesNotMatch(markup.replace(/<script>[\s\S]*?<\/script>/, '').replace(/<style>[\s\S]*?<\/style>/, ''), /style\s*=\s*["'][^"']*display/i);
 });

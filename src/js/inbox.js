@@ -29,7 +29,7 @@
 
   // Strip control, zero-width and bidi-override characters, squeeze whitespace, cap the length.
   function clean(s, max) {
-    var t = str(s).replace(/[\u0000-\u001f\u007f-\u009f​-‏  ‪-‮⁦-⁩﻿]/g, ' ').replace(/\s+/g, ' ').trim();
+    var t = str(s).replace(/[\u0000-\u001f\u007f-\u009f\u200b-\u200f\u2028\u2029\u202a-\u202e\u2066-\u2069\ufeff]/g, ' ').replace(/\s+/g, ' ').trim();
     if (max && t.length > max) {
       t = t.slice(0, max);
       var last = t.charCodeAt(t.length - 1);
@@ -369,7 +369,7 @@
     var attachments = [], names = [];
     arr(o.files).forEach(function (f) {
       if (!isObj(f) || typeof f.text !== 'string' || !f.text) return;
-      var name = str(f.name).replace(/[^A-Za-z0-9._-]/g, '-').replace(/^\.+/, '').slice(0, 80);
+      var name = str(f.name).replace(/[^A-Za-z0-9._-]/g, '-').replace(/\.{2,}/g, '.').replace(/^[.-]+/, '').slice(0, 80);
       if (!name) return;
       var ext = (/\.([A-Za-z0-9]+)$/.exec(name) || [])[1];
       var mime = typeof f.mimeType === 'string' && /^[a-z]+\/[a-z0-9.+-]+$/i.test(f.mimeType) ? f.mimeType : MIME[(ext || '').toLowerCase()] || 'text/plain';

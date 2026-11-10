@@ -37,12 +37,8 @@ body::before {
   padding: var(--space-2) max(16px, env(safe-area-inset-right, 0px)) var(--space-2) max(16px, env(safe-area-inset-left, 0px));
 }
 
-/* Fixed bottom nav: stays at 0 and adds the bottom inset itself, plus the side gutter since it spans the width. */
-.app-nav {
-  padding-left: max(16px, env(safe-area-inset-left, 0px));
-  padding-right: max(16px, env(safe-area-inset-right, 0px));
-  padding-bottom: env(safe-area-inset-bottom, 0px);
-}
+/* Fixed bottom nav: base.css already keeps it at bottom 0 and adds the bottom, left and right insets to its own
+   padding, so nothing is added here on phones (a 16px gutter would squeeze the five tab labels at 320px). */
 
 @media (min-width: 720px) {
   body { display: block; }
