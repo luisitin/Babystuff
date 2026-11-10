@@ -2,7 +2,9 @@
 
 Read-only review of `git diff d6e57e7..HEAD` over `src/`, `tools/autofill/` and `scripts/check-links.mjs`, at commit `feb5ed6`. The contract is the Phase G sections of `ARCHITECTURE.md`. `node --test` passes (226 tests). The browser suite was not run. I checked claims with throwaway scripts that load `src/js/logic.js`, `src/js/email.js` and `data/programs.json`.
 
-No high-severity bugs found. 0 high, 2 medium, 5 low.
+No high-severity bugs found. 0 high, 3 medium, 4 low.
+
+Status: all seven findings were fixed in round 4 (see `ARCHITECTURE.md`, "Phase G, round 4"), with unit tests. From "Not confirmed", the `rankCmp` tie-break now ends on `id`, `isOtherState` was removed and the autofill helper shares one state rule. The `loadRun` index item and `directory.inMyState` were left as they are.
 
 ## Findings
 

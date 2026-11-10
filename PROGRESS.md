@@ -73,14 +73,51 @@ The user asked to "make it fully functional with just a connection to email or s
 - Claude artifact: `artifact.html` is published as a Claude artifact titled "Baby Freebies Finder", with the downloads permission and the five Gmail tools declared. The publisher refused the first try because a raw U+FFFD had crept into `src/js/inbox.js`; it is now built with `String.fromCharCode(0xFFFD)`, and a build test fails on a raw U+FFFD, U+2028 or U+2029 in `src/` or either output. The page's Gmail call arguments were compared with the connector's tool schemas and match. No real mailbox call was made, so result shapes are untested against real Gmail.
 - Model audit: 38 subagent transcripts in the session so far (18 in this phase), 28 `claude-sonnet-5-5` and 10 `claude-haiku-5-5`, none on any other model. One `sonnet` builder stopped at the account's 5-hour usage limit before a small polish pass; that list is under Next steps.
 
-### Not tested (needs a person)
+## Phase G, what is really free, ranking, and a plan by due date (2026-11-10)
+The user reported that the "Truly free" filter showed sweepstakes, coupons and points instead of real free samples, and asked for the list to show which offers are worth the most, a plan by due date, and research into money and benefit programs.
+
+The contract is in `ARCHITECTURE.md` ("Phase G"). Rounds 1 to 4 are written there. Round 4 is the code-review fixes. Nothing in the product rules changed: no network calls, no form submission, and personal details only in localStorage.
+
+- Research (the session's network was Limited, so no official page was read directly):
+  - Wave 1: seven lanes, `formula-feeding`, `diapers-babycare`, `registry`, `health-benefits`, `assistance`, `rewards-testing` and `money`. Each wrote `research/phase-g/<lane>.json` and `<lane>-notes.md`. The shared brief is `research/phase-g/BRIEF.md`. The first merge took the list from 37 to 86 programs (`research/phase-g/merge-notes.md`).
+  - Wave 2: four lanes, `wave2-samples`, `wave2-retail`, `wave2-health` and `wave2-money`, gave 71 entries. The second merge took the list to 146.
+  - Link fixes: the Link check run before run 7 found 20 dead or moved addresses across 14 programs. Four programs were removed (text4baby, Ohio Every Baby Sleeps Safe, WellCare NC and Medela Mom's Room), five were re-pointed, and five dead source links were dropped. 146 minus 4 is 142 (`research/phase-g/link-fixes.md`).
+- Data: 142 programs, up from 37.
+  - By category: money 42, health benefits 39, assistance 16, registry welcome boxes 15, diapers and wipes 7, product testing 7, formula 6, baby care 6, feeding 3, rewards 1. `money` is the new category.
+  - 60 programs are limited to some states. 5 entries are another way to get the same thing (`sameAs`), and all five point to the insurance-covered breast pump entry.
+  - Confidence: 14 high, 95 medium, 33 low. The 14 high entries are all from the original 37. No program added in Phase G is high.
+  - 95 entries have a value range: 29 from the official page and 66 estimates.
+  - Truly free: 37 programs. 28 depend on eligibility rules (income, insurance, a benefit program). The other 9 have no eligibility rules: 6 are nationwide and 3 are for a single state. All 9 are marked likely. No truly free program is marked guaranteed.
+- App changes:
+  - "Truly free" means free to claim, no purchase or paid membership, a product first, and not dependent on chance. Sweepstakes, coupons, points and product testing never count.
+  - Programs: a summary with the truly free programs open to everyone, their combined estimated value, how many more are free if you qualify, and a "Show these" button. The default sort is "Best value first", which groups programs under "Top pick", "Worth doing", "Also free", "Only if you would buy anyway" and "Long shot", with a rank on each card. Other sorts include by when to do it. Filters: search, category, "What you get" and four tick boxes. Each card shows what arrives free, the estimated value, how sure it is, the effort and the best time. Entries that are two ways to the same benefit sit under the main card.
+  - Programs for other states are hidden until a state is set in My info, with a "Show them" button.
+  - A due date in My info gives the weeks left and buttons that jump to the plan for now, the last weeks and after the birth.
+  - The guided run and the tracker follow the same ranking and state rule. The tracker total estimates what is signed up or received, and counts each benefit once.
+  - The email features (plus addresses, Gmail filters, Gmail searches and the Gmail connection) cover only programs where signing up means brand mail arrives: an `email` requirement and a sign-up site that is not a government site.
+- Link check: run 7 on 2026-11-10 checked 309 unique addresses. 251 answered OK, 0 were not found, off-domain, dead or suspect, and 58 refused automated visits. See `docs/link-status.md`.
+- Code review (`docs/code-review-phase-g.md`): 0 high, 3 medium and 4 low, The review was of commit `feb5ed6`. Its medium findings were: the tracker's "no known value" count mixed programs and groups; the due-date counts did not match the lists they jump to, and still showed after the due date; and plus addresses still applied to government programs in the guided run and the fill script. The four low findings are listed in the file. All seven were fixed in round 4, each with a unit test.
+- Tests:
+  - Unit: `node --test` passes 231 of 231.
+  - Browser (`node tests/e2e/run.mjs`): being updated for Phase G. The run on the Phase G app before the update: 591 checks, 9 failed, all from expectations that Phase G changed on purpose (state-only programs hidden, two programs on one brand domain, a moved tracker row).
+- Model audit: 62 subagent transcripts in the session before the last three helpers, 50 `claude-sonnet-5-5` and 12 `claude-haiku-5-5`, none on any other model. The final count goes here when the phase closes.
+- Limits:
+  - The session's network was Limited, so no official page could be read directly in Phase G. Every Phase G entry rests on official-domain search results and is capped at medium.
+  - The session hit its web-search limit during the second research wave. Leads left unsearched: the FSA or HSA life-event rule; the adoption credit; the head-of-household filing change; Oakland Brilliant Baby; Oklahoma Dream Accounts; more city and state child-account programs; Colorado's state child tax credit; more brand sample programs; and the pages that removed programs now forward to (Carolina Complete Health "Start Smart for Your Baby" and the Medela Family newsletter).
+
+## Not tested (needs a person)
+- Phase G: the entries and value figures against their official pages (the network was Limited), and the due-date plan and state rule on a phone.
 - A real iPhone: Safari AutoFill, the Shortcut, the bookmark, Home Screen install.
 - The real Claude viewer: the save prompt, the Gmail consent card, and whether the Claude iPhone app runs connector calls from an artifact.
 - A real Gmail account and the real program sign-up forms.
 - Screen readers (only automated name, label, focus and contrast checks ran).
 
-### Next steps
-- Polish pass (not done, waiting on the `sonnet` usage limit): select the text in the copy fallback (`src/js/host.js` `showText`); say "Nothing was sent." after a draft is saved; one wording for standalone downloads; ask before the guided run's "Start over"; a plus-address caveat in My info; a keyboard-activation check for the Download backup button (the mutation the suite missed). Details are in `tests/e2e/FINDINGS.md` and `tests/e2e/MUTATIONS.md`.
-- Open the 14 robot-blocked links by hand (`docs/link-status.md`).
+## Next steps
+- Open the 58 robot-blocked links by hand (`docs/link-status.md`).
+- Re-verify the Phase G entries on their official pages once the network allows direct reading.
+- Search the leads listed under Phase G.
+- Re-run research every few months. The Phase G values and `verifiedOn` dates are as of 2026-11-10.
+- Finish the code-review fixes (round 4) and re-run the browser suite.
 - Try the Shortcut recipe on a phone and correct `docs/iphone.md` if a step is off.
 - Re-verify the Apple and Google help-page claims by reading the pages, once the session's network allows those hosts.
+- Phase F polish pass: done at the start of Phase G (wording polish, the tracker value line, and email features limited to brand sign-ups). Still open from that list and not re-checked: selecting the text in the copy fallback (`src/js/host.js` `showText`), one wording for standalone downloads, a plus-address caveat in My info, and a keyboard-activation check for the Download backup button (the mutation the suite missed). Details are in `tests/e2e/FINDINGS.md` and `tests/e2e/MUTATIONS.md`.
