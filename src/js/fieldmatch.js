@@ -106,6 +106,7 @@
       if (/^[0-9]+$/.test(labels[labels.length - 1])) return labels.join('.');
       var tld = labels[labels.length - 1];
       var take = tld.length === 2 && SECOND_LEVEL[labels[labels.length - 2]] === 1 ? 3 : 2;
+      if (tld === 'us' && labels[labels.length - 2].length === 2) take = 3;
       return labels.slice(-take).join('.');
     }
     function sameSite(a, b) {

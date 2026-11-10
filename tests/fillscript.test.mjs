@@ -375,6 +375,8 @@ test('fieldmatch: one source, same API as the helper wrapper', async () => {
   }
   assert.equal(FM.registrableDomain('https://register.gerber.com/x'), 'gerber.com');
   assert.equal(FM.registrableDomain('shop.example.co.uk'), 'example.co.uk');
+  assert.equal(FM.registrableDomain('https://www.revenue.state.mn.us/child-tax-credit'), 'state.mn.us');
+  assert.equal(FM.registrableDomain('www.medela.us'), 'medela.us');
   assert.equal(FM.sameSite('https://a.similac.com', 'https://similac.com.evil.example'), false);
   assert.equal(FM.classifyField({ type: 'text', autocomplete: 'cc-number' }), null);
   assert.ok(!FM.factory.toString().includes('\n//'), 'no line comments in the embedded factory');

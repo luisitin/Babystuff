@@ -145,6 +145,7 @@ test('registrable domain check for redirects', () => {
   assert.equal(registrableDomain('https://www.enfamil.com/x'), 'enfamil.com');
   assert.equal(registrableDomain('https://register.gerber.com/'), 'gerber.com');
   assert.equal(registrableDomain('https://shop.example.co.uk/'), 'example.co.uk');
+  assert.equal(registrableDomain('https://www.revenue.state.mn.us/x'), 'state.mn.us');
   assert.ok(sameSite('https://www.similac.com/a', 'https://similac.com/b'));
   assert.ok(!sameSite('https://similac.com/', 'https://evil-similac.com/'));
   assert.ok(!sameSite('https://similac.com.evil.net/', 'https://similac.com/'));

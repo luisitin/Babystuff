@@ -99,6 +99,7 @@
     if (parts.length <= 2) return parts.join('.');
     var tld = parts[parts.length - 1], sld = parts[parts.length - 2];
     var n = tld.length === 2 && ['co', 'com', 'org', 'net', 'gov', 'edu', 'ac'].indexOf(sld) >= 0 ? 3 : 2;
+    if (tld === 'us' && sld.length === 2) n = 3; // state sites: revenue.state.mn.us -> state.mn.us
     return parts.slice(-n).join('.');
   }
   // Retailers, marketplaces and other big senders whose mail is not just baby freebies.

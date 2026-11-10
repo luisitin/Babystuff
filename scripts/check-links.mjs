@@ -28,7 +28,9 @@ export function registrableDomain(host) {
   const labels = h.split('.').filter(Boolean);
   if (labels.length <= 2) return labels.join('.');
   const lastTwo = labels.slice(-2).join('.');
-  const n = SECOND_LEVEL.has(lastTwo) ? 3 : 2;
+  // US state sites sit under a two-letter state label: revenue.state.mn.us -> state.mn.us
+  const stateUs = /^[a-z]{2}\.us$/.test(lastTwo);
+  const n = SECOND_LEVEL.has(lastTwo) || stateUs ? 3 : 2;
   return labels.slice(-n).join('.');
 }
 
