@@ -45,8 +45,11 @@ export async function runGroup(name, fn) {
 
 // ---- opening the app ----
 const SKELETON_HEAD = '<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px system-ui,sans-serif}img{max-width:100%}[hidden]{display:none!important}</style></head><body>';
-export const standaloneUrl = pathToFileURL(path.join(ROOT, 'index.html')).href;
-export function artifactFragment() { return fs.readFileSync(path.join(ROOT, 'artifact.html'), 'utf8'); }
+// BFF_E2E_BUILD_DIR points the run at a folder holding index.html and artifact.html (used for the mutation spot-checks
+// in MUTATIONS.md, so the repo's own build output is never touched). Unset, the repo root is used.
+export const OUT = process.env.BFF_E2E_BUILD_DIR ? path.resolve(process.env.BFF_E2E_BUILD_DIR) : ROOT;
+export const standaloneUrl = pathToFileURL(path.join(OUT, 'index.html')).href;
+export function artifactFragment() { return fs.readFileSync(path.join(OUT, 'artifact.html'), 'utf8'); }
 export const artifactPath = path.join(TMP, 'artifact-wrapped.html');
 export function writeArtifactPage() { fs.writeFileSync(artifactPath, SKELETON_HEAD + artifactFragment() + '</body></html>'); }
 export const artifactUrl = pathToFileURL(artifactPath).href;

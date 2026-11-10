@@ -1,6 +1,7 @@
 // Groups 1 to 4: boot, routes, link audit, click-through.
 import fs from 'node:fs';
 import { ROOT, ROUTES, PROGRAMS, PROFILE, open, clean, runGroup, seedProfileUI, norm, artifactFragment, lsDump } from './harness.mjs';
+import { L, ALL, byId } from './model.mjs';
 
 export const suspects = []; // buttons that visibly did nothing (reported, never failed)
 export const SIGNUP = new Set(PROGRAMS.map((p) => p.signupUrl));
@@ -136,6 +137,19 @@ export async function links(env) {
       const label = mode + (mode === 'artifact' ? '/' + claude : '');
       const h = await open(browser, { mode, claude });
       await prepare(h);
+      // Programs for other states are hidden until the person asks. Check the rule, then use "Show them" so the audit covers all of them.
+      await h.go('directory');
+      const stateOnly = ALL.filter((p) => L.hiddenByState(p, PROFILE.state));
+      const idsNow = async () => h.page.evaluate(() => [...document.querySelectorAll('#view-directory article.card')].map((c) => c.dataset.programId));
+      const box = h.page.locator('#view-directory .dir-state');
+      let before = await idsNow();
+      g.check(label + ': with state ' + PROFILE.state + ' the other-state programs are not listed and the state line gives their count', stateOnly.length > 0 && stateOnly.every((p) => !before.includes(p.id)) && before.length === ALL.length - stateOnly.length && (await box.innerText()).includes(stateOnly.length + ' programs for other states are hidden.'), before.length + ' cards, ' + stateOnly.length + ' hidden');
+      await box.getByRole('button', { name: 'Show them' }).click(); await h.page.waitForTimeout(200);
+      let after = await idsNow();
+      g.check(label + ': "Show them" lists all ' + ALL.length + ' programs and the button becomes "Hide them"', after.length === ALL.length && (await box.getByRole('button', { name: 'Hide them' }).count()) === 1, String(after.length));
+      await box.getByRole('button', { name: 'Hide them' }).click(); await h.page.waitForTimeout(200);
+      g.check(label + ': "Hide them" hides them again', (await idsNow()).length === ALL.length - stateOnly.length && (await box.getByRole('button', { name: 'Show them' }).count()) === 1);
+      await box.getByRole('button', { name: 'Show them' }).click(); await h.page.waitForTimeout(200);
       const tally = {};
       for (const r of ROUTES) {
         await enterRoute(h, r);
@@ -160,7 +174,7 @@ export async function links(env) {
         if (!hs.includes(p.signupUrl)) missSign.push(p.id);
         (p.sourceUrls || []).forEach((u) => { if (!hs.includes(u)) missSrc.push(p.id + ' ' + u); });
       }
-      g.check(label + ': every program card links to its signupUrl', missSign.length === 0 && Object.keys(cards).length === PROGRAMS.length, missSign.join(',') + ' cards=' + Object.keys(cards).length);
+      g.check(label + ': every program card (leads and the ones inside "same thing" groups) links to its signupUrl', missSign.length === 0 && Object.keys(cards).length === PROGRAMS.length, missSign.join(',') + ' cards=' + Object.keys(cards).length);
       g.check(label + ': every sourceUrl is shown in its card', missSrc.length === 0, missSrc.slice(0, 3).join(' | '));
       clean(g, h, label);
       await h.ctx.close();
