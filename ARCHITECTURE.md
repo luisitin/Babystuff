@@ -212,7 +212,7 @@ A card titled "Gmail connection" in the tracker.
   1. **Check my Gmail**: runs the `buildQueries` searches one at a time, read-only, and lists matches grouped by program with subject, sender, date, a "needs you to confirm" badge for `confirm`, and an "Open in Gmail" link. Suggestions appear as "Mark Similac as Signed up" buttons plus one "Apply all N"; statuses change only when tapped, through `BFF.tracker.setStatus`, with the tracker's normal Undo-free flow (a line says what changed).
   2. **Use this address**: when My info has no email and a result reveals the account address, offer to fill it in. Only on tap.
   3. **Label these in Gmail**: `list_labels`, then `create_label` "Baby Freebies" if it is missing, then `label_thread` for each exact or likely match. Shows a count first and asks with the inline `BFF.ui.confirm` panel. A write is never retried automatically.
-  4. **Draft my checklist** and **Draft my setup kit**: `create_draft` to the person's own address. The message says "Draft created in your Gmail. Nothing was sent." with a link when `viewUrl` is safe.
+  4. **Draft my checklist** and **Draft my setup kit**: `create_draft` to the person's own address. The message says "Draft saved in your Gmail. Nothing was sent." (only after the connector confirmed the draft) with a link when `viewUrl` is safe.
 - Nothing from the mailbox is stored. Only `prefs.v1.inboxCheckedAt` (ISO time) is saved. Results live in memory and are cleared on any authorization-type error.
 - A live region announces progress and results. Buttons are disabled while a call runs.
 

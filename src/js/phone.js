@@ -220,7 +220,10 @@
             try { r = Promise.resolve(BFF.host.saveFile({ name: FILE_NAME, text: s, mime: 'text/plain' })); } catch (e) { r = Promise.resolve({ status: 'shown' }); }
             r.then(function (res) {
               var st = res && res.status;
-              if (st === 'saved') say('Saved ' + (res.name || FILE_NAME) + '. It contains your details, so keep it private.');
+              if (st === 'saved') {
+                var nm = res.name || FILE_NAME;
+                say((BFF.host.inArtifact ? 'Saved the fill script as ' + nm + ' (in the place you picked).' : 'Downloaded the fill script as ' + nm + '. Look in your Downloads.') + ' It contains your details, so keep it private.');
+              }
               else if (st === 'declined') say('Save cancelled. Nothing was saved.');
               else if (st === 'failed' && res.message) say(res.message);
               else { say('The file could not be saved here. Copy the text below instead.'); showText(s, 'The fill script'); }

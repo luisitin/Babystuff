@@ -177,7 +177,8 @@
         h('div', { class: 'fx-check' }, [plusBox, h('label', { 'for': 'info-plus', text: 'Give each program its own plus address' })]),
         h('p', { class: 'fx-muted', text: 'Adds a short tag to your email, like yourname+similac@gmail.com. The guided run copies the tagged address, and you can filter or search your inbox by program.' }),
         plusPreview,
-        plusNote
+        plusNote,
+        h('p', { class: 'fx-muted', text: 'Some sign-up forms refuse an address with a plus sign. If one does, use your plain email address there.' })
       ]));
 
       statusEl = h('p', { class: 'fx-saved fx-saved--block', role: 'status', 'aria-live': 'polite' });

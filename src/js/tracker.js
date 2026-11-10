@@ -154,6 +154,24 @@
       c.active = list.length - c.skipped;
       return c;
     },
+    // Combined estimated value of programs marked Signed up or Received (text only; null when none).
+    valueLine: function () {
+      var L = BFF.logic;
+      if (!L || !L.totalValue) return null;
+      var done = (BFF.programs || []).filter(function (p) {
+        var st = tracker.getStatus(p.id);
+        return st === 'signed-up' || st === 'received';
+      });
+      if (!done.length) return null;
+      var t = L.totalValue(done);
+      var missing = done.length - t.count;
+      var lead = 'Estimated value of what you have signed up for: ';
+      if (!t.count) return lead + 'not known (' + plural(missing, 'program') + ' with no known value)';
+      var lo = Math.round(t.low), hi = Math.round(t.high);
+      var range = lo === hi ? '$' + lo : '$' + lo + ' to $' + hi;
+      return lead + 'about ' + range + ' (our estimate' +
+        (missing ? '; ' + plural(missing, 'program') + ' with no known value ' + (missing === 1 ? 'is' : 'are') + ' not counted' : '') + ')';
+    },
     reset: function () {
       var ok = store.remove(KEY);
       emit(null);
@@ -233,6 +251,9 @@
     view.barText.textContent = c.done + ' of ' + c.active + ' done' + (c.skipped ? ' (' + c.skipped + ' skipped)' : '');
     view.bar.setAttribute('aria-label', c.done + ' of ' + c.active + ' programs done');
     STATUSES.forEach(function (st) { view.countEls[st].textContent = c[st]; });
+    var vl = tracker.valueLine();
+    view.valueEl.textContent = vl || '';
+    view.valueEl.hidden = !vl;
     view.empty.hidden = !!(BFF.programs && BFF.programs.length);
     view.storeWarn.hidden = store.persistent;
   }
@@ -396,9 +417,10 @@
       var r = view.rows[p.id];
       if (!r) return;
       var tag = plus ? map[p.id] : '';
-      r.addr.hidden = !plus;
-      r.addr.textContent = plus ? 'Sign up with: ' + E.plusAddress(pr.email, tag) : '';
-      var href = gmail ? E.gmailSearchUrl({ email: pr.email, tag: tag, domain: E.domainOfUrl(p.signupUrl), account: acct }) : '';
+      var inMail = !E.inEmailFeatures || E.inEmailFeatures(p);
+      r.addr.hidden = !(plus && inMail);
+      r.addr.textContent = plus && inMail ? 'Sign up with: ' + E.plusAddress(pr.email, tag) : '';
+      var href = gmail ? E.gmailSearchUrl({ email: pr.email, tag: tag, domain: E.domainOfUrl(p.signupUrl), account: acct, program: p }) : '';
       r.gm.hidden = !href;
       if (href) r.gm.setAttribute('href', href); else r.gm.removeAttribute('href');
     });
@@ -530,7 +552,7 @@
       h('span', { class: 'fx-small', text: 'Use 0 for the first Google account you are signed in to, 1 for the second, and so on.' })]);
     return h('section', { class: 'fx-card', 'aria-labelledby': 'trk-mail-h' }, [
       h('h3', { id: 'trk-mail-h', text: 'Email and calendar' }),
-      h('p', { class: 'fx-muted', text: 'These hand off to your own mail app, Gmail or calendar. Nothing is sent from this app.' }),
+      h('p', { class: 'fx-muted', text: 'These hand off to your own mail app, Gmail or calendar. Nothing is sent from this app. Government and benefit programs are left out of the filters and searches.' }),
       view.mailHint,
       mailRow,
       h('div', { class: 'fx-check' }, [arch, h('label', { 'for': 'trk-archive', text: 'Skip the inbox (archive)' })]),
@@ -559,11 +581,12 @@
       view.countEls[st] = n;
       counts.appendChild(h('li', {}, [n, h('span', { text: ' ' + LABELS[st] })]));
     });
+    view.valueEl = h('p', { class: 'fx-muted', hidden: '' });
     view.empty = h('p', { class: 'fx-muted', text: 'No programs loaded.', hidden: '' });
     view.storeWarn = h('p', { class: 'fx-warn', role: 'alert', text: 'This browser is not saving data. ' + SAVE_FAIL, hidden: '' });
     view.live = h('div', { class: 'fx-sr', role: 'status', 'aria-live': 'polite' });
     view.msg = h('p', { class: 'fx-hint', role: 'alert' });
-    el.appendChild(h('div', { class: 'fx-card' }, [view.barText, view.bar, counts, view.empty]));
+    el.appendChild(h('div', { class: 'fx-card' }, [view.barText, view.bar, counts, view.valueEl, view.empty]));
     el.appendChild(view.storeWarn);
     el.appendChild(view.msg);
     el.appendChild(view.live);

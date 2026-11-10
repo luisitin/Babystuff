@@ -129,8 +129,8 @@ test('gmailSearchUrl encoding', () => {
 });
 
 const prog = [
-  { id: 'a-1', name: 'Tom & Jerry <"Box"> \'s', brand: 'Acme', signupUrl: 'https://www.acme.com/signup?x=1&y=2' },
-  { id: 'b-1', name: 'Path/Name', brand: 'Bravo', signupUrl: 'https://bravo.example/x' }
+  { id: 'a-1', name: 'Tom & Jerry <"Box"> \'s', brand: 'Acme', requirements: ['email'], signupUrl: 'https://www.acme.com/signup?x=1&y=2' },
+  { id: 'b-1', name: 'Path/Name', brand: 'Bravo', requirements: ['email'], signupUrl: 'https://bravo.example/x' }
 ];
 function props(xml) {
   return [...xml.matchAll(/<entry>([\s\S]*?)<\/entry>/g)].map((m) =>
@@ -147,11 +147,11 @@ test('registrableDomain and broad domains', () => {
 
 test('gmailFiltersXml without plus: from filters on registrable domains, deduped, never archived', () => {
   const list = [
-    { id: 'a-1', name: 'Tom & Jerry <"Box"> \'s', brand: 'Acme', signupUrl: 'https://register.acme.com/signup?x=1&y=2' },
-    { id: 'a-2', name: 'Acme two', brand: 'Acme', signupUrl: 'https://www.acme.com/two' },
-    { id: 'b-1', name: 'Path/Name', brand: 'Bravo', signupUrl: 'https://bravo.example/x' },
-    { id: 'z-1', name: 'Shop', brand: 'Amazon', signupUrl: 'https://www.amazon.com/x' },
-    { id: 'g-1', name: 'Gov', brand: 'HC', signupUrl: 'https://www.healthcare.gov/x' }
+    { id: 'a-1', name: 'Tom & Jerry <"Box"> \'s', brand: 'Acme', requirements: ['email'], signupUrl: 'https://register.acme.com/signup?x=1&y=2' },
+    { id: 'a-2', name: 'Acme two', brand: 'Acme', requirements: ['email'], signupUrl: 'https://www.acme.com/two' },
+    { id: 'b-1', name: 'Path/Name', brand: 'Bravo', requirements: ['email'], signupUrl: 'https://bravo.example/x' },
+    { id: 'z-1', name: 'Shop', brand: 'Amazon', requirements: ['email'], signupUrl: 'https://www.amazon.com/x' },
+    { id: 'g-1', name: 'Gov', brand: 'HC', requirements: ['email'], signupUrl: 'https://www.healthcare.gov/x' }
   ];
   const xml = E.gmailFiltersXml(list, { email: 'jane@gmail.com', usePlus: false, archive: true });
   assert.match(xml, /^<\?xml version="1\.0" encoding="UTF-8"\?>\n<feed xmlns="http:\/\/www\.w3\.org\/2005\/Atom" xmlns:apps="http:\/\/schemas\.google\.com\/apps\/2006">/);
@@ -170,8 +170,8 @@ test('gmailFiltersXml without plus: from filters on registrable domains, deduped
 
 test('gmailFiltersXml with plus: to filters, archive only here', () => {
   const list = [
-    { id: 'a-1', name: 'A', brand: 'Acme', signupUrl: 'https://acme.com/' },
-    { id: 'z-1', name: 'Z', brand: 'Amazon', signupUrl: 'https://www.amazon.com/x' }
+    { id: 'a-1', name: 'A', brand: 'Acme', requirements: ['email'], signupUrl: 'https://acme.com/' },
+    { id: 'z-1', name: 'Z', brand: 'Amazon', requirements: ['email'], signupUrl: 'https://www.amazon.com/x' }
   ];
   const o = { email: 'jane@gmail.com', usePlus: true };
   const off = props(E.gmailFiltersXml(list, o));
@@ -246,4 +246,50 @@ test('icsReminders folds long lines at 75 octets', () => {
   const unfolded = ics.replace(/\r\n /g, '');
   assert.ok(unfolded.includes('SUMMARY:Check for ' + name + ' mail or box'));
   assert.ok(!unfolded.includes(String.fromCharCode(0xFFFD)));
+});
+
+// ---- which programs belong in the email features ----
+test('inEmailFeatures: email requirement and no government domain, in one place', () => {
+  const mk = (requirements, url) => ({ id: 'x', requirements, signupUrl: url });
+  assert.equal(E.inEmailFeatures(mk(['email'], 'https://www.similac.com/')), true);
+  assert.equal(E.inEmailFeatures(mk(['email', 'address'], 'https://www.target.com/gift-registry')), true);
+  assert.equal(E.inEmailFeatures(mk(['address'], 'https://www.similac.com/')), false, 'no email requirement');
+  assert.equal(E.inEmailFeatures(mk(['insurance', 'phone'], 'https://www.aeroflow.com/')), false);
+  for (const u of ['https://www.irs.gov/x', 'https://www.ssa.gov/', 'https://www.healthcare.gov/a', 'https://dhs.state.tx.us/x', 'https://x.army.mil/']) {
+    assert.equal(E.inEmailFeatures(mk(['email'], u)), false, u);
+  }
+  assert.equal(E.inEmailFeatures(mk('email', 'https://a.com/')), false);
+  assert.equal(E.inEmailFeatures(mk(['email'], 'not a url')), false);
+  assert.equal(E.inEmailFeatures(null), false);
+  assert.equal(E.emailPrograms(null).length, 0);
+});
+
+test('current data: no government program is in the email features, and brand sign-ups with email are', () => {
+  const inc = E.emailPrograms(programs), out = programs.filter((p) => !E.inEmailFeatures(p));
+  assert.ok(inc.length > 0 && out.length > 0);
+  for (const p of inc) { assert.ok(p.requirements.includes('email')); assert.doesNotMatch(E.domainOfUrl(p.signupUrl), /\.(gov|mil)$/); }
+  for (const p of programs.filter((q) => /\.gov\//.test(q.signupUrl))) assert.ok(out.includes(p), p.id);
+});
+
+test('gmailFiltersXml with 150 programs: only included programs, one entry per filter, bounded size', () => {
+  const many = Array.from({ length: 150 }, (_, i) => ({
+    id: 'p-' + String(i).padStart(3, '0'), brand: 'Brand' + i, name: 'Program ' + i,
+    requirements: i % 5 === 3 ? ['email'] : i % 5 === 4 ? ['phone'] : ['email'],
+    signupUrl: i % 5 === 3 ? 'https://www.agency' + i + '.gov/x' : 'https://www.brand' + i + '.com/x'
+  }));
+  const inc = many.filter(E.inEmailFeatures);
+  assert.equal(inc.length, 90);
+  for (const usePlus of [false, true]) {
+    const xml = E.gmailFiltersXml(many, { email: 'jane@gmail.com', usePlus, archive: false, allPrograms: many });
+    assert.equal((xml.match(/<entry>/g) || []).length, 90);
+    assert.doesNotMatch(xml, /\.gov/);
+    assert.ok(xml.length < 60000, String(xml.length));
+  }
+});
+
+test('gmailSearchUrl gives no link for a program outside the email features', () => {
+  const gov = { id: 'g', requirements: ['email'], signupUrl: 'https://www.benefit.gov/x' };
+  assert.equal(E.gmailSearchUrl({ email: 'jane@gmail.com', tag: 'benefit', domain: 'benefit.gov', program: gov }), '');
+  const ok = { id: 'o', requirements: ['email'], signupUrl: 'https://www.acme.com/x' };
+  assert.match(E.gmailSearchUrl({ email: 'jane@gmail.com', tag: 'acme', domain: 'acme.com', program: ok }), /^https:\/\/mail\.google\.com\//);
 });

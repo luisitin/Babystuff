@@ -136,7 +136,7 @@
         state === 'none' ? 'Gmail is not connected to this page. Checking your mail for sign-up and shipping emails works once the app is opened in Claude with Gmail connected. Until then, use the Search my Gmail links on each program below: they open your own Gmail in a new tab.' :
         noRetry ? I().errorCopy('not_granted') :
         dead ? I().errorCopy('capability_disabled') :
-        'Optional. Check my Gmail looks for sign-up and shipping emails from your programs, and you decide which tracker updates to apply. Labels and drafts are optional extras. Claude asks for your permission the first time.';
+        'Optional. Check my Gmail looks for sign-up and shipping emails from your programs, and you decide which tracker updates to apply. Only brand sign-ups that send you mail are searched; government and benefit programs are left out. Labels and drafts are optional extras. Claude asks for your permission the first time.';
       steps.hidden = !(state === 'none' || needConnect || noRetry);
       actions.hidden = !ready;
       btnCheck.hidden = off.check;
@@ -417,7 +417,7 @@
     // ---- drafts ----
     function draftDone(p) {
       done.textContent = '';
-      done.appendChild(document.createTextNode('Draft saved in your Gmail.'));
+      done.appendChild(document.createTextNode('Draft saved in your Gmail. Nothing was sent.'));
       var url = I().safeViewUrl(p && p.viewUrl);
       if (url) {
         done.appendChild(document.createTextNode(' '));

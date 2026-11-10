@@ -182,6 +182,8 @@
     panel.appendChild(row);
     panel.appendChild(note);
     parent.insertBefore(panel, after.nextSibling);
+    // The copy fallback: have the text already selected so the person only has to copy it.
+    try { ta.focus(); ta.select(); } catch (e) {}
     return panel;
   }
 

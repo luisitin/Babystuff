@@ -90,6 +90,8 @@
     return arr(programs).filter(function (p) { return isObj(p) && typeof p.id === 'string' && p.id; })
       .slice().sort(function (a, b) { return a.id < b.id ? -1 : a.id > b.id ? 1 : 0; });
   }
+  // Only programs that belong in the email features are searched, matched and labelled (see BFF.email.inEmailFeatures).
+  function emailList(list) { var E = EM(); return list.filter(E.inEmailFeatures); }
   function domainOfProgram(p) {
     var E = EM();
     var d = E.registrableDomain(E.domainOfUrl(p.signupUrl));
@@ -115,11 +117,11 @@
   function termsFor(o) {
     var E = EM();
     o = o || {};
-    var list = progList(o.programs);
+    var all = progList(o.programs), list = emailList(all);
     var email = validAddress(o.email);
     var plus = plusOn(o, email);
     var tags = isObj(o.tagMap) ? o.tagMap : {};
-    var owners = domainOwners(list);
+    var owners = domainOwners(all); // shared domains are judged on the whole list, so a government sender is never claimed by a brand
     var byText = {}, order = [], covered = {};
     function add(text, id) {
       if (!Object.prototype.hasOwnProperty.call(byText, text)) { byText[text] = []; order.push(text); }
@@ -235,7 +237,7 @@
   function matchThreads(threads, o) {
     var E = EM();
     o = o || {};
-    var list = progList(o.programs);
+    var all = progList(o.programs), list = emailList(all);
     var email = validAddress(o.email);
     var tags = isObj(o.tagMap) ? o.tagMap : null;
     var plusIds = {};
@@ -244,7 +246,8 @@
       var a = validAddress(E.plusAddress(email, tags[p.id])).toLowerCase();
       if (a) (plusIds[a] = plusIds[a] || []).push(p.id);
     });
-    var owners = domainOwners(list);
+    var owners = domainOwners(all), inList = {};
+    list.forEach(function (p) { inList[p.id] = true; });
     var seen = {}, out = [];
     arr(threads).forEach(function (th) {
       if (!isObj(th)) return;
@@ -266,7 +269,7 @@
       if (ids.length === 1) { programId = ids[0]; certainty = 'exact'; }
       else if (ids.length === 0 && sender) {
         var d = E.registrableDomain(sender.split('@')[1]);
-        if (!E.isBroadDomain(d) && Object.prototype.hasOwnProperty.call(owners, d) && owners[d].length === 1) { programId = owners[d][0]; certainty = 'likely'; }
+        if (!E.isBroadDomain(d) && Object.prototype.hasOwnProperty.call(owners, d) && owners[d].length === 1 && inList[owners[d][0]]) { programId = owners[d][0]; certainty = 'likely'; }
       }
       if (!programId) return;
       seen[threadId] = true;
