@@ -99,7 +99,9 @@ The contract is in `ARCHITECTURE.md` ("Phase G"). Rounds 1 to 4 are written ther
 - Code review (`docs/code-review-phase-g.md`): 0 high, 3 medium and 4 low, The review was of commit `feb5ed6`. Its medium findings were: the tracker's "no known value" count mixed programs and groups; the due-date counts did not match the lists they jump to, and still showed after the due date; and plus addresses still applied to government programs in the guided run and the fill script. The four low findings are listed in the file. All seven were fixed in round 4, each with a unit test.
 - Tests:
   - Unit: `node --test` passes 231 of 231.
-  - Browser (`node tests/e2e/run.mjs`): being updated for Phase G. The run on the Phase G app before the update: 591 checks, 9 failed, all from expectations that Phase G changed on purpose (state-only programs hidden, two programs on one brand domain, a moved tracker row).
+  - Browser (`node tests/e2e/run.mjs`): 983 checks, 0 failed. Groups 11 and 12 are new and cover the ranking, the filters, the summary, the state rule, the due-date plan, the guided run, the tracker value line and the email features. Expected numbers are worked out from the data by the real modules (`tests/e2e/lib/model.mjs`), not typed in. Before the update the same suite had 591 checks and 9 failed; all 9 were old expectations that Phase G changed on purpose, and none was an app bug.
+  - Mutation spot-check: 18 deliberate breaks, each made in a throwaway copy of the build, 18 caught (`tests/e2e/MUTATIONS.md`).
+  - One browser check ("the Show them choice is remembered after a reload", artifact output) failed in one early run and passed in every later run. It is noted in `tests/e2e/FINDINGS.md`.
 - Model audit: 62 subagent transcripts in the session before the last three helpers, 50 `claude-sonnet-5-5` and 12 `claude-haiku-5-5`, none on any other model. The final count goes here when the phase closes.
 - Limits:
   - The session's network was Limited, so no official page could be read directly in Phase G. Every Phase G entry rests on official-domain search results and is capped at medium.
@@ -117,7 +119,6 @@ The contract is in `ARCHITECTURE.md` ("Phase G"). Rounds 1 to 4 are written ther
 - Re-verify the Phase G entries on their official pages once the network allows direct reading.
 - Search the leads listed under Phase G.
 - Re-run research every few months. The Phase G values and `verifiedOn` dates are as of 2026-11-10.
-- Finish the code-review fixes (round 4) and re-run the browser suite.
 - Try the Shortcut recipe on a phone and correct `docs/iphone.md` if a step is off.
 - Re-verify the Apple and Google help-page claims by reading the pages, once the session's network allows those hosts.
-- Phase F polish pass: done at the start of Phase G (wording polish, the tracker value line, and email features limited to brand sign-ups). Still open from that list and not re-checked: selecting the text in the copy fallback (`src/js/host.js` `showText`), one wording for standalone downloads, a plus-address caveat in My info, and a keyboard-activation check for the Download backup button (the mutation the suite missed). Details are in `tests/e2e/FINDINGS.md` and `tests/e2e/MUTATIONS.md`.
+- Phase F polish pass: done. The copy fallback selects its text, the download wording is the same everywhere, My info carries the plus-address caveat, and guided "Start over" asks inside the page. Still open: a browser check that starts the Download backup button from the keyboard (the one mutation the earlier suite missed). Details are in `tests/e2e/FINDINGS.md` and `tests/e2e/MUTATIONS.md`.
