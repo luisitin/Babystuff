@@ -363,3 +363,13 @@ Data rules added in the second merge:
 - Same-thing groups: `groupKey(p)` = `sameAs || id`. `rankMap` gives every member of a group the same rank number (groups numbered in `rankPrograms` order, no gaps). `collapseGroups(sorted)` returns `[{ lead, others }]` in order of first appearance. The Directory shows the lead as a card and the others inside a native `<details class="same-group">` ("N more ways to get the same thing") right after it, in the same grid (it spans the full row). The section is decided by the lead. Section "(N)" counts leads; "Showing X of Y programs" still counts programs; the summary figures count distinct group keys. Open groups are remembered in memory only, and restored after a re-render.
 - Summary: a "Show these" button turns on "Truly free" and "Open to everyone", then focuses the result count. Hidden when both are already on or the figure is 0.
 - Guided and tracker use only `rankPrograms`, so they needed no change.
+
+### Phase G, round 4 (review fixes)
+
+- `totalValue(list)` also returns `missing`: the number of group keys (`sameAs || id`) where no member has a value. The tracker note "N programs with no known value are not counted" uses it, so doors to one benefit count once.
+- `rankCmp` ends on `id`, so order never depends on data order. `isOtherState` is removed (`hiddenByState` is the one rule).
+- Directory due-date buttons count the lead cards in the matching `when` section under the current filters, the state rule and `collapseGroups`. A button with a count of 0 is not shown, so the section it jumps to always exists. After the due date has passed only "after the birth" is offered. The accessible name starts with the visible text ("3 do now, show these programs").
+- "Show these" also clears the search text, Category, "What you get", Email only and Needs a registry (the sort stays), so the list matches the summary figure.
+- A saved `offer` and the label lookups use own-property checks.
+- Plus-address tagging follows `BFF.email.inEmailFeatures(p)` everywhere: guided run, fill script (`programList`) and the phone view. Other programs get the plain address. When several listed programs share the page's domain and their addresses differ, the fill script still uses the plain address.
+- `tools/autofill`: `hiddenByState(p, state)` lives in `field-matcher.mjs`. `--all-free` and `--from-backup` (`selectTodo`, option `state`) both use it. The backup's own profile state is used when the backup has My info, else `profile.json`.
