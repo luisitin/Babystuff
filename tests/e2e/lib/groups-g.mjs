@@ -37,7 +37,8 @@ function wantLines(sp, hasState, shown) {
   return L.HIDE_REASONS.filter((r) => sp.counts[r] > 0).map((r) => {
     const t = L.hideReasonText(r, sp.counts[r], hasState);
     const on = !!(shown && shown[r]);
-    return { reason: r, text: t + (r === 'otherState' && !hasState ? ' Add your state in My info to see the ones for you.' : '') + (on ? ' (shown for now)' : ''), btn: on ? 'Hide' : 'Show', hid: ' ' + t };
+    const text = r === 'otherState' && !hasState ? sp.counts[r] + ' only for some states' + (on ? ' (shown for now)' : '') + '. Add your state in My info to see the ones for you.' : t + (on ? ' (shown for now)' : '');
+    return { reason: r, text, btn: on ? 'Hide' : 'Show', hid: ' ' + t };
   });
 }
 const summaryWant = (sp) => (sp.hiddenNow === 0 ? 'Nothing is hidden right now (' + sp.total + ' normally ' + (sp.total === 1 ? 'is' : 'are') + ')' : 'Hidden from this list: ' + plural(sp.hiddenNow, 'program'));

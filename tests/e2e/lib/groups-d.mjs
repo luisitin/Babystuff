@@ -203,7 +203,7 @@ export async function directoryG(env) {
         // Show them / Hide them without a state
         await toggleReason(page, 'otherState');
         const hb2 = await hiddenBoxState(page); const os2 = hb2.lines.find((l) => l.reason === 'otherState') || {};
-        g.check(tag + 'no state: Show lists the state-only programs, the line ends (shown for now) and the button becomes Hide', sameSet(await shownIds(page), ids(L.filterPrograms(ALL, {}))) && os2.text.endsWith('(shown for now)') && os2.btnVisible === 'Hide' && hb2.summary === 'Nothing is hidden right now (' + nHidden + ' normally are)', JSON.stringify(hb2));
+        g.check(tag + 'no state: Show lists the state-only programs, the line says (shown for now) before the full stop and the button becomes Hide', sameSet(await shownIds(page), ids(L.filterPrograms(ALL, {}))) && os2.text === nHidden + ' only for some states (shown for now). Add your state in My info to see the ones for you.' && os2.btnVisible === 'Hide' && hb2.summary === 'Nothing is hidden right now (' + nHidden + ' normally are)', JSON.stringify(hb2));
         g.check(tag + 'no state: focus stays on the Show / Hide button', await focusOnOS(page));
         const rk = await page.evaluate(SCRAPE);
         const M2 = shownFor('', true, {}, 'best');

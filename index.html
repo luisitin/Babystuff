@@ -5427,13 +5427,16 @@ label.tick input:focus-visible { outline: 3px solid var(--focus); outline-offset
       var n = split.counts[r];
       if (!n) return;
       var on = shownReasons[r] === true;
-      var kids = [document.createTextNode(reasonText(r, n, hasState))];
+      var text = reasonText(r, n, hasState);
+      var mark = on ? ' (shown for now)' : '';
+      var stop = text.charAt(text.length - 1) === '.';   // the mark goes before a full stop
+      var kids = [document.createTextNode(on && stop ? text.slice(0, -1) + mark + '.' : text)];
       if (r === 'otherState' && !hasState) {
         kids.push(document.createTextNode(' Add your state in '));
         kids.push(h('a', { href: '#info', 'data-info-key': 'state', text: 'My info' }));
         kids.push(document.createTextNode(' to see the ones for you.'));
       }
-      if (on) kids.push(document.createTextNode(' (shown for now)'));
+      if (on && !stop) kids.push(document.createTextNode(mark));
       var btn = h('button', { type: 'button', class: 'btn btn-small' }, [
         document.createTextNode(on ? 'Hide' : 'Show'),
         h('span', { class: 'visually-hidden', text: ' ' + reasonText(r, n, hasState) })
