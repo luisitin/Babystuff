@@ -489,6 +489,28 @@ details.dir-filters { margin: 0 0 var(--space-1); }
 .gd-miss { margin: 0 0 var(--space-1) calc(24px + var(--space-3)); }
 .fx-alt-list .gd-miss { margin-left: calc(24px + var(--space-3)); }
 .gd-miss .miss-line { margin: 0; }
+
+/* ===== Phase J: tick boxes, collapsed strip, the hidden-programs box (ticks.js, directory.js) ===== */
+.ticks { display: flex; flex-wrap: wrap; gap: var(--space-1) var(--space-4); margin: 0; }
+label.tick { display: inline-flex; align-items: center; gap: var(--space-2); min-height: 44px; padding: 0 var(--space-1); cursor: pointer; font-size: .9375rem; font-weight: 600; color: var(--text); }
+label.tick input { flex: none; width: 22px; height: 22px; margin: 0; cursor: pointer; accent-color: var(--primary); }
+label.tick input:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+.card-ticks { display: grid; gap: 0; border-top: 1px solid var(--border); padding-top: var(--space-1); }
+.tick-note { margin: 0 0 var(--space-1); font-size: .875rem; color: var(--muted); }
+.tick-note:empty { display: none; }
+.card.is-ticked .free-line, .card.is-ticked .value-line, .card.is-ticked .miss-line, .card.is-ticked .card-foot, .card.is-ticked .card-more,
+.card.is-ticked .card-brand, .card.is-ticked .card-top .badge:not(.card-status-badge), .card.is-ticked .card-top .rank { display: none; }
+.card.is-ticked .card-ticks { border-top: 0; padding-top: 0; }
+
+.dir-hidden { margin: var(--space-1) 0 0; border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--surface); font-size: .9375rem; }
+.dir-hidden > summary { min-height: 44px; display: flex; align-items: center; padding: 0 var(--space-3); cursor: pointer; font-weight: 600; color: var(--text); }
+.dir-hidden > summary:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+.dir-hidden-list { list-style: none; margin: 0; padding: 0 var(--space-3); display: grid; gap: var(--space-2); }
+.dir-hidden-list li { display: flex; align-items: center; justify-content: space-between; gap: var(--space-2) var(--space-3); }
+.dir-hidden-text { flex: 1 1 12rem; min-width: 0; line-height: 1.35; }
+.dir-hidden-list .btn { flex: none; }
+.dir-hidden-foot { margin: 0; padding: var(--space-2) var(--space-3) var(--space-3); font-size: .875rem; color: var(--muted); }
+.empty-hidden { margin: var(--space-2) 0; color: var(--muted); }
 /* Styles for My info, Tracker and Do it for me. Uses base.css tokens, with fallbacks. */
 .fx-view, .fx-confirm { --fx-bg: var(--bg, #fff); --fx-surface: var(--surface, #f6f7f9); --fx-text: var(--text, #1c2430); --fx-muted: var(--muted, #5b6676);
   --fx-primary: var(--primary, #2457c5); --fx-pc: var(--primary-contrast, #fff); --fx-border: var(--border, #cfd6e0);
@@ -1212,29 +1234,87 @@ body::before {
     return st.length ? 'Only in ' + joinAnd(st.map(String)) : '';
   }
 
+  // ---- Phase J: ticks and the one "hidden from this list" rule ----
+  // Done and Received are two ticks over the stored status; Not for me is the status skipped.
+  function tickState(status) {
+    return { done: status === 'signed-up' || status === 'received', received: status === 'received', notForMe: status === 'skipped' };
+  }
+  function statusAfterTick(status, box, checked) {
+    var st = status === 'signed-up' || status === 'received' || status === 'skipped' ? status : 'todo';
+    var on = !!checked;
+    if (box === 'done') {
+      if (on) return st === 'received' ? 'received' : 'signed-up';
+      return st === 'signed-up' || st === 'received' ? 'todo' : st;
+    }
+    if (box === 'received') {
+      if (on) return 'received';
+      return st === 'received' ? 'signed-up' : st;
+    }
+    if (box === 'notForMe') {
+      if (on) return 'skipped';
+      return st === 'skipped' ? 'todo' : st;
+    }
+    return st;
+  }
+  // { groupKey: true } for every group with a member that is signed up or received.
+  function coveredGroups(list, statusOf) {
+    var out = {};
+    var f = typeof statusOf === 'function' ? statusOf : function () { return 'todo'; };
+    (list || []).forEach(function (p) {
+      if (!p) return;
+      var st = f(p.id);
+      if (st === 'signed-up' || st === 'received') out[groupKey(p)] = true;
+    });
+    return out;
+  }
+  var HIDE_REASONS = ['otherState', 'noFit', 'done', 'notForMe', 'covered'];
+  // ctx = { state, profile, statusOf, covered }. '' when the program is not hidden. First match wins.
+  function hideReason(p, ctx) {
+    ctx = ctx || {};
+    var st = typeof ctx.statusOf === 'function' ? ctx.statusOf(p.id) : 'todo';
+    if (st === 'signed-up' || st === 'received') return 'done';
+    if (st === 'skipped') return 'notForMe';
+    if (hiddenByState(p, ctx.state)) return 'otherState';
+    if (hasSituation(ctx.profile) && fit(p, ctx.profile) === 'no') return 'noFit';
+    if (ctx.covered && Object.prototype.hasOwnProperty.call(ctx.covered, groupKey(p))) return 'covered';
+    return '';
+  }
+  // shown: { reason: true } for the reasons the person chose to show for now.
+  function splitHidden(list, ctx, shown) {
+    ctx = ctx || {};
+    shown = shown || {};
+    var c = ctx.covered ? ctx : Object.assign({}, ctx, { covered: coveredGroups(list, ctx.statusOf) });
+    var out = { pool: [], reasons: {}, counts: {}, total: 0, hiddenNow: 0 };
+    HIDE_REASONS.forEach(function (r) { out.counts[r] = 0; });
+    (list || []).forEach(function (p) {
+      if (!p) return;
+      var r = hideReason(p, c);
+      if (r) { out.reasons[p.id] = r; out.counts[r]++; out.total++; }
+      if (r && shown[r] !== true) { out.hiddenNow++; return; }
+      out.pool.push(p);
+    });
+    return out;
+  }
+
   // ---- the Tracker's own list ----
   // One pass over the programs in rank order. Anything the person has acted on is its own row.
   // To-do programs for other states, ruled out by the answers, or covered by a same-thing sign-up
-  // are left out (and counted) unless opts.all is set. To-do alternates fold under their lead.
+  // are left out (and counted) unless opts.all is set. Nothing the person chose to show is saved. To-do alternates fold under their lead.
   function trackerScope(list, opts) {
     opts = opts || {};
     var statusOf = typeof opts.statusOf === 'function' ? opts.statusOf : function () { return 'todo'; };
     var ranked = rankPrograms(list);
     var out = { rows: [], left: { otherState: 0, noFit: 0, covered: 0 }, total: ranked.length };
-    var covered = {};
     var leads = {};
     var sit = hasSituation(opts.profile);
-    ranked.forEach(function (p) {
-      var st = statusOf(p.id);
-      if (st === 'signed-up' || st === 'received') covered[groupKey(p)] = true;
-    });
+    var covered = coveredGroups(ranked, statusOf);
     ranked.forEach(function (p) {
       var st = statusOf(p.id) || 'todo';
       if (st !== 'todo') { out.rows.push({ p: p, status: st, others: [] }); return; }
       var k = groupKey(p);
       if (!opts.all) {
-        if (hiddenByState(p, opts.state) && !opts.showOtherStates) { out.left.otherState++; return; }
-        if (sit && hiddenByAnswers(p, opts.profile, 'todo') && !opts.showNoFit) { out.left.noFit++; return; }
+        if (hiddenByState(p, opts.state)) { out.left.otherState++; return; }
+        if (sit && hiddenByAnswers(p, opts.profile, 'todo')) { out.left.noFit++; return; }
         if (Object.prototype.hasOwnProperty.call(covered, k)) { out.left.covered++; return; }
       }
       if (Object.prototype.hasOwnProperty.call(leads, k)) leads[k].others.push(p);
@@ -1465,6 +1545,12 @@ body::before {
     missingInfoCounts: missingInfoCounts,
     missingInfoText: missingInfoText,
     onlyInText: onlyInText,
+    tickState: tickState,
+    statusAfterTick: statusAfterTick,
+    coveredGroups: coveredGroups,
+    HIDE_REASONS: HIDE_REASONS,
+    hideReason: hideReason,
+    splitHidden: splitHidden,
     trackerScope: trackerScope,
     readyNow: readyNow,
     trackerSections: trackerSections,
@@ -1756,6 +1842,89 @@ body::before {
   }, true);
 
   BFF.missing = { line: line, notice: notice, take: take, want: want };
+})();
+(function () {
+  'use strict';
+  window.BFF = window.BFF || {};
+
+  // Done / Received / Not for me tick boxes over the stored status. Phase J contract in ARCHITECTURE.md.
+  // Loads before tracker.js, so BFF.tracker is only touched inside handlers.
+  function h(tag, attrs, kids) {
+    var n = document.createElement(tag);
+    if (attrs) Object.keys(attrs).forEach(function (k) {
+      var v = attrs[k];
+      if (v === false || v === null || v === undefined) return;
+      if (k === 'text') n.textContent = v;
+      else if (k === 'class') n.className = v;
+      else n.setAttribute(k, v === true ? '' : v);
+    });
+    (kids || []).forEach(function (c) { if (c) n.appendChild(typeof c === 'string' ? document.createTextNode(c) : c); });
+    return n;
+  }
+
+  // Runs fn and scrolls the window by however far the anchor moved, at once (never animated),
+  // so the thing under the finger stays where it was.
+  function keepPlace(anchor, fn) {
+    var before = anchor && anchor.getBoundingClientRect ? anchor.getBoundingClientRect().top : null;
+    fn();
+    if (before === null || !anchor.isConnected) return;
+    var d = anchor.getBoundingClientRect().top - before;
+    if (Math.abs(d) < 0.5) return;
+    try { window.scrollBy({ top: d, left: 0, behavior: 'instant' }); }
+    catch (e) { window.scrollBy(0, d); }
+  }
+
+  // opts: prefix, status, received (add the Received box), onChange({ ok, status, prev, box, checked, input }).
+  function build(p, opts) {
+    opts = opts || {};
+    var prefix = opts.prefix || 'tick';
+    var L = BFF.logic;
+    var inputs = {};
+    var wrap = h('div', { class: 'ticks', role: 'group', 'aria-label': 'Mark ' + p.name, 'data-program-id': p.id });
+
+    function add(key, part, label) {
+      var input = h('input', { type: 'checkbox', id: prefix + '-' + part + '-' + p.id, 'data-tick': key });
+      inputs[key] = input;
+      wrap.appendChild(h('label', { class: 'tick' }, [
+        input,
+        h('span', { class: 'tick-text', text: label }),
+        h('span', { class: 'visually-hidden', text: ': ' + p.name })
+      ]));
+      input.addEventListener('change', function () { changed(key, input); });
+    }
+
+    function sync(status) {
+      var t = L.tickState(status);
+      Object.keys(inputs).forEach(function (k) { inputs[k].checked = !!t[k]; });
+    }
+
+    function changed(key, input) {
+      keepPlace(input, function () {
+        var T = BFF.tracker;
+        var checked = input.checked;
+        var prev = T.getStatus(p.id) || 'todo';
+        var next = L.statusAfterTick(prev, key, checked);
+        var ok = true;
+        if (next !== prev) {
+          var entry = T.getEntry ? T.getEntry(p.id) : null;
+          ok = T.setStatus(p.id, next) !== false;
+          // A save that did not reach storage is undone, so the box and the badge never claim it.
+          if (!ok && T.restoreEntry) T.restoreEntry(p.id, entry);
+        }
+        var now = T.getStatus(p.id) || 'todo';
+        sync(now);
+        if (typeof opts.onChange === 'function') opts.onChange({ ok: ok, status: now, prev: prev, box: key, checked: checked, input: input });
+      });
+    }
+
+    add('done', 'done', 'Done');
+    if (opts.received) add('received', 'rcv', 'Received');
+    add('notForMe', 'nfm', 'Not for me');
+    sync(opts.status || 'todo');
+    return { el: wrap, sync: sync };
+  }
+
+  BFF.ticks = { build: build, keepPlace: keepPlace };
 })();
 // Pure helpers for plus addresses, Gmail filters, a mailto checklist and calendar reminders.
 // Nothing here touches the network or the DOM. Loadable from Node tests as well as the browser.
@@ -3581,9 +3750,9 @@ body::before {
     return p && typeof p === 'object' && !Array.isArray(p) ? p : {};
   }
   function computeScope() {
-    var pr = profileOf(), pf = prefsNow();
+    var pr = profileOf();
     return BFF.logic.trackerScope(BFF.programs || [], {
-      state: pr.state, showOtherStates: !!pf.showOtherStates, profile: pr, showNoFit: !!pf.showNoFit,
+      state: pr.state, profile: pr,
       all: view.showAll, statusOf: function (id) { return tracker.getStatus(id); }
     });
   }
@@ -4752,7 +4921,7 @@ body::before {
     ['category', 'Category'],
     ['confidence', 'Confidence']
   ];
-  var STATUSES = [['todo', 'To do'], ['signed-up', 'Signed up'], ['received', 'Received'], ['skipped', 'Skipped']];
+  var STATUSES = [['todo', 'To do'], ['signed-up', 'Signed up'], ['received', 'Received'], ['skipped', 'Not for me']];
 
   var VERDICT_NOTES = {
     top: 'Free, and worth the most. Claim these first.',
@@ -4771,8 +4940,12 @@ body::before {
   var TRULY_FREE_LINE = 'Truly free: real products or samples at no cost. No purchase, no fee, not a prize draw.';
 
   var state = Object.assign({}, DEFAULTS);
-  var showOther = false;
-  var showNoFit = false;
+  // What the person chose to show for now: reason -> true. Never saved; empty on every page load.
+  var shownReasons = {};
+  var hiddenOpen = false;
+  var tickOf = {};
+  var renderedIds = [];
+  var SAVE_FAIL = 'Could not save on this device (storage is full or blocked). Nothing was changed.';
   var openCards = {};
   var profile = {};
   var els = {};
@@ -4810,16 +4983,13 @@ body::before {
       state.kind = KIND_IDS.indexOf(f.kind) !== -1 ? f.kind : DEFAULTS.kind;
       state.sort = f.sort === 'recommended' ? 'best' : SORTS.some(function (s) { return s[0] === f.sort; }) ? f.sort : 'best';
     }
-    showOther = !!(prefs && prefs.showOtherStates);
-    showNoFit = !!(prefs && prefs.showNoFit);
   }
   function savePrefs() {
     if (!BFF.store) return;
     var prefs = BFF.store.get('prefs.v1', {});
     if (!prefs || typeof prefs !== 'object') prefs = {};
     prefs.filters = Object.assign({}, state);
-    prefs.showOtherStates = showOther;
-    prefs.showNoFit = showNoFit;
+    delete prefs.showOtherStates; delete prefs.showNoFit;
     BFF.store.set('prefs.v1', prefs);
   }
 
@@ -4905,8 +5075,15 @@ body::before {
       els.fitsHint
     ]);
     els.tfNote = h('p', { class: 'dir-note', hidden: true, text: TRULY_FREE_LINE });
-    els.stateBox = h('div', { class: 'dir-state', hidden: true });
-    els.fitBox = h('div', { class: 'dir-state dir-fit', hidden: true });
+    els.hiddenSummary = h('summary');
+    els.hiddenList = h('ul', { class: 'dir-hidden-list' });
+    els.hiddenBox = h('details', { class: 'dir-hidden', hidden: true }, [
+      els.hiddenSummary,
+      els.hiddenList,
+      h('p', { class: 'dir-hidden-foot', text: 'What you show here is hidden again the next time you open the app.' })
+    ]);
+    els.hiddenBox.addEventListener('toggle', function () { hiddenOpen = els.hiddenBox.open; });
+    els.live = h('div', { class: 'visually-hidden', role: 'status', 'aria-live': 'polite', 'aria-atomic': 'true' });
     els.summary = h('section', { class: 'dir-summary', 'aria-label': 'Summary' });
     els.missBox = h('div', { class: 'dir-miss', hidden: true });
 
@@ -4916,12 +5093,15 @@ body::before {
     els.empty = h('div', { class: 'empty', hidden: true }, [
       h('p', { text: 'No programs match those filters.' })
     ]);
+    els.emptyHidden = h('p', { class: 'empty-hidden', hidden: true });
+    els.empty.appendChild(els.emptyHidden);
     var emptyClear = h('button', { type: 'button', class: 'btn btn-primary', text: 'Clear filters' });
     emptyClear.addEventListener('click', clearFilters);
     els.empty.appendChild(emptyClear);
 
     els.start = h('button', { type: 'button', class: 'btn btn-primary start-run' });
     els.start.addEventListener('click', function () {
+      refreshStart();
       if (!shownIds.length || !BFF.guided) return;
       var ids = shownIds.slice();
       function go() { BFF.guided.preselect(ids); if (BFF.nav) BFF.nav.go('guided'); else location.hash = '#guided'; }
@@ -4940,12 +5120,12 @@ body::before {
     root.appendChild(els.tabs);
     root.appendChild(els.filterBox);
     root.appendChild(els.tfNote);
-    root.appendChild(els.stateBox);
-    root.appendChild(els.fitBox);
+    root.appendChild(els.hiddenBox);
     root.appendChild(resultRow);
     root.appendChild(h('div', { class: 'start-row' }, [els.start]));
     root.appendChild(els.list);
     root.appendChild(els.empty);
+    root.appendChild(els.live);
   }
 
   function syncControls() {
@@ -5060,6 +5240,12 @@ body::before {
       h('span', { class: 'card-toggle-icon', 'aria-hidden': 'true', text: open ? String.fromCharCode(0x25B4) : String.fromCharCode(0x25BE) })
     ]);
     kids.push(h('div', { class: 'card-foot' }, [link, toggle]));
+    var art;
+    if (BFF.tracker && BFF.ticks) {
+      var tk = BFF.ticks.build(p, { prefix: 'tick', status: st, onChange: function (res) { onTick(art, p, res); } });
+      tickOf[p.id] = tk;
+      kids.push(h('div', { class: 'card-ticks' }, [tk.el, h('p', { class: 'tick-note' })]));
+    }
 
     // Everything else, shown when the card is opened.
     var d = [];
@@ -5124,7 +5310,7 @@ body::before {
     var more = h('div', { class: 'card-more', id: cid, hidden: !open }, d);
     kids.push(more);
 
-    var art = h('article', { class: 'card' + (open ? ' is-open' : ''), 'data-program-id': p.id }, kids);
+    art = h('article', { class: 'card' + (open ? ' is-open' : ''), 'data-program-id': p.id }, kids);
     toggle.addEventListener('click', function () {
       var now = toggle.getAttribute('aria-expanded') !== 'true';
       toggle.setAttribute('aria-expanded', now ? 'true' : 'false');
@@ -5136,58 +5322,61 @@ body::before {
     return art;
   }
 
-  function stateInfo() {
-    var st = profState();
-    var hidden = L.otherStateCount(programs(), st);
-    return { st: st, hidden: hidden, hide: hidden > 0 && !showOther };
+  function hideCtx() {
+    return { state: profState(), profile: profile, statusOf: statusOf, covered: L.coveredGroups(programs(), statusOf) };
+  }
+  // The reason a program would be hidden at the next render, '' when it would be listed.
+  function hiddenNowReason(p, ctx) {
+    var r = L.hideReason(p, ctx);
+    return r && shownReasons[r] !== true ? r : '';
   }
 
-  // Programs the answers in My info rule out (never ones already in progress), among those left by the state rule.
-  function fitInfo(afterState) {
-    var sit = L.hasSituation(profile);
-    var hidden = sit ? L.hiddenByAnswersCount(afterState, profile, statusOf) : 0;
-    return { sit: sit, hidden: hidden, hide: sit && hidden > 0 && !showNoFit };
-  }
-  function renderFitBox(info) {
-    els.fitBox.textContent = '';
-    els.fitBox.hidden = info.hidden === 0;
-    if (info.hidden === 0) return;
-    var n = info.hidden;
-    els.fitBox.appendChild(h('p', { text: info.hide
-      ? (n === 1 ? '1 program hidden' : n + ' programs hidden') + ' because of your answers in My info.'
-      : (n === 1 ? '1 program that does not match' : n + ' programs that do not match') + ' your answers in My info ' + (n === 1 ? 'is' : 'are') + ' shown.' }));
-    var b = h('button', { type: 'button', class: 'btn btn-small', text: info.hide ? 'Show them' : 'Hide them' });
-    b.addEventListener('click', function () { showNoFit = !showNoFit; savePrefs(); render(); var nb = els.fitBox.querySelector('button'); if (nb) nb.focus(); });
-    els.fitBox.appendChild(b);
+  var REASON_NOUN = {
+    otherState: ['for another state', 'for other states'],
+    noFit: ['that your answers in My info rule out', 'that your answers in My info rule out'],
+    done: ['you marked done', 'you marked done'],
+    notForMe: ['you marked not for me', 'you marked not for me'],
+    covered: ['other way to get something you already signed up for', 'other ways to get something you already signed up for']
+  };
+  function reasonText(r, n, hasState) {
+    if (r === 'otherState' && !hasState) return n + ' only for some states.';
+    return n + ' ' + REASON_NOUN[r][n === 1 ? 0 : 1];
   }
 
-  function renderStateBox(info) {
-    els.stateBox.textContent = '';
-    els.stateBox.hidden = false;
-    if (info.hidden === 0) { els.stateBox.hidden = true; return; }
-    var n = info.hidden, t;
-    if (!info.st) {
-      if (info.hide) t = (n === 1 ? '1 program is' : n + ' programs are') + ' only for some states. ';
-      else t = (n === 1 ? '1 program only for some states is' : n + ' programs only for some states are') + ' shown. ';
-      var kids = [document.createTextNode(t)];
-      if (info.hide) {
-        kids.push(document.createTextNode('Add your state in '));
+  function renderHiddenBox(split) {
+    var box = els.hiddenBox;
+    box.hidden = split.total === 0;
+    els.hiddenList.textContent = '';
+    if (split.total === 0) return;
+    var hasState = !!profState();
+    var now = split.hiddenNow;
+    els.hiddenSummary.textContent = now === 0
+      ? 'Nothing is hidden right now (' + split.total + ' normally ' + (split.total === 1 ? 'is' : 'are') + ')'
+      : 'Hidden from this list: ' + plural(now, 'program', 'programs');
+    L.HIDE_REASONS.forEach(function (r) {
+      var n = split.counts[r];
+      if (!n) return;
+      var on = shownReasons[r] === true;
+      var kids = [document.createTextNode(reasonText(r, n, hasState))];
+      if (r === 'otherState' && !hasState) {
+        kids.push(document.createTextNode(' Add your state in '));
         kids.push(h('a', { href: '#info', 'data-info-key': 'state', text: 'My info' }));
         kids.push(document.createTextNode(' to see the ones for you.'));
-      } else {
-        kids.push(document.createTextNode('Add your state in '));
-        kids.push(h('a', { href: '#info', 'data-info-key': 'state', text: 'My info' }));
-        kids.push(document.createTextNode(' to narrow them.'));
       }
-      els.stateBox.appendChild(h('p', null, kids));
-    } else if (info.hide) {
-      els.stateBox.appendChild(h('p', { text: n === 1 ? '1 program for another state is hidden.' : n + ' programs for other states are hidden.' }));
-    } else {
-      els.stateBox.appendChild(h('p', { text: n === 1 ? '1 program for another state is shown.' : n + ' programs for other states are shown.' }));
-    }
-    var b = h('button', { type: 'button', class: 'btn btn-small', text: info.hide ? 'Show them' : 'Hide them' });
-    b.addEventListener('click', function () { showOther = !showOther; savePrefs(); render(); var nb = els.stateBox.querySelector('button'); if (nb) nb.focus(); });
-    els.stateBox.appendChild(b);
+      if (on) kids.push(document.createTextNode(' (shown for now)'));
+      var btn = h('button', { type: 'button', class: 'btn btn-small' }, [
+        document.createTextNode(on ? 'Hide' : 'Show'),
+        h('span', { class: 'visually-hidden', text: ' ' + reasonText(r, n, true) })
+      ]);
+      btn.addEventListener('click', function () {
+        if (shownReasons[r] === true) delete shownReasons[r]; else shownReasons[r] = true;
+        render();
+        var again = els.hiddenBox.querySelector('li[data-reason="' + r + '"] button');
+        if (again) again.focus();
+      });
+      els.hiddenList.appendChild(h('li', { 'data-reason': r }, [h('span', { class: 'dir-hidden-text' }, kids), btn]));
+    });
+    box.open = hiddenOpen;
   }
 
   function goGroup(when) {
@@ -5217,9 +5406,8 @@ body::before {
   }
   // Filter options for the list: the chosen filters plus the state and answers rules.
   function listOpts(extra) {
-    var info = stateInfo();
     var opts = Object.assign({}, state, {
-      state: info.st, hideOtherStates: info.hide,
+      state: profState(), hideOtherStates: false,
       profile: profile, hideNoFit: false,
       fitsMine: state.fitsMine && L.hasSituation(profile)
     }, extra || {});
@@ -5229,7 +5417,9 @@ body::before {
   function renderSummary(pool, fInfo) {
     var box = els.summary;
     box.textContent = '';
-    var free = pool.filter(function (p) { return L.isTrulyFree(p) && L.isOpenToAll(p); });
+    function todoNow(p) { return statusOf(p.id) === 'todo'; }
+    var free = pool.filter(function (p) { return todoNow(p) && L.isTrulyFree(p) && L.isOpenToAll(p); });
+    var marked = programs().some(function (p) { var s = statusOf(p.id); return s !== 'todo' && L.isTrulyFree(p) && L.isOpenToAll(p); });
     var freeGroups = distinctGroups(free);
     var tv = L.totalValue(free);
     var lo = L.roundTotal(tv.low), hi = L.roundTotal(tv.high);
@@ -5238,13 +5428,13 @@ body::before {
     var skipNote = noValue ? '; ' + noValue + (noValue === 1 ? ' has' : ' have') + ' no known value and ' + (noValue === 1 ? 'is' : 'are') + ' not counted' : '';
     if (tv.count) worth = ', worth about ' + (lo === hi ? L.money(lo) : L.money(lo) + ' to ' + L.money(hi)) + ' together (our estimate, from ordinary shelf prices' + skipNote + ').';
     var mainKids = [
-      h('strong', { text: freeGroups + ' truly free ' + (freeGroups === 1 ? 'program' : 'programs') + ' open to everyone' }),
+      h('strong', { text: freeGroups + ' truly free ' + (freeGroups === 1 ? 'program' : 'programs') + ' open to everyone' + (marked ? ' left to do' : '') }),
       document.createTextNode(worth)
     ];
     var top = h('div', { class: 'sum-top' }, [h('p', { class: 'sum-main' }, mainKids)]);
     var more = distinctGroups(pool.filter(function (p) {
       var v = L.verdict(p);
-      return L.needsQualifying(p) && (v === 'top' || v === 'good' || v === 'small') && L.fit(p, L.hasSituation(profile) ? profile : {}) !== 'no';
+      return todoNow(p) && L.needsQualifying(p) && (v === 'top' || v === 'good' || v === 'small') && L.fit(p, L.hasSituation(profile) ? profile : {}) !== 'no';
     }));
     if (freeGroups > 0 && !(state.trulyFree && state.openToAll && state.kind !== 'money' && state.kind !== 'care')) {
       var show = h('button', { type: 'button', class: 'btn btn-small show-these', text: 'Show these' });
@@ -5326,10 +5516,11 @@ body::before {
 
   function render() {
     var all = programs();
-    var info = stateInfo();
-    var afterState = L.filterPrograms(all, { state: info.st, hideOtherStates: info.hide });
-    var fInfo = fitInfo(afterState);
-    var pool = fInfo.hide ? L.filterPrograms(afterState, { profile: profile, hideNoFit: true, statusOf: statusOf }) : afterState;
+    var sit = L.hasSituation(profile);
+    var split = L.splitHidden(all, { state: profState(), profile: profile, statusOf: statusOf }, shownReasons);
+    var pool = split.pool;
+    var fInfo = { sit: sit };
+    tickOf = {};
     // Ranks are numbered within the tab, over the programs that are left after the state and answers rules.
     var rankOf = L.rankMap(state.kind === 'all' ? pool : L.filterPrograms(pool, { kind: state.kind }));
     var ctx = { sit: fInfo.sit };
@@ -5355,15 +5546,29 @@ body::before {
     els.tfNote.hidden = !state.trulyFree;
     renderTabs(pool);
     renderFilterBox(fInfo);
-    renderFitBox(fInfo);
-    renderStateBox(info);
+    renderHiddenBox(split);
     renderSummary(pool, fInfo);
     renderMissBox();
     els.count.textContent = 'Showing ' + shown.length + ' of ' + pool.length + ' programs';
     els.empty.hidden = shown.length !== 0;
-    shownIds = shown.map(function (p) { return p.id; });
-    els.start.textContent = 'Start a guided run with these ' + shown.length;
-    els.start.disabled = shown.length === 0;
+    els.emptyHidden.hidden = !(shown.length === 0 && split.hiddenNow > 0);
+    els.emptyHidden.textContent = split.hiddenNow > 0
+      ? (split.hiddenNow === 1 ? '1 program is' : split.hiddenNow + ' programs are') + ' hidden from this list. Open "Hidden from this list" above to show ' + (split.hiddenNow === 1 ? 'it.' : 'them.')
+      : '';
+    renderedIds = shown.map(function (p) { return p.id; });
+    refreshStart();
+  }
+
+  // The guided run only gets programs that would still be listed: ticking something done
+  // also takes its other ways out of the run, so the button stays true between full renders.
+  function refreshStart() {
+    var ctx = hideCtx();
+    shownIds = renderedIds.filter(function (id) {
+      var p = byProgramId(id);
+      return p && !hiddenNowReason(p, ctx);
+    });
+    els.start.textContent = 'Start a guided run with these ' + shownIds.length;
+    els.start.disabled = shownIds.length === 0;
   }
 
   // Tab labels and counts: what each tab would show with the other filters as they are now.
@@ -5398,6 +5603,45 @@ body::before {
     els.fitsMine.checked = state.fitsMine && fInfo.sit;
   }
 
+  function say(text) {
+    if (!els.live) return;
+    els.live.textContent = '';
+    els.live.textContent = text;
+  }
+
+  // Close Details on a card (used when it collapses to a strip).
+  function closeDetails(art, id) {
+    var more = art.querySelector('.card-more'), tg = art.querySelector('.card-toggle');
+    if (more) more.hidden = true;
+    if (tg) {
+      tg.setAttribute('aria-expanded', 'false');
+      var ic = tg.querySelector('.card-toggle-icon');
+      if (ic) ic.textContent = String.fromCharCode(0x25BE);
+    }
+    art.classList.remove('is-open');
+    delete openCards[id];
+  }
+
+  // A tick box was used on a card. The save and the boxes are already settled (BFF.ticks).
+  function onTick(art, p, res) {
+    if (!res.ok) { say(SAVE_FAIL); return; }
+    var note = art.querySelector('.tick-note');
+    var reason = hiddenNowReason(p, hideCtx());
+    var strip = (reason === 'done' || reason === 'notForMe');
+    BFF.ticks.keepPlace(res.input, function () {
+      if (strip) {
+        closeDetails(art, p.id);
+        art.classList.add('is-ticked');
+        if (note) note.textContent = (reason === 'done' ? 'Marked done.' : 'Marked not for me.') + ' It will be hidden from this list. Untick to undo.';
+      } else {
+        art.classList.remove('is-ticked');
+        if (note) note.textContent = '';
+      }
+    });
+    var st = res.status;
+    say(p.name + (st === 'signed-up' || st === 'received' ? ' marked done.' : st === 'skipped' ? ' marked not for me.' : ' is back on your list.'));
+  }
+
   function onTrackerChanged() {
     if (!BFF.tracker || !els.list) return;
     var badges = els.list.querySelectorAll('.card[data-program-id]');
@@ -5417,6 +5661,8 @@ body::before {
       if (want) { var foot = badges[m].querySelector('.card-foot'); badges[m].insertBefore(want, foot); }
     }
     renderMissBox();
+    Object.keys(tickOf).forEach(function (id) { tickOf[id].sync(statusOf(id)); });
+    refreshStart();
     var sels = els.list.querySelectorAll('select[data-program-id]');
     for (var i = 0; i < sels.length; i++) {
       var s = BFF.tracker.getStatus(sels[i].getAttribute('data-program-id')) || 'todo';
@@ -5645,22 +5891,18 @@ body::before {
     return h('div', { class: 'fx-check' }, [cb, h('label', { 'for': id, text: 'When I tap Done or Skip, open the next sign-up page' })]);
   }
 
-  // Programs for other states are left out of the list unless the person chose to show them.
+  // Programs for other states are always left out of the list.
   function hiddenByState(p) {
     var L = BFF.logic;
     if (!L || !L.hiddenByState) return false;
-    var prefs = store.get('prefs.v1', {});
-    if (prefs && typeof prefs === 'object' && prefs.showOtherStates) return false;
     var st = profile().state;
     return L.hiddenByState(p, typeof st === 'string' ? st : '');
   }
-  // Programs the person's answers in My info rule out are left out too, unless they chose to show them.
+  // Programs the person's answers in My info rule out are left out too.
   // A program already signed up for or received is never hidden.
   function hiddenByAnswers(p) {
     var L = BFF.logic;
     if (!L || !L.hiddenByAnswers) return false;
-    var prefs = store.get('prefs.v1', {});
-    if (prefs && typeof prefs === 'object' && prefs.showNoFit) return false;
     return L.hiddenByAnswers(p, profile(), T().getStatus(p.id));
   }
   function hiddenHere(p) { return hiddenByState(p) || hiddenByAnswers(p); }

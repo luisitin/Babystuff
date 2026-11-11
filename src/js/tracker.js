@@ -315,9 +315,9 @@
     return p && typeof p === 'object' && !Array.isArray(p) ? p : {};
   }
   function computeScope() {
-    var pr = profileOf(), pf = prefsNow();
+    var pr = profileOf();
     return BFF.logic.trackerScope(BFF.programs || [], {
-      state: pr.state, showOtherStates: !!pf.showOtherStates, profile: pr, showNoFit: !!pf.showNoFit,
+      state: pr.state, profile: pr,
       all: view.showAll, statusOf: function (id) { return tracker.getStatus(id); }
     });
   }

@@ -145,7 +145,7 @@ Artifact frame facts the code must respect (from the Artifact page contract):
 - Side gutter: `padding-left: max(16px, env(safe-area-inset-left, 0px))` and the same on the right, on one outer wrapper. A sticky header uses `top: env(safe-area-inset-top, 0px)`. The fixed bottom nav adds the bottom inset. Keep the skeleton's `:root` padding.
 
 ### New files, load order and owners
-JS order in both outputs: `logic.js`, `store.js`, `email.js`, `zip.js`, `host.js`, `fieldmatch.js`, `fillscript.js`, `inbox.js`, `tracker.js`, `profile.js`, `directory.js`, `guided.js`, `inboxview.js`, `phone.js`, `app.js`. CSS order: `base.css`, `features.css`, `inbox.css`, `phone.css` (plus `artifact.css`, appended only in `artifact.html`).
+JS order in both outputs: `logic.js`, `store.js`, `missing.js`, `ticks.js`, `email.js`, `zip.js`, `host.js`, `fieldmatch.js`, `fillscript.js`, `inbox.js`, `tracker.js`, `profile.js`, `directory.js`, `guided.js`, `inboxview.js`, `phone.js`, `app.js`. CSS order: `base.css`, `features.css`, `inbox.css`, `phone.css` (plus `artifact.css`, appended only in `artifact.html`).
 
 | File | Owner | Purpose |
 |---|---|---|
@@ -344,13 +344,13 @@ New optional field `sameAs` (string, `""` when none): the `id` of the main progr
 - `needsQualifying(p)`: `!isOpenToAll(p)`.
 
 Directory:
-- State: programs hidden by state are left out unless the person taps "Show them" (`prefs.showOtherStates`). With no state in My info the line reads "N programs are only for some states. Add your state in My info to see the ones for you." (with a link to My info and the "Show them" button). With a state it reads "N programs for other states are hidden." Ranks (`rankMap`) and the summary are worked out over the programs left after this step, so the numbers have no gaps.
+- State: programs hidden by state are left out; Phase J puts them in the one "Hidden from this list" box, where "Show" brings them back for this visit only (never saved). With no state in My info the row reads "N only for some states. Add your state in My info to see the ones for you." With a state it reads "N for other states." Ranks (`rankMap`) and the summary are worked out over the programs left after this step, so the numbers have no gaps.
 - Summary, first line: the count of programs that are truly free and open to everyone, with their combined value (through `roundTotal`, labelled as our estimate). Second line: "N more are free if you qualify (income, insurance or where you live)." with no sum, because several of them are alternatives. The due-date lines stay.
 - Card: an "If you qualify" tag beside the verdict when `certainty` is `if-eligible`; an "In your state" tag when `states` includes the person's state; when `sameAs` is set, a line "Another way to get the same thing as <main program name>. You only need one."
 - Card layout: always visible are rank, verdict, name, brand, the free line, the value line, the offer chips, How sure, Effort, Best time, Catches, the sign-up button and My status. Everything else (what you get in full, cost, what you need, who, where, notes, sources, verified date) sits in one "More details" disclosure.
 - The filter chips wrap onto more lines at phone width. Nothing scrolls sideways.
 
-Guided run and helper: programs hidden by state are not in the guided list or its default selection (same rule and same `showOtherStates` preference). `tools/autofill --all-free` skips them by the profile's state.
+Guided run and helper: programs hidden by state are not in the guided list or its default selection (always, with no way to show them there; Phase J). `tools/autofill --all-free` skips them by the profile's state.
 
 Tracker: the value line uses `totalValue`, so two doors to one benefit count once.
 
@@ -403,7 +403,7 @@ Why: the Programs page was about 61,000 px tall, the top pick was a tax credit, 
 - These four are never used by the fill script (`cleanProfile` whitelists the form fields), the bookmark, the phone view, the autofill helper, the guided run's copy fields, email features or any link. A unit test pins the fill-script payload.
 - `L.fit(p, profile)` -> `yes`, `no`, `maybe` over `p.audience` (missing = `[]`): any `no` -> `no`; no tags -> `yes`; all `yes` -> `yes`; else `maybe`. Tags: medicaid, wic, low-income, insured, marketplace, military, employer, worker, local, member (needs `p.insurer`); unknown tags are unknown. `L.hasSituation(profile)`: any of the four answered.
 - `L.hiddenByAnswers(p, profile, status)`: fit `no` and status is empty or `todo`. `L.hiddenByAnswersCount(list, profile, statusOf)`.
-- Hidden when fit is `no`: Directory, guided run (default list and setup list), and the Gmail search program list. Pref `prefs.showNoFit` shows them in the Directory and guided run, with a "Does not match your answers" badge in the Directory. The state rule is separate and unchanged.
+- Hidden when fit is `no`: Directory, guided run (default list and setup list), and the Gmail search program list. Since Phase J nothing is saved for showing them: the Programs page can show them for the visit only ("Hidden from this list"), with a "Does not match your answers" badge; the guided run never lists them. The state rule is separate and unchanged.
 - Badges: with answers, fit `yes` and a non-empty audience -> "Fits your answers"; fit `maybe` -> "If you qualify". With no answers, "If you qualify" only for `certainty: if-eligible`. Other certainties show a short badge (Guaranteed, Likely, Chance only).
 - Summary: no answers -> "Answer four quick questions in My info to hide programs that cannot apply to you."; answers -> "N programs fit your answers; M hidden." The "X more are free if you qualify" line leaves out fit `no`.
 
@@ -414,20 +414,20 @@ Why: the Programs page was about 61,000 px tall, the top pick was a tax credit, 
 - Summary: `.dir-summary`, `.sum-main`, `.sum-more`, `.sum-money`, `.sum-situation`, `.show-these`, `.when-buttons button`.
 - Lists: `.dir-fit` (hidden-by-answers box with its Show/Hide button), `.dir-state`, `.result-count`, `.start-run`, `.dir-group`, `.same-group`.
 - My info: `.fx-situation`, selects `#info-cover`, `#info-insurer`, `#info-lowIncome`, `#info-job` (field wrappers carry `data-situation`).
-- Prefs: `filters.kind`, `filters.fitsMine`, `showNoFit` in `bff.prefs.v1`.
+- Prefs: `filters.kind`, `filters.fitsMine` in `bff.prefs.v1` (the old `showNoFit` and `showOtherStates` are deleted on the next save).
 
 ## Phase I: a Tracker you can work down (contract)
 
 Why: the Tracker listed every program in file order, including ones for other states and ones the answers in My info rule out, and the list started 1,600 px down a 54,000 px page. Now it is the person's own to-do list: only what applies, best first, what can be done now on top, small rows, tools folded away. Nothing in the product rules changes.
 
 ### `BFF.logic` helpers (pure)
-- `trackerScope(list, {state, showOtherStates, profile, showNoFit, statusOf, all})` returns `{rows, left: {otherState, noFit, covered}, total}`. Programs are taken in `rankPrograms` order. A program with a status other than `todo` is always its own row, `{p, status, others: []}`. A to-do program is left out and counted when: its `states` do not include the person's state (or no state is set) and `showOtherStates` is off; the answers in My info rule it out and `showNoFit` is off (only when `hasSituation`); or another program of the same group (`groupKey`) is Signed up or Received. Skipped never covers a group. `all: true` switches off those three rules only. Left-in to-do programs of one group fold: the first is the lead row, the others go in its `others`, in rank order. `total` is the number of programs.
+- `trackerScope(list, {state, profile, statusOf, all})` returns `{rows, left: {otherState, noFit, covered}, total}`. Programs are taken in `rankPrograms` order. A program with a status other than `todo` is always its own row, `{p, status, others: []}`. A to-do program is left out and counted when: its `states` do not include the person's state (or no state is set) ; the answers in My info rule it out (only when `hasSituation`); or another program of the same group (`groupKey`) is Signed up or Received. Skipped never covers a group. `all: true` switches off those three rules only. Left-in to-do programs of one group fold: the first is the lead row, the others go in its `others`, in rank order. `total` is the number of programs.
 - `readyNow(p, weeks)`: `weeks` is what `weeksUntil` returns. With null or more than 8: true for `pregnancy` and `anytime`. From 0 to 8: also `late-pregnancy`. Below 0: always true.
 - `trackerSections(rows, weeks)` returns `{now, later, optional}` from to-do rows only. `optional` holds rows whose `verdict` is `conditional` or `longshot`, whatever their timing. Of the rest, `now` holds `readyNow` rows and `later` the others, `late-pregnancy` before the rest, each in rank order.
 - `toClaim(rows)` returns `{free, money}`, each a `totalValue` result, from to-do rows that are not optional (lead programs only). `money` is kind `money`; `free` is kind `stuff` or `care`.
 
 ### Scope
-One `trackerScope` result feeds the summary, the tab counts and the list. The Tracker reads `showOtherStates` and `showNoFit` from `bff.prefs.v1` (the Programs page owns them), the profile (`state`, the situation answers, `dueDate`) and a session-only switch (`view.showAll`, not stored). It is recomputed on every render.
+One `trackerScope` result feeds the summary, the tab counts and the list. The Tracker reads the profile (`state`, the situation answers, `dueDate`) and a session-only switch (`view.showAll`, not stored). It is recomputed on every render.
 
 ### Page layout (top to bottom)
 1. Summary card: "X of N done (S skipped)" (X = Signed up or Received rows, N = rows that are not Skipped) with a progress bar; `p#trk-toclaim` ("Still to claim: about $A to $B in free things and covered care, and about $C to $D in money programs (tax credits, deposits, paid leave) if you qualify.", parts at zero left out, or "Nothing left to claim on your list."); the muted "Our estimate..." line; the existing claimed-value line.
@@ -473,3 +473,25 @@ Why: many programs are state, plan or income specific, and a badge "If you quali
 
 ### Do it for me use
 The compact notice sits under the intro (`div.gd-miss-box`), but it is skipped, along with the empty box, while the "My info is empty" warning is shown. The per-row lines stay either way.
+
+## Phase J: hide what is done or does not apply, and tick boxes
+Request: "Programs that do not qualify or are for other states should be defaulted to hidden. Also, a checkbox system for done to hide ones that are completed or inapplicable."
+
+### Hide reasons (`logic.js`)
+- `HIDE_REASONS = ['otherState', 'noFit', 'done', 'notForMe', 'covered']`. `hideReason(p, ctx)` with `ctx = {state, profile, statusOf, covered}` returns the first match or `''`: status `signed-up` or `received` -> `done`; `skipped` -> `notForMe`; then (status `todo`) `hiddenByState(p, ctx.state)` -> `otherState` (no state set counts); `hasSituation(profile)` and `fit === 'no'` -> `noFit`; the program's `groupKey` in `ctx.covered` -> `covered`. A `maybe` fit is never hidden.
+- `splitHidden(list, ctx, shown)` -> `{pool, reasons, counts, total, hiddenNow}`. `reasons`: id -> reason; `counts`: one number per reason whether shown or not; `total`: their sum; `pool`: the list in order without programs whose reason is not `true` in `shown`; `hiddenNow`: how many were left out. `covered` is worked out with `coveredGroups` when `ctx.covered` is missing.
+- `coveredGroups(list, statusOf)` -> map of `groupKey` to true for groups with a `signed-up` or `received` member (`trackerScope` uses it).
+- Nothing the person chose to show is ever saved. `bff.prefs.v1` no longer holds `showOtherStates` or `showNoFit` (`directory.js` deletes them on save and never reads them). The Programs page keeps one in-memory map reason -> true, empty on every page load. `trackerScope(list, {state, profile, statusOf, all})` has no show options; `all: true` still switches the three rules off. The guided run always leaves out other-state and ruled-out programs.
+
+### Ticks
+- `tickState(status)` -> `{done, received, notForMe}` (`done` for `signed-up` and `received`; `received` for `received`; `notForMe` for `skipped`; unknown = `todo`).
+- `statusAfterTick(status, box, checked)`: `done` on -> `signed-up` (`received` stays); `done` off -> `todo` only from `signed-up` or `received`; `received` on -> `received`; `received` off -> `signed-up` only from `received`; `notForMe` on -> `skipped`; `notForMe` off -> `todo` only from `skipped`; any other box or case leaves the status as it is.
+- `BFF.ticks` (`src/js/ticks.js`, after `missing.js`; touches `BFF.tracker` only inside handlers). `build(p, {prefix, status, received, onChange})` -> `{el, sync(status)}`. `el` is `div.ticks[role=group][aria-label="Mark <name>"][data-program-id]` with `label.tick > input[type=checkbox]#<prefix>-done-<id>[data-tick=done] + span.tick-text "Done" + span.visually-hidden ": <name>"`, optionally `#<prefix>-rcv-<id>[data-tick=received]` "Received", then `#<prefix>-nfm-<id>[data-tick=notForMe]` "Not for me". A change computes `statusAfterTick`, saves with `BFF.tracker.setStatus`, and when the save fails restores the old entry (`restoreEntry`), so the box and the status go back. It then sets every box from `BFF.tracker.getStatus` and calls `onChange({ok, status, prev, box, checked, input})`. The whole handler runs inside `keepPlace`.
+- `keepPlace(anchor, fn)` runs `fn` and scrolls the window by how far `anchor` moved (`behavior: 'instant'`, no animation) so the element stays under the finger.
+
+### Programs page
+- Each card has `div.card-ticks` (after `.card-foot`, before `.card-more`) with `BFF.ticks.build(p, {prefix: 'tick'})` (no Received box) and `p.tick-note`. The Details select keeps its id `st-<id>`; its fourth label is "Not for me" (stored value `skipped`). `bff:tracker-changed` keeps boxes, select and badge in step.
+- When a tick makes the program `done` or `notForMe` and that reason is not being shown, the card collapses to a strip (`article.card.is-ticked`: only the status badge, the name, the tick row and the note "Marked done. / Marked not for me. It will be hidden from this list. Untick to undo."; Details closed). Unticking restores the card. A full `render()` never adds `is-ticked`. Changes are announced in a polite visually hidden live region.
+- "Start a guided run with these N" is recomputed after every tracker change: programs whose reason is not being shown are left out of N and of the ids passed to `BFF.guided.preselect`.
+- `details.dir-hidden` (not rendered when `total` is 0; closed at first; the open state is kept in memory across renders) replaces `div.dir-state` and `div.dir-fit`. Summary: "Hidden from this list: N programs", or "Nothing is hidden right now (N normally are)". `ul.dir-hidden-list` has one `li[data-reason]` per reason with a count: "N for other states" / "N only for some states. Add your state in My info..." (link `a[href="#info"][data-info-key="state"]`), "N that your answers in My info rule out", "N you marked done", "N you marked not for me", "N other ways to get something you already signed up for", each with `button.btn.btn-small` "Show" / "Hide" (plus a visually hidden row name) and "(shown for now)". Last line: "What you show here is hidden again the next time you open the app."
+- The summary's first sentence never counts programs marked done or not for me, and reads "... open to everyone left to do" once one such program has been marked.

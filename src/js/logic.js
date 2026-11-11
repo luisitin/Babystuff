@@ -353,29 +353,87 @@
     return st.length ? 'Only in ' + joinAnd(st.map(String)) : '';
   }
 
+  // ---- Phase J: ticks and the one "hidden from this list" rule ----
+  // Done and Received are two ticks over the stored status; Not for me is the status skipped.
+  function tickState(status) {
+    return { done: status === 'signed-up' || status === 'received', received: status === 'received', notForMe: status === 'skipped' };
+  }
+  function statusAfterTick(status, box, checked) {
+    var st = status === 'signed-up' || status === 'received' || status === 'skipped' ? status : 'todo';
+    var on = !!checked;
+    if (box === 'done') {
+      if (on) return st === 'received' ? 'received' : 'signed-up';
+      return st === 'signed-up' || st === 'received' ? 'todo' : st;
+    }
+    if (box === 'received') {
+      if (on) return 'received';
+      return st === 'received' ? 'signed-up' : st;
+    }
+    if (box === 'notForMe') {
+      if (on) return 'skipped';
+      return st === 'skipped' ? 'todo' : st;
+    }
+    return st;
+  }
+  // { groupKey: true } for every group with a member that is signed up or received.
+  function coveredGroups(list, statusOf) {
+    var out = {};
+    var f = typeof statusOf === 'function' ? statusOf : function () { return 'todo'; };
+    (list || []).forEach(function (p) {
+      if (!p) return;
+      var st = f(p.id);
+      if (st === 'signed-up' || st === 'received') out[groupKey(p)] = true;
+    });
+    return out;
+  }
+  var HIDE_REASONS = ['otherState', 'noFit', 'done', 'notForMe', 'covered'];
+  // ctx = { state, profile, statusOf, covered }. '' when the program is not hidden. First match wins.
+  function hideReason(p, ctx) {
+    ctx = ctx || {};
+    var st = typeof ctx.statusOf === 'function' ? ctx.statusOf(p.id) : 'todo';
+    if (st === 'signed-up' || st === 'received') return 'done';
+    if (st === 'skipped') return 'notForMe';
+    if (hiddenByState(p, ctx.state)) return 'otherState';
+    if (hasSituation(ctx.profile) && fit(p, ctx.profile) === 'no') return 'noFit';
+    if (ctx.covered && Object.prototype.hasOwnProperty.call(ctx.covered, groupKey(p))) return 'covered';
+    return '';
+  }
+  // shown: { reason: true } for the reasons the person chose to show for now.
+  function splitHidden(list, ctx, shown) {
+    ctx = ctx || {};
+    shown = shown || {};
+    var c = ctx.covered ? ctx : Object.assign({}, ctx, { covered: coveredGroups(list, ctx.statusOf) });
+    var out = { pool: [], reasons: {}, counts: {}, total: 0, hiddenNow: 0 };
+    HIDE_REASONS.forEach(function (r) { out.counts[r] = 0; });
+    (list || []).forEach(function (p) {
+      if (!p) return;
+      var r = hideReason(p, c);
+      if (r) { out.reasons[p.id] = r; out.counts[r]++; out.total++; }
+      if (r && shown[r] !== true) { out.hiddenNow++; return; }
+      out.pool.push(p);
+    });
+    return out;
+  }
+
   // ---- the Tracker's own list ----
   // One pass over the programs in rank order. Anything the person has acted on is its own row.
   // To-do programs for other states, ruled out by the answers, or covered by a same-thing sign-up
-  // are left out (and counted) unless opts.all is set. To-do alternates fold under their lead.
+  // are left out (and counted) unless opts.all is set. Nothing the person chose to show is saved. To-do alternates fold under their lead.
   function trackerScope(list, opts) {
     opts = opts || {};
     var statusOf = typeof opts.statusOf === 'function' ? opts.statusOf : function () { return 'todo'; };
     var ranked = rankPrograms(list);
     var out = { rows: [], left: { otherState: 0, noFit: 0, covered: 0 }, total: ranked.length };
-    var covered = {};
     var leads = {};
     var sit = hasSituation(opts.profile);
-    ranked.forEach(function (p) {
-      var st = statusOf(p.id);
-      if (st === 'signed-up' || st === 'received') covered[groupKey(p)] = true;
-    });
+    var covered = coveredGroups(ranked, statusOf);
     ranked.forEach(function (p) {
       var st = statusOf(p.id) || 'todo';
       if (st !== 'todo') { out.rows.push({ p: p, status: st, others: [] }); return; }
       var k = groupKey(p);
       if (!opts.all) {
-        if (hiddenByState(p, opts.state) && !opts.showOtherStates) { out.left.otherState++; return; }
-        if (sit && hiddenByAnswers(p, opts.profile, 'todo') && !opts.showNoFit) { out.left.noFit++; return; }
+        if (hiddenByState(p, opts.state)) { out.left.otherState++; return; }
+        if (sit && hiddenByAnswers(p, opts.profile, 'todo')) { out.left.noFit++; return; }
         if (Object.prototype.hasOwnProperty.call(covered, k)) { out.left.covered++; return; }
       }
       if (Object.prototype.hasOwnProperty.call(leads, k)) leads[k].others.push(p);
@@ -606,6 +664,12 @@
     missingInfoCounts: missingInfoCounts,
     missingInfoText: missingInfoText,
     onlyInText: onlyInText,
+    tickState: tickState,
+    statusAfterTick: statusAfterTick,
+    coveredGroups: coveredGroups,
+    HIDE_REASONS: HIDE_REASONS,
+    hideReason: hideReason,
+    splitHidden: splitHidden,
     trackerScope: trackerScope,
     readyNow: readyNow,
     trackerSections: trackerSections,

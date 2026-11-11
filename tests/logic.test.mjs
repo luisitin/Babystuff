@@ -602,12 +602,12 @@ test('trackerScope: rank order, left-out counts and total', () => {
   assert.ok(s.rows.every((r) => r.status === 'todo' && r.others.length === 0));
 });
 
-test('trackerScope: no state set leaves state-only programs out; show switches bring them back', () => {
+test('trackerScope: no state set leaves state-only programs out; all: true brings them back', () => {
   const list = [TP('tx-only', { states: ['TX'] }), TP('open')];
   const s = L.trackerScope(list, { profile: {}, statusOf: () => 'todo' });
   assert.deepEqual(s.rows.map((r) => r.p.id), ['open']);
   assert.equal(s.left.otherState, 1);
-  const s2 = L.trackerScope(list, { profile: {}, showOtherStates: true, statusOf: () => 'todo' });
+  const s2 = L.trackerScope(list, { profile: {}, all: true, statusOf: () => 'todo' });
   assert.equal(s2.rows.length, 2);
   assert.equal(s2.left.otherState, 0);
   const s3 = L.trackerScope(list, { statusOf: () => 'todo' });   // no opts at all besides statusOf
@@ -615,14 +615,14 @@ test('trackerScope: no state set leaves state-only programs out; show switches b
   assert.equal(L.trackerScope(list).rows.length, 1);              // not even statusOf
 });
 
-test('trackerScope: the answers rule programs out only when answered, and showNoFit brings them back', () => {
+test('trackerScope: the answers rule programs out only when answered, and all: true brings them back', () => {
   const list = [TP('mcd', { audience: ['medicaid'] }), TP('open')];
   assert.equal(L.trackerScope(list, { profile: {}, statusOf: () => 'todo' }).rows.length, 2);
   const prof = { cover: 'private' };
   const s = L.trackerScope(list, { profile: prof, statusOf: () => 'todo' });
   assert.equal(s.rows.length, 1);
   assert.equal(s.left.noFit, 1);
-  assert.equal(L.trackerScope(list, { profile: prof, showNoFit: true, statusOf: () => 'todo' }).rows.length, 2);
+  assert.equal(L.trackerScope(list, { profile: prof, all: true, statusOf: () => 'todo' }).rows.length, 2);
 });
 
 test('trackerScope: acted-on programs stay in, even when state or answers would hide them', () => {
@@ -881,4 +881,103 @@ test('BFF.missing.notice: full, one-key and compact forms', async () => {
   assert.equal(find(compact, 'miss-add')[0].getAttribute('data-info-key'), 'state');
   assert.equal(find(compact, 'miss-lead')[0].text, '! My info is missing details that 92 programs depend on. Add them in My info');
   assert.equal(compact.getAttribute('data-missing-keys'), 'state cover');
+});
+
+// ---- Phase J: ticks and the one hidden-from-this-list rule ----
+test('tickState maps each status to the three boxes, unknown counts as todo', () => {
+  assert.deepEqual(L.tickState('todo'), { done: false, received: false, notForMe: false });
+  assert.deepEqual(L.tickState('signed-up'), { done: true, received: false, notForMe: false });
+  assert.deepEqual(L.tickState('received'), { done: true, received: true, notForMe: false });
+  assert.deepEqual(L.tickState('skipped'), { done: false, received: false, notForMe: true });
+  assert.deepEqual(L.tickState(undefined), { done: false, received: false, notForMe: false });
+  assert.deepEqual(L.tickState('weird'), { done: false, received: false, notForMe: false });
+});
+
+test('statusAfterTick: every box, both ways, from every status', () => {
+  const S = ['todo', 'signed-up', 'received', 'skipped'];
+  const want = {
+    'done:true':       { todo: 'signed-up', 'signed-up': 'signed-up', received: 'received', skipped: 'signed-up' },
+    'done:false':      { todo: 'todo', 'signed-up': 'todo', received: 'todo', skipped: 'skipped' },
+    'received:true':   { todo: 'received', 'signed-up': 'received', received: 'received', skipped: 'received' },
+    'received:false':  { todo: 'todo', 'signed-up': 'signed-up', received: 'signed-up', skipped: 'skipped' },
+    'notForMe:true':   { todo: 'skipped', 'signed-up': 'skipped', received: 'skipped', skipped: 'skipped' },
+    'notForMe:false':  { todo: 'todo', 'signed-up': 'signed-up', received: 'signed-up', skipped: 'todo' }
+  };
+  want['received:false'].received = 'signed-up';
+  want['notForMe:false']['signed-up'] = 'signed-up';
+  want['notForMe:false'].received = 'received';
+  for (const k of Object.keys(want)) {
+    const [box, c] = k.split(':');
+    for (const s of S) assert.equal(L.statusAfterTick(s, box, c === 'true'), want[k][s], k + ' from ' + s);
+  }
+  assert.equal(L.statusAfterTick('signed-up', 'nope', true), 'signed-up');
+  assert.equal(L.statusAfterTick(undefined, 'done', true), 'signed-up');
+  assert.equal(L.statusAfterTick(undefined, 'nope', false), 'todo');
+});
+
+test('coveredGroups: only signed-up or received members cover their group', () => {
+  const list = [TP('a1', { sameAs: '' }), TP('a2', { sameAs: 'a1' }), TP('b'), TP('c')];
+  const st = { a1: 'signed-up', b: 'skipped', c: 'received' };
+  const cov = L.coveredGroups(list, (id) => st[id] || 'todo');
+  assert.equal(cov[L.groupKey(list[0])], true);
+  assert.equal(cov[L.groupKey(list[1])], true);   // same group as a1
+  assert.equal(cov[L.groupKey(list[2])], undefined);
+  assert.equal(cov[L.groupKey(list[3])], true);
+  assert.deepEqual(L.coveredGroups(list), {});
+});
+
+test('hideReason: first match wins, maybe is never hidden', () => {
+  assert.deepEqual(L.HIDE_REASONS, ['otherState', 'noFit', 'done', 'notForMe', 'covered']);
+  const tx = TP('tx-only', { states: ['TX'] });
+  const mcd = TP('mcd', { audience: ['medicaid'] });
+  const maybe = TP('maybe', { audience: ['wic'] });
+  const open = TP('open');
+  const ctx = (st, profile, extra) => Object.assign({ state: 'CA', profile: profile || {}, statusOf: (id) => st[id] || 'todo', covered: {} }, extra);
+  assert.equal(L.hideReason(tx, ctx({})), 'otherState');
+  assert.equal(L.hideReason(tx, ctx({}, {}, { state: '' })), 'otherState');   // state unknown counts
+  assert.equal(L.hideReason(tx, ctx({ 'tx-only': 'signed-up' })), 'done');
+  assert.equal(L.hideReason(tx, ctx({ 'tx-only': 'received' })), 'done');
+  assert.equal(L.hideReason(tx, ctx({ 'tx-only': 'skipped' })), 'notForMe');
+  assert.equal(L.hideReason(mcd, ctx({}, { cover: 'private' }, { state: 'TX' })), 'noFit');
+  assert.equal(L.hideReason(mcd, ctx({}, {})), '');                              // no answers, no rule-out
+  assert.equal(L.hideReason(maybe, ctx({}, { cover: 'private' })), '');
+  assert.equal(L.hideReason(mcd, ctx({ mcd: 'skipped' }, { cover: 'private' })), 'notForMe');
+  const cov = {}; cov[L.groupKey(open)] = true;
+  assert.equal(L.hideReason(open, ctx({}, {}, { covered: cov })), 'covered');
+  assert.equal(L.hideReason(open, ctx({}, {}, { covered: {} })), '');
+  assert.equal(L.hideReason(open, { statusOf: () => 'todo' }), '');
+});
+
+test('splitHidden: pool keeps order, counts ignore what is shown, covered is worked out itself', () => {
+  const list = [TP('open'), TP('tx-only', { states: ['TX'] }), TP('mcd', { audience: ['medicaid'] }),
+    TP('lead'), TP('alt', { sameAs: 'lead' }), TP('done1'), TP('skip1')];
+  const st = { lead: 'signed-up', done1: 'received', skip1: 'skipped' };
+  const ctx = { state: 'CA', profile: { cover: 'private' }, statusOf: (id) => st[id] || 'todo' };
+  const a = L.splitHidden(list, ctx, {});
+  assert.deepEqual(a.pool.map((p) => p.id), ['open']);
+  assert.deepEqual(a.counts, { otherState: 1, noFit: 1, done: 2, notForMe: 1, covered: 1 });
+  assert.equal(a.total, 6);
+  assert.equal(a.hiddenNow, 6);
+  assert.equal(a.reasons.alt, 'covered');
+  assert.equal(a.reasons.open, undefined);
+  const b = L.splitHidden(list, ctx, { done: true, covered: true });
+  assert.deepEqual(b.pool.map((p) => p.id), ['open', 'lead', 'alt', 'done1']);
+  assert.deepEqual(b.counts, a.counts);
+  assert.equal(b.total, 6);
+  assert.equal(b.hiddenNow, 3);
+  const all = L.splitHidden(list, ctx, { otherState: true, noFit: true, done: true, notForMe: true, covered: true });
+  assert.equal(all.pool.length, list.length);
+  assert.equal(all.hiddenNow, 0);
+  const none = L.splitHidden([TP('x')], { state: '', statusOf: () => 'todo' });
+  assert.equal(none.total, 0);
+});
+
+test('the show choices are never saved or read: only the two delete statements remain', () => {
+  const src = (f) => readFileSync(new URL('../src/js/' + f, import.meta.url), 'utf8');
+  for (const f of ['tracker.js', 'guided.js', 'logic.js', 'ticks.js']) {
+    assert.ok(!/showOtherStates|showNoFit/.test(src(f)), f + ' must not mention the old show choices');
+  }
+  const lines = src('directory.js').split('\n').filter((l) => /showOtherStates|showNoFit/.test(l));
+  assert.equal(lines.length, 1);
+  assert.match(lines[0], /delete prefs\.showOtherStates; delete prefs\.showNoFit;/);
 });

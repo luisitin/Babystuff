@@ -206,22 +206,18 @@
     return h('div', { class: 'fx-check' }, [cb, h('label', { 'for': id, text: 'When I tap Done or Skip, open the next sign-up page' })]);
   }
 
-  // Programs for other states are left out of the list unless the person chose to show them.
+  // Programs for other states are always left out of the list.
   function hiddenByState(p) {
     var L = BFF.logic;
     if (!L || !L.hiddenByState) return false;
-    var prefs = store.get('prefs.v1', {});
-    if (prefs && typeof prefs === 'object' && prefs.showOtherStates) return false;
     var st = profile().state;
     return L.hiddenByState(p, typeof st === 'string' ? st : '');
   }
-  // Programs the person's answers in My info rule out are left out too, unless they chose to show them.
+  // Programs the person's answers in My info rule out are left out too.
   // A program already signed up for or received is never hidden.
   function hiddenByAnswers(p) {
     var L = BFF.logic;
     if (!L || !L.hiddenByAnswers) return false;
-    var prefs = store.get('prefs.v1', {});
-    if (prefs && typeof prefs === 'object' && prefs.showNoFit) return false;
     return L.hiddenByAnswers(p, profile(), T().getStatus(p.id));
   }
   function hiddenHere(p) { return hiddenByState(p) || hiddenByAnswers(p); }

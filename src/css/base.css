@@ -486,3 +486,25 @@ details.dir-filters { margin: 0 0 var(--space-1); }
 .gd-miss { margin: 0 0 var(--space-1) calc(24px + var(--space-3)); }
 .fx-alt-list .gd-miss { margin-left: calc(24px + var(--space-3)); }
 .gd-miss .miss-line { margin: 0; }
+
+/* ===== Phase J: tick boxes, collapsed strip, the hidden-programs box (ticks.js, directory.js) ===== */
+.ticks { display: flex; flex-wrap: wrap; gap: var(--space-1) var(--space-4); margin: 0; }
+label.tick { display: inline-flex; align-items: center; gap: var(--space-2); min-height: 44px; padding: 0 var(--space-1); cursor: pointer; font-size: .9375rem; font-weight: 600; color: var(--text); }
+label.tick input { flex: none; width: 22px; height: 22px; margin: 0; cursor: pointer; accent-color: var(--primary); }
+label.tick input:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+.card-ticks { display: grid; gap: 0; border-top: 1px solid var(--border); padding-top: var(--space-1); }
+.tick-note { margin: 0 0 var(--space-1); font-size: .875rem; color: var(--muted); }
+.tick-note:empty { display: none; }
+.card.is-ticked .free-line, .card.is-ticked .value-line, .card.is-ticked .miss-line, .card.is-ticked .card-foot, .card.is-ticked .card-more,
+.card.is-ticked .card-brand, .card.is-ticked .card-top .badge:not(.card-status-badge), .card.is-ticked .card-top .rank { display: none; }
+.card.is-ticked .card-ticks { border-top: 0; padding-top: 0; }
+
+.dir-hidden { margin: var(--space-1) 0 0; border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--surface); font-size: .9375rem; }
+.dir-hidden > summary { min-height: 44px; display: flex; align-items: center; padding: 0 var(--space-3); cursor: pointer; font-weight: 600; color: var(--text); }
+.dir-hidden > summary:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+.dir-hidden-list { list-style: none; margin: 0; padding: 0 var(--space-3); display: grid; gap: var(--space-2); }
+.dir-hidden-list li { display: flex; align-items: center; justify-content: space-between; gap: var(--space-2) var(--space-3); }
+.dir-hidden-text { flex: 1 1 12rem; min-width: 0; line-height: 1.35; }
+.dir-hidden-list .btn { flex: none; }
+.dir-hidden-foot { margin: 0; padding: var(--space-2) var(--space-3) var(--space-3); font-size: .875rem; color: var(--muted); }
+.empty-hidden { margin: var(--space-2) 0; color: var(--muted); }
