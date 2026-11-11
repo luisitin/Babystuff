@@ -2,7 +2,7 @@
 // guided run order and plus addresses, tracker value line and email features). Every expected number is
 // worked out from data/programs.json in lib/model.mjs, never typed in.
 import fs from 'node:fs';
-import { PROFILE, open, clean, runGroup, setStatuses, revealPick, openTools, trkTab, showAllRows, revealRow, openRowDetails, openAllPanels, reloadAfterWrite } from './harness.mjs';
+import { PROFILE, open, clean, runGroup, setStatuses, revealPick, openTools, trkTab, showAllRows, revealRow, openRowDetails, openAllPanels, reloadAfterWrite, hiddenBoxState, toggleReason } from './harness.mjs';
 import { L, E, ALL, byId, poolFor, shownFor, distinct, summaryFor, isoInDays } from './model.mjs';
 
 const norm = (s) => String(s === null || s === undefined ? '' : s).replace(/\s+/g, ' ').trim();
@@ -31,6 +31,9 @@ const pick = (page, label) => page.locator('#view-directory .field', { has: page
 const setSort = (page, v) => pick(page, 'Sort by').selectOption(v);
 const settle = (page) => page.waitForTimeout(300);
 const money = L.money;
+const OSB = '#view-directory details.dir-hidden li[data-reason="otherState"] button';
+const focusOnOS = (page) => page.evaluate((s) => document.activeElement === document.querySelector(s), OSB);
+const HB_FOOT = 'These numbers count every tab and ignore the search and filters. What you show here is hidden again the next time you open the app.';
 
 const expectedFacts = (p) => {
   const f = [];
@@ -57,9 +60,9 @@ export async function directoryG(env) {
         const pool = M.pool;
         const nHidden = L.otherStateCount(ALL, '');
         // state line and what is hidden
-        const box = await page.locator('#view-directory .dir-state:not(.dir-fit)').innerText();
-        g.check(tag + 'no state: the state line asks to add a state and gives the count', box.includes(nHidden + ' programs are only for some states.') && box.includes('Add your state in My info'), box);
-        g.check(tag + 'no state: the state line links to My info and has a Show them button', (await page.locator('#view-directory .dir-state:not(.dir-fit) a[href="#info"]').count()) === 1 && (await page.locator('#view-directory .dir-state:not(.dir-fit) button', { hasText: 'Show them' }).count()) === 1);
+        const hb0 = await hiddenBoxState(page); const osLine = hb0.lines.find((l) => l.reason === 'otherState') || {};
+        g.check(tag + 'no state: the box says N only for some states and asks to add a state', hb0.present && osLine.text === nHidden + ' only for some states. Add your state in My info to see the ones for you.' && hb0.summary === 'Hidden from this list: ' + nHidden + ' programs' && hb0.lines.length === 1, JSON.stringify(hb0));
+        g.check(tag + 'no state: the line links to My info (data-info-key=state) and has a Show button', osLine.link === 'My info' && (await page.locator(OSB).count()) === 1 && osLine.btnVisible === 'Show' && hb0.foot === HB_FOOT, JSON.stringify(osLine));
         const cards = await page.evaluate(SCRAPE);
         const cardIds = cards.map((c) => c.id);
         g.check(tag + 'no state: state-only programs are not in the list, everything else is', sameSet(cardIds, ids(pool)) && stateOnly.every((p) => !cardIds.includes(p.id)), diff(cardIds, ids(pool)));
@@ -198,15 +201,15 @@ export async function directoryG(env) {
         g.check(tag + 'Show these: only truly free programs open to everyone are listed', sameSet(await shownIds(page), ids(SS.free)));
         await page.locator('#view-directory button.btn-small', { hasText: 'Clear filters' }).first().click(); await h.showAll(); // Clear filters also returns to the Free stuff tab
         // Show them / Hide them without a state
-        await page.locator('#view-directory .dir-state:not(.dir-fit) button').click(); await settle(page);
-        const box2 = norm(await page.locator('#view-directory .dir-state:not(.dir-fit)').innerText());
-        g.check(tag + 'no state: Show them lists the state-only programs and the button becomes Hide them', sameSet(await shownIds(page), ids(L.filterPrograms(ALL, {}))) && box2.includes(nHidden + ' programs only for some states are shown.') && (await page.locator('#view-directory .dir-state:not(.dir-fit) button').innerText()) === 'Hide them', box2);
-        g.check(tag + 'no state: focus stays on the Show them / Hide them button', await page.evaluate(() => document.activeElement === document.querySelector('#view-directory .dir-state:not(.dir-fit) button')));
+        await toggleReason(page, 'otherState');
+        const hb2 = await hiddenBoxState(page); const os2 = hb2.lines.find((l) => l.reason === 'otherState') || {};
+        g.check(tag + 'no state: Show lists the state-only programs, the line ends (shown for now) and the button becomes Hide', sameSet(await shownIds(page), ids(L.filterPrograms(ALL, {}))) && os2.text.endsWith('(shown for now)') && os2.btnVisible === 'Hide' && hb2.summary === 'Nothing is hidden right now (' + nHidden + ' normally are)', JSON.stringify(hb2));
+        g.check(tag + 'no state: focus stays on the Show / Hide button', await focusOnOS(page));
         const rk = await page.evaluate(SCRAPE);
         const M2 = shownFor('', true, {}, 'best');
         g.check(tag + 'with them shown, ranks are worked out over all programs and still have no gaps', rk.every((c) => c.rank === '#' + M2.ranks[c.id]) && new Set(rk.map((c) => c.rank)).size === M2.groups.length);
-        await page.locator('#view-directory .dir-state:not(.dir-fit) button').click(); await settle(page);
-        g.check(tag + 'Hide them hides them again and keeps focus on the button', sameSet(await shownIds(page), ids(pool)) && (await page.evaluate(() => document.activeElement === document.querySelector('#view-directory .dir-state:not(.dir-fit) button'))));
+        await toggleReason(page, 'otherState');
+        g.check(tag + 'Hide hides them again and keeps focus on the button', sameSet(await shownIds(page), ids(pool)) && (await focusOnOS(page)));
         clean(g, h, tag + 'default view');
         await h.ctx.close();
       }
@@ -218,21 +221,21 @@ export async function directoryG(env) {
         const M = shownFor('TX', false, {}, 'best');
         const nHidden = L.otherStateCount(ALL, 'TX');
         const txOnly = ALL.filter((p) => p.states.includes('TX'));
-        const box = norm(await page.locator('#view-directory .dir-state:not(.dir-fit)').innerText());
-        g.check(tag + 'state TX: the line says N programs for other states are hidden', box.includes(nHidden + ' programs for other states are hidden.') && !box.includes('Add your state'), box);
+        const hbT = await hiddenBoxState(page); const osT = hbT.lines.find((l) => l.reason === 'otherState') || {};
+        g.check(tag + 'state TX: the box says N for other states and does not ask for a state', osT.text === nHidden + ' for other states' && osT.link === null && hbT.lines.length === 1 && hbT.summary === 'Hidden from this list: ' + nHidden + ' programs', JSON.stringify(hbT));
         const got = await shownIds(page);
         g.check(tag + 'state TX: programs of other states are hidden, Texas and nationwide programs shown', sameSet(got, ids(M.pool)) && got.every((id) => !byId[id].states.length || byId[id].states.includes('TX')), diff(got, ids(M.pool)));
         const cards = await page.evaluate(SCRAPE);
         g.check(tag + 'state TX: Texas programs carry the "In your state" tag and others do not', txOnly.length > 0 && cards.every((c) => c.tags.includes('In your state') === byId[c.id].states.includes('TX')), cards.filter((c) => c.tags.includes('In your state') !== byId[c.id].states.includes('TX')).map((c) => c.id).slice(0, 3).join(','));
         g.check(tag + 'state TX: ranks and group counts come from the shown programs and have no gaps', cards.every((c) => c.rank === '#' + M.ranks[c.id]) && JSON.stringify((await page.evaluate(SECTIONS)).map((s) => s.head)) === JSON.stringify(L.VERDICTS.map((v) => ({ v, n: M.groups.filter((x) => L.verdict(x.lead) === v.id).length })).filter((x) => x.n).map((x) => x.v.label + ' (' + x.n + ')')));
-        await page.locator('#view-directory .dir-state:not(.dir-fit) button').click(); await settle(page);
+        await toggleReason(page, 'otherState');
         const all2 = await shownIds(page);
-        const box3 = norm(await page.locator('#view-directory .dir-state:not(.dir-fit)').innerText());
-        g.check(tag + 'state TX: Show them adds the other states, says so and keeps focus on the button', sameSet(all2, ids(L.filterPrograms(ALL, {}))) && box3.includes(nHidden + ' programs for other states are shown.') && (await page.evaluate(() => document.activeElement.textContent)) === 'Hide them', box3);
-        await reloadAfterWrite(page); await page.waitForFunction((n) => document.querySelectorAll('#view-directory article.card').length === n, ALL.length, { timeout: 4000 }).catch(() => {}); await settle(page);
-        g.check(tag + 'state TX: the Show them choice is remembered after a reload', sameSet(await shownIds(page), ids(L.filterPrograms(ALL, {}))));
-        await page.locator('#view-directory .dir-state:not(.dir-fit) button').click(); await settle(page);
-        g.check(tag + 'state TX: Hide them hides them and keeps focus', sameSet(await shownIds(page), ids(M.pool)) && (await page.evaluate(() => document.activeElement.textContent)) === 'Show them');
+        const hbT2 = await hiddenBoxState(page); const osT2 = hbT2.lines.find((l) => l.reason === 'otherState') || {};
+        g.check(tag + 'state TX: Show adds the other states, the line says (shown for now) and focus stays on the button', sameSet(all2, ids(L.filterPrograms(ALL, {}))) && osT2.text === nHidden + ' for other states (shown for now)' && (await focusOnOS(page)), JSON.stringify(osT2));
+        await reloadAfterWrite(page); await page.waitForSelector('#view-directory article.card', { timeout: 4000 }).catch(() => {}); await settle(page);
+        g.check(tag + 'state TX: the Show choice is never saved: after a reload the other states are hidden again and prefs holds no show key', sameSet(await shownIds(page), ids(M.pool)) && await page.evaluate(() => { const p = JSON.parse(localStorage.getItem('bff.prefs.v1') || '{}'); return !('showOtherStates' in p) && !('showNoFit' in p); }));
+        await toggleReason(page, 'otherState');
+        g.check(tag + 'state TX: Show then Hide, and Hide keeps focus', await toggleReason(page, 'otherState').then(async () => sameSet(await shownIds(page), ids(M.pool)) && (await focusOnOS(page))));
         clean(g, h, tag + 'state TX');
         await h.ctx.close();
       }
@@ -372,12 +375,12 @@ export async function guidedTrackerG(env) {
         const h = await open(browser, { mode, profile: plain });
         const page = h.page;
         const M = shownFor('TX', true, { trulyFree: true }, 'best');
-        await page.locator('#view-directory .dir-state:not(.dir-fit) button').click(); await settle(page);
+        await toggleReason(page, 'otherState');
         await chip(page, 'Truly free').check(); await settle(page);
         await page.getByRole('button', { name: /^Start a guided run with these/ }).click();
         await page.waitForSelector('#view-guided:not([hidden])'); await settle(page);
         await h.go('directory');
-        await page.locator('#view-directory .dir-state:not(.dir-fit) button').click(); await settle(page); // Hide them
+        await toggleReason(page, 'otherState'); // Hide
         await h.go('guided');
         const listed = await page.evaluate(() => [...document.querySelectorAll('#view-guided ul.fx-pick input[type=checkbox]')].map((c) => ({ id: c.id.replace('gd-pick-', ''), on: c.checked })));
         const otherSel = ALL.filter((p) => L.hiddenByState(p, 'TX') && L.isTrulyFree(p)).map((p) => p.id);
@@ -441,7 +444,7 @@ export async function guidedTrackerG(env) {
 
         // per-row address and Gmail link: they live in each row's Details panel, so show every program and open every panel
         await showAllRows(page); await openAllPanels(page);
-        const rows = await page.evaluate(() => [...document.querySelectorAll('#view-tracker li.fx-trk-row')].map((r) => { const a = r.querySelector('.fx-trk-addr'); const gm = [...r.querySelectorAll('a')].find((x) => /Search my Gmail/.test(x.textContent)); return { id: r.querySelector('select').id.replace('trk-s-', ''), addrShown: !a.hidden, addr: a.textContent, gmShown: !gm.hidden, href: gm.getAttribute('href') || '' }; }));
+        const rows = await page.evaluate(() => [...document.querySelectorAll('#view-tracker li.fx-trk-row')].map((r) => { const a = r.querySelector('.fx-trk-addr'); const gm = [...r.querySelectorAll('a')].find((x) => /Search my Gmail/.test(x.textContent)); return { id: r.dataset.id, addrShown: !a.hidden, addr: a.textContent, gmShown: !gm.hidden, href: gm.getAttribute('href') || '' }; }));
         const tags = await page.evaluate(() => BFF.plusTags.map());
         const plusOf = (id) => { const [l, d] = PLUS_PROFILE.email.split('@'); return l + '+' + tags[id] + '@' + d; };
         const rowBad = [];

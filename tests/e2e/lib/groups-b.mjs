@@ -202,7 +202,7 @@ export async function backup(env) {
       await openRowDetails(page, PROGRAMS[1].id);
       await page.locator('#trk-n-' + PROGRAMS[1].id).fill('synthetic note for the round trip');
       await revealRow(page, PROGRAMS[3].id);
-      await page.locator('#trk-s-' + PROGRAMS[3].id).selectOption('signed-up');
+      await page.locator('#trk-done-' + PROGRAMS[3].id).check();
       await page.waitForTimeout(800);
       await page.getByLabel('Include My info in the backup').check();
       let text;

@@ -1,7 +1,7 @@
 // Groups 1 to 4: boot, routes, link audit, click-through.
 import fs from 'node:fs';
-import { ROOT, ROUTES, PROGRAMS, PROFILE, open, clean, runGroup, guardedReload, seedProfileUI, norm, artifactFragment, lsDump, openCard, showAllRows, openAllPanels, openViewTools } from './harness.mjs';
-import { L, ALL, byId } from './model.mjs';
+import { ROOT, ROUTES, PROGRAMS, PROFILE, open, clean, runGroup, guardedReload, seedProfileUI, norm, artifactFragment, lsDump, setStatuses, showAllRows, openAllPanels, openViewTools, hiddenBoxState, toggleReason, showAllHidden, cardIds, HB } from './harness.mjs';
+import { L, ALL, byId, splitFor } from './model.mjs';
 
 export const suspects = []; // buttons that visibly did nothing (reported, never failed)
 export const SIGNUP = new Set(PROGRAMS.map((p) => p.signupUrl));
@@ -87,13 +87,13 @@ export async function routes(env) {
   });
 }
 
-// Fill My info through the form, then mark a few programs through the directory selects, as a person would.
+// Fill My info through the form, then mark a few programs in the page (these groups need the state, not the control; the tick boxes have their own group).
 export async function prepare(h) {
   await seedProfileUI(h, PROFILE, true);
-  await h.go('directory');
   const ids = PROGRAMS.slice(0, 3).map((p) => p.id);
   const vals = ['signed-up', 'received', 'skipped'];
-  for (let i = 0; i < ids.length; i++) { await openCard(h.page, ids[i]); await h.page.locator('select[data-program-id="' + ids[i] + '"]').selectOption(vals[i]); }
+  await setStatuses(h.page, Object.fromEntries(ids.map((id, i) => [id, vals[i]]))); // while on My info, so the Programs page draws them hidden when it opens
+  await h.go('directory');
 }
 async function expandAll(page) { await page.evaluate(() => document.querySelectorAll('details').forEach((d) => { d.open = true; })); }
 async function startGuided(h) {
@@ -140,19 +140,25 @@ export async function links(env) {
       const label = mode + (mode === 'artifact' ? '/' + claude : '');
       const h = await open(browser, { mode, claude });
       await prepare(h);
-      // Programs for other states are hidden until the person asks. Check the rule, then use "Show them" so the audit covers all of them.
+      // Phase J: programs for other states and the three marked ones are hidden until the person shows them. Check the rule with the
+      // box's own Show and Hide buttons, then show everything so the audit covers all of them.
       await h.go('directory');
       const stateOnly = ALL.filter((p) => L.hiddenByState(p, PROFILE.state));
-      const idsNow = async () => h.page.evaluate(() => [...document.querySelectorAll('#view-directory article.card')].map((c) => c.dataset.programId));
-      const box = h.page.locator('#view-directory .dir-state:not(.dir-fit)');
+      const marked = Object.fromEntries(PROGRAMS.slice(0, 3).map((p, i) => [p.id, ['signed-up', 'received', 'skipped'][i]]));
+      const M0 = splitFor({ state: PROFILE.state, profile: PROFILE, statuses: marked });
+      const idsNow = () => cardIds(h.page);
       let before = await idsNow();
-      g.check(label + ': with state ' + PROFILE.state + ' the other-state programs are not listed and the state line gives their count', stateOnly.length > 0 && stateOnly.every((p) => !before.includes(p.id)) && before.length === ALL.length - stateOnly.length && (await box.innerText()).includes(stateOnly.length + ' programs for other states are hidden.'), before.length + ' cards, ' + stateOnly.length + ' hidden');
-      await box.getByRole('button', { name: 'Show them' }).click(); await h.page.waitForTimeout(200);
+      const bx = await hiddenBoxState(h.page);
+      const oneLine = (r) => (bx.lines.find((l) => l.reason === r) || {}).text;
+      g.check(label + ': with state ' + PROFILE.state + ' the other-state and marked programs are not listed and the box gives the counts', stateOnly.length > 0 && before.length === M0.pool.length && M0.pool.length === ALL.length - M0.total && stateOnly.every((p) => !before.includes(p.id)) && Object.keys(marked).every((id) => !before.includes(id)) && oneLine('otherState') === L.hideReasonText('otherState', M0.counts.otherState, true) && bx.summary === 'Hidden from this list: ' + M0.hiddenNow + ' programs', before.length + ' cards, ' + stateOnly.length + ' hidden, ' + JSON.stringify(bx.lines));
+      await toggleReason(h.page, 'otherState');
       let after = await idsNow();
-      g.check(label + ': "Show them" lists all ' + ALL.length + ' programs and the button becomes "Hide them"', after.length === ALL.length && (await box.getByRole('button', { name: 'Hide them' }).count()) === 1, String(after.length));
-      await box.getByRole('button', { name: 'Hide them' }).click(); await h.page.waitForTimeout(200);
-      g.check(label + ': "Hide them" hides them again', (await idsNow()).length === ALL.length - stateOnly.length && (await box.getByRole('button', { name: 'Show them' }).count()) === 1);
-      await box.getByRole('button', { name: 'Show them' }).click(); await h.page.waitForTimeout(200);
+      const bx2 = await hiddenBoxState(h.page);
+      g.check(label + ': Show on the other-state line lists those programs and the button becomes Hide', stateOnly.every((p) => after.includes(p.id)) && after.length === M0.pool.length + M0.counts.otherState && bx2.lines.find((l) => l.reason === 'otherState').btnVisible === 'Hide', String(after.length));
+      await toggleReason(h.page, 'otherState');
+      g.check(label + ': Hide hides them again', (await idsNow()).length === M0.pool.length && (await hiddenBoxState(h.page)).lines.find((l) => l.reason === 'otherState').btnVisible === 'Show');
+      await showAllHidden(h.page);
+      g.check(label + ': showing every reason lists all ' + ALL.length + ' programs', (await idsNow()).length === ALL.length, String((await idsNow()).length));
       const tally = {};
       for (const r of ROUTES) {
         await enterRoute(h, r);

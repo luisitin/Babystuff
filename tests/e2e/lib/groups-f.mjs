@@ -26,12 +26,12 @@ const eq = (a, b) => JSON.stringify(a) === JSON.stringify(b);
 const plural = (n, w) => n + ' ' + w + (n === 1 ? '' : 's');
 const norm = (s) => String(s || '').replace(/\s+/g, ' ').trim();
 const idsOf = (rows) => rows.map((r) => r.p.id);
-const TAB_LABELS = { todo: 'To do', 'signed-up': 'Signed up', received: 'Received', skipped: 'Skipped', all: 'All' };
+const TAB_LABELS = { todo: 'To do', 'signed-up': 'Signed up', received: 'Received', skipped: 'Not for me', all: 'All' };
 const EMPTY = {
-  todo: 'Nothing left to do. Everything on your list is signed up, received or skipped.',
-  'signed-up': 'Nothing signed up yet. Change a program’s status after you sign up.',
+  todo: 'Nothing left to do. Everything on your list is signed up, received or marked not for me.',
+  'signed-up': 'Nothing signed up yet. Tick Done on a program after you sign up.',
   received: 'Nothing marked received yet.',
-  skipped: 'Nothing skipped.',
+  skipped: 'Nothing marked not for me.',
   all: 'Nothing here yet.'
 };
 
@@ -63,7 +63,7 @@ const readTrk = (page) => page.evaluate(() => {
 });
 
 // The "Left out of your list" sentence, worded from the module's counts (see ARCHITECTURE.md, Phase I).
-function leftSentence(sc, hasState) {
+export function leftSentence(sc, hasState) {
   const l = sc.left, parts = [];
   let first = true;
   const noun = (n) => { const t = first ? plural(n, 'program') : String(n); first = false; return t; };
@@ -84,7 +84,7 @@ async function verifyTracker(g, label, page, o) {
   g.check(label + ': progress bar equals done and active', d.bar && Number(d.bar.max) === Math.max(c.active, 1) && Number(d.bar.value) === Math.min(c.done, Math.max(c.active, 1)), JSON.stringify(d.bar));
   g.check(label + ': "Still to claim" line equals L.toClaim', d.claim === claimText(ex.sc, ex.secs), d.claim + ' vs ' + claimText(ex.sc, ex.secs));
   g.check(label + ': tab counts equal the rows by status', eq(d.tabs.map((t) => [t.f, t.n]), ['todo', 'signed-up', 'received', 'skipped', 'all'].map((f) => [f, '(' + c[f] + ')'])), JSON.stringify(d.tabs.map((t) => t.f + t.n)));
-  g.check(label + ': tab labels and the pressed tab', eq(d.tabs.map((t) => t.label), ['To do', 'Signed up', 'Received', 'Skipped', 'All']) && d.tabs.filter((t) => t.pressed === 'true').map((t) => t.f).join() === tab, JSON.stringify(d.tabs.map((t) => t.label + t.pressed)));
+  g.check(label + ': tab labels and the pressed tab', eq(d.tabs.map((t) => t.label), ['To do', 'Signed up', 'Received', 'Not for me', 'All']) && d.tabs.filter((t) => t.pressed === 'true').map((t) => t.f).join() === tab, JSON.stringify(d.tabs.map((t) => t.label + t.pressed)));
   g.check(label + ': list says which tab it shows', d.tab === tab, d.tab);
   const left = leftSentence(ex.sc, !!String(o.profile && o.profile.state || '').trim());
   const anyLeft = !!left;
@@ -137,12 +137,13 @@ async function trackerChecks(env, g) {
   const cases = [];
   for (const mode of MODES) for (const [name, profile] of PROFILES) cases.push([mode, name, profile, {}]);
   [['due in 150 days', dueFar], ['due in 4 weeks', dueNear], ['due date passed', duePast]].forEach(([n, due]) => cases.push(['standalone', 'full sample, ' + n, Object.assign({}, FULL, { dueDate: due }), {}]));
-  // a group already signed up for, and a skipped and a received program: the covered rule and the other tabs
+  // a group already signed up for, and a not-for-me and a received program: the covered rule and the other tabs
   const grp = L.collapseGroups(L.rankPrograms(ALL)).find((x) => x.others.length > 0 && !L.hiddenByState(x.lead, 'TX') && !x.others.some((o) => L.hiddenByState(o, 'TX')) && !L.hiddenByAnswers(x.lead, FULL, 'todo'));
   const some = L.rankPrograms(ALL).filter((p) => !L.hiddenByState(p, 'TX') && !L.hiddenByAnswers(p, FULL, 'todo') && L.groupKey(p) !== L.groupKey(grp.lead));
   const statuses = { [grp.lead.id]: 'signed-up', [some[0].id]: 'received', [some[1].id]: 'skipped', [some[2].id]: 'signed-up' };
-  for (const mode of MODES) cases.push([mode, 'full sample with a signed up group, a received and a skipped program', FULL, { statuses }]);
-  cases.push(['standalone', 'full sample, Programs preferences show other states and non-fits', FULL, { prefs: { showOtherStates: true, showNoFit: true } }]);
+  for (const mode of MODES) cases.push([mode, 'full sample with a signed up group, a received and a not-for-me program', FULL, { statuses }]);
+  // Phase J: the old saved Programs choices are gone. The app neither reads nor writes them, so the Tracker must equal the model without them.
+  cases.push(['standalone', 'full sample, old saved Programs preferences (showOtherStates, showNoFit) change nothing', FULL, { prefs: { showOtherStates: true, showNoFit: true } }]);
 
   for (const [mode, name, profile, extra] of cases) {
     const label = mode + ' ' + name;
@@ -178,7 +179,7 @@ async function trackerBehaviour(env, g) {
   for (const mode of MODES) {
     const label = mode + ' tracker';
     const profile = FULL;
-    // ---- a status change through a row's own select leaves the row in place ----
+    // ---- a status change through a row's own tick box leaves the row in place ----
     {
       const h = await openP(browser, mode, { profile });
       const page = h.page;
@@ -188,15 +189,15 @@ async function trackerBehaviour(env, g) {
       const before = await readTrk(page);
       const secIdx = before.secs.find((s) => s.ids.includes(id));
       const idx = secIdx.ids.indexOf(id);
-      await page.locator('#trk-s-' + id).selectOption('signed-up');
+      await page.locator('#trk-done-' + id).check();
       await page.waitForTimeout(150);
       const o = { profile, statuses: { [id]: 'signed-up' } };
       const d = await verifyTracker(g, label + ' after marking ' + id + ' Signed up (row stays)', page, Object.assign({ soft: true }, o));
       const sec = d.secs.find((s) => s.ids.includes(id));
       g.check(label + ': the row stays where it was', !!sec && sec.sec === secIdx.sec && sec.ids.indexOf(id) === idx && eq(sec.ids, secIdx.ids), sec && sec.ids.indexOf(id) + ' vs ' + idx);
-      const r = await page.locator('#trk-list li.fx-trk-row[data-id="' + id + '"]').evaluate((li) => ({ moved: li.classList.contains('fx-moved'), status: li.dataset.status, sel: li.querySelector('select').value }));
-      g.check(label + ': the row is marked .fx-moved and shows the new status', r.moved && r.status === 'signed-up' && r.sel === 'signed-up', JSON.stringify(r));
-      g.check(label + ': the live region says what changed', d.live === byId[id].name + ' marked Signed up.', d.live);
+      const r = await page.locator('#trk-list li.fx-trk-row[data-id="' + id + '"]').evaluate((li) => ({ moved: li.classList.contains('fx-moved'), status: li.dataset.status, done: li.querySelector('input[data-tick="done"]').checked, hasSelect: !!li.querySelector('select'), note: li.querySelector('p.tick-note').textContent.replace(/\s+/g, ' ').trim() }));
+      g.check(label + ': the row is marked .fx-moved, shows the new status, has the Done box ticked, no select, and the note says where it will go', r.moved && r.status === 'signed-up' && r.done && !r.hasSelect && r.note === 'Marked done. It is now listed under Signed up. Untick to undo.', JSON.stringify(r));
+      g.check(label + ': the live region says what changed', d.live === byId[id].name + ' marked done.', d.live);
       // numbers moved at once, rows did not: compare the two
       g.check(label + ': the row count in the list did not change but the title count did', d.secs.map((s) => s.ids.length).join() === before.secs.map((s) => s.ids.length).join() && (before.secs.find((s) => s.sec === sec.sec).count !== sec.count || sec.sec === 'optional'), sec.count + ' vs ' + before.secs.find((s) => s.sec === sec.sec).count);
       // it moves after a tab switch
@@ -314,7 +315,8 @@ async function guidedChecks(env, g) {
       const page = h.page;
       const d = await readGuided(page);
       const st = statusFn(statuses);
-      const shown = ALL.filter((p) => !L.hiddenByState(p, profile.state || '') && !L.hiddenByAnswers(p, profile, st(p.id)));
+      // Phase J: the one hide rule (other state, ruled out, done, not for me, covered by another sign-up).
+      const shown = L.splitHidden(ALL, { state: profile.state || '', profile, statusOf: st }, {}).pool;
       const groups = L.collapseGroups(L.rankPrograms(shown));
       const side = groups.filter((x) => ['conditional', 'longshot'].includes(L.verdict(x.lead)));
       const main = groups.filter((x) => !['conditional', 'longshot'].includes(L.verdict(x.lead)));
@@ -322,6 +324,7 @@ async function guidedChecks(env, g) {
       g.check(label + ': other ways sit in each group item in rank order', d.items.every((it) => eq(it.others, (groups.find((x) => x.lead.id === it.lead) || { others: [] }).others.map((o) => o.id))));
       g.check(label + ': alternates are never outside a "more ways" fold', d.rows.filter((r) => r.altRow).every((r) => r.inAlt));
       g.check(label + ': each fold says how many more ways', d.items.filter((it) => it.others.length).every((it) => it.altSummary === (it.others.length === 1 ? '1 more way to get the same thing' : it.others.length + ' more ways to get the same thing')));
+      if (Object.keys(statuses).length) g.check(label + ': the signed-up program and every other way to get it are left out of the list', ALL.filter((p) => L.groupKey(p) === L.groupKey(grp.lead)).every((p) => !d.rows.some((r) => r.id === p.id)), d.rows.filter((r) => L.groupKey(byId[r.id]) === L.groupKey(grp.lead)).map((r) => r.id).join());
       g.check(label + ': the optional section is one closed fold with its count', side.length === 0 ? d.sideSummary === null : d.sideSummary === 'Only if you would buy anyway, and long shots (' + side.length + ')', d.sideSummary);
       const ticked = d.rows.filter((r) => r.checked).map((r) => r.id);
       const perGroup = {};
@@ -358,9 +361,15 @@ async function guidedGroupRule(env, g) {
       const d = await readGuided(h.page);
       const inGroup = d.rows.filter((r) => r.id === A.id || r.id === B.id);
       const done = Object.keys(statuses).length > 0;
-      g.check(label + ': the two programs are one group (one is under the other as "another way")', d.items.some((it) => it.lead === A.id && eq(it.others, [B.id])), JSON.stringify(d.items.filter((it) => it.others.length).map((it) => [it.lead, it.others])));
       const ticked = inGroup.filter((r) => r.checked).map((r) => r.id);
-      if (done) g.check(label + ': nothing in the group is ticked', ticked.length === 0, ticked.join());
+      if (done) {
+        // Phase J: the signed-up program is left out (done) and so is its other way (covered): the group is not listed at all.
+        const left = await h.page.locator('#view-guided p.gd-left').innerText();
+        g.check(label + ': neither program is listed (one is done, the other is covered by it) and the left-out line counts both', inGroup.length === 0 && left.includes(L.hideReasonText('done', 1, true)) && left.includes(L.hideReasonText('covered', 1, true)), inGroup.map((r) => r.id).join() + ' | ' + left.slice(0, 200));
+      } else {
+        g.check(label + ': the two programs are one group (one is under the other as "another way")', d.items.some((it) => it.lead === A.id && eq(it.others, [B.id])), JSON.stringify(d.items.filter((it) => it.others.length).map((it) => [it.lead, it.others])));
+      }
+      if (done) { /* nothing more to tick */ }
       else g.check(label + ': exactly one of the two is ticked by default (the better one)', eq(ticked, [A.id]), ticked.join());
       clean(g, h, label);
       await h.ctx.close();
@@ -511,7 +520,7 @@ async function countingRule(env, g) {
     const before = await total('#view-tracker .fx-trk-miss-notice');
     g.check(label + ': Tracker notice starts at the module total', before === total0, before + ' vs ' + total0);
     g.check(label + ': the row carries a line before the change', (await page.locator('#trk-list li.fx-trk-row[data-id="' + id + '"] > .fx-trk-main .miss-line').count()) === 1);
-    await page.locator('#trk-s-' + id).selectOption('signed-up');
+    await page.locator('#trk-done-' + id).check();
     await page.waitForTimeout(150);
     const after = await total('#view-tracker .fx-trk-miss-notice');
     g.check(label + ': marking it Signed up lowers the Tracker total by one, at once', after === total0 - 1 && after === countsFor(profile, { [id]: 'signed-up' }).total, before + ' -> ' + after);

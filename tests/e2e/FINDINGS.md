@@ -52,3 +52,23 @@ None found. In every run: no console or page error, no network request of the ap
 - With no state set, the Tracker and Do it for me notices count programs that are limited to a state although the lists leave them out. This is by design (the number is the same on every page) and is tested as such.
 - The Tracker's "mail" and "plus address" hints are inside the Email and calendar fold, so they cannot be seen until it is opened. Tested as such (I6 opens the fold first).
 - Group 4 lists "All (6)" on the Programs page as a button that changed nothing visible. `open()` already presses the All tab (Phase H), so pressing it again is expected to change nothing. It is reported, not failed, as before.
+
+## Phase J (2026-11-11)
+
+Group 15 (J1 to J10) and the port of groups 1 to 14. `README.md` has the group list and the last full run.
+
+### App bugs
+None found. In every run: no console or page error, no network request of the app's own (a run that opens the next sign-up page is the one thing the browser tries on purpose; J8 turns that option off), and no stored key other than the four `bff.*.v1`.
+
+### What changed in the old groups (all test expectations, none an app bug)
+- The Programs boxes `.dir-state` and `.dir-fit` and their "Show them" / "Hide them" buttons are now `details.dir-hidden` with a Show / Hide button per reason (groups 3, 11, 13). The old checks "the choice is remembered in prefs" became "the choice is never saved, and everything is hidden again after a reload".
+- A program that is signed up, received or marked not for me is hidden on Programs and in Do it for me (reasons done, not for me). Group 13's "a tracked program is never hidden" became "a marked program leaves the list under its own reason, and showing that line brings it back with the Does not match badge". Group 12 / I3 expect a signed-up group (and its covered other ways) to be absent from the Do it for me list; the patched-data checks expect the same.
+- `prepare()` (groups 3 to 10) sets the three statuses in the page while My info is open, so the Programs page draws them hidden when it opens; the audits use `showAllHidden` to list every program.
+- The Tracker and Do it for me now say "Not for me" where they said "Skipped"; the Tracker summary reads "(N not for me)"; the empty-tab texts changed; the live message is "<name> marked done.".
+
+### Notes for the person who decides (not failures)
+- The brief for this round says that after a redraw the undo memory is gone; `ARCHITECTURE.md` (Phase J, Ticks) says the memory is a module-level map that is kept for the visit and forgotten only on a bulk change or a reload. The suite follows `ARCHITECTURE.md` and the app agrees with it (J6: undo still works after a redraw, and after a reload `statusAfterTick` decides).
+- The brief says an undo restores `bff.tracker.v1` exactly. Status, note and sign-up date are restored exactly (J6), but `updatedAt` moves forward with every save, and an untouched program that was ticked and unticked ends as a to-do entry instead of no entry. J6 compares everything except `updatedAt` (which must not go backwards). If an exact `updatedAt` is wanted, `ticks.js` would have to restore the whole entry.
+- Reading the sentences as a person would: with no state set, a shown other-state line reads "60 only for some states. Add your state in My info to see the ones for you. (shown for now)"; the invitation is odd once the programs are shown. Minor.
+- Harness: the tail of Storage calls in `guardedReload` was read before the reload and was practically always empty. A removal made while the old page unloads (a `pagehide` handler) cannot be recorded at all: a binding call and a `window.name` write made from `pagehide` are lost, while the same handler's `localStorage` writes land (measured in Chromium). The tail was dropped; the comment says so. Such a page would be run once more and then failed by the "second loss" rule.
+- Not covered: the Gmail panel and the guided run's keyboard shortcuts with the new "Not for me" label (S), a real phone, and a real claude.ai viewer.
