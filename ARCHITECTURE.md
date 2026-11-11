@@ -312,7 +312,7 @@ New category: `money` ("Money and savings"), for cash programs such as account d
 - New select "What you get": "Anything", then the eight `OFFER_LABELS`.
 - Chips: "Truly free" (new meaning), "Open to everyone" (`openToAll`), "Email only", "Needs a registry". When "Truly free" is on, one line under the chips says: "Truly free: real products or samples at no cost. No purchase, no fee, not a prize draw."
 - When My info has a state and some programs are for other states only, those are hidden and a line says "N programs for other states are hidden." with a "Show them" button (stored in prefs).
-- Each card gains: its rank ("#3", from `rankMap` over all programs), the verdict badge, the offer kinds, a "Free with no purchase" line (`freeStuff`, or "Nothing arrives free without a purchase or a win."), the value line with `valueBasis`, the certainty label, the effort label, and "Best time" with `whenNote`.
+- Each card gains: its rank ("#3", from `rankMap` over all programs), the verdict badge, the offer kinds, a "Free with no purchase" line (`freeStuff`, or the sentence from `logic.freeNote(p)` that says why nothing arrives free, for example "Nothing arrives free without a purchase." or "Nothing arrives unless you are picked."), the value line with `valueBasis`, the certainty label, the effort label, and "Best time" with `whenNote`.
 - A summary above the list: how many truly free programs there are and their combined value (labelled as an estimate), and, when My info has a due date, the weeks left and how many programs are best done now, in the last weeks, and after the birth. Without a due date it says to add one in My info. The due date is read from `profile.v1` and never leaves the page.
 
 ### Guided run, tracker and helper
