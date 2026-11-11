@@ -981,3 +981,52 @@ test('the show choices are never saved or read: only the two delete statements r
   assert.equal(lines.length, 1);
   assert.match(lines[0], /delete prefs\.showOtherStates; delete prefs\.showNoFit;/);
 });
+
+test('hideReasonText: the one wording for the Programs hidden box and Do it for me', () => {
+  assert.equal(L.hideReasonText('otherState', 3, true), '3 for other states');
+  assert.equal(L.hideReasonText('otherState', 1, true), '1 for another state');
+  assert.equal(L.hideReasonText('otherState', 4, false), '4 only for some states.');
+  assert.equal(L.hideReasonText('noFit', 2, true), '2 that your answers in My info rule out');
+  assert.equal(L.hideReasonText('done', 1, true), '1 you marked done');
+  assert.equal(L.hideReasonText('notForMe', 5, true), '5 you marked not for me');
+  assert.equal(L.hideReasonText('covered', 1, true), '1 other way to get something you already signed up for');
+  assert.equal(L.hideReasonText('covered', 2, true), '2 other ways to get something you already signed up for');
+  assert.equal(L.hideReasonText('nope', 2, true), '');
+});
+
+test('ticks.js keeps a change whose save failed: no undo of the entry', () => {
+  const src = readFileSync(new URL('../src/js/ticks.js', import.meta.url), 'utf8');
+  assert.ok(!/restoreEntry|getEntry/.test(src));
+  assert.match(src, /opts\.around/);
+});
+
+test('hideCountsText: reasons in HIDE_REASONS order, zero counts and end stops left out', () => {
+  assert.equal(L.hideCountsText({}, true), '');
+  assert.equal(L.hideCountsText({ otherState: 3, done: 2 }, true), '3 for other states, 2 you marked done');
+  assert.equal(L.hideCountsText({ covered: 1, notForMe: 1, noFit: 2, otherState: 1 }, true),
+    '1 for another state, 2 that your answers in My info rule out, 1 you marked not for me, 1 other way to get something you already signed up for');
+  assert.equal(L.hideCountsText({ otherState: 4, done: 1 }, false), '4 only for some states, 1 you marked done');
+});
+
+test('pruneSelection: drops ids that were listed and are hidden now, keeps ones handed over while hidden', () => {
+  const selected = { a: true, b: true, c: true, d: true };
+  const seen = { a: true, b: true, d: true };      // c was hidden at the last look (handed over)
+  const now = { a: true };                          // b and d are hidden now, c still is
+  const out = L.pruneSelection(selected, seen, now);
+  assert.deepEqual(out, { a: true, c: true });
+  assert.deepEqual(selected, { a: true, b: true, c: true, d: true });   // the input is not changed
+  assert.deepEqual(L.pruneSelection({ a: true }, null, {}), { a: true });
+  assert.deepEqual(L.pruneSelection({ a: true, b: false }, { a: true }, { a: true }), { a: true });
+  assert.deepEqual(L.pruneSelection(null, {}, {}), {});
+});
+
+test('Do it for me and the Tracker use the shared hide rule and the new wording', () => {
+  const src = (f) => readFileSync(new URL('../src/js/' + f, import.meta.url), 'utf8');
+  const g = src('guided.js'), t = src('tracker.js');
+  assert.match(g, /hideReason\(p, ctx\)/);
+  assert.ok(!/text: 'Skip'/.test(g));
+  assert.match(g, /text: 'Not for me'/);
+  assert.match(t, /skipped: 'Not for me'/);
+  assert.ok(!/trk-s-/.test(t));
+  assert.match(t, /prefix: 'trk'/);
+});

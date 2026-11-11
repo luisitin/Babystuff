@@ -398,6 +398,40 @@
     if (ctx.covered && Object.prototype.hasOwnProperty.call(ctx.covered, groupKey(p))) return 'covered';
     return '';
   }
+  var REASON_NOUN = {
+    otherState: ['for another state', 'for other states'],
+    noFit: ['that your answers in My info rule out', 'that your answers in My info rule out'],
+    done: ['you marked done', 'you marked done'],
+    notForMe: ['you marked not for me', 'you marked not for me'],
+    covered: ['other way to get something you already signed up for', 'other ways to get something you already signed up for']
+  };
+  // "3 for other states", "1 only for some states" (no state set). Shared by the Programs hidden box and Do it for me.
+  function hideReasonText(reason, n, hasState) {
+    if (!REASON_NOUN[reason]) return '';
+    if (reason === 'otherState' && !hasState) return n + ' only for some states.';
+    return n + ' ' + REASON_NOUN[reason][n === 1 ? 0 : 1];
+  }
+  // "3 for other states, 2 you marked done": the counts in HIDE_REASONS order, zero counts left out, no end stop.
+  function hideCountsText(counts, hasState) {
+    var parts = [];
+    HIDE_REASONS.forEach(function (r) {
+      var n = counts && counts[r] ? counts[r] : 0;
+      if (n > 0) parts.push(hideReasonText(r, n, hasState).replace(/\.$/, ''));
+    });
+    return parts.join(', ');
+  }
+  // The Do it for me selection after a look at what is hidden. seen: ids that were listed the last time,
+  // now: ids listed now. A selected id that was listed and is hidden now goes (it was ticked off on another
+  // page, or the state or answers changed). Ids selected while already hidden (handed over) stay.
+  function pruneSelection(selected, seen, now) {
+    var out = {};
+    Object.keys(selected || {}).forEach(function (id) {
+      if (!selected[id]) return;
+      if (seen && seen[id] === true && !(now && now[id] === true)) return;
+      out[id] = true;
+    });
+    return out;
+  }
   // shown: { reason: true } for the reasons the person chose to show for now.
   function splitHidden(list, ctx, shown) {
     ctx = ctx || {};
@@ -669,6 +703,9 @@
     coveredGroups: coveredGroups,
     HIDE_REASONS: HIDE_REASONS,
     hideReason: hideReason,
+    hideReasonText: hideReasonText,
+    hideCountsText: hideCountsText,
+    pruneSelection: pruneSelection,
     splitHidden: splitHidden,
     trackerScope: trackerScope,
     readyNow: readyNow,

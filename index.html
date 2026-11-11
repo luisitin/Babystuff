@@ -313,9 +313,6 @@ main:focus { outline: none; }
 .sum-main { font-size: 1.0625rem; }
 .dir-note { color: var(--muted); font-size: .875rem; margin: var(--space-2) 0 0; }
 .dir-summary .dir-note { margin: 0; }
-.dir-state { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2) var(--space-3); margin: var(--space-2) 0 0; font-size: .9375rem; }
-.dir-state p { margin: 0; }
-.dir-state .dir-note { margin: 0; }
 .when-buttons { display: flex; gap: var(--space-2); list-style: none; margin: 0; padding: 0; }
 .when-buttons li { flex: 1 1 0; min-width: 0; }
 .when-buttons li:only-child { flex: 0 1 12rem; }
@@ -475,9 +472,6 @@ details.dir-filters { display: block; background: var(--surface); border: 1px so
 .filters-search { margin: 0 0 var(--space-1); }
 .kind-tabs { margin: 0 0 var(--space-1); }
 details.dir-filters { margin: 0 0 var(--space-1); }
-.dir-state { flex-wrap: nowrap; margin: var(--space-1) 0 0; padding: 0 var(--space-3); min-height: 44px; border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--surface); font-size: .875rem; gap: var(--space-2); }
-.dir-state p { flex: 1 1 0; min-width: 0; padding: var(--space-1) 0; line-height: 1.3; }
-.dir-state .btn { flex: none; }
 .result-row { margin: var(--space-1) 0; }
 .start-row { margin: 0 0 var(--space-2); }
 @media (min-width: 640px) {
@@ -592,8 +586,11 @@ label.tick input:focus-visible { outline: 3px solid var(--focus); outline-offset
 .fx-view .fx-trk-meta, .fx-view .fx-trk-line3 { margin: 2px 0 0; }
 .fx-trk-actions { display: flex; flex-wrap: wrap; align-items: center; gap: var(--fx-s2); margin-top: var(--fx-s1); }
 .fx-trk-actions .fx-link-btn, .fx-trk-actions .fx-btn { flex: none; padding: var(--fx-s1) var(--fx-s3); }
-.fx-trk-status { flex: 1 1 7rem; min-width: 0; }
-.fx-trk-status .fx-select { padding-left: var(--fx-s2); padding-right: var(--fx-s1); }
+/* Phase J: Done / Received / Not for me ticks under the actions of a row (tick rules live in base.css) */
+.fx-trk-ticks { margin-top: var(--fx-s1); border-top: 1px solid var(--fx-border); padding-top: 2px; min-width: 0; }
+.fx-trk-ticks .ticks { gap: 0 var(--fx-s3); }
+.fx-trk-tick-note { margin: 0 0 var(--fx-s1); line-height: 1.35; overflow-wrap: anywhere; }
+.fx-trk-tabs .fx-tab-label { overflow-wrap: normal; }
 .fx-trk-dot { color: var(--fx-primary); }
 .fx-trk-panel { margin-top: var(--fx-s2); padding-top: var(--fx-s2); border-top: 1px solid var(--fx-border); }
 .fx-trk-panel .fx-field { margin: var(--fx-s2) 0 0; }
@@ -640,8 +637,11 @@ label.tick input:focus-visible { outline: 3px solid var(--focus); outline-offset
 .fx-confirm-msg { margin: 0 0 var(--fx-s2); font-weight: 600; }
 .fx-confirm-msg:focus { outline: none; }
 .fx-problem { margin-bottom: var(--fx-s2); }
-.fx-actionbar-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--fx-s2); }
-.fx-actionbar-row .fx-btn { padding-left: var(--fx-s1); padding-right: var(--fx-s1); min-width: 0; }
+.fx-actionbar-row { display: grid; grid-template-columns: minmax(0, .85fr) minmax(0, 1.1fr) minmax(0, 1.1fr) minmax(0, .85fr); gap: var(--fx-s2); }
+.fx-actionbar-row .fx-btn { padding-left: var(--fx-s1); padding-right: var(--fx-s1); min-width: 0; line-height: 1.15; }
+/* Phase J: the line about what Do it for me leaves out; its links are 44px targets that add no line height */
+.gd-left { margin: var(--fx-s3) 0; line-height: 1.45; }
+.gd-left a { display: inline-block; padding: 12px 4px; margin: -12px 0; }
 
 /* Sticky bars only on phones, where the nav is fixed at the bottom */
 @media (max-width: 719px) {
@@ -1240,6 +1240,40 @@ label.tick input:focus-visible { outline: 3px solid var(--focus); outline-offset
     if (ctx.covered && Object.prototype.hasOwnProperty.call(ctx.covered, groupKey(p))) return 'covered';
     return '';
   }
+  var REASON_NOUN = {
+    otherState: ['for another state', 'for other states'],
+    noFit: ['that your answers in My info rule out', 'that your answers in My info rule out'],
+    done: ['you marked done', 'you marked done'],
+    notForMe: ['you marked not for me', 'you marked not for me'],
+    covered: ['other way to get something you already signed up for', 'other ways to get something you already signed up for']
+  };
+  // "3 for other states", "1 only for some states" (no state set). Shared by the Programs hidden box and Do it for me.
+  function hideReasonText(reason, n, hasState) {
+    if (!REASON_NOUN[reason]) return '';
+    if (reason === 'otherState' && !hasState) return n + ' only for some states.';
+    return n + ' ' + REASON_NOUN[reason][n === 1 ? 0 : 1];
+  }
+  // "3 for other states, 2 you marked done": the counts in HIDE_REASONS order, zero counts left out, no end stop.
+  function hideCountsText(counts, hasState) {
+    var parts = [];
+    HIDE_REASONS.forEach(function (r) {
+      var n = counts && counts[r] ? counts[r] : 0;
+      if (n > 0) parts.push(hideReasonText(r, n, hasState).replace(/\.$/, ''));
+    });
+    return parts.join(', ');
+  }
+  // The Do it for me selection after a look at what is hidden. seen: ids that were listed the last time,
+  // now: ids listed now. A selected id that was listed and is hidden now goes (it was ticked off on another
+  // page, or the state or answers changed). Ids selected while already hidden (handed over) stay.
+  function pruneSelection(selected, seen, now) {
+    var out = {};
+    Object.keys(selected || {}).forEach(function (id) {
+      if (!selected[id]) return;
+      if (seen && seen[id] === true && !(now && now[id] === true)) return;
+      out[id] = true;
+    });
+    return out;
+  }
   // shown: { reason: true } for the reasons the person chose to show for now.
   function splitHidden(list, ctx, shown) {
     ctx = ctx || {};
@@ -1511,6 +1545,9 @@ label.tick input:focus-visible { outline: 3px solid var(--focus); outline-offset
     coveredGroups: coveredGroups,
     HIDE_REASONS: HIDE_REASONS,
     hideReason: hideReason,
+    hideReasonText: hideReasonText,
+    hideCountsText: hideCountsText,
+    pruneSelection: pruneSelection,
     splitHidden: splitHidden,
     trackerScope: trackerScope,
     readyNow: readyNow,
@@ -1835,28 +1872,33 @@ label.tick input:focus-visible { outline: 3px solid var(--focus); outline-offset
     catch (e) { window.scrollBy(0, d); }
   }
 
-  // opts: prefix, status, received (add the Received box), onChange({ ok, status, prev, box, checked, input }).
+  // opts: prefix, status, received (add the Received box, shown only while done), around(run) (the save runs inside it), onChange({ ok, status, prev, box, checked, input }).
   function build(p, opts) {
     opts = opts || {};
     var prefix = opts.prefix || 'tick';
     var L = BFF.logic;
     var inputs = {};
+    var labels = {};
     var wrap = h('div', { class: 'ticks', role: 'group', 'aria-label': 'Mark ' + p.name, 'data-program-id': p.id });
 
     function add(key, part, label) {
       var input = h('input', { type: 'checkbox', id: prefix + '-' + part + '-' + p.id, 'data-tick': key });
       inputs[key] = input;
-      wrap.appendChild(h('label', { class: 'tick' }, [
+      var lab = h('label', { class: 'tick' }, [
         input,
         h('span', { class: 'tick-text', text: label }),
         h('span', { class: 'visually-hidden', text: ': ' + p.name })
-      ]));
+      ]);
+      labels[key] = lab;
+      wrap.appendChild(lab);
       input.addEventListener('change', function () { changed(key, input); });
     }
 
     function sync(status) {
       var t = L.tickState(status);
       Object.keys(inputs).forEach(function (k) { inputs[k].checked = !!t[k]; });
+      // The Received box is only offered once the program is marked done.
+      if (labels.received) labels.received.hidden = !(status === 'signed-up' || status === 'received');
     }
 
     function changed(key, input) {
@@ -1867,10 +1909,10 @@ label.tick input:focus-visible { outline: 3px solid var(--focus); outline-offset
         var next = L.statusAfterTick(prev, key, checked);
         var ok = true;
         if (next !== prev) {
-          var entry = T.getEntry ? T.getEntry(p.id) : null;
-          ok = T.setStatus(p.id, next) !== false;
-          // A save that did not reach storage is undone, so the box and the badge never claim it.
-          if (!ok && T.restoreEntry) T.restoreEntry(p.id, entry);
+          // A save that did not reach storage still holds for this visit (the app-wide rule):
+          // the change stays and onChange gets ok: false, so the caller can say it will not last.
+          var save = function () { ok = T.setStatus(p.id, next) !== false; };
+          if (typeof opts.around === 'function') opts.around(save); else save();
         }
         var now = T.getStatus(p.id) || 'todo';
         sync(now);
@@ -3401,7 +3443,7 @@ label.tick input:focus-visible { outline: 3px solid var(--focus); outline-offset
   var store = BFF.store;
 
   var STATUSES = ['todo', 'signed-up', 'received', 'skipped'];
-  var LABELS = { todo: 'To do', 'signed-up': 'Signed up', received: 'Received', skipped: 'Skipped' };
+  var LABELS = { todo: 'To do', 'signed-up': 'Signed up', received: 'Received', skipped: 'Not for me' };
   var APP = 'baby-freebies-finder';
   var KEY = 'tracker.v1';
   var MAX_BYTES = 1024 * 1024, MAX_ENTRIES = 5000, MAX_NOTE = 2000, MAX_FIELD = 200;
@@ -3686,12 +3728,12 @@ label.tick input:focus-visible { outline: 3px solid var(--focus); outline-offset
     }
   }
 
-  var TABS = [['todo', 'To do'], ['signed-up', 'Signed up'], ['received', 'Received'], ['skipped', 'Skipped'], ['all', 'All']];
+  var TABS = [['todo', 'To do'], ['signed-up', 'Signed up'], ['received', 'Received'], ['skipped', 'Not for me'], ['all', 'All']];
   var EMPTY = {
-    todo: 'Nothing left to do. Everything on your list is signed up, received or skipped.',
-    'signed-up': 'Nothing signed up yet. Change a program’s status after you sign up.',
+    todo: 'Nothing left to do. Everything on your list is signed up, received or marked not for me.',
+    'signed-up': 'Nothing signed up yet. Tick Done on a program after you sign up.',
     received: 'Nothing marked received yet.',
-    skipped: 'Nothing skipped.',
+    skipped: 'Nothing marked not for me.',
     all: 'Nothing here yet.'
   };
   var SECTION_TITLES = { now: 'Do now', later: 'Later', optional: 'Only if you would buy anyway, and long shots' };
@@ -3745,7 +3787,7 @@ label.tick input:focus-visible { outline: 3px solid var(--focus); outline-offset
     var c = rowCounts(sc), secs = sectionsOf(sc);
     view.bar.max = Math.max(c.active, 1);
     view.bar.value = Math.min(c.done, view.bar.max);
-    view.barText.textContent = c.done + ' of ' + c.active + ' done' + (c.skipped ? ' (' + c.skipped + ' skipped)' : '');
+    view.barText.textContent = c.done + ' of ' + c.active + ' done' + (c.skipped ? ' (' + c.skipped + ' not for me)' : '');
     view.bar.setAttribute('aria-label', c.done + ' of ' + c.active + ' programs done');
     view.claimEl.textContent = claimLine(sc, secs);
     view.claimNote.hidden = !(secs.now.length + secs.later.length);
@@ -4124,10 +4166,59 @@ label.tick input:focus-visible { outline: 3px solid var(--focus); outline-offset
     if (n) r.miss.appendChild(n);
     r.missShown = !!n;
   }
+
+  // ---- ticks on a row ----
+  var TAB_NAMES = { todo: 'To do', 'signed-up': 'Signed up', received: 'Received', skipped: 'Not for me' };
+  // Why a program that goes back to to-do would be left out of the list at the next render, '' when it stays.
+  function leftOutSentence(p) {
+    if (view.showAll) return '';
+    var L = BFF.logic, pr = profileOf();
+    var reason = L.hideReason(p, {
+      state: pr.state, profile: pr,
+      statusOf: function (id) { return tracker.getStatus(id); },
+      covered: L.coveredGroups(BFF.programs || [], function (id) { return tracker.getStatus(id); })
+    });
+    if (reason === 'otherState') {
+      return String(pr.state || '').trim()
+        ? 'It is for another state, so it will be left out of your list.'
+        : 'It is only for some states, so it will be left out of your list until you add your state in My info.';
+    }
+    if (reason === 'noFit') return 'Your answers in My info rule it out, so it will be left out of your list.';
+    if (reason === 'covered') return 'You already signed up for another way to get this, so it will be left out of your list.';
+    return '';
+  }
+  // The sentence under a row after a tick: what happened, where the row lives now, how to undo.
+  function tickNoteText(r, res) {
+    var st = res.status;
+    if (st === r.rendered) return '';
+    var t = st === 'signed-up' ? (res.prev === 'received' ? 'No longer marked received.' : 'Marked done.')
+      : st === 'received' ? 'Marked received.'
+      : st === 'skipped' ? 'Marked not for me.'
+      : 'No longer marked.';
+    if (st === 'todo') {
+      var out = leftOutSentence(r.p);
+      if (out) t += ' ' + out;
+      else if (view.filter !== 'all') t += ' It is now listed under To do.';
+    } else if (view.filter !== 'all') {
+      t += ' It is now listed under ' + TAB_NAMES[st] + '.';
+    }
+    return t + (res.checked ? ' Untick to undo.' : ' Tick it again to undo.');
+  }
+  function tickChanged(r, res) {
+    var text = tickNoteText(r, res);
+    if (text && !res.ok) text += ' ' + SAVE_FAIL;
+    r.tickNote.textContent = text;
+    if (!res.ok) view.msg.textContent = SAVE_FAIL;
+    var st = res.status, name = r.p.name;
+    view.live.textContent = '';
+    view.live.textContent = name + (st === 'signed-up' ? (res.prev === 'received' ? ' is no longer marked received.' : ' marked done.')
+      : st === 'received' ? ' marked received.' : st === 'skipped' ? ' marked not for me.' : ' is back on your list.');
+  }
+
   // The row restyles in place; it only moves at the next full render.
   function syncRowLocal(r) {
     var st = tracker.getStatus(r.p.id);
-    r.select.value = st;
+    r.ticks.sync(st);
     r.el.setAttribute('data-status', st);
     r.el.classList.toggle('fx-moved', st !== r.rendered);
     setLine3(r);
@@ -4184,14 +4275,17 @@ label.tick input:focus-visible { outline: 3px solid var(--focus); outline-offset
   // o: {tag, others}. Compact: name, a muted line, an optional timing line, one actions row.
   function buildRow(p, o) {
     var L = BFF.logic, id = p.id, st = tracker.getStatus(id);
-    var sid = 'trk-s-' + id, pid = 'trk-p-' + id;
+    var pid = 'trk-p-' + id;
     var r = { p: p, tag: o.tag || '', rendered: st, built: false };
-    var select = h('select', { id: sid, class: 'fx-select fx-trk-select' });
-    STATUSES.forEach(function (s) { select.appendChild(h('option', { value: s, text: LABELS[s] })); });
-    select.value = st;
     var link = h('a', { class: 'fx-link-btn', href: p.signupUrl, target: '_blank', rel: 'noopener noreferrer', text: 'Sign up ↗' });
     link.setAttribute('aria-label', 'Sign up for ' + p.name + ' (opens in a new tab)');
-    r.select = select;
+    // Done / Received / Not for me ticks. The save runs inside localChange, so the row stays where it is.
+    r.ticks = BFF.ticks.build(p, {
+      prefix: 'trk', status: st, received: true,
+      around: function (run) { view.localChange = id; try { run(); } finally { view.localChange = null; } },
+      onChange: function (res) { tickChanged(r, res); }
+    });
+    r.tickNote = h('p', { class: 'tick-note fx-trk-tick-note' });
     r.more = h('button', { type: 'button', id: 'trk-d-' + id, class: 'fx-btn fx-trk-more', 'aria-expanded': 'false', 'aria-controls': pid });
     r.panel = h('div', { id: pid, class: 'fx-trk-panel', hidden: '' });
     r.line3 = h('p', { class: 'fx-muted fx-trk-line3', hidden: '' });
@@ -4207,23 +4301,15 @@ label.tick input:focus-visible { outline: 3px solid var(--focus); outline-offset
       ]),
       h('div', { class: 'fx-trk-actions' }, [
         link,
-        h('div', { class: 'fx-trk-status' }, [h('label', { 'for': sid, class: 'fx-sr', text: 'Status for ' + p.name }), select]),
         r.more
       ]),
+      h('div', { class: 'fx-trk-ticks' }, [r.ticks.el, r.tickNote]),
       r.panel
     ]);
     setLine3(r);
     setMore(r);
     setMiss(r);
     r.more.addEventListener('click', function () { setOpen(r, r.more.getAttribute('aria-expanded') !== 'true'); });
-    select.addEventListener('change', function () {
-      var ok;
-      view.localChange = id;
-      try { ok = tracker.setStatus(id, select.value); } finally { view.localChange = null; }
-      if (!ok) view.msg.textContent = SAVE_FAIL;
-      view.live.textContent = '';
-      view.live.textContent = p.name + ' marked ' + LABELS[tracker.getStatus(id)] + '.';
-    });
     view.rows[id] = r;
     if (view.open[id]) setOpen(r, true);
     if (o.others && o.others.length) {
@@ -4906,7 +4992,7 @@ label.tick input:focus-visible { outline: 3px solid var(--focus); outline-offset
   var hiddenOpen = false;
   var tickOf = {};
   var renderedIds = [];
-  var SAVE_FAIL = 'Could not save on this device (storage is full or blocked). Nothing was changed.';
+  var SAVE_FAIL = 'It could not be saved on this device (storage is full or blocked), so it lasts only until you close this page.';
   var openCards = {};
   var profile = {};
   var els = {};
@@ -5292,17 +5378,7 @@ label.tick input:focus-visible { outline: 3px solid var(--focus); outline-offset
     return r && shownReasons[r] !== true ? r : '';
   }
 
-  var REASON_NOUN = {
-    otherState: ['for another state', 'for other states'],
-    noFit: ['that your answers in My info rule out', 'that your answers in My info rule out'],
-    done: ['you marked done', 'you marked done'],
-    notForMe: ['you marked not for me', 'you marked not for me'],
-    covered: ['other way to get something you already signed up for', 'other ways to get something you already signed up for']
-  };
-  function reasonText(r, n, hasState) {
-    if (r === 'otherState' && !hasState) return n + ' only for some states.';
-    return n + ' ' + REASON_NOUN[r][n === 1 ? 0 : 1];
-  }
+  function reasonText(r, n, hasState) { return L.hideReasonText(r, n, hasState); }
 
   function renderHiddenBox(split) {
     var box = els.hiddenBox;
@@ -5585,7 +5661,6 @@ label.tick input:focus-visible { outline: 3px solid var(--focus); outline-offset
 
   // A tick box was used on a card. The save and the boxes are already settled (BFF.ticks).
   function onTick(art, p, res) {
-    if (!res.ok) { say(SAVE_FAIL); return; }
     var note = art.querySelector('.tick-note');
     var reason = hiddenNowReason(p, hideCtx());
     var strip = (reason === 'done' || reason === 'notForMe');
@@ -5593,14 +5668,14 @@ label.tick input:focus-visible { outline: 3px solid var(--focus); outline-offset
       if (strip) {
         closeDetails(art, p.id);
         art.classList.add('is-ticked');
-        if (note) note.textContent = (reason === 'done' ? 'Marked done.' : 'Marked not for me.') + ' It will be hidden from this list. Untick to undo.';
+        if (note) note.textContent = (reason === 'done' ? 'Marked done.' : 'Marked not for me.') + ' It will be hidden from this list. Untick to undo.' + (res.ok ? '' : ' ' + SAVE_FAIL);
       } else {
         art.classList.remove('is-ticked');
-        if (note) note.textContent = '';
+        if (note) note.textContent = res.ok ? '' : SAVE_FAIL;
       }
     });
     var st = res.status;
-    say(p.name + (st === 'signed-up' || st === 'received' ? ' marked done.' : st === 'skipped' ? ' marked not for me.' : ' is back on your list.'));
+    say(p.name + (st === 'signed-up' || st === 'received' ? ' marked done.' : st === 'skipped' ? ' marked not for me.' : ' is back on your list.') + (res.ok ? '' : ' ' + SAVE_FAIL));
   }
 
   function onTrackerChanged() {
@@ -5795,7 +5870,7 @@ label.tick input:focus-visible { outline: 3px solid var(--focus); outline-offset
   var el, body, selected = null, run = null, focusHeading = false, focusOpen = false;
   var actions = null; // buttons of the program on screen, for keyboard shortcuts
   var preorder = null; // ids in the order the Directory gave them; null means best first
-  var undoInfo = null; // {id, entry, index, text}: lets the last Done or Skip be taken back
+  var undoInfo = null; // {id, entry, index, text}: lets the last Done or Not for me be taken back
   var saved0 = store.get(KEY, null);
   var autoOpen = !(saved0 && saved0.autoOpenNext === false); // only used where canPopup() is true
   var shortcutsOn = !!(saved0 && saved0.shortcuts === true);
@@ -5847,36 +5922,33 @@ label.tick input:focus-visible { outline: 3px solid var(--focus); outline-offset
     cb.addEventListener('change', function () {
       autoOpen = cb.checked;
       saveRun();
-      announce(autoOpen ? 'Will open the next sign-up page when you tap Done or Skip.' : 'Will not open pages automatically.');
+      announce(autoOpen ? 'Will open the next sign-up page when you tap Done or Not for me.' : 'Will not open pages automatically.');
     });
-    return h('div', { class: 'fx-check' }, [cb, h('label', { 'for': id, text: 'When I tap Done or Skip, open the next sign-up page' })]);
+    return h('div', { class: 'fx-check' }, [cb, h('label', { 'for': id, text: 'When I tap Done or Not for me, open the next sign-up page' })]);
   }
 
-  // Programs for other states are always left out of the list.
-  function hiddenByState(p) {
-    var L = BFF.logic;
-    if (!L || !L.hiddenByState) return false;
-    var st = profile().state;
-    return L.hiddenByState(p, typeof st === 'string' ? st : '');
+  // One hide rule for the whole page (the same as the Programs page): other state, ruled out by the answers,
+  // done, marked not for me, or covered by another sign-up. The context is built once per pass.
+  function hideCtx() {
+    var L = BFF.logic, st = {};
+    progs().forEach(function (p) { st[p.id] = T().getStatus(p.id); });
+    var statusOf = function (id) { return st[id] || 'todo'; };
+    var pr = profile();
+    return { state: typeof pr.state === 'string' ? pr.state : '', profile: pr, statusOf: statusOf, covered: L.coveredGroups(progs(), statusOf) };
   }
-  // Programs the person's answers in My info rule out are left out too.
-  // A program already signed up for or received is never hidden.
-  function hiddenByAnswers(p) {
-    var L = BFF.logic;
-    if (!L || !L.hiddenByAnswers) return false;
-    return L.hiddenByAnswers(p, profile(), T().getStatus(p.id));
-  }
-  function hiddenHere(p) { return hiddenByState(p) || hiddenByAnswers(p); }
+  function hiddenHere(p, ctx) { return !!BFF.logic.hideReason(p, ctx); }
+  // A hidden program that is selected (handed over by preselect) stays listed.
   function setupProgs() {
-    return progs().filter(function (p) { return !hiddenHere(p) || !!(selected && selected[p.id]); });
+    var ctx = hideCtx();
+    return progs().filter(function (p) { return !hiddenHere(p, ctx) || !!(selected && selected[p.id]); });
   }
 
   // At most one program per group of the same thing (the best ranked one that qualifies),
   // and none in a group where another member is already signed up or received.
   var seen = null; // ids that were listed the last time the selection was looked at
   function visibleNow() {
-    var v = {};
-    progs().forEach(function (p) { if (!hiddenHere(p)) v[p.id] = true; });
+    var v = {}, ctx = hideCtx();
+    progs().forEach(function (p) { if (!hiddenHere(p, ctx)) v[p.id] = true; });
     return v;
   }
   // Programs that became visible since then (the person added their state, say) get the normal default.
@@ -5884,6 +5956,8 @@ label.tick input:focus-visible { outline: 3px solid var(--focus); outline-offset
   function applyNewDefaults() {
     var now = visibleNow();
     if (!seen) { seen = now; return; }
+    // Ticked off on another page, or no longer applies: it leaves the selection.
+    selected = BFF.logic.pruneSelection(selected, seen, now);
     var done = {}, taken = {};
     progs().forEach(function (p) {
       var st = T().getStatus(p.id);
@@ -5902,7 +5976,7 @@ label.tick input:focus-visible { outline: 3px solid var(--focus); outline-offset
     selected = {};
     preorder = null;
     seen = visibleNow();
-    var done = {}, taken = {};
+    var done = {}, taken = {}, ctx = hideCtx();
     progs().forEach(function (p) {
       var st = T().getStatus(p.id);
       if (st === 'signed-up' || st === 'received') done[gkey(p)] = true;
@@ -5910,7 +5984,7 @@ label.tick input:focus-visible { outline: 3px solid var(--focus); outline-offset
     ranked(progs()).forEach(function (p) {
       var k = gkey(p);
       if (done[k] || taken[k]) return;
-      if (!handled(p) && !hiddenHere(p) && defaultOn(p)) { selected[p.id] = true; taken[k] = true; }
+      if (!handled(p) && !hiddenHere(p, ctx) && defaultOn(p)) { selected[p.id] = true; taken[k] = true; }
     });
   }
 
@@ -6017,6 +6091,8 @@ label.tick input:focus-visible { outline: 3px solid var(--focus); outline-offset
       body.appendChild(sideDet);
     }
     openTicked();
+    var left = leftOutLine();
+    if (left) body.appendChild(left);
     start.addEventListener('click', function () {
       var chosen = ranked(progs().filter(function (p) { return selected[p.id]; })).map(function (p) { return p.id; });
       var ids2 = chosen;
@@ -6034,6 +6110,30 @@ label.tick input:focus-visible { outline: 3px solid var(--focus); outline-offset
     });
     body.appendChild(h('div', { class: 'fx-actions fx-sticky' }, [start]));
     refresh();
+  }
+
+  // One line about what the list leaves out (hidden and not selected), with the way to get it back.
+  function leftOutLine() {
+    var L = BFF.logic, ctx = hideCtx(), counts = {}, total = 0;
+    progs().forEach(function (p) {
+      var r = L.hideReason(p, ctx);
+      if (!r || (selected && selected[p.id])) return;
+      counts[r] = (counts[r] || 0) + 1;
+      total++;
+    });
+    if (!total) return null;
+    var hasState = !!String(ctx.state).trim();
+    var kids = [
+      document.createTextNode('Left out of this list: ' + L.hideCountsText(counts, hasState) + '. To include any of them, show them on the '),
+      h('a', { href: '#directory', text: 'Programs page' }),
+      document.createTextNode(' and start the run from there.')
+    ];
+    if (!hasState && counts.otherState) {
+      kids.push(document.createTextNode(' Add your state in '));
+      kids.push(h('a', { href: '#info', 'data-info-key': 'state', text: 'My info' }));
+      kids.push(document.createTextNode(' to see the ones for you.'));
+    }
+    return h('p', { class: 'fx-small gd-left' }, kids);
   }
 
   function listBlock(title, items, cls) {
@@ -6062,7 +6162,7 @@ label.tick input:focus-visible { outline: 3px solid var(--focus); outline-offset
 
   var SAVE_FAIL = 'Could not save on this device (storage is full or blocked). Your progress is kept only until you close this page.';
 
-  // "Undo" after Done or Skip: restores that program's status and note and returns to it.
+  // "Undo" after Done or Not for me: restores that program's status and note and returns to it.
   function undoBar() {
     if (!undoInfo) return null;
     var u = undoInfo;
@@ -6168,7 +6268,7 @@ label.tick input:focus-visible { outline: 3px solid var(--focus); outline-offset
       h('summary', { text: 'Shortcuts' }),
       shortcutToggle(),
       h('p', { class: 'fx-small', text: 'When on, press a key while you are not typing in a field.' }),
-      h('ul', { class: 'fx-keys' }, [['O', 'Open the sign-up page'], ['C', 'Copy all details'], ['D', 'Done and go on'], ['S', 'Skip'],
+      h('ul', { class: 'fx-keys' }, [['O', 'Open the sign-up page'], ['C', 'Copy all details'], ['D', 'Done and go on'], ['S', 'Not for me (skip it)'],
         ['P', 'Report a problem'], ['B', 'Back'], ['N', 'Next without changing']].map(function (k) {
         return h('li', {}, [h('kbd', { text: k[0] }), document.createTextNode(' ' + k[1])]);
       }))
@@ -6197,12 +6297,16 @@ label.tick input:focus-visible { outline: 3px solid var(--focus); outline-offset
       saved(T().setNote(p.id, 'Problem: ' + txt + (old ? '\n' + old : '')));
       go(1);
     });
-    // Done and Skip share one path. Opening the next page happens inside the click (a user gesture).
+    // Done and Not for me share one path. Done changes only to do or not for me; Not for me changes only to do.
+    // Opening the next page happens inside the click (a user gesture).
     function advance(kind) {
       var prev = T().getEntry(p.id);
-      if (kind === 'done') { if (st === 'todo' || st === 'skipped') saved(T().setStatus(p.id, 'signed-up')); }
-      else if (st === 'todo') saved(T().setStatus(p.id, 'skipped'));
-      var msg = p.name + (kind === 'done' ? ' marked as signed up.' : ' skipped.');
+      var cur = T().getStatus(p.id);
+      var changed = false, ok = true;
+      if (kind === 'done') { if (cur === 'todo' || cur === 'skipped') { ok = T().setStatus(p.id, 'signed-up') !== false; changed = true; } }
+      else if (cur === 'todo') { ok = T().setStatus(p.id, 'skipped') !== false; changed = true; }
+      var msg = changed ? p.name + (kind === 'done' ? ' marked as signed up.' : ' marked not for me.')
+        : p.name + ' is already marked ' + T().LABELS[cur] + ', so it was left as it is.';
       var nextP = last ? null : byId(run.ids[run.index + 1]);
       if (autoOpen && canPopup() && nextP) {
         var r = openOnce(nextP);
@@ -6212,12 +6316,12 @@ label.tick input:focus-visible { outline: 3px solid var(--focus); outline-offset
       if (nextP) msg += ' Next: ' + nextP.name + '. Focus is on its Open sign-up page link.';
       undoInfo = { id: p.id, entry: prev, index: run.index, text: msg };
       go(1, true, nextP ? 'open' : '');
-      announce(msg + ' Undo is available.');
+      announce(msg + (ok ? '' : ' ' + SAVE_FAIL) + ' Undo is available.');
     }
     var done = h('button', { type: 'button', class: 'fx-btn fx-btn--primary', text: 'Done' });
     done.addEventListener('click', function () { advance('done'); });
     actions.done = done;
-    var skip = h('button', { type: 'button', class: 'fx-btn', text: 'Skip' });
+    var skip = h('button', { type: 'button', class: 'fx-btn', text: 'Not for me' });
     skip.addEventListener('click', function () { advance('skip'); });
     actions.skip = skip;
     var prob = h('button', { type: 'button', class: 'fx-btn', text: 'Problem', 'aria-expanded': 'false' });
@@ -6252,15 +6356,15 @@ label.tick input:focus-visible { outline: 3px solid var(--focus); outline-offset
     if (ub) body.appendChild(ub);
     var title = h('h3', { class: 'fx-run-title', tabindex: '-1', text: 'All done for now' });
     body.appendChild(title);
-    body.appendChild(h('p', { class: 'fx-lead', text: doneL.length + ' signed up, ' + skipL.length + ' skipped, ' + probL.length + ' with problems.' }));
+    body.appendChild(h('p', { class: 'fx-lead', text: doneL.length + ' signed up, ' + skipL.length + ' not for me, ' + probL.length + ' with problems.' }));
     function sec(name, list) {
       if (!list.length) return;
       var ul = h('ul');
       list.forEach(function (p) { ul.appendChild(h('li', { text: p.name })); });
       body.appendChild(h('div', { class: 'fx-block' }, [h('h4', { text: name + ' (' + list.length + ')' }), ul]));
     }
-    sec('Signed up', doneL); sec('Skipped', skipL); sec('Problems', probL);
-    body.appendChild(h('p', { class: 'fx-muted', text: 'Watch your inbox for confirmation emails, and mark programs as Received in the Tracker when your freebies arrive.' }));
+    sec('Signed up', doneL); sec('Not for me', skipL); sec('Problems', probL);
+    body.appendChild(h('p', { class: 'fx-muted', text: 'Watch your inbox for confirmation emails, and tick Received in the Tracker when your freebies arrive.' }));
     var again = h('button', { type: 'button', class: 'fx-btn', text: 'Start over' });
     again.addEventListener('click', startOver);
     var bk = h('button', { type: 'button', class: 'fx-btn', text: 'Back to last program' });

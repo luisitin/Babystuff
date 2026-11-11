@@ -301,9 +301,6 @@ main:focus { outline: none; }
 .sum-main { font-size: 1.0625rem; }
 .dir-note { color: var(--muted); font-size: .875rem; margin: var(--space-2) 0 0; }
 .dir-summary .dir-note { margin: 0; }
-.dir-state { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2) var(--space-3); margin: var(--space-2) 0 0; font-size: .9375rem; }
-.dir-state p { margin: 0; }
-.dir-state .dir-note { margin: 0; }
 .when-buttons { display: flex; gap: var(--space-2); list-style: none; margin: 0; padding: 0; }
 .when-buttons li { flex: 1 1 0; min-width: 0; }
 .when-buttons li:only-child { flex: 0 1 12rem; }
@@ -463,9 +460,6 @@ details.dir-filters { display: block; background: var(--surface); border: 1px so
 .filters-search { margin: 0 0 var(--space-1); }
 .kind-tabs { margin: 0 0 var(--space-1); }
 details.dir-filters { margin: 0 0 var(--space-1); }
-.dir-state { flex-wrap: nowrap; margin: var(--space-1) 0 0; padding: 0 var(--space-3); min-height: 44px; border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--surface); font-size: .875rem; gap: var(--space-2); }
-.dir-state p { flex: 1 1 0; min-width: 0; padding: var(--space-1) 0; line-height: 1.3; }
-.dir-state .btn { flex: none; }
 .result-row { margin: var(--space-1) 0; }
 .start-row { margin: 0 0 var(--space-2); }
 @media (min-width: 640px) {

@@ -149,7 +149,7 @@
   var el, body, selected = null, run = null, focusHeading = false, focusOpen = false;
   var actions = null; // buttons of the program on screen, for keyboard shortcuts
   var preorder = null; // ids in the order the Directory gave them; null means best first
-  var undoInfo = null; // {id, entry, index, text}: lets the last Done or Skip be taken back
+  var undoInfo = null; // {id, entry, index, text}: lets the last Done or Not for me be taken back
   var saved0 = store.get(KEY, null);
   var autoOpen = !(saved0 && saved0.autoOpenNext === false); // only used where canPopup() is true
   var shortcutsOn = !!(saved0 && saved0.shortcuts === true);
@@ -201,36 +201,33 @@
     cb.addEventListener('change', function () {
       autoOpen = cb.checked;
       saveRun();
-      announce(autoOpen ? 'Will open the next sign-up page when you tap Done or Skip.' : 'Will not open pages automatically.');
+      announce(autoOpen ? 'Will open the next sign-up page when you tap Done or Not for me.' : 'Will not open pages automatically.');
     });
-    return h('div', { class: 'fx-check' }, [cb, h('label', { 'for': id, text: 'When I tap Done or Skip, open the next sign-up page' })]);
+    return h('div', { class: 'fx-check' }, [cb, h('label', { 'for': id, text: 'When I tap Done or Not for me, open the next sign-up page' })]);
   }
 
-  // Programs for other states are always left out of the list.
-  function hiddenByState(p) {
-    var L = BFF.logic;
-    if (!L || !L.hiddenByState) return false;
-    var st = profile().state;
-    return L.hiddenByState(p, typeof st === 'string' ? st : '');
+  // One hide rule for the whole page (the same as the Programs page): other state, ruled out by the answers,
+  // done, marked not for me, or covered by another sign-up. The context is built once per pass.
+  function hideCtx() {
+    var L = BFF.logic, st = {};
+    progs().forEach(function (p) { st[p.id] = T().getStatus(p.id); });
+    var statusOf = function (id) { return st[id] || 'todo'; };
+    var pr = profile();
+    return { state: typeof pr.state === 'string' ? pr.state : '', profile: pr, statusOf: statusOf, covered: L.coveredGroups(progs(), statusOf) };
   }
-  // Programs the person's answers in My info rule out are left out too.
-  // A program already signed up for or received is never hidden.
-  function hiddenByAnswers(p) {
-    var L = BFF.logic;
-    if (!L || !L.hiddenByAnswers) return false;
-    return L.hiddenByAnswers(p, profile(), T().getStatus(p.id));
-  }
-  function hiddenHere(p) { return hiddenByState(p) || hiddenByAnswers(p); }
+  function hiddenHere(p, ctx) { return !!BFF.logic.hideReason(p, ctx); }
+  // A hidden program that is selected (handed over by preselect) stays listed.
   function setupProgs() {
-    return progs().filter(function (p) { return !hiddenHere(p) || !!(selected && selected[p.id]); });
+    var ctx = hideCtx();
+    return progs().filter(function (p) { return !hiddenHere(p, ctx) || !!(selected && selected[p.id]); });
   }
 
   // At most one program per group of the same thing (the best ranked one that qualifies),
   // and none in a group where another member is already signed up or received.
   var seen = null; // ids that were listed the last time the selection was looked at
   function visibleNow() {
-    var v = {};
-    progs().forEach(function (p) { if (!hiddenHere(p)) v[p.id] = true; });
+    var v = {}, ctx = hideCtx();
+    progs().forEach(function (p) { if (!hiddenHere(p, ctx)) v[p.id] = true; });
     return v;
   }
   // Programs that became visible since then (the person added their state, say) get the normal default.
@@ -238,6 +235,8 @@
   function applyNewDefaults() {
     var now = visibleNow();
     if (!seen) { seen = now; return; }
+    // Ticked off on another page, or no longer applies: it leaves the selection.
+    selected = BFF.logic.pruneSelection(selected, seen, now);
     var done = {}, taken = {};
     progs().forEach(function (p) {
       var st = T().getStatus(p.id);
@@ -256,7 +255,7 @@
     selected = {};
     preorder = null;
     seen = visibleNow();
-    var done = {}, taken = {};
+    var done = {}, taken = {}, ctx = hideCtx();
     progs().forEach(function (p) {
       var st = T().getStatus(p.id);
       if (st === 'signed-up' || st === 'received') done[gkey(p)] = true;
@@ -264,7 +263,7 @@
     ranked(progs()).forEach(function (p) {
       var k = gkey(p);
       if (done[k] || taken[k]) return;
-      if (!handled(p) && !hiddenHere(p) && defaultOn(p)) { selected[p.id] = true; taken[k] = true; }
+      if (!handled(p) && !hiddenHere(p, ctx) && defaultOn(p)) { selected[p.id] = true; taken[k] = true; }
     });
   }
 
@@ -371,6 +370,8 @@
       body.appendChild(sideDet);
     }
     openTicked();
+    var left = leftOutLine();
+    if (left) body.appendChild(left);
     start.addEventListener('click', function () {
       var chosen = ranked(progs().filter(function (p) { return selected[p.id]; })).map(function (p) { return p.id; });
       var ids2 = chosen;
@@ -388,6 +389,30 @@
     });
     body.appendChild(h('div', { class: 'fx-actions fx-sticky' }, [start]));
     refresh();
+  }
+
+  // One line about what the list leaves out (hidden and not selected), with the way to get it back.
+  function leftOutLine() {
+    var L = BFF.logic, ctx = hideCtx(), counts = {}, total = 0;
+    progs().forEach(function (p) {
+      var r = L.hideReason(p, ctx);
+      if (!r || (selected && selected[p.id])) return;
+      counts[r] = (counts[r] || 0) + 1;
+      total++;
+    });
+    if (!total) return null;
+    var hasState = !!String(ctx.state).trim();
+    var kids = [
+      document.createTextNode('Left out of this list: ' + L.hideCountsText(counts, hasState) + '. To include any of them, show them on the '),
+      h('a', { href: '#directory', text: 'Programs page' }),
+      document.createTextNode(' and start the run from there.')
+    ];
+    if (!hasState && counts.otherState) {
+      kids.push(document.createTextNode(' Add your state in '));
+      kids.push(h('a', { href: '#info', 'data-info-key': 'state', text: 'My info' }));
+      kids.push(document.createTextNode(' to see the ones for you.'));
+    }
+    return h('p', { class: 'fx-small gd-left' }, kids);
   }
 
   function listBlock(title, items, cls) {
@@ -416,7 +441,7 @@
 
   var SAVE_FAIL = 'Could not save on this device (storage is full or blocked). Your progress is kept only until you close this page.';
 
-  // "Undo" after Done or Skip: restores that program's status and note and returns to it.
+  // "Undo" after Done or Not for me: restores that program's status and note and returns to it.
   function undoBar() {
     if (!undoInfo) return null;
     var u = undoInfo;
@@ -522,7 +547,7 @@
       h('summary', { text: 'Shortcuts' }),
       shortcutToggle(),
       h('p', { class: 'fx-small', text: 'When on, press a key while you are not typing in a field.' }),
-      h('ul', { class: 'fx-keys' }, [['O', 'Open the sign-up page'], ['C', 'Copy all details'], ['D', 'Done and go on'], ['S', 'Skip'],
+      h('ul', { class: 'fx-keys' }, [['O', 'Open the sign-up page'], ['C', 'Copy all details'], ['D', 'Done and go on'], ['S', 'Not for me (skip it)'],
         ['P', 'Report a problem'], ['B', 'Back'], ['N', 'Next without changing']].map(function (k) {
         return h('li', {}, [h('kbd', { text: k[0] }), document.createTextNode(' ' + k[1])]);
       }))
@@ -551,12 +576,16 @@
       saved(T().setNote(p.id, 'Problem: ' + txt + (old ? '\n' + old : '')));
       go(1);
     });
-    // Done and Skip share one path. Opening the next page happens inside the click (a user gesture).
+    // Done and Not for me share one path. Done changes only to do or not for me; Not for me changes only to do.
+    // Opening the next page happens inside the click (a user gesture).
     function advance(kind) {
       var prev = T().getEntry(p.id);
-      if (kind === 'done') { if (st === 'todo' || st === 'skipped') saved(T().setStatus(p.id, 'signed-up')); }
-      else if (st === 'todo') saved(T().setStatus(p.id, 'skipped'));
-      var msg = p.name + (kind === 'done' ? ' marked as signed up.' : ' skipped.');
+      var cur = T().getStatus(p.id);
+      var changed = false, ok = true;
+      if (kind === 'done') { if (cur === 'todo' || cur === 'skipped') { ok = T().setStatus(p.id, 'signed-up') !== false; changed = true; } }
+      else if (cur === 'todo') { ok = T().setStatus(p.id, 'skipped') !== false; changed = true; }
+      var msg = changed ? p.name + (kind === 'done' ? ' marked as signed up.' : ' marked not for me.')
+        : p.name + ' is already marked ' + T().LABELS[cur] + ', so it was left as it is.';
       var nextP = last ? null : byId(run.ids[run.index + 1]);
       if (autoOpen && canPopup() && nextP) {
         var r = openOnce(nextP);
@@ -566,12 +595,12 @@
       if (nextP) msg += ' Next: ' + nextP.name + '. Focus is on its Open sign-up page link.';
       undoInfo = { id: p.id, entry: prev, index: run.index, text: msg };
       go(1, true, nextP ? 'open' : '');
-      announce(msg + ' Undo is available.');
+      announce(msg + (ok ? '' : ' ' + SAVE_FAIL) + ' Undo is available.');
     }
     var done = h('button', { type: 'button', class: 'fx-btn fx-btn--primary', text: 'Done' });
     done.addEventListener('click', function () { advance('done'); });
     actions.done = done;
-    var skip = h('button', { type: 'button', class: 'fx-btn', text: 'Skip' });
+    var skip = h('button', { type: 'button', class: 'fx-btn', text: 'Not for me' });
     skip.addEventListener('click', function () { advance('skip'); });
     actions.skip = skip;
     var prob = h('button', { type: 'button', class: 'fx-btn', text: 'Problem', 'aria-expanded': 'false' });
@@ -606,15 +635,15 @@
     if (ub) body.appendChild(ub);
     var title = h('h3', { class: 'fx-run-title', tabindex: '-1', text: 'All done for now' });
     body.appendChild(title);
-    body.appendChild(h('p', { class: 'fx-lead', text: doneL.length + ' signed up, ' + skipL.length + ' skipped, ' + probL.length + ' with problems.' }));
+    body.appendChild(h('p', { class: 'fx-lead', text: doneL.length + ' signed up, ' + skipL.length + ' not for me, ' + probL.length + ' with problems.' }));
     function sec(name, list) {
       if (!list.length) return;
       var ul = h('ul');
       list.forEach(function (p) { ul.appendChild(h('li', { text: p.name })); });
       body.appendChild(h('div', { class: 'fx-block' }, [h('h4', { text: name + ' (' + list.length + ')' }), ul]));
     }
-    sec('Signed up', doneL); sec('Skipped', skipL); sec('Problems', probL);
-    body.appendChild(h('p', { class: 'fx-muted', text: 'Watch your inbox for confirmation emails, and mark programs as Received in the Tracker when your freebies arrive.' }));
+    sec('Signed up', doneL); sec('Not for me', skipL); sec('Problems', probL);
+    body.appendChild(h('p', { class: 'fx-muted', text: 'Watch your inbox for confirmation emails, and tick Received in the Tracker when your freebies arrive.' }));
     var again = h('button', { type: 'button', class: 'fx-btn', text: 'Start over' });
     again.addEventListener('click', startOver);
     var bk = h('button', { type: 'button', class: 'fx-btn', text: 'Back to last program' });

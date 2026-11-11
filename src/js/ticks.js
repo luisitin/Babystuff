@@ -29,28 +29,33 @@
     catch (e) { window.scrollBy(0, d); }
   }
 
-  // opts: prefix, status, received (add the Received box), onChange({ ok, status, prev, box, checked, input }).
+  // opts: prefix, status, received (add the Received box, shown only while done), around(run) (the save runs inside it), onChange({ ok, status, prev, box, checked, input }).
   function build(p, opts) {
     opts = opts || {};
     var prefix = opts.prefix || 'tick';
     var L = BFF.logic;
     var inputs = {};
+    var labels = {};
     var wrap = h('div', { class: 'ticks', role: 'group', 'aria-label': 'Mark ' + p.name, 'data-program-id': p.id });
 
     function add(key, part, label) {
       var input = h('input', { type: 'checkbox', id: prefix + '-' + part + '-' + p.id, 'data-tick': key });
       inputs[key] = input;
-      wrap.appendChild(h('label', { class: 'tick' }, [
+      var lab = h('label', { class: 'tick' }, [
         input,
         h('span', { class: 'tick-text', text: label }),
         h('span', { class: 'visually-hidden', text: ': ' + p.name })
-      ]));
+      ]);
+      labels[key] = lab;
+      wrap.appendChild(lab);
       input.addEventListener('change', function () { changed(key, input); });
     }
 
     function sync(status) {
       var t = L.tickState(status);
       Object.keys(inputs).forEach(function (k) { inputs[k].checked = !!t[k]; });
+      // The Received box is only offered once the program is marked done.
+      if (labels.received) labels.received.hidden = !(status === 'signed-up' || status === 'received');
     }
 
     function changed(key, input) {
@@ -61,10 +66,10 @@
         var next = L.statusAfterTick(prev, key, checked);
         var ok = true;
         if (next !== prev) {
-          var entry = T.getEntry ? T.getEntry(p.id) : null;
-          ok = T.setStatus(p.id, next) !== false;
-          // A save that did not reach storage is undone, so the box and the badge never claim it.
-          if (!ok && T.restoreEntry) T.restoreEntry(p.id, entry);
+          // A save that did not reach storage still holds for this visit (the app-wide rule):
+          // the change stays and onChange gets ok: false, so the caller can say it will not last.
+          var save = function () { ok = T.setStatus(p.id, next) !== false; };
+          if (typeof opts.around === 'function') opts.around(save); else save();
         }
         var now = T.getStatus(p.id) || 'todo';
         sync(now);

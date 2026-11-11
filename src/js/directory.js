@@ -39,7 +39,7 @@
   var hiddenOpen = false;
   var tickOf = {};
   var renderedIds = [];
-  var SAVE_FAIL = 'Could not save on this device (storage is full or blocked). Nothing was changed.';
+  var SAVE_FAIL = 'It could not be saved on this device (storage is full or blocked), so it lasts only until you close this page.';
   var openCards = {};
   var profile = {};
   var els = {};
@@ -425,17 +425,7 @@
     return r && shownReasons[r] !== true ? r : '';
   }
 
-  var REASON_NOUN = {
-    otherState: ['for another state', 'for other states'],
-    noFit: ['that your answers in My info rule out', 'that your answers in My info rule out'],
-    done: ['you marked done', 'you marked done'],
-    notForMe: ['you marked not for me', 'you marked not for me'],
-    covered: ['other way to get something you already signed up for', 'other ways to get something you already signed up for']
-  };
-  function reasonText(r, n, hasState) {
-    if (r === 'otherState' && !hasState) return n + ' only for some states.';
-    return n + ' ' + REASON_NOUN[r][n === 1 ? 0 : 1];
-  }
+  function reasonText(r, n, hasState) { return L.hideReasonText(r, n, hasState); }
 
   function renderHiddenBox(split) {
     var box = els.hiddenBox;
@@ -718,7 +708,6 @@
 
   // A tick box was used on a card. The save and the boxes are already settled (BFF.ticks).
   function onTick(art, p, res) {
-    if (!res.ok) { say(SAVE_FAIL); return; }
     var note = art.querySelector('.tick-note');
     var reason = hiddenNowReason(p, hideCtx());
     var strip = (reason === 'done' || reason === 'notForMe');
@@ -726,14 +715,14 @@
       if (strip) {
         closeDetails(art, p.id);
         art.classList.add('is-ticked');
-        if (note) note.textContent = (reason === 'done' ? 'Marked done.' : 'Marked not for me.') + ' It will be hidden from this list. Untick to undo.';
+        if (note) note.textContent = (reason === 'done' ? 'Marked done.' : 'Marked not for me.') + ' It will be hidden from this list. Untick to undo.' + (res.ok ? '' : ' ' + SAVE_FAIL);
       } else {
         art.classList.remove('is-ticked');
-        if (note) note.textContent = '';
+        if (note) note.textContent = res.ok ? '' : SAVE_FAIL;
       }
     });
     var st = res.status;
-    say(p.name + (st === 'signed-up' || st === 'received' ? ' marked done.' : st === 'skipped' ? ' marked not for me.' : ' is back on your list.'));
+    say(p.name + (st === 'signed-up' || st === 'received' ? ' marked done.' : st === 'skipped' ? ' marked not for me.' : ' is back on your list.') + (res.ok ? '' : ' ' + SAVE_FAIL));
   }
 
   function onTrackerChanged() {

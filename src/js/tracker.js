@@ -5,7 +5,7 @@
   var store = BFF.store;
 
   var STATUSES = ['todo', 'signed-up', 'received', 'skipped'];
-  var LABELS = { todo: 'To do', 'signed-up': 'Signed up', received: 'Received', skipped: 'Skipped' };
+  var LABELS = { todo: 'To do', 'signed-up': 'Signed up', received: 'Received', skipped: 'Not for me' };
   var APP = 'baby-freebies-finder';
   var KEY = 'tracker.v1';
   var MAX_BYTES = 1024 * 1024, MAX_ENTRIES = 5000, MAX_NOTE = 2000, MAX_FIELD = 200;
@@ -290,12 +290,12 @@
     }
   }
 
-  var TABS = [['todo', 'To do'], ['signed-up', 'Signed up'], ['received', 'Received'], ['skipped', 'Skipped'], ['all', 'All']];
+  var TABS = [['todo', 'To do'], ['signed-up', 'Signed up'], ['received', 'Received'], ['skipped', 'Not for me'], ['all', 'All']];
   var EMPTY = {
-    todo: 'Nothing left to do. Everything on your list is signed up, received or skipped.',
-    'signed-up': 'Nothing signed up yet. Change a program’s status after you sign up.',
+    todo: 'Nothing left to do. Everything on your list is signed up, received or marked not for me.',
+    'signed-up': 'Nothing signed up yet. Tick Done on a program after you sign up.',
     received: 'Nothing marked received yet.',
-    skipped: 'Nothing skipped.',
+    skipped: 'Nothing marked not for me.',
     all: 'Nothing here yet.'
   };
   var SECTION_TITLES = { now: 'Do now', later: 'Later', optional: 'Only if you would buy anyway, and long shots' };
@@ -349,7 +349,7 @@
     var c = rowCounts(sc), secs = sectionsOf(sc);
     view.bar.max = Math.max(c.active, 1);
     view.bar.value = Math.min(c.done, view.bar.max);
-    view.barText.textContent = c.done + ' of ' + c.active + ' done' + (c.skipped ? ' (' + c.skipped + ' skipped)' : '');
+    view.barText.textContent = c.done + ' of ' + c.active + ' done' + (c.skipped ? ' (' + c.skipped + ' not for me)' : '');
     view.bar.setAttribute('aria-label', c.done + ' of ' + c.active + ' programs done');
     view.claimEl.textContent = claimLine(sc, secs);
     view.claimNote.hidden = !(secs.now.length + secs.later.length);
@@ -728,10 +728,59 @@
     if (n) r.miss.appendChild(n);
     r.missShown = !!n;
   }
+
+  // ---- ticks on a row ----
+  var TAB_NAMES = { todo: 'To do', 'signed-up': 'Signed up', received: 'Received', skipped: 'Not for me' };
+  // Why a program that goes back to to-do would be left out of the list at the next render, '' when it stays.
+  function leftOutSentence(p) {
+    if (view.showAll) return '';
+    var L = BFF.logic, pr = profileOf();
+    var reason = L.hideReason(p, {
+      state: pr.state, profile: pr,
+      statusOf: function (id) { return tracker.getStatus(id); },
+      covered: L.coveredGroups(BFF.programs || [], function (id) { return tracker.getStatus(id); })
+    });
+    if (reason === 'otherState') {
+      return String(pr.state || '').trim()
+        ? 'It is for another state, so it will be left out of your list.'
+        : 'It is only for some states, so it will be left out of your list until you add your state in My info.';
+    }
+    if (reason === 'noFit') return 'Your answers in My info rule it out, so it will be left out of your list.';
+    if (reason === 'covered') return 'You already signed up for another way to get this, so it will be left out of your list.';
+    return '';
+  }
+  // The sentence under a row after a tick: what happened, where the row lives now, how to undo.
+  function tickNoteText(r, res) {
+    var st = res.status;
+    if (st === r.rendered) return '';
+    var t = st === 'signed-up' ? (res.prev === 'received' ? 'No longer marked received.' : 'Marked done.')
+      : st === 'received' ? 'Marked received.'
+      : st === 'skipped' ? 'Marked not for me.'
+      : 'No longer marked.';
+    if (st === 'todo') {
+      var out = leftOutSentence(r.p);
+      if (out) t += ' ' + out;
+      else if (view.filter !== 'all') t += ' It is now listed under To do.';
+    } else if (view.filter !== 'all') {
+      t += ' It is now listed under ' + TAB_NAMES[st] + '.';
+    }
+    return t + (res.checked ? ' Untick to undo.' : ' Tick it again to undo.');
+  }
+  function tickChanged(r, res) {
+    var text = tickNoteText(r, res);
+    if (text && !res.ok) text += ' ' + SAVE_FAIL;
+    r.tickNote.textContent = text;
+    if (!res.ok) view.msg.textContent = SAVE_FAIL;
+    var st = res.status, name = r.p.name;
+    view.live.textContent = '';
+    view.live.textContent = name + (st === 'signed-up' ? (res.prev === 'received' ? ' is no longer marked received.' : ' marked done.')
+      : st === 'received' ? ' marked received.' : st === 'skipped' ? ' marked not for me.' : ' is back on your list.');
+  }
+
   // The row restyles in place; it only moves at the next full render.
   function syncRowLocal(r) {
     var st = tracker.getStatus(r.p.id);
-    r.select.value = st;
+    r.ticks.sync(st);
     r.el.setAttribute('data-status', st);
     r.el.classList.toggle('fx-moved', st !== r.rendered);
     setLine3(r);
@@ -788,14 +837,17 @@
   // o: {tag, others}. Compact: name, a muted line, an optional timing line, one actions row.
   function buildRow(p, o) {
     var L = BFF.logic, id = p.id, st = tracker.getStatus(id);
-    var sid = 'trk-s-' + id, pid = 'trk-p-' + id;
+    var pid = 'trk-p-' + id;
     var r = { p: p, tag: o.tag || '', rendered: st, built: false };
-    var select = h('select', { id: sid, class: 'fx-select fx-trk-select' });
-    STATUSES.forEach(function (s) { select.appendChild(h('option', { value: s, text: LABELS[s] })); });
-    select.value = st;
     var link = h('a', { class: 'fx-link-btn', href: p.signupUrl, target: '_blank', rel: 'noopener noreferrer', text: 'Sign up ↗' });
     link.setAttribute('aria-label', 'Sign up for ' + p.name + ' (opens in a new tab)');
-    r.select = select;
+    // Done / Received / Not for me ticks. The save runs inside localChange, so the row stays where it is.
+    r.ticks = BFF.ticks.build(p, {
+      prefix: 'trk', status: st, received: true,
+      around: function (run) { view.localChange = id; try { run(); } finally { view.localChange = null; } },
+      onChange: function (res) { tickChanged(r, res); }
+    });
+    r.tickNote = h('p', { class: 'tick-note fx-trk-tick-note' });
     r.more = h('button', { type: 'button', id: 'trk-d-' + id, class: 'fx-btn fx-trk-more', 'aria-expanded': 'false', 'aria-controls': pid });
     r.panel = h('div', { id: pid, class: 'fx-trk-panel', hidden: '' });
     r.line3 = h('p', { class: 'fx-muted fx-trk-line3', hidden: '' });
@@ -811,23 +863,15 @@
       ]),
       h('div', { class: 'fx-trk-actions' }, [
         link,
-        h('div', { class: 'fx-trk-status' }, [h('label', { 'for': sid, class: 'fx-sr', text: 'Status for ' + p.name }), select]),
         r.more
       ]),
+      h('div', { class: 'fx-trk-ticks' }, [r.ticks.el, r.tickNote]),
       r.panel
     ]);
     setLine3(r);
     setMore(r);
     setMiss(r);
     r.more.addEventListener('click', function () { setOpen(r, r.more.getAttribute('aria-expanded') !== 'true'); });
-    select.addEventListener('change', function () {
-      var ok;
-      view.localChange = id;
-      try { ok = tracker.setStatus(id, select.value); } finally { view.localChange = null; }
-      if (!ok) view.msg.textContent = SAVE_FAIL;
-      view.live.textContent = '';
-      view.live.textContent = p.name + ' marked ' + LABELS[tracker.getStatus(id)] + '.';
-    });
     view.rows[id] = r;
     if (view.open[id]) setOpen(r, true);
     if (o.others && o.others.length) {
