@@ -707,6 +707,79 @@ async function j8(env, g) {
     clean(g, h, tag + 'handed over');
     await h.ctx.close();
   }
+  // ----- a ticked program becomes hidden although its own status stays the same: it leaves the selection -----
+  const leftOf = async (page) => page.locator('#view-guided p.fx-small.gd-left').evaluateAll((els) => els.map((e) => e.textContent.replace(/\s+/g, ' ').trim()));
+  const leftWant = (sp, hasState) => 'Left out of this list: ' + L.hideCountsText(sp.counts, hasState) + '. To include any of them, show them on the Programs page and start the run from there.' + (!hasState && sp.counts.otherState ? ' Add your state in My info to see the ones for you.' : '');
+  const afterChecks = async (g, label, page, victim, control, sp2, profile2, sp1) => {
+    const rows = await pickIds(page);
+    const ex = (profile2.state || '').trim() ? 1 : 0;
+    g.check(label + ': the program that became hidden is no longer in the setup list', !rows.some((r) => r.id === victim.id), 'rows ' + rows.length);
+    g.check(label + ': the control program is still listed and still ticked', rows.some((r) => r.id === control.id && r.on), JSON.stringify(rows.filter((r) => r.id === control.id)));
+    const startText = norm(await page.getByRole('button', { name: /^Start \(/ }).innerText());
+    // Programs that became listed because of the change get the normal default tick, so the ticked set is the control plus some of those.
+    const newly = ids(sp2.pool).filter((id) => !ids(sp1.pool).includes(id));
+    const on = rows.filter((r) => r.on).map((r) => r.id);
+    g.check(label + ': what is ticked is the control plus only programs the change newly listed (not the one that became hidden), and the start button counts them', on.includes(control.id) && !on.includes(victim.id) && on.every((id) => id === control.id || newly.includes(id)) && startText === 'Start (' + on.length + ' program' + (on.length === 1 ? '' : 's') + ')', startText + ' ticked ' + on.length + ' newly listed ' + newly.length);
+    g.check(label + ': the setup list equals the model list after the change', sameSet(rows.map((r) => r.id), ids(sp2.pool)), diff(rows.map((r) => r.id), ids(sp2.pool)));
+    const left = await leftOf(page);
+    g.check(label + ': the left-out line has the model counts after the change (' + L.hideCountsText(sp2.counts, !!ex) + ')', left.length === 1 && left[0] === leftWant(sp2, !!ex), JSON.stringify(left) + ' vs ' + leftWant(sp2, !!ex));
+  };
+  const tickBoth = async (page, a, b) => {
+    await page.getByRole('button', { name: 'Select none' }).click();
+    for (const p of [a, b]) { await revealPick(page, p.id); await page.locator('#gd-pick-' + p.id).check(); }
+  };
+  const saved = async (page) => {
+    await page.waitForFunction(() => /Saved on this device/.test(document.querySelector('#view-info .fx-saved').textContent), null, { timeout: 4000 });
+    await page.waitForTimeout(150);
+  };
+  const CAP = Object.assign({}, TXP, { state: 'CA' });
+  const MEDP = PROFILES[2][1];
+  const MEDP_PRIV = Object.assign({}, MEDP, { cover: 'private' });
+  for (const mode of MODES) {
+    const tag = mode + ': ';
+    for (const [name, from, to, reason, change] of [
+      ['A. the state changes to California', TXP, CAP, 'otherState', (page) => page.locator('#info-state').selectOption('CA')],
+      ['B. the cover answer changes to private', MEDP, MEDP_PRIV, 'noFit', (page) => page.locator('#info-cover').selectOption('private')]
+    ]) {
+      const label = tag + name;
+      const sp1 = modelOf(from), sp2 = modelOf(to);
+      const victim = sp1.pool.find((p) => groupSize(p) === 1 && sp2.reasons[p.id] === reason);
+      const control = sp1.pool.find((p) => groupSize(p) === 1 && p !== victim && sp2.pool.includes(p));
+      const h = await openJ(browser, mode, { profile: from, hash: 'guided' });
+      const page = h.page;
+      g.check(label + ': the model lists the program and then hides it for the reason ' + reason + ', and lists the control both times', !!victim && !!control && sp1.pool.includes(victim) && sp2.reasons[victim.id] === reason && sp2.pool.includes(control), String(victim && victim.id));
+      await tickBoth(page, victim, control);
+      g.check(label + ': both programs are ticked and the start button reads "Start (2 programs)"', norm(await page.getByRole('button', { name: /^Start \(/ }).innerText()) === 'Start (2 programs)');
+      await h.go('info');
+      await change(page);
+      await saved(page);
+      await h.go('guided'); await page.waitForTimeout(200);
+      await afterChecks(g, label, page, victim, control, sp2, to, sp1);
+      clean(g, h, label);
+      await h.ctx.close();
+    }
+    {
+      const label = tag + 'C. another way to the same thing is signed up';
+      const sp1 = modelOf(TXP);
+      const key = L.groupKey(byId[PUMP]);
+      const alt = sp1.pool.find((p) => L.groupKey(p) === key && p.id !== PUMP);
+      const control = sp1.pool.find((p) => groupSize(p) === 1);
+      const st = { [PUMP]: 'signed-up' };
+      const sp2 = modelOf(TXP, st);
+      const h = await openJ(browser, mode, { profile: TXP, hash: 'guided' });
+      const page = h.page;
+      g.check(label + ': the model lists the alternate now and gives it the reason covered once the pump is signed up', !!alt && sp1.pool.includes(byId[PUMP]) && sp2.reasons[alt.id] === 'covered', String(alt && alt.id));
+      await tickBoth(page, alt, control);
+      g.check(label + ': the alternate and the control are ticked and the start button reads "Start (2 programs)"', norm(await page.getByRole('button', { name: /^Start \(/ }).innerText()) === 'Start (2 programs)');
+      await h.go('directory');
+      await page.locator('#' + ID.done + PUMP).check(); await page.waitForTimeout(150);
+      g.check(label + ': the pump is marked signed up and the ticked alternate keeps its own status (todo)', (await statusNow(page, PUMP)) === 'signed-up' && (await statusNow(page, alt.id)) === 'todo');
+      await h.go('guided'); await page.waitForTimeout(200);
+      await afterChecks(g, label, page, alt, control, sp2, TXP, sp1);
+      clean(g, h, label);
+      await h.ctx.close();
+    }
+  }
 }
 
 // ======================= J9 the three pages agree =======================
