@@ -300,6 +300,128 @@
     }).length;
   }
 
+  // ---- what My info is missing for a program ----
+  var MISSING_KEYS = ['state', 'cover', 'insurer', 'lowIncome', 'job'];
+  var MISSING_LABELS = { state: 'your state', cover: 'your health cover', insurer: 'your health plan', lowIncome: 'your income answer', job: 'your paid job answer' };
+  var MISSING_SHORT = { state: 'Your state', cover: 'Health cover', insurer: 'Health plan', lowIncome: 'Income', job: 'Paid job' };
+  // Keys (in MISSING_KEYS order) of the My info answers that would settle whether the program applies.
+  // [] when nothing is missing or the program is already ruled out.
+  function missingInfo(p, profile) {
+    if (!p || typeof p !== 'object') return [];
+    var st = statesOf(p);
+    var mine = profile && typeof profile === 'object' ? stateOf(profile.state) : '';
+    if (st.length && mine && !st.some(function (x) { return stateOf(x) === mine; })) return [];
+    if (fit(p, profile) === 'no') return [];
+    var need = {};
+    if (st.length && !mine) need.state = true;
+    var cover = coverOf(profile), low = yesNo(profile, 'lowIncome'), job = yesNo(profile, 'job'), ins = ans(profile, 'insurer');
+    var tags = Array.isArray(p.audience) ? p.audience : [];
+    tags.forEach(function (t) {
+      if ((t === 'medicaid' || t === 'insured' || t === 'marketplace' || t === 'military') && !cover) need.cover = true;
+      else if ((t === 'wic' || t === 'low-income') && !low && cover !== 'medicaid') need.lowIncome = true;
+      else if ((t === 'worker' || t === 'employer') && !job) need.job = true;
+      else if (t === 'member' && !ins && cover !== 'none') need.insurer = true;
+    });
+    return MISSING_KEYS.filter(function (k) { return need[k] === true; });
+  }
+  // { total, keys: {state, cover, ...} }. With statusOf, programs already acted on (not todo) are skipped.
+  function missingInfoCounts(list, profile, statusOf) {
+    var out = { total: 0, keys: {} };
+    MISSING_KEYS.forEach(function (k) { out.keys[k] = 0; });
+    (list || []).forEach(function (p) {
+      if (!p) return;
+      if (typeof statusOf === 'function') {
+        var s = statusOf(p.id);
+        if (s && s !== 'todo') return;
+      }
+      var m = missingInfo(p, profile);
+      if (!m.length) return;
+      out.total++;
+      m.forEach(function (k) { out.keys[k]++; });
+    });
+    return out;
+  }
+  function joinAnd(items) {
+    if (items.length < 2) return items.join('');
+    return items.slice(0, -1).join(', ') + ' and ' + items[items.length - 1];
+  }
+  function missingInfoText(keys) {
+    return joinAnd((keys || []).map(function (k) { return MISSING_LABELS[k]; }).filter(Boolean));
+  }
+  function onlyInText(p) {
+    var st = statesOf(p);
+    return st.length ? 'Only in ' + joinAnd(st.map(String)) : '';
+  }
+
+  // ---- the Tracker's own list ----
+  // One pass over the programs in rank order. Anything the person has acted on is its own row.
+  // To-do programs for other states, ruled out by the answers, or covered by a same-thing sign-up
+  // are left out (and counted) unless opts.all is set. To-do alternates fold under their lead.
+  function trackerScope(list, opts) {
+    opts = opts || {};
+    var statusOf = typeof opts.statusOf === 'function' ? opts.statusOf : function () { return 'todo'; };
+    var ranked = rankPrograms(list);
+    var out = { rows: [], left: { otherState: 0, noFit: 0, covered: 0 }, total: ranked.length };
+    var covered = {};
+    var leads = {};
+    var sit = hasSituation(opts.profile);
+    ranked.forEach(function (p) {
+      var st = statusOf(p.id);
+      if (st === 'signed-up' || st === 'received') covered[groupKey(p)] = true;
+    });
+    ranked.forEach(function (p) {
+      var st = statusOf(p.id) || 'todo';
+      if (st !== 'todo') { out.rows.push({ p: p, status: st, others: [] }); return; }
+      var k = groupKey(p);
+      if (!opts.all) {
+        if (hiddenByState(p, opts.state) && !opts.showOtherStates) { out.left.otherState++; return; }
+        if (sit && hiddenByAnswers(p, opts.profile, 'todo') && !opts.showNoFit) { out.left.noFit++; return; }
+        if (Object.prototype.hasOwnProperty.call(covered, k)) { out.left.covered++; return; }
+      }
+      if (Object.prototype.hasOwnProperty.call(leads, k)) leads[k].others.push(p);
+      else { leads[k] = { p: p, status: 'todo', others: [] }; out.rows.push(leads[k]); }
+    });
+    return out;
+  }
+  // weeks is what weeksUntil returns (whole weeks, or null without a due date).
+  function readyNow(p, weeks) {
+    var w = typeof weeks === 'number' && isFinite(weeks) ? weeks : null;
+    if (w !== null && w < 0) return true;
+    var when = p ? p.when : '';
+    if (when === 'pregnancy' || when === 'anytime') return true;
+    return w !== null && w <= 8 && when === 'late-pregnancy';
+  }
+  function isOptionalVerdict(p) {
+    var v = verdict(p);
+    return v === 'conditional' || v === 'longshot';
+  }
+  // To-do rows only: { now, later, optional }, each in rank order (later: last weeks before after birth).
+  function trackerSections(rows, weeks) {
+    var sec = { now: [], later: [], optional: [] };
+    (rows || []).forEach(function (r) {
+      if (!r || r.status !== 'todo') return;
+      if (isOptionalVerdict(r.p)) sec.optional.push(r);
+      else if (readyNow(r.p, weeks)) sec.now.push(r);
+      else sec.later.push(r);
+    });
+    var order = sec.later.map(function (r, i) { return { r: r, i: i }; });
+    order.sort(function (a, b) {
+      var x = a.r.p.when === 'late-pregnancy' ? 0 : 1, y = b.r.p.when === 'late-pregnancy' ? 0 : 1;
+      return x - y || a.i - b.i;
+    });
+    sec.later = order.map(function (o) { return o.r; });
+    return sec;
+  }
+  // What is still to claim: to-do rows that are not optional, lead programs only.
+  function toClaim(rows) {
+    var free = [], cash = [];
+    (rows || []).forEach(function (r) {
+      if (!r || r.status !== 'todo' || isOptionalVerdict(r.p)) return;
+      (kindOf(r.p) === 'money' ? cash : free).push(r.p);
+    });
+    return { free: totalValue(free), money: totalValue(cash) };
+  }
+
   function filterPrograms(list, opts) {
     opts = opts || {};
     var q = String(opts.query || '').trim().toLowerCase();
@@ -477,6 +599,17 @@
     needsRegistry: needsRegistry,
     isEligibilityBased: isEligibilityBased,
     guidedDefault: guidedDefault,
+    MISSING_KEYS: MISSING_KEYS,
+    MISSING_LABELS: MISSING_LABELS,
+    MISSING_SHORT: MISSING_SHORT,
+    missingInfo: missingInfo,
+    missingInfoCounts: missingInfoCounts,
+    missingInfoText: missingInfoText,
+    onlyInText: onlyInText,
+    trackerScope: trackerScope,
+    readyNow: readyNow,
+    trackerSections: trackerSections,
+    toClaim: toClaim,
     filterPrograms: filterPrograms,
     sortPrograms: sortPrograms,
     domainOf: domainOf,

@@ -583,3 +583,302 @@ test('rankPrograms ends on id, so data order does not matter', () => {
     assert.equal(L.hiddenByAnswers(list[1], pr), true);
   });
 }
+
+// ---- Phase I: the Tracker's own list ----
+const TP = (id, o) => P(Object.assign({ id, name: id, valueLow: 10, valueHigh: 20, when: 'pregnancy', effort: 'quick' }, o));
+
+test('trackerScope: rank order, left-out counts and total', () => {
+  const list = [
+    TP('tx-only', { states: ['TX'], valueLow: 100, valueHigh: 100 }),
+    TP('ca-only', { states: ['CA'] }),
+    TP('mcd', { audience: ['medicaid'] }),
+    TP('open', { valueLow: 50, valueHigh: 50 })
+  ];
+  const prof = { state: 'TX', cover: 'private' };
+  const s = L.trackerScope(list, { state: 'TX', profile: prof, statusOf: () => 'todo' });
+  assert.deepEqual(s.rows.map((r) => r.p.id), ['tx-only', 'open']);
+  assert.deepEqual(s.left, { otherState: 1, noFit: 1, covered: 0 });
+  assert.equal(s.total, 4);
+  assert.ok(s.rows.every((r) => r.status === 'todo' && r.others.length === 0));
+});
+
+test('trackerScope: no state set leaves state-only programs out; show switches bring them back', () => {
+  const list = [TP('tx-only', { states: ['TX'] }), TP('open')];
+  const s = L.trackerScope(list, { profile: {}, statusOf: () => 'todo' });
+  assert.deepEqual(s.rows.map((r) => r.p.id), ['open']);
+  assert.equal(s.left.otherState, 1);
+  const s2 = L.trackerScope(list, { profile: {}, showOtherStates: true, statusOf: () => 'todo' });
+  assert.equal(s2.rows.length, 2);
+  assert.equal(s2.left.otherState, 0);
+  const s3 = L.trackerScope(list, { statusOf: () => 'todo' });   // no opts at all besides statusOf
+  assert.equal(s3.rows.length, 1);
+  assert.equal(L.trackerScope(list).rows.length, 1);              // not even statusOf
+});
+
+test('trackerScope: the answers rule programs out only when answered, and showNoFit brings them back', () => {
+  const list = [TP('mcd', { audience: ['medicaid'] }), TP('open')];
+  assert.equal(L.trackerScope(list, { profile: {}, statusOf: () => 'todo' }).rows.length, 2);
+  const prof = { cover: 'private' };
+  const s = L.trackerScope(list, { profile: prof, statusOf: () => 'todo' });
+  assert.equal(s.rows.length, 1);
+  assert.equal(s.left.noFit, 1);
+  assert.equal(L.trackerScope(list, { profile: prof, showNoFit: true, statusOf: () => 'todo' }).rows.length, 2);
+});
+
+test('trackerScope: acted-on programs stay in, even when state or answers would hide them', () => {
+  const list = [TP('ca-only', { states: ['CA'] }), TP('mcd', { audience: ['medicaid'] }), TP('skip', {}), TP('open')];
+  const st = { 'ca-only': 'signed-up', mcd: 'received', skip: 'skipped' };
+  const s = L.trackerScope(list, { state: 'TX', profile: { cover: 'private' }, statusOf: (id) => st[id] || 'todo' });
+  assert.deepEqual(s.rows.map((r) => r.p.id).sort(), ['ca-only', 'mcd', 'open', 'skip']);
+  assert.deepEqual(s.rows.filter((r) => r.status !== 'todo').map((r) => r.status).sort(), ['received', 'signed-up', 'skipped']);
+  assert.deepEqual(s.left, { otherState: 0, noFit: 0, covered: 0 });
+});
+
+test('trackerScope: alternates fold under the first lead in rank order', () => {
+  const list = [
+    TP('lead', { valueLow: 300, valueHigh: 300 }),
+    TP('alt-b', { sameAs: 'lead', valueLow: 100, valueHigh: 100 }),
+    TP('alt-a', { sameAs: 'lead', valueLow: 200, valueHigh: 200 }),
+    TP('solo')
+  ];
+  const s = L.trackerScope(list, { statusOf: () => 'todo' });
+  assert.equal(s.rows.length, 2);
+  assert.equal(s.rows[0].p.id, 'lead');
+  assert.deepEqual(s.rows[0].others.map((p) => p.id), ['alt-a', 'alt-b']);
+});
+
+test('trackerScope: a sign-up covers its group; Skipped does not', () => {
+  const list = [
+    TP('lead', { valueLow: 300, valueHigh: 300 }),
+    TP('alt1', { sameAs: 'lead', valueLow: 200, valueHigh: 200 }),
+    TP('alt2', { sameAs: 'lead', valueLow: 100, valueHigh: 100 })
+  ];
+  const sign = (id) => (id === 'alt1' ? 'signed-up' : 'todo');
+  const s = L.trackerScope(list, { statusOf: sign });
+  assert.deepEqual(s.rows.map((r) => r.p.id + ':' + r.status), ['alt1:signed-up']);
+  assert.equal(s.left.covered, 2);
+  // received covers too
+  assert.equal(L.trackerScope(list, { statusOf: (id) => (id === 'lead' ? 'received' : 'todo') }).left.covered, 2);
+  // Skipped does not: the next alternate becomes the lead
+  const skip = L.trackerScope(list, { statusOf: (id) => (id === 'lead' ? 'skipped' : 'todo') });
+  assert.deepEqual(skip.rows.map((r) => r.p.id + ':' + r.status), ['lead:skipped', 'alt1:todo']);
+  assert.deepEqual(skip.rows[1].others.map((p) => p.id), ['alt2']);
+  assert.equal(skip.left.covered, 0);
+});
+
+test('trackerScope: all switches off the three leave-out rules but still folds alternates', () => {
+  const list = [
+    TP('ca-only', { states: ['CA'] }),
+    TP('mcd', { audience: ['medicaid'] }),
+    TP('lead', { valueLow: 300, valueHigh: 300 }),
+    TP('alt', { sameAs: 'lead', valueLow: 100, valueHigh: 100 }),
+    TP('signed', { sameAs: 'lead' })
+  ];
+  const statusOf = (id) => (id === 'signed' ? 'signed-up' : 'todo');
+  const s = L.trackerScope(list, { all: true, state: 'TX', profile: { cover: 'private' }, statusOf });
+  assert.deepEqual(s.left, { otherState: 0, noFit: 0, covered: 0 });
+  assert.equal(s.rows.length, 4);
+  const lead = s.rows.find((r) => r.p.id === 'lead');
+  assert.deepEqual(lead.others.map((p) => p.id), ['alt']);
+  assert.equal(s.total, 5);
+});
+
+test('readyNow: due-date windows', () => {
+  const w = (when) => ({ when });
+  for (const weeks of [null, undefined, 9, 40]) {
+    assert.equal(L.readyNow(w('pregnancy'), weeks), true, 'pregnancy ' + weeks);
+    assert.equal(L.readyNow(w('anytime'), weeks), true, 'anytime ' + weeks);
+    assert.equal(L.readyNow(w('late-pregnancy'), weeks), false, 'late ' + weeks);
+    assert.equal(L.readyNow(w('after-birth'), weeks), false, 'after ' + weeks);
+  }
+  for (const weeks of [8, 0]) {
+    assert.equal(L.readyNow(w('late-pregnancy'), weeks), true, 'late ' + weeks);
+    assert.equal(L.readyNow(w('pregnancy'), weeks), true);
+    assert.equal(L.readyNow(w('after-birth'), weeks), false, 'after ' + weeks);
+  }
+  for (const when of ['pregnancy', 'late-pregnancy', 'after-birth', 'anytime']) assert.equal(L.readyNow(w(when), -1), true, when);
+});
+
+test('trackerSections: to-do rows only; optional by verdict; later puts last-weeks first', () => {
+  const rows = [
+    { p: TP('a', { when: 'after-birth' }), status: 'todo', others: [] },
+    { p: TP('b', { when: 'pregnancy' }), status: 'todo', others: [] },
+    { p: TP('c', { when: 'late-pregnancy' }), status: 'todo', others: [] },
+    { p: TP('d', { offers: ['coupons'] }), status: 'todo', others: [] },
+    { p: TP('e', { certainty: 'chance', when: 'after-birth' }), status: 'todo', others: [] },
+    { p: TP('f', { when: 'after-birth' }), status: 'signed-up', others: [] },
+    { p: TP('g', { when: 'late-pregnancy' }), status: 'todo', others: [] },
+    { p: TP('h', { when: 'anytime' }), status: 'skipped', others: [] }
+  ];
+  const s = L.trackerSections(rows, null);
+  assert.deepEqual(s.now.map((r) => r.p.id), ['b']);
+  assert.deepEqual(s.later.map((r) => r.p.id), ['c', 'g', 'a']);   // late-pregnancy before after-birth, rank order kept
+  assert.deepEqual(s.optional.map((r) => r.p.id), ['d', 'e']);
+  const near = L.trackerSections(rows, 5);
+  assert.deepEqual(near.now.map((r) => r.p.id), ['b', 'c', 'g']);
+  assert.deepEqual(near.later.map((r) => r.p.id), ['a']);
+  const past = L.trackerSections(rows, -2);
+  assert.equal(past.later.length, 0);
+  assert.equal(past.now.length, 4);
+  assert.deepEqual(L.trackerSections([], 3), { now: [], later: [], optional: [] });
+});
+
+test('toClaim: leaves out optional and acted-on rows; money is apart; a group counts once', () => {
+  const rows = [
+    { p: TP('stuff', { valueLow: 100, valueHigh: 200 }), status: 'todo', others: [] },
+    { p: TP('care', { offers: ['service'], valueLow: 50, valueHigh: 50 }), status: 'todo', others: [] },
+    { p: TP('cash', { offers: ['cash'], valueLow: 1000, valueHigh: 2000 }), status: 'todo', others: [] },
+    { p: TP('buy', { offers: ['coupons'], valueLow: 999, valueHigh: 999 }), status: 'todo', others: [] },
+    { p: TP('draw', { certainty: 'chance', valueLow: 500, valueHigh: 500 }), status: 'todo', others: [] },
+    { p: TP('done', { valueLow: 70, valueHigh: 70 }), status: 'signed-up', others: [] },
+    { p: TP('unknown', { valueLow: null, valueHigh: null }), status: 'todo', others: [] }
+  ];
+  const t = L.toClaim(rows);
+  assert.equal(t.free.low, 150); assert.equal(t.free.high, 250); assert.equal(t.free.count, 2); assert.equal(t.free.missing, 1);
+  assert.equal(t.money.low, 1000); assert.equal(t.money.high, 2000); assert.equal(t.money.count, 1);
+  // two rows of the same group (as a caller might pass them) still count once
+  const twin = L.toClaim([
+    { p: TP('x', { valueLow: 40, valueHigh: 60 }), status: 'todo', others: [] },
+    { p: TP('y', { sameAs: 'x', valueLow: 30, valueHigh: 30 }), status: 'todo', others: [] }
+  ]);
+  assert.equal(twin.free.count, 1);
+  assert.deepEqual(L.toClaim([]).free, { low: 0, high: 0, count: 0, missing: 0 });
+});
+
+// ---- Phase I part 3: what My info is missing ----
+import { readFileSync as readData } from 'node:fs';
+const DATA = JSON.parse(readData(new URL('../data/programs.json', import.meta.url), 'utf8'));
+
+test('missingInfo: exact rules on fixtures', () => {
+  const st = P({ id: 's', states: ['IL', 'TX'] });
+  assert.deepEqual(L.missingInfo(st, {}), ['state']);
+  assert.deepEqual(L.missingInfo(st, null), ['state']);
+  assert.deepEqual(L.missingInfo(st, 'junk'), ['state']);
+  assert.deepEqual(L.missingInfo(st, { state: 'tx' }), []);
+  assert.deepEqual(L.missingInfo(st, { state: 'DE' }), []);          // ruled out
+  assert.deepEqual(L.missingInfo(P({}), {}), []);                     // no audience, no states
+  assert.deepEqual(L.missingInfo(P({ audience: ['medicaid'] }), {}), ['cover']);
+  assert.deepEqual(L.missingInfo(P({ audience: ['medicaid'] }), { cover: 'private' }), []);   // ruled out
+  for (const t of ['insured', 'marketplace', 'military']) assert.deepEqual(L.missingInfo(P({ audience: [t] }), {}), ['cover'], t);
+  assert.deepEqual(L.missingInfo(P({ audience: ['wic'] }), {}), ['lowIncome']);
+  assert.deepEqual(L.missingInfo(P({ audience: ['low-income'] }), { cover: 'private' }), ['lowIncome']);
+  assert.deepEqual(L.missingInfo(P({ audience: ['wic'] }), { cover: 'medicaid' }), []);
+  assert.deepEqual(L.missingInfo(P({ audience: ['worker'] }), {}), ['job']);
+  assert.deepEqual(L.missingInfo(P({ audience: ['employer'] }), {}), ['job']);
+  assert.deepEqual(L.missingInfo(P({ audience: ['member'], insurer: 'Aetna' }), { cover: 'private' }), ['insurer']);
+  assert.deepEqual(L.missingInfo(P({ audience: ['member'], insurer: 'Aetna' }), { cover: 'none' }), []);
+  assert.deepEqual(L.missingInfo(P({ audience: ['local'] }), {}), []);
+  assert.deepEqual(L.missingInfo(P({ states: ['TX'], audience: ['worker', 'member', 'wic', 'insured'], insurer: 'Aetna' }), {}),
+    ['state', 'cover', 'insurer', 'lowIncome', 'job']);
+  assert.deepEqual(L.missingInfo(null, {}), []);
+});
+
+test('missingInfoCounts, missingInfoText, onlyInText', () => {
+  const list = [P({ id: 'a', states: ['TX'] }), P({ id: 'b', audience: ['medicaid'] }), P({ id: 'c', states: ['TX'], audience: ['insured'] }), P({ id: 'd' })];
+  const c = L.missingInfoCounts(list, {});
+  assert.deepEqual(c, { total: 3, keys: { state: 2, cover: 2, insurer: 0, lowIncome: 0, job: 0 } });
+  const done = L.missingInfoCounts(list, {}, (id) => (id === 'a' ? 'signed-up' : 'todo'));
+  assert.equal(done.total, 2);
+  assert.equal(L.missingInfoCounts(list, {}, () => 'todo').total, 3);
+  assert.equal(L.missingInfoCounts(null, {}).total, 0);
+  assert.equal(L.missingInfoText([]), '');
+  assert.equal(L.missingInfoText(['state']), 'your state');
+  assert.equal(L.missingInfoText(['state', 'insurer']), 'your state and your health plan');
+  assert.equal(L.missingInfoText(['state', 'cover', 'lowIncome']), 'your state, your health cover and your income answer');
+  assert.equal(L.onlyInText({}), '');
+  assert.equal(L.onlyInText({ states: ['DE'] }), 'Only in DE');
+  assert.equal(L.onlyInText({ states: ['IL', 'TX'] }), 'Only in IL and TX');
+  assert.equal(L.onlyInText({ states: ['DE', 'FL', 'OH'] }), 'Only in DE, FL and OH');
+  assert.deepEqual(L.MISSING_KEYS, ['state', 'cover', 'insurer', 'lowIncome', 'job']);
+  for (const k of L.MISSING_KEYS) assert.ok(L.MISSING_LABELS[k] && L.MISSING_SHORT[k], k);
+});
+
+test('missingInfo invariants over the real data and a grid of profiles', () => {
+  const insurers = ['', ...new Set(DATA.map((p) => p.insurer).filter(Boolean)).values()].slice(0, 2).concat(['other']);
+  let n = 0;
+  for (const cover of ['', 'private', 'marketplace', 'medicaid', 'tricare', 'none'])
+    for (const lowIncome of ['', 'yes', 'no'])
+      for (const job of ['', 'yes', 'no'])
+        for (const insurer of insurers)
+          for (const state of ['', 'TX', 'DE']) {
+            const pr = { cover, lowIncome, job, insurer, state };
+            for (const p of DATA) {
+              n++;
+              const m = L.missingInfo(p, pr);
+              const idx = m.map((k) => L.MISSING_KEYS.indexOf(k));
+              assert.ok(idx.every((i) => i >= 0) && idx.every((i, j) => j === 0 || i > idx[j - 1]), 'order ' + p.id);
+              const limited = Array.isArray(p.states) && p.states.length > 0;
+              const outState = limited && state && !p.states.includes(state);
+              const f = L.fit(p, pr);
+              if (f === 'no' || outState) assert.deepEqual(m, [], 'ruled out ' + p.id);
+              if (m.length) assert.ok(f === 'maybe' || (limited && !state), 'maybe ' + p.id);
+              const tags = p.audience || [];
+              if (!m.length && f !== 'no' && !outState && !tags.includes('local') && !tags.includes('employer')) assert.equal(f, 'yes', 'yes ' + p.id);
+            }
+          }
+  assert.ok(n > 1000);
+  const insurerNames = [...new Set(DATA.map((p) => p.insurer).filter(Boolean))];
+  for (const insurer of insurerNames.concat(['other']))
+    for (const cover of ['private', 'marketplace', 'medicaid', 'tricare', 'none'])
+      for (const p of DATA) assert.deepEqual(L.missingInfo(p, { state: 'TX', cover, insurer, lowIncome: 'no', job: 'yes' }), [], p.id);
+});
+
+// ---- BFF.missing: markup of line() and notice() on a tiny fake DOM ----
+async function loadMissing() {
+  const vm = await import('node:vm');
+  class Node_ {
+    constructor(tag) { this.tag = tag; this.kids = []; this.attrs = {}; this.className = ''; this.nodeType = 1; }
+    appendChild(c) { this.kids.push(c); return c; }
+    setAttribute(k, v) { this.attrs[k] = String(v); }
+    getAttribute(k) { return k in this.attrs ? this.attrs[k] : null; }
+    set textContent(t) { this.kids = [{ nodeType: 3, text: String(t) }]; }
+    get text() { return this.kids.map((k) => (k.nodeType === 3 ? k.text : k.text)).join(''); }
+  }
+  Object.defineProperty(Node_.prototype, 'text', { get() { return this.kids.map((k) => (k.nodeType === 3 ? k.text : k.text)).join(''); } });
+  const document = { createElement: (t) => new Node_(t), createTextNode: (t) => ({ nodeType: 3, text: t }), addEventListener() {} };
+  const sandbox = { document, location: { hash: '' }, BFF: { logic: L } };
+  sandbox.window = sandbox;
+  vm.createContext(sandbox);
+  vm.runInContext(readData(new URL('../src/js/missing.js', import.meta.url), 'utf8'), sandbox);
+  return sandbox.BFF.missing;
+}
+const find = (n, cls) => (n.className.split(' ').includes(cls) ? [n] : []).concat(...(n.kids || []).filter((k) => k.kids).map((k) => find(k, cls)));
+
+test('BFF.missing.line: one sentence, link last, first key on the link', async () => {
+  const M = await loadMissing();
+  assert.equal(M.line(P({ id: 'x' }), {}), null);
+  const one = M.line(P({ id: 'x', states: ['TX'] }), {});
+  assert.equal(one.getAttribute('data-missing'), 'state');
+  assert.equal(find(one, 'miss-text')[0].text, 'Only in TX. My info is missing your state.');
+  const a = find(one, 'miss-add')[0];
+  assert.equal(a.getAttribute('data-info-key'), 'state');
+  assert.ok(a.text.startsWith('Add it'));
+  const three = M.line(P({ id: 'y', states: ['IL', 'TX'], audience: ['insured', 'worker'] }), {});
+  assert.equal(three.getAttribute('data-missing'), 'state cover job');
+  assert.equal(find(three, 'miss-text')[0].text, 'Only in IL and TX. My info is missing your state, your health cover and your paid job answer.');
+  assert.ok(find(three, 'miss-add')[0].text.startsWith('Add them'));
+  assert.equal(M.line(P({ id: 'y', states: ['IL'], audience: ['insured'] }), {}, { states: false }).kids.map((k) => k.text || '').join('').includes('Only in'), false);
+});
+
+test('BFF.missing.notice: full, one-key and compact forms', async () => {
+  const M = await loadMissing();
+  const counts = (keys, total) => ({ total, keys: Object.assign({ state: 0, cover: 0, insurer: 0, lowIncome: 0, job: 0 }, keys) });
+  assert.equal(M.notice(counts({}, 0)), null);
+  assert.equal(M.notice(null), null);
+  const full = M.notice(counts({ state: 60, cover: 29, job: 1 }, 92));
+  assert.equal(full.className, 'miss-box');
+  assert.equal(full.getAttribute('data-missing-total'), '92');
+  assert.equal(full.getAttribute('data-missing-keys'), 'state cover job');
+  assert.deepEqual(find(full, 'miss-chip').map((c) => c.getAttribute('data-info-key')), ['state', 'cover', 'job']);
+  const one = M.notice(counts({ insurer: 5 }, 5));
+  assert.equal(one.className, 'miss-box miss-box--one');
+  assert.equal(find(one, 'miss-chip').length, 0);
+  assert.equal(find(one, 'miss-lead')[0].text, '! My info is missing your health plan. 5 programs depend on it. Add it in My info');
+  assert.equal(find(M.notice(counts({ insurer: 1 }, 1)), 'miss-lead')[0].text, '! My info is missing your health plan. 1 program depends on it. Add it in My info');
+  const compact = M.notice(counts({ cover: 29, state: 60 }, 92), { compact: true });
+  assert.equal(compact.className, 'miss-box miss-box--one');
+  assert.equal(find(compact, 'miss-chip').length, 0);
+  assert.equal(find(compact, 'miss-add')[0].getAttribute('data-info-key'), 'state');
+  assert.equal(find(compact, 'miss-lead')[0].text, '! My info is missing details that 92 programs depend on. Add them in My info');
+  assert.equal(compact.getAttribute('data-missing-keys'), 'state cover');
+});

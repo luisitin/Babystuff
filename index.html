@@ -430,8 +430,7 @@ details.dir-filters { display: block; background: var(--surface); border: 1px so
 .tag-fit { background: var(--success-bg); color: var(--success); border-color: var(--success); }
 .tag-certainty { background: var(--surface-2); color: var(--text); border-color: var(--border); }
 .tag-nomatch { background: var(--warning-bg); color: var(--warning-text); border-color: var(--warning-border); }
-.sum-money, .sum-situation { font-size: .9375rem; }
-.dir-note a, .sum-situation a { color: var(--primary); }
+.dir-note a { color: var(--primary); }
 /* Phase H: tighter collapsed cards */
 .dir-groups { gap: var(--space-4); }
 .dir-group { gap: var(--space-1); }
@@ -445,6 +444,60 @@ details.dir-filters { display: block; background: var(--surface); border: 1px so
 .card-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0 var(--space-2); }
 .card-head h3, .card-head h4 { flex: 0 1 auto; max-width: 100%; }
 .card-head .card-brand { flex: 0 1 auto; min-width: 0; }
+
+/* Guided setup list: grouped rows, folds for alternates and for purchase-only offers */
+.fx-pick-item.fx-grp { flex-direction: column; align-items: stretch; gap: 0; padding: var(--space-1) 0; }
+.fx-pick-row { display: flex; align-items: flex-start; gap: var(--space-3); }
+.fx-pick-row label { display: flex; flex-direction: column; min-height: 44px; justify-content: center; flex: 1; min-width: 0; cursor: pointer; gap: 0; line-height: 1.3; }
+.fx-pick-row input { width: 24px; height: 24px; flex: none; margin-top: 10px; accent-color: var(--primary); }
+.fx-pick-row input:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+.fx-pick-free { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; line-clamp: 2; overflow: hidden; }
+.fx-pick-meta { font-size: .8125rem; }
+.fx-alt, .fx-side { margin: 0; }
+.fx-alt { margin-left: calc(24px + var(--space-3)); }
+.fx-alt > summary, .fx-side > summary { display: flex; align-items: center; min-height: 44px; cursor: pointer; font-weight: 600; color: var(--primary); }
+.fx-alt > summary:focus-visible, .fx-side > summary:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+.fx-alt-list { border-left: 2px solid var(--border); padding-left: var(--space-3); margin-bottom: var(--space-1); }
+.fx-pick-alt { padding: var(--space-1) 0; }
+.fx-side { margin-top: var(--space-3); border-top: 1px solid var(--border); }
+
+/* Programs page header: fewer, tighter lines above the first card */
+.dir-summary { padding: var(--space-2) var(--space-3); gap: var(--space-2); margin: 0 0 var(--space-2); }
+.sum-top { display: flex; align-items: center; gap: var(--space-3); }
+.sum-top .sum-main { flex: 1 1 0; min-width: 0; font-size: .9375rem; line-height: 1.35; }
+.sum-top .sum-show { flex: none; }
+.sum-due { display: grid; gap: var(--space-1); }
+.sum-due-head { font-size: .9375rem; }
+.sum-due .when-buttons { gap: var(--space-2); }
+.sum-due .when-buttons .btn { display: block; width: 100%; height: 100%; min-height: 44px; padding: var(--space-1) var(--space-2); font-size: .8125rem; line-height: 1.2; text-align: center; }
+.sum-due .when-buttons strong { font-size: inherit; }
+.filters-search .field > label { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+.filters-search { margin: 0 0 var(--space-1); }
+.kind-tabs { margin: 0 0 var(--space-1); }
+details.dir-filters { margin: 0 0 var(--space-1); }
+.dir-state { flex-wrap: nowrap; margin: var(--space-1) 0 0; padding: 0 var(--space-3); min-height: 44px; border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--surface); font-size: .875rem; gap: var(--space-2); }
+.dir-state p { flex: 1 1 0; min-width: 0; padding: var(--space-1) 0; line-height: 1.3; }
+.dir-state .btn { flex: none; }
+.result-row { margin: var(--space-1) 0; }
+.start-row { margin: 0 0 var(--space-2); }
+@media (min-width: 640px) {
+  .sum-due .when-buttons .btn { width: auto; display: inline-flex; align-items: center; padding: 0 var(--space-3); font-size: .9375rem; }
+}
+
+/* ===== Phase I part 3: what My info is missing (profile.js, directory.js, guided.js) ===== */
+.fx-need { margin: var(--space-1) 0 0; font-size: .875rem; color: var(--muted); }
+.fx-need[hidden] { display: none; }
+.fx-field.fx-ask, .fx-plus-row.fx-ask { background: var(--warning-bg); color: var(--warning-text); border: 2px solid var(--warning-border); border-radius: var(--radius-sm); padding: var(--space-3); margin-left: calc(-1 * var(--space-3)); margin-right: calc(-1 * var(--space-3)); }
+.fx-field.fx-ask .fx-need, .fx-plus-row.fx-ask .fx-need { color: var(--warning-text); }
+.fx-ask-back { display: inline-flex; align-items: center; min-height: 44px; margin-top: var(--space-2); font-weight: 600; color: var(--primary); }
+.fx-ask-back:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+.fx-field.fx-ask .fx-ask-back, .fx-plus-row.fx-ask .fx-ask-back { color: var(--warning-text); text-decoration: underline; }
+.dir-miss { margin: 0 0 var(--space-2); }
+.dir-miss[hidden] { display: none; }
+.gd-miss-box { margin: var(--space-3) 0; }
+.gd-miss { margin: 0 0 var(--space-1) calc(24px + var(--space-3)); }
+.fx-alt-list .gd-miss { margin-left: calc(24px + var(--space-3)); }
+.gd-miss .miss-line { margin: 0; }
 /* Styles for My info, Tracker and Do it for me. Uses base.css tokens, with fallbacks. */
 .fx-view, .fx-confirm { --fx-bg: var(--bg, #fff); --fx-surface: var(--surface, #f6f7f9); --fx-text: var(--text, #1c2430); --fx-muted: var(--muted, #5b6676);
   --fx-primary: var(--primary, #2457c5); --fx-pc: var(--primary-contrast, #fff); --fx-border: var(--border, #cfd6e0);
@@ -485,7 +538,7 @@ details.dir-filters { display: block; background: var(--surface); border: 1px so
 .fx-btn--small { min-height: 44px; padding: var(--fx-s1) var(--fx-s3); }
 .fx-btn--link { background: none; border: none; color: var(--fx-primary); text-decoration: underline; font-weight: 500; }
 .fx-btn:disabled { opacity: .5; cursor: not-allowed; }
-.fx-btn:focus-visible, .fx-link-btn:focus-visible, .fx-input:focus-visible, .fx-select:focus-visible, .fx-textarea:focus-visible, .fx-file:focus-visible, .fx-tab:focus-visible, .fx-view a:focus-visible, .fx-check input:focus-visible, .fx-pick-item input:focus-visible { outline: 3px solid var(--fx-primary); outline-offset: 2px; }
+.fx-btn:focus-visible, .fx-link-btn:focus-visible, .fx-input:focus-visible, .fx-select:focus-visible, .fx-textarea:focus-visible, .fx-file:focus-visible, .fx-tab:focus-visible, .fx-trk-more:focus-visible, .fx-view a:focus-visible, .fx-check input:focus-visible, .fx-pick-item input:focus-visible { outline: 3px solid var(--fx-primary); outline-offset: 2px; }
 .fx-actions { display: flex; flex-wrap: wrap; gap: var(--fx-s2); margin: var(--fx-s3) 0; }
 .fx-sticky .fx-btn { flex: 1; }
 .fx-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
@@ -493,16 +546,52 @@ details.dir-filters { display: block; background: var(--surface); border: 1px so
 /* tracker */
 .fx-progress { width: 100%; height: 14px; accent-color: var(--fx-success); }
 .fx-progress-text { font-weight: 700; font-size: 1.1em; }
-.fx-counts { display: flex; flex-wrap: wrap; gap: var(--fx-s2) var(--fx-s4); list-style: none; padding: 0; margin: var(--fx-s3) 0 0; }
 .fx-tabs { display: flex; flex-wrap: wrap; gap: var(--fx-s2); margin: var(--fx-s3) 0; }
 .fx-tab { min-height: 44px; padding: var(--fx-s2) var(--fx-s3); font: inherit; cursor: pointer; color: var(--fx-text); background: var(--fx-bg); border: 1px solid var(--fx-border); border-radius: 999px; }
 .fx-tab[aria-pressed="true"] { color: var(--fx-pc); background: var(--fx-primary); border-color: var(--fx-primary); }
 .fx-trk-list, .fx-pick, .fx-details { list-style: none; padding: 0; margin: 0; }
-.fx-trk-row { background: var(--fx-surface); border: 1px solid var(--fx-border); border-radius: var(--fx-r); padding: var(--fx-s3) var(--fx-s4); margin: var(--fx-s3) 0; }
+.fx-trk-row { background: var(--fx-surface); border: 1px solid var(--fx-border); border-radius: var(--fx-r); padding: var(--fx-s2) var(--fx-s3); margin: var(--fx-s2) 0; }
 .fx-trk-row[data-status="received"], .fx-trk-row[data-status="signed-up"] { border-left: 4px solid var(--fx-success); }
-.fx-trk-row[data-status="skipped"] { opacity: .75; }
+.fx-trk-row[data-status="skipped"], .fx-trk-row.fx-moved { background: var(--fx-bg); border-style: dashed; }
+.fx-trk-row[data-status="skipped"] .fx-trk-title, .fx-trk-row.fx-moved > .fx-trk-main .fx-trk-title { color: var(--fx-muted); }
 .fx-trk-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--fx-s2); }
 .fx-trk-name { display: flex; flex-direction: column; min-width: 0; flex: 1 1 12rem; }
+.fx-trk-listbox { margin: var(--fx-s3) 0; }
+.fx-trk-sec { margin: var(--fx-s4) 0 var(--fx-s3); }
+.fx-trk-sec-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--fx-s2); }
+.fx-trk-sec-title { font-size: 1.1em; margin: var(--fx-s2) 0; }
+.fx-trk-opt > summary .fx-trk-sec-title { margin: 0; }
+.fx-trk-opt { padding: 0 var(--fx-s3) var(--fx-s2); }
+.fx-trk-opt > summary { margin-bottom: var(--fx-s1); }
+.fx-trk-help-line { margin: 0 0 var(--fx-s2); }
+.fx-trk-empty { margin: var(--fx-s4) 0; }
+.fx-trk-title { display: block; line-height: 1.25; font-size: .95em; }
+.fx-trk-meta, .fx-trk-line3 { margin: 2px 0 0; font-size: .8em; line-height: 1.3; }
+.fx-view .fx-trk-meta, .fx-view .fx-trk-line3 { margin: 2px 0 0; }
+.fx-trk-actions { display: flex; flex-wrap: wrap; align-items: center; gap: var(--fx-s2); margin-top: var(--fx-s1); }
+.fx-trk-actions .fx-link-btn, .fx-trk-actions .fx-btn { flex: none; padding: var(--fx-s1) var(--fx-s3); }
+.fx-trk-status { flex: 1 1 7rem; min-width: 0; }
+.fx-trk-status .fx-select { padding-left: var(--fx-s2); padding-right: var(--fx-s1); }
+.fx-trk-dot { color: var(--fx-primary); }
+.fx-trk-panel { margin-top: var(--fx-s2); padding-top: var(--fx-s2); border-top: 1px solid var(--fx-border); }
+.fx-trk-panel .fx-field { margin: var(--fx-s2) 0 0; }
+.fx-trk-others { margin: var(--fx-s2) 0 0; background: var(--fx-bg); }
+.fx-trk-others summary { min-height: 44px; }
+.fx-trk-others .fx-trk-row { background: var(--fx-surface); }
+.fx-trk-left { margin: var(--fx-s3) 0; }
+.fx-trk-claim { font-weight: 600; line-height: 1.35; margin: var(--fx-s2) 0 0; }
+.fx-trk-alert { position: sticky; top: 0; z-index: 3; background: var(--fx-wbg); padding: var(--fx-s2) var(--fx-s3); border-radius: var(--fx-r); }
+.fx-fold { margin: var(--fx-s1) 0; }
+.fx-fold-body { padding-bottom: var(--fx-s3); }
+.fx-fold .fx-card { background: none; border: 0; padding: 0; margin: 0; }
+.fx-trk-summary { padding: var(--fx-s3); margin-top: var(--fx-s2); }
+.fx-trk-summary p { margin: var(--fx-s1) 0; }
+.fx-trk-summary .fx-progress-text { margin-top: 0; }
+.fx-trk-summary .fx-muted { line-height: 1.35; }
+.fx-trk-tabs { display: grid; grid-template-columns: repeat(5, 1fr); gap: var(--fx-s1); }
+.fx-trk-tabs .fx-tab { padding: var(--fx-s1); font-size: .8em; overflow-wrap: normal; line-height: 1.2; border-radius: var(--fx-r); min-width: 0; }
+.fx-trk-tabs .fx-tab-count { display: block; font-weight: 700; }
+@media (max-width: 359px) { .fx-trk-tabs { grid-template-columns: repeat(3, 1fr); } }
 
 /* guided */
 .fx-pick-item { display: flex; align-items: flex-start; gap: var(--fx-s3); padding: var(--fx-s2) 0; border-bottom: 1px solid var(--fx-border); }
@@ -560,6 +649,24 @@ details.dir-filters { display: block; background: var(--surface); border: 1px so
 .fx-undo { display: flex; flex-wrap: wrap; align-items: center; gap: var(--fx-s2) var(--fx-s3); background: var(--fx-surface); border: 1px solid var(--fx-border); border-radius: var(--fx-r); padding: var(--fx-s2) var(--fx-s3); margin: var(--fx-s2) 0; }
 .fx-undo span { flex: 1 1 10rem; }
 .fx-confirm { box-sizing: border-box; }
+
+/* Phase I part 3: "My info is missing ..." line and notice */
+.miss-line { display: block; margin: var(--fx-s1, 4px) 0; font-size: .9em; line-height: 1.5; color: var(--text, #1c2430); overflow-wrap: anywhere; }
+.miss-mark { display: inline-block; width: 1.35em; height: 1.35em; border-radius: 50%; border: 2px solid var(--warning-text, #6b4a00); background: var(--warning-bg, #fff4d6); color: var(--warning-text, #6b4a00); font-weight: 800; font-size: .85em; line-height: 1.1em; text-align: center; vertical-align: text-bottom; box-sizing: border-box; }
+.miss-text { overflow-wrap: anywhere; }
+/* The link is a 44px target without making the line taller: padding is cancelled by a negative margin. */
+.miss-add { display: inline-block; padding: 12px 8px; margin: -12px 0; font-weight: 600; color: var(--primary, #2457c5); text-decoration: underline; }
+.miss-chip { display: flex; align-items: center; justify-content: space-between; gap: var(--fx-s2, 8px); min-height: 44px; padding: 0 10px; font-weight: 600; font-size: .9em; color: var(--primary, #2457c5); background: var(--bg, #fff); border: 1px solid var(--border, #cfd6e0); border-radius: var(--radius, 10px); text-decoration: none; }
+.miss-add:focus-visible, .miss-chip:focus-visible { outline: 3px solid var(--primary, #2457c5); outline-offset: 2px; }
+.miss-box { background: var(--warning-bg, #fff4d6); color: var(--warning-text, #6b4a00); border: 1px solid var(--warning-text, #6b4a00); border-radius: var(--radius, 10px); padding: 6px 12px; margin: var(--fx-s2, 8px) 0; max-width: 100%; }
+.miss-box .miss-add { color: inherit; }
+.miss-box .miss-mark { margin-right: 2px; }
+.miss-box .miss-lead { margin: 0; font-size: .9em; line-height: 1.45; }
+.miss-box--one { padding-top: 10px; padding-bottom: 10px; }
+.miss-chips { display: grid; grid-template-columns: repeat(auto-fit, minmax(7.5rem, 1fr)); gap: var(--fx-s1, 4px) var(--fx-s2, 8px); list-style: none; margin: var(--fx-s1, 4px) 0 0; padding: 0; }
+.miss-chips li { min-width: 0; }
+.miss-n { font-weight: 700; color: var(--text, #1c2430); }
+.fx-trk-miss .miss-line { margin: 2px 0 13px; }
 /* inbox.css: the "Gmail connection" card. Tokens come from base.css. */
 .ib-card [hidden] { display: none !important; }
 .ib-card { overflow-wrap: anywhere; }
@@ -611,6 +718,14 @@ details.dir-filters { display: block; background: var(--surface); border: 1px so
 }
 .ph-tag { margin: 0 0 var(--space-2); color: var(--muted); font-size: .9em; font-weight: 600; }
 .ph-warn .ph-list { padding-left: var(--space-4); }
+
+/* The phone section sits in a fold in My info. The summary names it, so its own heading is read but not shown twice. */
+.ph-fold { padding: 0 var(--space-4); }
+.ph-fold-sum { display: flex; align-items: center; min-height: 48px; cursor: pointer; font-weight: 600; color: var(--primary); }
+.ph-fold-sum:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+.ph-fold[open] > .ph-fold-sum { border-bottom: 1px solid var(--border); margin-bottom: var(--space-2); }
+.ph-fold .ph-card { border: 0; padding: 0 0 var(--space-3); margin: 0; background: none; box-shadow: none; }
+.ph-fold .ph-card > h3 { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
 </style>
 </head>
 <body>
@@ -1005,6 +1120,128 @@ details.dir-filters { display: block; background: var(--surface); border: 1px so
     }).length;
   }
 
+  // ---- what My info is missing for a program ----
+  var MISSING_KEYS = ['state', 'cover', 'insurer', 'lowIncome', 'job'];
+  var MISSING_LABELS = { state: 'your state', cover: 'your health cover', insurer: 'your health plan', lowIncome: 'your income answer', job: 'your paid job answer' };
+  var MISSING_SHORT = { state: 'Your state', cover: 'Health cover', insurer: 'Health plan', lowIncome: 'Income', job: 'Paid job' };
+  // Keys (in MISSING_KEYS order) of the My info answers that would settle whether the program applies.
+  // [] when nothing is missing or the program is already ruled out.
+  function missingInfo(p, profile) {
+    if (!p || typeof p !== 'object') return [];
+    var st = statesOf(p);
+    var mine = profile && typeof profile === 'object' ? stateOf(profile.state) : '';
+    if (st.length && mine && !st.some(function (x) { return stateOf(x) === mine; })) return [];
+    if (fit(p, profile) === 'no') return [];
+    var need = {};
+    if (st.length && !mine) need.state = true;
+    var cover = coverOf(profile), low = yesNo(profile, 'lowIncome'), job = yesNo(profile, 'job'), ins = ans(profile, 'insurer');
+    var tags = Array.isArray(p.audience) ? p.audience : [];
+    tags.forEach(function (t) {
+      if ((t === 'medicaid' || t === 'insured' || t === 'marketplace' || t === 'military') && !cover) need.cover = true;
+      else if ((t === 'wic' || t === 'low-income') && !low && cover !== 'medicaid') need.lowIncome = true;
+      else if ((t === 'worker' || t === 'employer') && !job) need.job = true;
+      else if (t === 'member' && !ins && cover !== 'none') need.insurer = true;
+    });
+    return MISSING_KEYS.filter(function (k) { return need[k] === true; });
+  }
+  // { total, keys: {state, cover, ...} }. With statusOf, programs already acted on (not todo) are skipped.
+  function missingInfoCounts(list, profile, statusOf) {
+    var out = { total: 0, keys: {} };
+    MISSING_KEYS.forEach(function (k) { out.keys[k] = 0; });
+    (list || []).forEach(function (p) {
+      if (!p) return;
+      if (typeof statusOf === 'function') {
+        var s = statusOf(p.id);
+        if (s && s !== 'todo') return;
+      }
+      var m = missingInfo(p, profile);
+      if (!m.length) return;
+      out.total++;
+      m.forEach(function (k) { out.keys[k]++; });
+    });
+    return out;
+  }
+  function joinAnd(items) {
+    if (items.length < 2) return items.join('');
+    return items.slice(0, -1).join(', ') + ' and ' + items[items.length - 1];
+  }
+  function missingInfoText(keys) {
+    return joinAnd((keys || []).map(function (k) { return MISSING_LABELS[k]; }).filter(Boolean));
+  }
+  function onlyInText(p) {
+    var st = statesOf(p);
+    return st.length ? 'Only in ' + joinAnd(st.map(String)) : '';
+  }
+
+  // ---- the Tracker's own list ----
+  // One pass over the programs in rank order. Anything the person has acted on is its own row.
+  // To-do programs for other states, ruled out by the answers, or covered by a same-thing sign-up
+  // are left out (and counted) unless opts.all is set. To-do alternates fold under their lead.
+  function trackerScope(list, opts) {
+    opts = opts || {};
+    var statusOf = typeof opts.statusOf === 'function' ? opts.statusOf : function () { return 'todo'; };
+    var ranked = rankPrograms(list);
+    var out = { rows: [], left: { otherState: 0, noFit: 0, covered: 0 }, total: ranked.length };
+    var covered = {};
+    var leads = {};
+    var sit = hasSituation(opts.profile);
+    ranked.forEach(function (p) {
+      var st = statusOf(p.id);
+      if (st === 'signed-up' || st === 'received') covered[groupKey(p)] = true;
+    });
+    ranked.forEach(function (p) {
+      var st = statusOf(p.id) || 'todo';
+      if (st !== 'todo') { out.rows.push({ p: p, status: st, others: [] }); return; }
+      var k = groupKey(p);
+      if (!opts.all) {
+        if (hiddenByState(p, opts.state) && !opts.showOtherStates) { out.left.otherState++; return; }
+        if (sit && hiddenByAnswers(p, opts.profile, 'todo') && !opts.showNoFit) { out.left.noFit++; return; }
+        if (Object.prototype.hasOwnProperty.call(covered, k)) { out.left.covered++; return; }
+      }
+      if (Object.prototype.hasOwnProperty.call(leads, k)) leads[k].others.push(p);
+      else { leads[k] = { p: p, status: 'todo', others: [] }; out.rows.push(leads[k]); }
+    });
+    return out;
+  }
+  // weeks is what weeksUntil returns (whole weeks, or null without a due date).
+  function readyNow(p, weeks) {
+    var w = typeof weeks === 'number' && isFinite(weeks) ? weeks : null;
+    if (w !== null && w < 0) return true;
+    var when = p ? p.when : '';
+    if (when === 'pregnancy' || when === 'anytime') return true;
+    return w !== null && w <= 8 && when === 'late-pregnancy';
+  }
+  function isOptionalVerdict(p) {
+    var v = verdict(p);
+    return v === 'conditional' || v === 'longshot';
+  }
+  // To-do rows only: { now, later, optional }, each in rank order (later: last weeks before after birth).
+  function trackerSections(rows, weeks) {
+    var sec = { now: [], later: [], optional: [] };
+    (rows || []).forEach(function (r) {
+      if (!r || r.status !== 'todo') return;
+      if (isOptionalVerdict(r.p)) sec.optional.push(r);
+      else if (readyNow(r.p, weeks)) sec.now.push(r);
+      else sec.later.push(r);
+    });
+    var order = sec.later.map(function (r, i) { return { r: r, i: i }; });
+    order.sort(function (a, b) {
+      var x = a.r.p.when === 'late-pregnancy' ? 0 : 1, y = b.r.p.when === 'late-pregnancy' ? 0 : 1;
+      return x - y || a.i - b.i;
+    });
+    sec.later = order.map(function (o) { return o.r; });
+    return sec;
+  }
+  // What is still to claim: to-do rows that are not optional, lead programs only.
+  function toClaim(rows) {
+    var free = [], cash = [];
+    (rows || []).forEach(function (r) {
+      if (!r || r.status !== 'todo' || isOptionalVerdict(r.p)) return;
+      (kindOf(r.p) === 'money' ? cash : free).push(r.p);
+    });
+    return { free: totalValue(free), money: totalValue(cash) };
+  }
+
   function filterPrograms(list, opts) {
     opts = opts || {};
     var q = String(opts.query || '').trim().toLowerCase();
@@ -1182,6 +1419,17 @@ details.dir-filters { display: block; background: var(--surface); border: 1px so
     needsRegistry: needsRegistry,
     isEligibilityBased: isEligibilityBased,
     guidedDefault: guidedDefault,
+    MISSING_KEYS: MISSING_KEYS,
+    MISSING_LABELS: MISSING_LABELS,
+    MISSING_SHORT: MISSING_SHORT,
+    missingInfo: missingInfo,
+    missingInfoCounts: missingInfoCounts,
+    missingInfoText: missingInfoText,
+    onlyInText: onlyInText,
+    trackerScope: trackerScope,
+    readyNow: readyNow,
+    trackerSections: trackerSections,
+    toClaim: toClaim,
     filterPrograms: filterPrograms,
     sortPrograms: sortPrograms,
     domainOf: domainOf,
@@ -1337,6 +1585,138 @@ details.dir-filters { display: block; background: var(--surface); border: 1px so
     },
     closeConfirm: closePanel
   };
+})();
+(function () {
+  'use strict';
+  var BFF = (window.BFF = window.BFF || {});
+
+  var pending = null;
+
+  function el(tag, cls, text) {
+    var n = document.createElement(tag);
+    if (cls) n.className = cls;
+    if (text !== undefined) n.textContent = text;
+    return n;
+  }
+  function mark() {
+    var m = el('span', 'miss-mark', '!');
+    m.setAttribute('aria-hidden', 'true');
+    return m;
+  }
+  function srText(t) {
+    var s = el('span', 'fx-sr', t);
+    return s;
+  }
+  function plural(n, w) { return n + ' ' + w + (n === 1 ? '' : 's'); }
+
+  function sp() { return document.createTextNode(' '); }
+  function addLink(many) {
+    var a = el('a', 'miss-add', many ? 'Add them' : 'Add it');
+    a.setAttribute('href', '#info');
+    a.appendChild(srText(' in My info'));
+    return a;
+  }
+
+  // One line for a program: what My info is missing, with a link to add it. null when nothing is missing.
+  // It reads as one sentence: the mark, the text, then the link.
+  function line(p, profile, opts) {
+    var L = BFF.logic;
+    opts = opts || {};
+    var keys = L && L.missingInfo ? L.missingInfo(p, profile) : [];
+    if (!keys.length) return null;
+    var lead = '';
+    if (opts.states !== false && keys.indexOf('state') !== -1) {
+      lead = L.onlyInText(p);
+      if (lead) lead += '. ';
+    }
+    var n = el(opts.tag || 'p', 'miss-line');
+    n.setAttribute('data-missing', keys.join(' '));
+    n.appendChild(mark());
+    n.appendChild(sp());
+    n.appendChild(el('span', 'miss-text', lead + 'My info is missing ' + L.missingInfoText(keys) + '.'));
+    n.appendChild(sp());
+    var a = addLink(keys.length > 1);
+    a.setAttribute('data-info-key', keys[0]);
+    n.appendChild(a);
+    return n;
+  }
+
+  // A box for a page header. Full form: one chip per missing answer. One missing answer, or opts.compact:
+  // a single sentence and one link. null when nothing is missing.
+  function notice(counts, opts) {
+    var L = BFF.logic;
+    if (!counts || !counts.total || !L) return null;
+    opts = opts || {};
+    var keys = L.MISSING_KEYS.filter(function (k) { return counts.keys && counts.keys[k] > 0; });
+    if (!keys.length) return null;
+    var one = keys.length === 1 || opts.compact === true;
+    var box = el('div', 'miss-box' + (one ? ' miss-box--one' : ''));
+    box.setAttribute('data-missing-total', String(counts.total));
+    box.setAttribute('data-missing-keys', keys.join(' '));
+    var lead = el('p', 'miss-lead');
+    lead.appendChild(mark());
+    var pr = el('strong', '', plural(counts.total, 'program'));
+    if (keys.length === 1) {
+      lead.appendChild(document.createTextNode(' My info is missing ' + L.MISSING_LABELS[keys[0]] + '. '));
+      lead.appendChild(pr);
+      lead.appendChild(document.createTextNode(counts.total === 1 ? ' depends on it. ' : ' depend on it. '));
+    } else {
+      lead.appendChild(document.createTextNode(' My info is missing details that '));
+      lead.appendChild(pr);
+      lead.appendChild(document.createTextNode(counts.total === 1 ? ' depends on. ' : ' depend on. '));
+    }
+    if (one) {
+      var add = addLink(keys.length > 1);
+      add.setAttribute('data-info-key', keys[0]);
+      lead.appendChild(add);
+      box.appendChild(lead);
+      return box;
+    }
+    box.appendChild(lead);
+    var ul = el('ul', 'miss-chips');
+    keys.forEach(function (k) {
+      var c = counts.keys[k];
+      var a = el('a', 'miss-chip');
+      a.setAttribute('href', '#info');
+      a.setAttribute('data-info-key', k);
+      a.appendChild(el('span', 'miss-label', L.MISSING_SHORT[k]));
+      var n = el('span', 'miss-n', String(c));
+      n.appendChild(srText(c === 1 ? ' program' : ' programs'));
+      a.appendChild(n);
+      var li = el('li');
+      li.appendChild(a);
+      ul.appendChild(li);
+    });
+    box.appendChild(ul);
+    return box;
+  }
+
+  function currentView() {
+    var name = String(location.hash || '').replace(/^#/, '');
+    var views = BFF.nav && BFF.nav.views;
+    if (!name) return 'directory';
+    if (views && views.indexOf(name) === -1) return 'directory';
+    return name;
+  }
+  function want(key, from) {
+    pending = key ? { key: String(key), from: from || currentView() } : null;
+  }
+  function take() {
+    var p = pending;
+    pending = null;
+    return p;
+  }
+
+  // Runs before the router's own click handler (capture phase) and changes nothing about the click.
+  document.addEventListener('click', function (e) {
+    var t = e && e.target;
+    if (t && t.nodeType === 3) t = t.parentNode;
+    if (!t || !t.closest) return;
+    var a = t.closest('a[data-info-key]');
+    if (a) want(a.getAttribute('data-info-key'), currentView());
+  }, true);
+
+  BFF.missing = { line: line, notice: notice, take: take, want: want };
 })();
 // Pure helpers for plus addresses, Gmail filters, a mailto checklist and calendar reminders.
 // Nothing here touches the network or the DOM. Loadable from Node tests as well as the browser.
@@ -3100,107 +3480,6 @@ details.dir-filters { display: block; background: var(--surface); border: 1px so
   function plural(n, w) { return n + ' ' + (n === 1 ? w : w.replace(/y$/, 'ie') + 's'); }
   var SAVE_FAIL = 'Could not save on this device (storage is full or blocked). Your changes are kept only until you close this page.';
 
-  var view = { rows: {}, filter: 'all', flushers: [] };
-
-  function updateSummary() {
-    if (!view.bar) return;
-    var c = tracker.counts();
-    view.bar.max = Math.max(c.active, 1);
-    view.bar.value = Math.min(c.done, view.bar.max);
-    view.barText.textContent = c.done + ' of ' + c.active + ' done' + (c.skipped ? ' (' + c.skipped + ' skipped)' : '');
-    view.bar.setAttribute('aria-label', c.done + ' of ' + c.active + ' programs done');
-    STATUSES.forEach(function (st) { view.countEls[st].textContent = c[st]; });
-    var vl = tracker.valueLine();
-    view.valueEl.textContent = vl || '';
-    view.valueEl.hidden = !vl;
-    view.empty.hidden = !!(BFF.programs && BFF.programs.length);
-    view.storeWarn.hidden = store.persistent;
-  }
-
-  function applyFilter() {
-    var shown = 0;
-    var active = document.activeElement, moved = null;
-    var list = BFF.programs || [];
-    list.forEach(function (p) {
-      var r = view.rows[p.id];
-      if (!r) return;
-      var ok = view.filter === 'all' || tracker.getStatus(p.id) === view.filter;
-      if (!ok && !r.el.hidden && active && r.el.contains(active)) moved = p;
-      r.el.hidden = !ok;
-      if (ok) shown++;
-    });
-    view.none.hidden = shown > 0 || !list.length;
-    Array.prototype.forEach.call(view.tabs, function (b) {
-      b.setAttribute('aria-pressed', b.getAttribute('data-filter') === view.filter ? 'true' : 'false');
-    });
-    if (moved) {
-      // The row with focus just left this filter: hand focus to the next visible row.
-      var idx = list.indexOf(moved), target = null, i;
-      for (i = idx + 1; i < list.length && !target; i++) if (!view.rows[list[i].id].el.hidden) target = view.rows[list[i].id].select;
-      for (i = idx - 1; i >= 0 && !target; i--) if (!view.rows[list[i].id].el.hidden) target = view.rows[list[i].id].select;
-      if (!target) target = view.tabs[STATUSES.indexOf(view.filter) + 1];
-      if (target) target.focus();
-      view.live.textContent = moved.name + ' moved to ' + LABELS[tracker.getStatus(moved.id)] + '.';
-    }
-  }
-
-  function syncRow(id, force) {
-    var r = view.rows[id];
-    if (!r) return;
-    r.select.value = tracker.getStatus(id);
-    r.el.setAttribute('data-status', r.select.value);
-    if (force || document.activeElement !== r.note) r.note.value = tracker.getNote(id);
-  }
-
-  function buildRow(p) {
-    var id = p.id;
-    var sid = 'trk-s-' + id, nid = 'trk-n-' + id;
-    var select = h('select', { id: sid, class: 'fx-select' });
-    STATUSES.forEach(function (st) { select.appendChild(h('option', { value: st, text: LABELS[st] })); });
-    var note = h('textarea', { id: nid, class: 'fx-textarea', rows: '2', maxlength: '2000', placeholder: 'Notes (confirmation email, date, issues)' });
-    var hint = h('span', { class: 'fx-saved', role: 'status', 'aria-live': 'polite' });
-    var link = h('a', { class: 'fx-link-btn', href: p.signupUrl, target: '_blank', rel: 'noopener noreferrer', text: 'Sign up ↗' });
-    link.setAttribute('aria-label', 'Sign up for ' + p.name + ' (opens in a new tab)');
-    var addr = h('p', { class: 'fx-muted fx-trk-addr', hidden: '' });
-    var gm = h('a', { class: 'fx-link-btn fx-link-btn--ghost', target: '_blank', rel: 'noopener noreferrer', hidden: '', text: 'Search my Gmail ↗' });
-    gm.setAttribute('aria-label', 'Search my Gmail for ' + p.name + ' (opens your own Gmail in a new tab)');
-    var el = h('li', { class: 'fx-trk-row' }, [
-      h('div', { class: 'fx-trk-head' }, [
-        h('div', { class: 'fx-trk-name' }, [h('strong', { text: p.name }), h('span', { class: 'fx-muted', text: p.brand || '' })]),
-        h('div', { class: 'fx-trk-links' }, [link, gm])
-      ]),
-      addr,
-      h('div', { class: 'fx-field' }, [h('label', { 'for': sid, text: 'Status for ' + p.name }), select]),
-      h('div', { class: 'fx-field' }, [h('label', { 'for': nid, text: 'Notes for ' + p.name }), note, hint])
-    ]);
-    var timer = null;
-    function flush() {
-      if (timer === null) return;
-      clearTimeout(timer);
-      timer = null;
-      if (tracker.setNote(id, note.value)) {
-        hint.className = 'fx-saved';
-        hint.textContent = 'Saved';
-        setTimeout(function () { if (hint.textContent === 'Saved') hint.textContent = ''; }, 1500);
-      } else {
-        hint.className = 'fx-hint';
-        hint.textContent = SAVE_FAIL;
-      }
-    }
-    view.flushers.push(flush);
-    note.addEventListener('input', function () {
-      hint.textContent = '';
-      if (timer !== null) clearTimeout(timer);
-      timer = setTimeout(flush, 500);
-    });
-    note.addEventListener('blur', flush);
-    select.addEventListener('change', function () {
-      if (!tracker.setStatus(id, select.value)) view.msg.textContent = SAVE_FAIL;
-    });
-    view.rows[id] = { el: el, select: select, note: note, addr: addr, gm: gm };
-    return el;
-  }
-
   // Every file goes through BFF.host.saveFile, then the message says what happened (see reportSave).
   function hostOk() { return !!(BFF.host && BFF.host.saveFile); }
   function clearShown(msg, key) {
@@ -3238,11 +3517,117 @@ details.dir-filters { display: block; background: var(--surface); border: 1px so
     }
   }
 
-  // ---- email and calendar helpers ----
+  var TABS = [['todo', 'To do'], ['signed-up', 'Signed up'], ['received', 'Received'], ['skipped', 'Skipped'], ['all', 'All']];
+  var EMPTY = {
+    todo: 'Nothing left to do. Everything on your list is signed up, received or skipped.',
+    'signed-up': 'Nothing signed up yet. Change a program’s status after you sign up.',
+    received: 'Nothing marked received yet.',
+    skipped: 'Nothing skipped.',
+    all: 'Nothing here yet.'
+  };
+  var SECTION_TITLES = { now: 'Do now', later: 'Later', optional: 'Only if you would buy anyway, and long shots' };
+
+  // rows: the live DOM rows of the last full render, by program id.
+  // localChange: the id whose status or note the person is changing with the row's own control.
+  var view = { rows: {}, filter: 'todo', showAll: false, localChange: null, flushers: [], open: {}, openOthers: {}, optOpen: false, scope: null };
+  var CTX = '·';
+
+  // ---- scope: one result feeds the summary, the tab counts and the list ----
+  function prefsNow() {
+    var p = store.get('prefs.v1', {});
+    return p && typeof p === 'object' && !Array.isArray(p) ? p : {};
+  }
   function profileOf() {
     var p = store.get('profile.v1', {});
     return p && typeof p === 'object' && !Array.isArray(p) ? p : {};
   }
+  function computeScope() {
+    var pr = profileOf(), pf = prefsNow();
+    return BFF.logic.trackerScope(BFF.programs || [], {
+      state: pr.state, showOtherStates: !!pf.showOtherStates, profile: pr, showNoFit: !!pf.showNoFit,
+      all: view.showAll, statusOf: function (id) { return tracker.getStatus(id); }
+    });
+  }
+  function weeksNow() { return BFF.logic.weeksUntil(profileOf().dueDate); }
+  function sectionsOf(sc) { return BFF.logic.trackerSections(sc.rows, weeksNow()); }
+  function rowCounts(sc) {
+    var c = { todo: 0, 'signed-up': 0, received: 0, skipped: 0, all: sc.rows.length };
+    sc.rows.forEach(function (r) { c[r.status]++; });
+    c.done = c['signed-up'] + c.received;
+    c.active = sc.rows.length - c.skipped;
+    return c;
+  }
+  function range(t) {
+    var L = BFF.logic, lo = t.low, hi = t.high;
+    if (t.count > 1) { lo = L.roundTotal(lo); hi = L.roundTotal(hi); }
+    return Math.round(lo) === Math.round(hi) ? L.money(lo) : L.money(lo) + ' to ' + L.money(hi);
+  }
+  function claimLine(sc, secs) {
+    var t = BFF.logic.toClaim(sc.rows), parts = [];
+    if (t.free.count) parts.push('about ' + range(t.free) + ' in free things and covered care');
+    if (t.money.count) parts.push('about ' + range(t.money) + ' in money programs (tax credits, deposits, paid leave) if you qualify');
+    if (parts.length) return 'Still to claim: ' + parts.join(', and ') + '.';
+    if (secs.now.length + secs.later.length) return 'Still to claim: no known dollar value for what is left on your list.';
+    return 'Nothing left to claim on your list.';
+  }
+
+  function updateSummary(sc) {
+    if (!view.bar) return;
+    var c = rowCounts(sc), secs = sectionsOf(sc);
+    view.bar.max = Math.max(c.active, 1);
+    view.bar.value = Math.min(c.done, view.bar.max);
+    view.barText.textContent = c.done + ' of ' + c.active + ' done' + (c.skipped ? ' (' + c.skipped + ' skipped)' : '');
+    view.bar.setAttribute('aria-label', c.done + ' of ' + c.active + ' programs done');
+    view.claimEl.textContent = claimLine(sc, secs);
+    view.claimNote.hidden = !(secs.now.length + secs.later.length);
+    var vl = tracker.valueLine();
+    view.valueEl.textContent = vl || '';
+    view.valueEl.hidden = !vl;
+    view.empty.hidden = !!(BFF.programs && BFF.programs.length);
+    view.storeWarn.hidden = store.persistent;
+    TABS.forEach(function (t) { view.tabCounts[t[0]].textContent = '(' + c[t[0]] + ')'; });
+    updateSectionCounts(sc, c, secs);
+  }
+  function updateSectionCounts(sc, c, secs) {
+    var els = view.list ? view.list.querySelectorAll('[data-sec]') : [];
+    Array.prototype.forEach.call(els, function (s) {
+      var key = s.getAttribute('data-sec');
+      var n = key === 'all' ? (view.filter === 'all' ? c.all : c[view.filter]) : secs[key].length;
+      var el = s.querySelector('.fx-trk-count');
+      if (el) el.textContent = '(' + n + ')';
+    });
+  }
+
+  function leftNodes(sc) {
+    var l = sc.left, hasState = !!String(profileOf().state || '').trim(), out = [], first = true;
+    function noun(n) { var t = first ? plural(n, 'program') : String(n); first = false; return t; }
+    if (l.otherState) {
+      if (hasState) out.push([document.createTextNode(noun(l.otherState) + ' for other states')]);
+      else out.push([document.createTextNode(noun(l.otherState) + ' only for some states (add your state in '), h('a', { href: '#info', 'data-info-key': 'state', text: 'My info' }), document.createTextNode(')')]);
+    }
+    if (l.noFit) out.push([document.createTextNode(noun(l.noFit) + ' that your answers in My info rule out')]);
+    if (l.covered) out.push([document.createTextNode(l.covered + ' other ' + (l.covered === 1 ? 'way' : 'ways') + ' to get something you already signed up for')]);
+    return out;
+  }
+  function updateLeft(sc) {
+    var l = sc.left, any = l.otherState + l.noFit + l.covered > 0;
+    view.leftText.textContent = '';
+    if (view.showAll) {
+      view.leftText.textContent = 'Showing all ' + sc.total + ' programs, including ones that are not for you.';
+    } else if (any) {
+      view.leftText.appendChild(document.createTextNode('Left out of your list: '));
+      leftNodes(sc).forEach(function (nodes, i) {
+        if (i) view.leftText.appendChild(document.createTextNode(', '));
+        nodes.forEach(function (n) { view.leftText.appendChild(n); });
+      });
+      view.leftText.appendChild(document.createTextNode('.'));
+    }
+    view.leftBtn.textContent = view.showAll ? 'Back to my list' : 'Show all ' + sc.total + ' programs';
+    view.leftBtn.setAttribute('aria-pressed', view.showAll ? 'true' : 'false');
+    view.left.hidden = !(any || view.showAll);
+  }
+
+  // ---- email and calendar helpers ----
   function plusOn(pr) {
     return !!pr.usePlusTags && BFF.email.supportsPlus(pr.email) !== false && !!BFF.email.plusAddress(pr.email, 'x');
   }
@@ -3255,10 +3640,12 @@ details.dir-filters { display: block; background: var(--surface); border: 1px so
   function activePrograms() {
     return (BFF.programs || []).filter(function (p) { return tracker.getStatus(p.id) !== 'skipped'; });
   }
-  // Programs the person has signed up for (or received); before that, everything still on their list.
+  // Programs the person has signed up for (or received); before that, their own to-do list in the order shown.
   function checklistPrograms() {
     var started = (BFF.programs || []).filter(function (p) { var st = tracker.getStatus(p.id); return st === 'signed-up' || st === 'received'; });
-    return started.length ? started : activePrograms();
+    if (started.length) return started;
+    var secs = sectionsOf(computeScope());
+    return secs.now.concat(secs.later, secs.optional).map(function (r) { return r.p; });
   }
   function localDate(iso) {
     var t = Date.parse(iso);
@@ -3266,31 +3653,33 @@ details.dir-filters { display: block; background: var(--surface); border: 1px so
     var d = new Date(t);
     return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate());
   }
-  // Show or hide the per-row address and Gmail search link from the current profile.
+  function emailCtx() {
+    var pr = profileOf(), E = BFF.email, plus = plusOn(pr);
+    return { pr: pr, E: E, plus: plus, gmail: E.isGmail(pr.email), map: plus ? tagMapNow() : {}, acct: gmailAccount() };
+  }
+  // Show or hide one row's address and Gmail search link (only rows whose details panel is built have them).
+  function applyRowEmail(r, x) {
+    if (!r.addr) return;
+    var p = r.p, E = x.E;
+    var tag = x.plus ? x.map[p.id] : '';
+    var inMail = !E.inEmailFeatures || E.inEmailFeatures(p);
+    r.addr.hidden = !(x.plus && inMail);
+    r.addr.textContent = x.plus && inMail ? 'Sign up with: ' + E.plusAddress(x.pr.email, tag) : '';
+    var href = x.gmail ? E.gmailSearchUrl({ email: x.pr.email, tag: tag, domain: E.domainOfUrl(p.signupUrl), account: x.acct, program: p }) : '';
+    r.gm.hidden = !href;
+    if (href) r.gm.setAttribute('href', href); else r.gm.removeAttribute('href');
+  }
   function syncEmailBits() {
-    var pr = profileOf(), E = BFF.email, all = BFF.programs || [];
-    var plus = plusOn(pr), gmail = E.isGmail(pr.email);
-    var map = plus ? tagMapNow() : {};
-    var acct = gmailAccount();
-    all.forEach(function (p) {
-      var r = view.rows[p.id];
-      if (!r) return;
-      var tag = plus ? map[p.id] : '';
-      var inMail = !E.inEmailFeatures || E.inEmailFeatures(p);
-      r.addr.hidden = !(plus && inMail);
-      r.addr.textContent = plus && inMail ? 'Sign up with: ' + E.plusAddress(pr.email, tag) : '';
-      var href = gmail ? E.gmailSearchUrl({ email: pr.email, tag: tag, domain: E.domainOfUrl(p.signupUrl), account: acct, program: p }) : '';
-      r.gm.hidden = !href;
-      if (href) r.gm.setAttribute('href', href); else r.gm.removeAttribute('href');
-    });
+    var x = emailCtx();
+    Object.keys(view.rows).forEach(function (id) { applyRowEmail(view.rows[id], x); });
     if (view.archive) {
-      view.archive.disabled = !plus;
-      if (!plus) view.archive.checked = false;
-      view.plusHint.hidden = plus;
+      view.archive.disabled = !x.plus;
+      if (!x.plus) view.archive.checked = false;
+      view.plusHint.hidden = x.plus;
     }
-    if (view.acctRow) view.acctRow.hidden = !gmail;
-    if (view.mailHint) view.mailHint.hidden = !!E.plusAddress(pr.email, 'x');
-    if (view.gmailNote) view.gmailNote.hidden = !gmail;
+    if (view.acctRow) view.acctRow.hidden = !x.gmail;
+    if (view.mailHint) view.mailHint.hidden = !!x.E.plusAddress(x.pr.email, 'x');
+    if (view.gmailNote) view.gmailNote.hidden = !x.gmail;
     refreshMailto();
   }
 
@@ -3317,12 +3706,34 @@ details.dir-filters { display: block; background: var(--surface); border: 1px so
     if (!(BFF.host && BFF.host.inArtifact)) return null;
     return h('p', { class: 'fx-small', text: 'From this page ' + what + ' arrive inside a zip file. Unzip it first, then use the file inside.' });
   }
+  // A message that changes inside a fold is scrolled into view, so it is never left off screen.
+  function watchMsg(msg) {
+    if (typeof MutationObserver !== 'function') return;
+    new MutationObserver(function () {
+      if (msg.textContent && msg.scrollIntoView) { try { msg.scrollIntoView({ block: 'nearest' }); } catch (e) {} }
+    }).observe(msg, { childList: true, characterData: true, subtree: true });
+  }
+  function fold(key, title, kids) {
+    var d = h('details', { class: 'fx-about fx-fold', 'data-fold': key }, [h('summary', { text: title }), h('div', { class: 'fx-fold-body' }, kids)]);
+    var o = prefsNow().trkOpen;
+    if (o && typeof o === 'object' && o[key] === true) d.open = true;
+    d.addEventListener('toggle', function () {
+      var pf = prefsNow();
+      var cur = pf.trkOpen && typeof pf.trkOpen === 'object' && !Array.isArray(pf.trkOpen) ? pf.trkOpen : {};
+      if (!!cur[key] === d.open) return;
+      cur[key] = d.open;
+      pf.trkOpen = cur;
+      store.set('prefs.v1', pf);
+    });
+    return d;
+  }
 
   function buildEmailPanel() {
     var E = BFF.email;
     var msg = h('p', { class: 'fx-msg', role: 'status', 'aria-live': 'polite' });
+    watchMsg(msg);
     view.mailHint = h('p', { class: 'fx-warn', hidden: '' }, [
-      document.createTextNode('Add your email in '), h('a', { href: '#info', text: 'My info' }), document.createTextNode(' to email yourself the checklist.')
+      document.createTextNode('Add your email in '), h('a', { href: '#info', text: 'My info', 'data-info-key': 'email' }), document.createTextNode(' to email yourself the checklist.')
     ]);
     // 1. checklist by email: a real mailto link (kept current by refreshMailto) plus a Copy button that always works.
     var inArt = !!(BFF.host && BFF.host.inArtifact);
@@ -3356,8 +3767,8 @@ details.dir-filters { display: block; background: var(--surface); border: 1px so
     // 2. Gmail filters
     var arch = h('input', { type: 'checkbox', id: 'trk-archive' });
     view.archive = arch;
-    view.plusHint = h('p', { class: 'fx-small', hidden: '' }, [document.createTextNode('For tidy, safe filters, turn on plus addresses in '), h('a', { href: '#info', text: 'My info' }),
-      document.createTextNode('. Without them, filters only add a label for each program\u2019s sender domain (big stores and .gov sites are left out), and Skip the inbox is off.')]);
+    view.plusHint = h('p', { class: 'fx-small', hidden: '' }, [document.createTextNode('For tidy, safe filters, turn on plus addresses in '), h('a', { href: '#info', text: 'My info', 'data-info-key': 'plus' }),
+      document.createTextNode('. Without them, filters only add a label for each program’s sender domain (big stores and .gov sites are left out), and Skip the inbox is off.')]);
     var fBtn = h('button', { type: 'button', class: 'fx-btn', text: 'Download Gmail filters' });
     fBtn.addEventListener('click', function () {
       var pr = profileOf();
@@ -3374,7 +3785,7 @@ details.dir-filters { display: block; background: var(--surface); border: 1px so
         h('li', { text: 'Select Open file, tick the filters you want, and choose Create filters.' })
       ]),
       zipNote('the filters'),
-      h('p', { class: 'fx-small', text: 'Each filter adds a label like Baby Freebies/Program name. With plus addresses on, it matches the tagged address exactly, so Skip the inbox is safe. Otherwise it matches the program\u2019s sender domain and never archives.' })
+      h('p', { class: 'fx-small', text: 'Each filter adds a label like Baby Freebies/Program name. With plus addresses on, it matches the tagged address exactly, so Skip the inbox is safe. Otherwise it matches the program’s sender domain and never archives.' })
     ]);
     // 3. reminders
     var iBtn = h('button', { type: 'button', class: 'fx-btn', text: 'Download reminders (.ics)' });
@@ -3409,9 +3820,9 @@ details.dir-filters { display: block; background: var(--surface); border: 1px so
     view.acctRow = h('div', { class: 'fx-field', hidden: '' }, [
       h('label', { 'for': 'trk-acct', text: 'Gmail account number' }), acct,
       h('span', { class: 'fx-small', text: 'Use 0 for the first Google account you are signed in to, 1 for the second, and so on.' })]);
-    return h('section', { class: 'fx-card', 'aria-labelledby': 'trk-mail-h' }, [
-      h('h3', { id: 'trk-mail-h', text: 'Email and calendar' }),
+    return fold('email', 'Email and calendar', [
       h('p', { class: 'fx-muted', text: 'These hand off to your own mail app, Gmail or calendar. Nothing is sent from this app. Government and benefit programs are left out of the filters and searches.' }),
+      msg,
       view.mailHint,
       mailRow,
       h('div', { class: 'fx-check' }, [arch, h('label', { 'for': 'trk-archive', text: 'Skip the inbox (archive)' })]),
@@ -3421,60 +3832,16 @@ details.dir-filters { display: block; background: var(--surface); border: 1px so
       h('div', { class: 'fx-actions' }, [iBtn]),
       icsNote,
       view.gmailNote,
-      view.acctRow,
-      msg
+      view.acctRow
     ]);
   }
 
-  view.init = function (el) {
-    view.el = el;
-    el.classList.add('fx-view');
-    if (!el.querySelector('h2')) el.appendChild(h('h2', { tabindex: '-1', text: 'Tracker' }));
-
-    view.bar = h('progress', { class: 'fx-progress', value: '0', max: '1' });
-    view.barText = h('p', { class: 'fx-progress-text' });
-    view.countEls = {};
-    var counts = h('ul', { class: 'fx-counts' });
-    STATUSES.forEach(function (st) {
-      var n = h('strong');
-      view.countEls[st] = n;
-      counts.appendChild(h('li', {}, [n, h('span', { text: ' ' + LABELS[st] })]));
-    });
-    view.valueEl = h('p', { class: 'fx-muted', hidden: '' });
-    view.empty = h('p', { class: 'fx-muted', text: 'No programs loaded.', hidden: '' });
-    view.storeWarn = h('p', { class: 'fx-warn', role: 'alert', text: 'This browser is not saving data. ' + SAVE_FAIL, hidden: '' });
-    view.live = h('div', { class: 'fx-sr', role: 'status', 'aria-live': 'polite' });
-    view.msg = h('p', { class: 'fx-hint', role: 'alert' });
-    el.appendChild(h('div', { class: 'fx-card' }, [view.barText, view.bar, counts, view.valueEl, view.empty]));
-    el.appendChild(view.storeWarn);
-    el.appendChild(view.msg);
-    el.appendChild(view.live);
-    el.appendChild(buildEmailPanel());
-    // Mount point for the Gmail connection panel (BFF.inboxView, optional).
-    var inboxNode = h('div', { id: 'trk-inbox' });
-    el.appendChild(inboxNode);
-    try { if (BFF.inboxView && typeof BFF.inboxView.mount === 'function') BFF.inboxView.mount(inboxNode); } catch (e) { if (window.console) console.error('Gmail panel failed to mount:', e); }
-
-    var bar = h('div', { class: 'fx-tabs', role: 'group', 'aria-label': 'Filter by status' });
-    [['all', 'All']].concat(STATUSES.map(function (s) { return [s, LABELS[s]]; })).forEach(function (f) {
-      var b = h('button', { type: 'button', class: 'fx-tab', 'data-filter': f[0], 'aria-pressed': f[0] === 'all' ? 'true' : 'false', text: f[1] });
-      b.addEventListener('click', function () { view.filter = f[0]; applyFilter(); });
-      bar.appendChild(b);
-    });
-    view.tabs = bar.children;
-    el.appendChild(bar);
-
-    var list = h('ul', { class: 'fx-trk-list' });
-    (BFF.programs || []).forEach(function (p) { list.appendChild(buildRow(p)); syncRow(p.id, true); });
-    view.none = h('p', { class: 'fx-muted', text: 'Nothing here yet.', hidden: '' });
-    el.appendChild(list);
-    el.appendChild(view.none);
-
-    // Backup panel
+  function buildBackupPanel() {
     var inc = h('input', { type: 'checkbox', id: 'trk-inc-profile' });
     var warn = h('p', { class: 'fx-warn', text: 'The file will contain your personal details (name, email, address). Keep it somewhere private.', hidden: '' });
     inc.addEventListener('change', function () { warn.hidden = !inc.checked; });
     var msg = h('p', { class: 'fx-msg', role: 'status', 'aria-live': 'polite' });
+    watchMsg(msg);
     var dl = h('button', { type: 'button', class: 'fx-btn fx-btn--primary', text: 'Download backup (JSON)' });
     dl.addEventListener('click', function () {
       var text;
@@ -3540,41 +3907,382 @@ details.dir-filters { display: block; background: var(--surface); border: 1px so
         onCancel: function () { msg.textContent = 'Reset cancelled.'; }
       });
     });
-    el.appendChild(h('section', { class: 'fx-card', 'aria-labelledby': 'trk-backup-h' }, [
-      h('h3', { id: 'trk-backup-h', text: 'Backup' }),
+    return fold('backup', 'Backup and restore', [
       h('p', { class: 'fx-muted', text: 'Your tracker lives only in this browser. Download a file to keep a copy or move to another device.' }),
+      msg,
       h('div', { class: 'fx-check' }, [inc, h('label', { 'for': 'trk-inc-profile', text: 'Include My info in the backup' })]),
       warn,
       actions1,
       h('div', { class: 'fx-field' }, [h('label', { 'for': 'trk-restore', text: 'Restore from backup' }), file]),
       paste,
-      actions2,
-      msg
-    ]));
+      actions2
+    ]);
+  }
+
+  // ---- rows ----
+  function verdictLabel(p) {
+    var L = BFF.logic, v = L.verdict(p);
+    for (var i = 0; i < L.VERDICTS.length; i++) if (L.VERDICTS[i].id === v) return L.VERDICTS[i].label;
+    return '';
+  }
+  function line3Text(r) {
+    if (r.tag) return r.tag;
+    var st = tracker.getStatus(r.p.id);
+    if (st !== 'signed-up' && st !== 'received') return '';
+    var en = tracker.getEntry(r.p.id), d = en && en.signedUpAt ? localDate(en.signedUpAt) : '';
+    return d ? 'Signed up ' + d : '';
+  }
+  function setLine3(r) {
+    var t = line3Text(r);
+    r.line3.textContent = t;
+    r.line3.hidden = !t;
+  }
+  function setMore(r) {
+    r.more.textContent = '';
+    r.more.appendChild(document.createTextNode('Details'));
+    r.more.appendChild(h('span', { class: 'fx-sr', text: ' for ' + r.p.name }));
+    if (tracker.getNote(r.p.id).trim()) {
+      r.more.appendChild(h('span', { class: 'fx-trk-dot', 'aria-hidden': 'true', text: ' ●' }));
+      r.more.appendChild(h('span', { class: 'fx-sr', text: ' (has a note)' }));
+    }
+  }
+  // "My info is missing ..." under a to-do row; it goes away when the status leaves to-do and returns with it.
+  function setMiss(r) {
+    var want = tracker.getStatus(r.p.id) === 'todo' && !!(BFF.missing && BFF.missing.line);
+    var n = want ? BFF.missing.line(r.p, profileOf()) : null;
+    if (!!n === !!r.missShown) return;
+    r.miss.textContent = '';
+    if (n) r.miss.appendChild(n);
+    r.missShown = !!n;
+  }
+  // The row restyles in place; it only moves at the next full render.
+  function syncRowLocal(r) {
+    var st = tracker.getStatus(r.p.id);
+    r.select.value = st;
+    r.el.setAttribute('data-status', st);
+    r.el.classList.toggle('fx-moved', st !== r.rendered);
+    setLine3(r);
+    setMore(r);
+    setMiss(r);
+  }
+  function setOpen(r, open) {
+    if (open && !r.built) buildPanel(r);
+    r.panel.hidden = !open;
+    r.more.setAttribute('aria-expanded', open ? 'true' : 'false');
+    if (open) view.open[r.p.id] = true; else delete view.open[r.p.id];
+  }
+  function buildPanel(r) {
+    var p = r.p, id = p.id, nid = 'trk-n-' + id;
+    r.built = true;
+    var note = h('textarea', { id: nid, class: 'fx-textarea', rows: '2', maxlength: '2000', placeholder: 'Notes (confirmation email, date, issues)' });
+    note.value = tracker.getNote(id);
+    var hint = h('span', { class: 'fx-saved', role: 'status', 'aria-live': 'polite' });
+    r.addr = h('p', { class: 'fx-muted fx-trk-addr', hidden: '' });
+    r.gm = h('a', { class: 'fx-link-btn fx-link-btn--ghost', target: '_blank', rel: 'noopener noreferrer', hidden: '', text: 'Search my Gmail ↗' });
+    r.gm.setAttribute('aria-label', 'Search my Gmail for ' + p.name + ' (opens your own Gmail in a new tab)');
+    r.note = note;
+    if (p.whatYouGet) r.panel.appendChild(h('p', { class: 'fx-trk-what', text: p.whatYouGet }));
+    r.panel.appendChild(r.addr);
+    r.panel.appendChild(h('div', { class: 'fx-trk-links' }, [r.gm]));
+    r.panel.appendChild(h('div', { class: 'fx-field' }, [h('label', { 'for': nid, text: 'Notes for ' + p.name }), note, hint]));
+    var timer = null;
+    function flush() {
+      if (timer === null) return;
+      clearTimeout(timer);
+      timer = null;
+      var ok;
+      view.localChange = id;
+      try { ok = tracker.setNote(id, note.value); } finally { view.localChange = null; }
+      if (ok) {
+        hint.className = 'fx-saved';
+        hint.textContent = 'Saved';
+        setTimeout(function () { if (hint.textContent === 'Saved') hint.textContent = ''; }, 1500);
+      } else {
+        hint.className = 'fx-hint';
+        hint.textContent = SAVE_FAIL;
+      }
+    }
+    view.flushers.push(flush);
+    note.addEventListener('input', function () {
+      hint.textContent = '';
+      if (timer !== null) clearTimeout(timer);
+      timer = setTimeout(flush, 500);
+    });
+    note.addEventListener('blur', flush);
+    applyRowEmail(r, emailCtx());
+  }
+
+  // o: {tag, others}. Compact: name, a muted line, an optional timing line, one actions row.
+  function buildRow(p, o) {
+    var L = BFF.logic, id = p.id, st = tracker.getStatus(id);
+    var sid = 'trk-s-' + id, pid = 'trk-p-' + id;
+    var r = { p: p, tag: o.tag || '', rendered: st, built: false };
+    var select = h('select', { id: sid, class: 'fx-select fx-trk-select' });
+    STATUSES.forEach(function (s) { select.appendChild(h('option', { value: s, text: LABELS[s] })); });
+    select.value = st;
+    var link = h('a', { class: 'fx-link-btn', href: p.signupUrl, target: '_blank', rel: 'noopener noreferrer', text: 'Sign up ↗' });
+    link.setAttribute('aria-label', 'Sign up for ' + p.name + ' (opens in a new tab)');
+    r.select = select;
+    r.more = h('button', { type: 'button', id: 'trk-d-' + id, class: 'fx-btn fx-trk-more', 'aria-expanded': 'false', 'aria-controls': pid });
+    r.panel = h('div', { id: pid, class: 'fx-trk-panel', hidden: '' });
+    r.line3 = h('p', { class: 'fx-muted fx-trk-line3', hidden: '' });
+    r.miss = h('div', { class: 'fx-trk-miss' });
+    r.missShown = false;
+    var meta = [p.brand, verdictLabel(p), L.valueText(p)].filter(Boolean).join(' ' + CTX + ' ');
+    r.el = h('li', { class: 'fx-trk-row', 'data-id': id, 'data-status': st }, [
+      h('div', { class: 'fx-trk-main' }, [
+        h('strong', { class: 'fx-trk-title', text: p.name }),
+        h('p', { class: 'fx-muted fx-trk-meta', text: meta }),
+        r.line3,
+        r.miss
+      ]),
+      h('div', { class: 'fx-trk-actions' }, [
+        link,
+        h('div', { class: 'fx-trk-status' }, [h('label', { 'for': sid, class: 'fx-sr', text: 'Status for ' + p.name }), select]),
+        r.more
+      ]),
+      r.panel
+    ]);
+    setLine3(r);
+    setMore(r);
+    setMiss(r);
+    r.more.addEventListener('click', function () { setOpen(r, r.more.getAttribute('aria-expanded') !== 'true'); });
+    select.addEventListener('change', function () {
+      var ok;
+      view.localChange = id;
+      try { ok = tracker.setStatus(id, select.value); } finally { view.localChange = null; }
+      if (!ok) view.msg.textContent = SAVE_FAIL;
+      view.live.textContent = '';
+      view.live.textContent = p.name + ' marked ' + LABELS[tracker.getStatus(id)] + '.';
+    });
+    view.rows[id] = r;
+    if (view.open[id]) setOpen(r, true);
+    if (o.others && o.others.length) {
+      var n = o.others.length;
+      var ul = h('ul', { class: 'fx-trk-list fx-trk-alts' });
+      o.others.forEach(function (a) { ul.appendChild(buildRow(a, {})); });
+      var d = h('details', { class: 'fx-about fx-trk-others' }, [
+        h('summary', { text: n === 1 ? '1 more way to get the same thing' : n + ' more ways to get the same thing' }), ul]);
+      d.open = !!view.openOthers[id];
+      d.addEventListener('toggle', function () { if (d.open) view.openOthers[id] = true; else delete view.openOthers[id]; });
+      r.el.appendChild(d);
+    }
+    return r.el;
+  }
+
+  function startGuided(ids, anchor, btn) {
+    var live = ids.filter(function (id) { return tracker.getStatus(id) === 'todo'; });
+    if (!live.length || !BFF.guided || !BFF.guided.preselect) return;
+    function go() { BFF.guided.preselect(live); if (BFF.nav) BFF.nav.go('guided'); else location.hash = '#guided'; }
+    var ri = BFF.guided.runInfo && BFF.guided.runInfo();
+    if (!ri || !BFF.ui) { go(); return; }
+    BFF.ui.confirm({
+      after: anchor, returnTo: btn, confirmLabel: 'Replace run',
+      message: 'Replace your current run? You are at ' + ri.index + ' of ' + ri.total + ' in a guided run. A new run starts from this list. Statuses you already set are kept.',
+      onConfirm: go
+    });
+  }
+
+  function titleEl(key, text, n) {
+    return h('h3', { class: 'fx-trk-sec-title', id: 'trk-h-' + key }, [document.createTextNode(text + ' '), h('span', { class: 'fx-trk-count', text: '(' + n + ')' })]);
+  }
+  function rowList(rows, tagLater) {
+    var ul = h('ul', { class: 'fx-trk-list' });
+    rows.forEach(function (r) {
+      ul.appendChild(buildRow(r.p, { others: r.others, tag: tagLater ? BFF.logic.WHEN_LABELS[r.p.when] || '' : '' }));
+    });
+    return ul;
+  }
+  function nowHelp(secs, weeks) {
+    if (!secs.now.length) return [document.createTextNode(secs.later.length ? 'Nothing to do right now. The rest comes later:' : 'Nothing else to do right now. Only the options below are left.')];
+    if (typeof weeks !== 'number') {
+      return [document.createTextNode('These work now, while pregnant or at any time. Add your due date in '), h('a', { href: '#info', text: 'My info', 'data-info-key': 'dueDate' }),
+        document.createTextNode(' to see when the rest is ready.')];
+    }
+    if (weeks < 0) return [document.createTextNode('Your due date has passed, so everything on your list is ready now.')];
+    if (weeks > 8) return [document.createTextNode('These work now, while pregnant or at any time. Programs for the last weeks and after the birth are under Later.')];
+    var away = weeks === 0 ? 'Your due date is this week' : 'Your due date is ' + weeks + (weeks === 1 ? ' week' : ' weeks') + ' away';
+    return [document.createTextNode(away + ', so the last-weeks programs have joined this list. Programs for after the birth are under Later.')];
+  }
+
+  function renderList(sc) {
+    var active = document.activeElement, focusId = '', caret = null, hadFocus = false;
+    if (active && active !== document.body && view.list.contains(active)) {
+      hadFocus = true;
+      focusId = active.id || '';
+      if (active.tagName === 'TEXTAREA') caret = active.selectionStart;
+    }
+    view.list.textContent = '';
+    view.rows = {};
+    view.flushers = [];
+    view.list.setAttribute('data-tab', view.filter);
+    var c = rowCounts(sc);
+    if (view.filter === 'todo') {
+      if (!c.todo) {
+        view.list.appendChild(h('p', { class: 'fx-muted fx-trk-empty', text: EMPTY.todo }));
+      } else {
+        var weeks = weeksNow(), secs = sectionsOf(sc);
+        // 1. Do now
+        var nowSec = h('section', { class: 'fx-trk-sec', 'data-sec': 'now', 'aria-labelledby': 'trk-h-now' });
+        var head = h('div', { class: 'fx-trk-sec-head' }, [titleEl('now', SECTION_TITLES.now, secs.now.length)]);
+        if (secs.now.length && BFF.guided && BFF.guided.preselect) {
+          var help = h('button', { type: 'button', class: 'fx-btn fx-btn--primary fx-btn--small fx-trk-help', text: 'Do these with help' });
+          help.addEventListener('click', function () {
+            startGuided(secs.now.map(function (r) { return r.p.id; }), head, help);
+          });
+          head.appendChild(help);
+        }
+        nowSec.appendChild(head);
+        nowSec.appendChild(h('p', { class: 'fx-muted fx-trk-help-line' }, nowHelp(secs, weeks)));
+        if (secs.now.length) nowSec.appendChild(rowList(secs.now, false));
+        view.list.appendChild(nowSec);
+        // 2. Later
+        if (secs.later.length) {
+          view.list.appendChild(h('section', { class: 'fx-trk-sec', 'data-sec': 'later', 'aria-labelledby': 'trk-h-later' },
+            [h('div', { class: 'fx-trk-sec-head' }, [titleEl('later', SECTION_TITLES.later, secs.later.length)]), rowList(secs.later, true)]));
+        }
+        // 3. Only if you would buy anyway, and long shots (closed by default)
+        if (secs.optional.length) {
+          var opt = h('details', { class: 'fx-about fx-trk-sec fx-trk-opt', 'data-sec': 'optional' }, [
+            h('summary', {}, [titleEl('optional', SECTION_TITLES.optional, secs.optional.length)]), rowList(secs.optional, false)]);
+          opt.open = view.optOpen;
+          opt.addEventListener('toggle', function () { view.optOpen = opt.open; });
+          view.list.appendChild(opt);
+        }
+      }
+    } else {
+      var rows = sc.rows.filter(function (r) { return view.filter === 'all' || r.status === view.filter; });
+      if (!rows.length) view.list.appendChild(h('p', { class: 'fx-muted fx-trk-empty', text: EMPTY[view.filter] }));
+      else {
+        var label = '';
+        TABS.forEach(function (t) { if (t[0] === view.filter) label = t[1]; });
+        view.list.appendChild(h('section', { class: 'fx-trk-sec', 'data-sec': 'all', 'aria-labelledby': 'trk-h-all' },
+          [h('div', { class: 'fx-trk-sec-head' }, [titleEl('all', label, rows.length)]), rowList(rows, false)]));
+      }
+    }
+    if (hadFocus) {
+      var n = focusId ? document.getElementById(focusId) : null;
+      if (n && view.list.contains(n)) {
+        try { n.focus({ preventScroll: true }); } catch (e) {}
+        if (caret !== null && n.setSelectionRange) { try { n.setSelectionRange(caret, caret); } catch (e2) {} }
+      }
+      if (!n || document.activeElement !== n) { var tb = view.tabBtns[view.filter]; if (tb) tb.focus({ preventScroll: true }); }
+    }
+  }
+
+  // The notice under the summary: how many to-do programs depend on missing My info answers.
+  function refreshMissing() {
+    if (!view.missBox) return;
+    var L = BFF.logic, M = BFF.missing;
+    var counts = L && L.missingInfoCounts ? L.missingInfoCounts(BFF.programs || [], profileOf(), function (id) { return tracker.getStatus(id); }) : null;
+    var sig = counts ? counts.total + ':' + L.MISSING_KEYS.map(function (k) { return counts.keys[k]; }).join(',') : '';
+    if (sig === view.missSig) return;
+    view.missSig = sig;
+    view.missBox.textContent = '';
+    var n = M && M.notice && counts ? M.notice(counts, { compact: true }) : null;
+    if (n) view.missBox.appendChild(n);
+    view.missBox.hidden = !n;
+  }
+
+  function flushAll() { view.flushers.forEach(function (f) { f(); }); }
+
+  // A full render: scope, summary, tab counts, list. Tool folds and the Gmail panel are never touched.
+  function render() {
+    if (!view.list || !BFF.logic) return;
+    flushAll();
+    var sc = computeScope();
+    view.scope = sc;
+    updateSummary(sc);
+    refreshMissing();
+    renderList(sc);
+    updateLeft(sc);
+    syncEmailBits();
+  }
+  // A change made with a row's own control: the row stays put, the numbers follow at once.
+  function softUpdate(id) {
+    var r = view.rows[id];
+    if (r) syncRowLocal(r);
+    var sc = computeScope();
+    updateSummary(sc);
+    refreshMissing();
+    updateLeft(sc);
+    refreshMailto();
+  }
+
+  view.init = function (el) {
+    view.el = el;
+    el.classList.add('fx-view');
+    if (!el.querySelector('h2')) el.appendChild(h('h2', { tabindex: '-1', text: 'Tracker' }));
+
+    view.bar = h('progress', { class: 'fx-progress', value: '0', max: '1' });
+    view.barText = h('p', { class: 'fx-progress-text' });
+    view.claimEl = h('p', { id: 'trk-toclaim', class: 'fx-trk-claim' });
+    view.claimNote = h('p', { class: 'fx-muted', text: 'Our estimate. Programs with no known value, offers that need a purchase and prize draws are not counted.' });
+    view.valueEl = h('p', { class: 'fx-muted', hidden: '' });
+    view.empty = h('p', { class: 'fx-muted', text: 'No programs loaded.', hidden: '' });
+    view.storeWarn = h('p', { class: 'fx-warn', role: 'alert', text: 'This browser is not saving data. ' + SAVE_FAIL, hidden: '' });
+    view.live = h('div', { class: 'fx-sr', role: 'status', 'aria-live': 'polite' });
+    view.msg = h('p', { class: 'fx-hint fx-trk-alert', role: 'alert' });
+    el.appendChild(h('div', { class: 'fx-card fx-trk-summary' }, [view.barText, view.bar, view.claimEl, view.claimNote, view.valueEl, view.empty]));
+    view.missBox = h('div', { class: 'fx-trk-miss-notice', hidden: '' });
+    el.appendChild(view.missBox);
+    el.appendChild(view.storeWarn);
+    el.appendChild(view.msg);
+    el.appendChild(view.live);
+
+    // Tools, folded away. Which folds are open is remembered in prefs.trkOpen.
+    el.appendChild(buildEmailPanel());
+    // Mount point for the Gmail connection panel (BFF.inboxView, optional); inboxview.js finds it by id.
+    var inboxNode = h('div', { id: 'trk-inbox' });
+    el.appendChild(fold('gmail', 'Check Gmail for sign-up emails', [inboxNode]));
+    try { if (BFF.inboxView && typeof BFF.inboxView.mount === 'function') BFF.inboxView.mount(inboxNode); } catch (e) { if (window.console) console.error('Gmail panel failed to mount:', e); }
+    el.appendChild(buildBackupPanel());
+
+    var bar = h('div', { class: 'fx-tabs fx-trk-tabs', role: 'group', 'aria-label': 'Filter by status' });
+    view.tabBtns = {};
+    view.tabCounts = {};
+    TABS.forEach(function (f) {
+      var cnt = h('span', { class: 'fx-tab-count', text: '(0)' });
+      var b = h('button', { type: 'button', class: 'fx-tab', 'data-filter': f[0], 'aria-pressed': f[0] === view.filter ? 'true' : 'false' },
+        [h('span', { class: 'fx-tab-label', text: f[1] }), document.createTextNode(' '), cnt]);
+      b.addEventListener('click', function () {
+        view.filter = f[0];
+        Object.keys(view.tabBtns).forEach(function (k) { view.tabBtns[k].setAttribute('aria-pressed', k === view.filter ? 'true' : 'false'); });
+        render();
+      });
+      view.tabBtns[f[0]] = b;
+      view.tabCounts[f[0]] = cnt;
+      bar.appendChild(b);
+    });
+    el.appendChild(bar);
+
+    view.list = h('div', { id: 'trk-list', class: 'fx-trk-listbox' });
+    el.appendChild(view.list);
+
+    view.leftText = h('p', { class: 'fx-small' });
+    view.leftBtn = h('button', { type: 'button', class: 'fx-btn fx-btn--small', 'aria-pressed': 'false' });
+    view.leftBtn.addEventListener('click', function () { view.showAll = !view.showAll; render(); });
+    view.left = h('div', { class: 'fx-trk-left', hidden: '' }, [view.leftText, view.leftBtn]);
+    el.appendChild(view.left);
 
     document.addEventListener('bff:tracker-changed', function (e) {
       var id = e && e.detail ? e.detail.id : null;
-      if (id && view.rows[id]) syncRow(id);
-      else (BFF.programs || []).forEach(function (p) { syncRow(p.id, true); });
-      updateSummary();
-      applyFilter();
-      refreshMailto();
+      if (id && view.localChange === id) { softUpdate(id); return; }
+      if (view.el.hidden) return;   // show() renders in full when the page comes back
+      render();
     });
-    document.addEventListener('bff:storage-failed', updateSummary);
-    function flushAll() { view.flushers.forEach(function (f) { f(); }); }
+    document.addEventListener('bff:storage-failed', function () { if (view.scope) updateSummary(view.scope); });
     window.addEventListener('pagehide', flushAll);
     document.addEventListener('visibilitychange', function () { if (document.visibilityState === 'hidden') flushAll(); });
-    syncEmailBits();
-    document.addEventListener('bff:profile-changed', syncEmailBits);
-    updateSummary();
-    applyFilter();
+    document.addEventListener('bff:profile-changed', function () {
+      if (view.el.hidden) { syncEmailBits(); return; }
+      render();
+    });
+    render();
   };
   view.show = function () {
-    syncEmailBits();
-    (BFF.programs || []).forEach(function (p) { syncRow(p.id); });
     view.msg.textContent = '';
-    updateSummary();
-    applyFilter();
+    render();
   };
   BFF.views.tracker = { init: view.init, show: view.show };
 })();
@@ -3609,6 +4317,106 @@ details.dir-filters { display: block; background: var(--surface); border: 1px so
     { key: 'job', label: 'Do you or your partner have a paid job?', options: [['yes', 'Yes'], ['no', 'No']] }
   ];
   var sitSel = {}, sitField = {};
+  var phoneFold = null;
+  var root = null;
+  var needEls = {};      // key -> the "N programs depend on this." line under each of the five fields
+  var ask = null;        // { key, from, wrap, back } while a field is marked as the one asked for
+  var NEED_KEYS = ['state', 'cover', 'insurer', 'lowIncome', 'job'];
+
+  function statusLookup() {
+    return BFF.tracker && BFF.tracker.getStatus ? function (id) { return BFF.tracker.getStatus(id); } : undefined;
+  }
+  var PLUS_ROW = null;   // wrapper around the plus-address checkbox row, so it can take the highlight
+  var ASK_KEYS = NEED_KEYS.concat(['dueDate', 'email', 'plus']);
+  function controlFor(key) {
+    if (key === 'plus') return plusBox;
+    return sitSel[key] || inputs[key];
+  }
+  function wrapFor(key) {
+    if (key === 'plus') return PLUS_ROW;
+    if (sitField[key]) return sitField[key];
+    return inputs[key] && inputs[key].parentNode;
+  }
+  function hasValue(c) { return !!c && (c.type === 'checkbox' ? c.checked : !!c.value); }
+  // Drop the highlight once the asked-for field has an answer.
+  function settleAsk(key) { if (ask && ask.key === key && hasValue(controlFor(key))) ask.wrap.classList.remove('fx-ask'); }
+  // Under each unanswered field: how many programs still to do depend on it. Neutral, not an error.
+  function refreshNeeds() {
+    var L = BFF.logic;
+    if (!L || !L.missingInfoCounts || !needEls.state) return;
+    var pr = read();
+    var counts = L.missingInfoCounts(BFF.programs || [], pr, statusLookup());
+    NEED_KEYS.forEach(function (k) {
+      var n = counts.keys && counts.keys[k] > 0 ? counts.keys[k] : 0;
+      var answered = typeof pr[k] === 'string' && pr[k] !== '';
+      var el = needEls[k];
+      if (!el) return;
+      if (answered || !n) { el.textContent = ''; el.hidden = true; }
+      else { el.textContent = n === 1 ? '1 program depends on this.' : n + ' programs depend on this.'; el.hidden = false; }
+    });
+    // Only the select fields settle here; text, date and checkbox fields settle on their own change/blur.
+    if (ask && NEED_KEYS.indexOf(ask.key) !== -1) settleAsk(ask.key);
+  }
+  function needLine(key, control) {
+    var id = 'info-' + key + '-need';
+    var el = h('p', { id: id, class: 'fx-need', hidden: '' });
+    el.hidden = true;
+    var cur = control.getAttribute('aria-describedby');
+    control.setAttribute('aria-describedby', cur ? cur + ' ' + id : id);
+    needEls[key] = el;
+    return el;
+  }
+  function clearAsk() {
+    if (!ask) return;
+    ask.wrap.classList.remove('fx-ask');
+    if (ask.back && ask.back.parentNode) ask.back.parentNode.removeChild(ask.back);
+    ask = null;
+  }
+  var BACK = { directory: 'Back to Programs', tracker: 'Back to Tracker', guided: 'Back to Do it for me' };
+  function applyAsk(w) {
+    var key = w && w.key;
+    if (ASK_KEYS.indexOf(key) === -1) return;
+    if (key === 'insurer' && sitField.insurer.hidden) key = 'cover';
+    var wrap = wrapFor(key), control = controlFor(key);
+    if (!wrap || !control) return;
+    ask = { key: key, from: w.from, wrap: wrap, back: null };
+    if (!hasValue(control)) wrap.classList.add('fx-ask');
+    if (BACK[w.from]) {
+      ask.back = h('a', { class: 'fx-ask-back', href: '#' + w.from, text: BACK[w.from] });
+      wrap.appendChild(ask.back);
+    }
+    var reduce = false;
+    try { reduce = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches); } catch (e) {}
+    setTimeout(function () {
+      try { wrap.scrollIntoView({ block: 'center', behavior: reduce ? 'auto' : 'smooth' }); } catch (e) { wrap.scrollIntoView(); }
+      control.focus({ preventScroll: true });
+    }, 0);
+  }
+  // A pending save is written when the person leaves My info, so the next page shows the new answer at once.
+  function flushPending() { if (timer) { clearTimeout(timer); saveNow(); } }
+  function visible() { return !!root && !root.hidden && root.offsetParent !== null; }
+  document.addEventListener('click', function (e) {
+    var t = e.target;
+    if (t && t.nodeType === 3) t = t.parentNode;
+    if (!timer || !visible() || !t || !t.closest) return;
+    if (t.closest('a[href^="#"]')) flushPending();
+  }, true);
+  window.addEventListener('hashchange', flushPending);
+  document.addEventListener('bff:profile-changed', refreshNeeds);
+  document.addEventListener('bff:tracker-changed', refreshNeeds);
+
+  // bff.prefs.v1.infoFillOpen: whether the phone fold is open. Read the object, change the key, write it back.
+  function readFillOpen() {
+    var p = store.get('prefs.v1', {});
+    return !!(p && typeof p === 'object' && p.infoFillOpen === true);
+  }
+  function writeFillOpen(open) {
+    var p = store.get('prefs.v1', {});
+    if (!p || typeof p !== 'object') p = {};
+    if (!!p.infoFillOpen === !!open) return;
+    p.infoFillOpen = !!open;
+    store.set('prefs.v1', p);
+  }
 
   var CHECKS = {
     email: { re: /^[^\s@]+@[^\s@]+\.[^\s@]+$/, msg: 'This does not look like an email address. You can still save it.' },
@@ -3741,6 +4549,7 @@ details.dir-filters { display: block; background: var(--surface); border: 1px so
   BFF.views.info = {
     init: function (el) {
       el.classList.add('fx-view');
+      root = el;
       if (!el.querySelector('h2')) el.appendChild(h('h2', { tabindex: '-1', text: 'My info' }));
       el.appendChild(h('p', { class: 'fx-note', text: 'Stored only in this browser on this device. This app has no server and makes no network requests, so your details never leave your device. Clearing your browser data deletes them.' }));
       el.appendChild(h('p', { class: 'fx-tip', text: 'Tip: Use a dedicated inbox or a plus address like yourname+baby@gmail.com. Sign-up mail is easy to filter, and you can see who shares your address.' }));
@@ -3773,14 +4582,17 @@ details.dir-filters { display: block; background: var(--surface); border: 1px so
           timer = setTimeout(saveNow, 400);
         });
         if (f.check) input.addEventListener('blur', function () { validate(f); });
+        input.addEventListener('change', function () { settleAsk(f.key); });
+        input.addEventListener('blur', function () { settleAsk(f.key); });
         if (f.key === 'email') { input.addEventListener('change', updatePlus); input.addEventListener('blur', updatePlus); }
-        form.appendChild(h('div', { class: 'fx-field' }, [h('label', { 'for': id, text: f.label }), input, hint]));
+        form.appendChild(h('div', { class: 'fx-field' }, [h('label', { 'for': id, text: f.label }), input, hint, f.key === 'state' ? needLine('state', input) : null]));
+        if (f.key === 'state') input.addEventListener('change', function () { if (input.value && ask && ask.key === 'state') ask.wrap.classList.remove('fx-ask'); });
       });
       el.appendChild(form);
 
       var sit = h('section', { class: 'fx-card fx-form fx-situation', 'aria-labelledby': 'info-sit-h' }, [
         h('h3', { id: 'info-sit-h', text: 'Your situation (optional)' }),
-        h('p', { class: 'fx-muted', text: 'Used only to hide programs that cannot apply to you. Stays on this device.' })
+        h('p', { class: 'fx-muted', text: 'Used only to work out which programs can apply to you. Stays on this device.' })
       ]);
       SITUATION.forEach(function (d) {
         var id = 'info-' + d.key;
@@ -3790,6 +4602,7 @@ details.dir-filters { display: block; background: var(--surface); border: 1px so
           sel.appendChild(h('option', { value: o[0], text: o[1] }));
         });
         sel.addEventListener('change', function () {
+          if (sel.value && ask && ask.key === d.key) ask.wrap.classList.remove('fx-ask');
           if (d.key === 'cover') syncSituation(read());
           statusEl.className = 'fx-saved fx-saved--block';
           statusEl.textContent = 'Saving…';
@@ -3797,7 +4610,7 @@ details.dir-filters { display: block; background: var(--surface); border: 1px so
           timer = setTimeout(saveNow, 400);
         });
         sitSel[d.key] = sel;
-        var fld = h('div', { class: 'fx-field', 'data-situation': d.key }, [h('label', { 'for': id, text: d.label }), sel]);
+        var fld = h('div', { class: 'fx-field', 'data-situation': d.key }, [h('label', { 'for': id, text: d.label }), sel, needLine(d.key, sel)]);
         sitField[d.key] = fld;
         sit.appendChild(fld);
       });
@@ -3809,6 +4622,7 @@ details.dir-filters { display: block; background: var(--surface); border: 1px so
       plusBox.addEventListener('change', function () {
         if (plusBox.checked) tagMapNow(true);
         updatePlus();
+        settleAsk('plus');
         statusEl.className = 'fx-saved fx-saved--block';
         statusEl.textContent = 'Saving…';
         if (timer) clearTimeout(timer);
@@ -3816,7 +4630,7 @@ details.dir-filters { display: block; background: var(--surface); border: 1px so
       });
       el.appendChild(h('section', { class: 'fx-card', 'aria-labelledby': 'info-plus-h' }, [
         h('h3', { id: 'info-plus-h', text: 'Plus addresses' }),
-        h('div', { class: 'fx-check' }, [plusBox, h('label', { 'for': 'info-plus', text: 'Give each program its own plus address' })]),
+        PLUS_ROW = h('div', { class: 'fx-plus-row' }, [h('div', { class: 'fx-check' }, [plusBox, h('label', { 'for': 'info-plus', text: 'Give each program its own plus address' })])]),
         h('p', { class: 'fx-muted', text: 'Adds a short tag to your email, like yourname+similac@gmail.com. The guided run copies the tagged address, and you can filter or search your inbox by program.' }),
         plusPreview,
         plusNote,
@@ -3844,15 +4658,41 @@ details.dir-filters { display: block; background: var(--surface); border: 1px so
       el.appendChild(clearRow);
       el.appendChild(statusEl);
       var phoneNode = h('div', { id: 'info-fill' });
-      el.appendChild(phoneNode);
+      // The phone section is long and most people open it once, so it sits in a fold that remembers its state.
+      // phone.js redraws only the inside of #info-fill, so a redraw never closes the fold.
+      phoneFold = h('details', { class: 'fx-card ph-fold', id: 'info-fill-fold' }, [
+        h('summary', { class: 'ph-fold-sum', id: 'info-fill-sum', text: 'Fill forms on your phone (iPhone shortcut or bookmark)' }),
+        phoneNode
+      ]);
+      phoneFold.open = readFillOpen();
+      phoneFold.addEventListener('toggle', function () { writeFillOpen(phoneFold.open); });
+      el.appendChild(phoneFold);
       if (BFF.phoneView && BFF.phoneView.mount) BFF.phoneView.mount(phoneNode);
       fill();
-      function flush() { if (timer) { clearTimeout(timer); saveNow(); } }
+      function flush() { flushPending(); }
       window.addEventListener('pagehide', flush);
       document.addEventListener('visibilitychange', function () { if (document.visibilityState === 'hidden') flush(); });
     },
     show: function () {
       if (!timer) fill();
+      clearAsk();
+      refreshNeeds();
+      var want = BFF.missing && BFF.missing.take ? BFF.missing.take() : null;
+      if (want) applyAsk(want);
+      // Arrived through the guided page's "Set up the fill script" link: open the fold, scroll to it, focus its summary.
+      // Done after the router has moved focus and scrolled to the top.
+      if (BFF.openInfoFill) {
+        BFF.openInfoFill = false;
+        setTimeout(function () {
+          if (!phoneFold) return;
+          phoneFold.open = true;
+          var reduce = false;
+          try { reduce = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches); } catch (e) {}
+          var sum = phoneFold.querySelector('summary');
+          try { phoneFold.scrollIntoView({ block: 'start', behavior: reduce ? 'auto' : 'smooth' }); } catch (e) { phoneFold.scrollIntoView(); }
+          if (sum) sum.focus({ preventScroll: true });
+        }, 0);
+      }
     }
   };
 })();
@@ -4029,6 +4869,7 @@ details.dir-filters { display: block; background: var(--surface); border: 1px so
     els.stateBox = h('div', { class: 'dir-state', hidden: true });
     els.fitBox = h('div', { class: 'dir-state dir-fit', hidden: true });
     els.summary = h('section', { class: 'dir-summary', 'aria-label': 'Summary' });
+    els.missBox = h('div', { class: 'dir-miss', hidden: true });
 
     els.count = h('p', { class: 'result-count', tabindex: '-1', 'aria-live': 'polite', 'aria-atomic': 'true' });
     var resultRow = h('div', { class: 'result-row' }, [els.count, els.clear]);
@@ -4055,6 +4896,7 @@ details.dir-filters { display: block; background: var(--surface); border: 1px so
     });
 
     root.appendChild(els.summary);
+    root.appendChild(els.missBox);
     root.appendChild(search);
     root.appendChild(els.tabs);
     root.appendChild(els.filterBox);
@@ -4120,6 +4962,24 @@ details.dir-filters { display: block; background: var(--surface); border: 1px so
     return null;
   }
 
+  // What My info is missing for this program, only while it is still to do.
+  function missLine(p) {
+    if (!BFF.missing || statusOf(p.id) !== 'todo') return null;
+    return BFF.missing.line(p, profile);
+  }
+  function byProgramId(id) {
+    var l = programs();
+    for (var i = 0; i < l.length; i++) if (l[i].id === id) return l[i];
+    return null;
+  }
+  function renderMissBox() {
+    if (!els.missBox) return;
+    els.missBox.textContent = '';
+    var n = BFF.missing && L.missingInfoCounts ? BFF.missing.notice(L.missingInfoCounts(programs(), profile, statusOf)) : null;
+    if (n) els.missBox.appendChild(n);
+    els.missBox.hidden = !n;
+  }
+
   function card(p, level, rank, ctx) {
     var cost = p.costToClaim;
     var open = !!openCards[p.id];
@@ -4147,6 +5007,8 @@ details.dir-filters { display: block; background: var(--surface); border: 1px so
         : h('p', { class: 'free-line free-none', text: L.freeNote(p) }));
     }
     kids.push(h('p', { class: 'value-line' }, [h('strong', { text: L.valueText(p) })]));
+    var ml = missLine(p);
+    if (ml) kids.push(ml);
 
     var link = h('a', { class: 'btn btn-primary', href: p.signupUrl, target: '_blank', rel: 'noopener noreferrer' }, [
       document.createTextNode('Sign up on ' + L.domainOf(p.signupUrl) + ' '),
@@ -4271,11 +5133,11 @@ details.dir-filters { display: block; background: var(--surface); border: 1px so
       var kids = [document.createTextNode(t)];
       if (info.hide) {
         kids.push(document.createTextNode('Add your state in '));
-        kids.push(h('a', { href: '#info', text: 'My info' }));
+        kids.push(h('a', { href: '#info', 'data-info-key': 'state', text: 'My info' }));
         kids.push(document.createTextNode(' to see the ones for you.'));
       } else {
         kids.push(document.createTextNode('Add your state in '));
-        kids.push(h('a', { href: '#info', text: 'My info' }));
+        kids.push(h('a', { href: '#info', 'data-info-key': 'state', text: 'My info' }));
         kids.push(document.createTextNode(' to narrow them.'));
       }
       els.stateBox.appendChild(h('p', null, kids));
@@ -4332,16 +5194,15 @@ details.dir-filters { display: block; background: var(--surface); border: 1px so
     var freeGroups = distinctGroups(free);
     var tv = L.totalValue(free);
     var lo = L.roundTotal(tv.low), hi = L.roundTotal(tv.high);
-    var worth = '.';
-    if (tv.count) worth = ', worth about ' + (lo === hi ? L.money(lo) : L.money(lo) + ' to ' + L.money(hi)) + ' together.';
-    box.appendChild(h('p', { class: 'sum-main' }, [
+    var noValue = free.filter(function (p) { return L.valueMid(p) === null; }).length;
+    var worth = '. No dollar value is known for these programs yet.';
+    var skipNote = noValue ? '; ' + noValue + (noValue === 1 ? ' has' : ' have') + ' no known value and ' + (noValue === 1 ? 'is' : 'are') + ' not counted' : '';
+    if (tv.count) worth = ', worth about ' + (lo === hi ? L.money(lo) : L.money(lo) + ' to ' + L.money(hi)) + ' together (our estimate, from ordinary shelf prices' + skipNote + ').';
+    var mainKids = [
       h('strong', { text: freeGroups + ' truly free ' + (freeGroups === 1 ? 'program' : 'programs') + ' open to everyone' }),
       document.createTextNode(worth)
-    ]));
-    var noValue = free.filter(function (p) { return L.valueMid(p) === null; }).length;
-    box.appendChild(h('p', { class: 'dir-note', text: tv.count
-      ? 'This is our estimate, from ordinary shelf prices.' + (noValue ? ' ' + noValue + (noValue === 1 ? ' has' : ' have') + ' no known value and ' + (noValue === 1 ? 'is' : 'are') + ' not counted.' : '')
-      : 'No dollar value is known for these programs yet.' }));
+    ];
+    var top = h('div', { class: 'sum-top' }, [h('p', { class: 'sum-main' }, mainKids)]);
     var more = distinctGroups(pool.filter(function (p) {
       var v = L.verdict(p);
       return L.needsQualifying(p) && (v === 'top' || v === 'good' || v === 'small') && L.fit(p, L.hasSituation(profile) ? profile : {}) !== 'no';
@@ -4363,31 +5224,17 @@ details.dir-filters { display: block; background: var(--surface); border: 1px so
         render();
         els.count.focus();
       });
-      box.appendChild(h('p', { class: 'sum-show' }, [show]));
+      top.appendChild(h('p', { class: 'sum-show' }, [show]));
     }
-    box.appendChild(h('p', { class: 'sum-more', text: more + ' more ' + (more === 1 ? 'is' : 'are') + ' free if you qualify (income, insurance or where you live).' }));
-    var money = distinctGroups(pool.filter(function (p) { return L.kindOf(p) === 'money'; }));
-    if (money > 0) {
-      box.appendChild(h('p', { class: 'sum-money', text: money + ' money ' + (money === 1 ? 'program (tax credits, savings deposits, paid leave) is' : 'programs (tax credits, savings deposits, paid leave) are') + ' under Money.' }));
-    }
-    if (L.hasSituation(profile)) {
-      var fits = pool.filter(function (p) { return L.fit(p, profile) === 'yes'; }).length;
-      var hid = fInfo.hidden;
-      box.appendChild(h('p', { class: 'sum-situation', text: fits + (fits === 1 ? ' program fits' : ' programs fit') + ' your answers; ' + hid + ' hidden.' }));
-    } else {
-      box.appendChild(h('p', { class: 'sum-situation' }, [
-        document.createTextNode('Answer four quick questions in '),
-        h('a', { href: '#info', text: 'My info' }),
-        document.createTextNode(' to hide programs that cannot apply to you.')
-      ]));
-    }
+    box.appendChild(top);
+    box.appendChild(h('p', { class: 'sum-more', text: more + ' more ' + (more === 1 ? 'is' : 'are') + ' free if you qualify.' }));
 
     var due = typeof profile.dueDate === 'string' ? profile.dueDate.trim() : '';
     var wk = due ? L.weeksUntil(due) : null;
     if (wk === null) {
       box.appendChild(h('p', { class: 'dir-note' }, [
         document.createTextNode('Add your due date in '),
-        h('a', { href: '#info', text: 'My info' }),
+        h('a', { href: '#info', text: 'My info', 'data-info-key': 'dueDate' }),
         document.createTextNode(' to see what to do when. It stays on this device.')
       ]));
       return;
@@ -4396,7 +5243,7 @@ details.dir-filters { display: block; background: var(--surface); border: 1px so
     if (wk < 0) head = 'Your due date has passed.';
     else if (wk === 0) head = 'Your due date is less than a week away.';
     else head = plural(wk, 'week', 'weeks') + ' until your due date.';
-    box.appendChild(h('p', { class: 'sum-main' }, [h('strong', { text: head })]));
+    var dueBox = h('div', { class: 'sum-due' }, [h('p', { class: 'sum-main sum-due-head' }, [h('strong', { text: head })])]);
     var defs = [['pregnancy', 'do now'], ['late-pregnancy', 'in the last weeks'], ['after-birth', 'after the birth']];
     if (wk < 0) defs = [defs[2]];
     var counts = {};
@@ -4412,7 +5259,8 @@ details.dir-filters { display: block; background: var(--surface); border: 1px so
       b.addEventListener('click', function () { goGroup(d[0]); });
       row.appendChild(h('li', null, [b]));
     });
-    if (row.childNodes.length) box.appendChild(row);
+    if (row.childNodes.length) dueBox.appendChild(row);
+    box.appendChild(dueBox);
   }
 
   function appendGroup(grid, g, level, rankOf, ctx) {
@@ -4471,6 +5319,7 @@ details.dir-filters { display: block; background: var(--surface); border: 1px so
     renderFitBox(fInfo);
     renderStateBox(info);
     renderSummary(pool, fInfo);
+    renderMissBox();
     els.count.textContent = 'Showing ' + shown.length + ' of ' + pool.length + ' programs';
     els.empty.hidden = shown.length !== 0;
     shownIds = shown.map(function (p) { return p.id; });
@@ -4518,6 +5367,17 @@ details.dir-filters { display: block; background: var(--surface); border: 1px so
       var stv = statusOf(badges[j].getAttribute('data-program-id'));
       if (sb) { sb.hidden = stv === 'todo'; sb.textContent = stv === 'todo' ? '' : statusLabel(stv); }
     }
+    for (var m = 0; m < badges.length; m++) {
+      var pid = badges[m].getAttribute('data-program-id');
+      var oldLine = badges[m].querySelector('.miss-line');
+      var prog = byProgramId(pid);
+      var want = prog ? missLine(prog) : null;
+      if (!oldLine && !want) continue;
+      if (oldLine && want && oldLine.getAttribute('data-missing') === want.getAttribute('data-missing')) continue;
+      if (oldLine) oldLine.parentNode.removeChild(oldLine);
+      if (want) { var foot = badges[m].querySelector('.card-foot'); badges[m].insertBefore(want, foot); }
+    }
+    renderMissBox();
     var sels = els.list.querySelectorAll('select[data-program-id]');
     for (var i = 0; i < sels.length; i++) {
       var s = BFF.tracker.getStatus(sels[i].getAttribute('data-program-id')) || 'todo';
@@ -4572,7 +5432,6 @@ details.dir-filters { display: block; background: var(--surface); border: 1px so
     var r = p.requirements || [];
     return trulyFree(p) && p.category !== 'health-benefits' && p.category !== 'assistance' && r.indexOf('eligibility') < 0 && r.indexOf('insurance') < 0;
   }
-  var NO_FREE = 'Nothing arrives free without a purchase or a win.';
   // Best first. Falls back to the data order when the shared logic is missing.
   function ranked(list) {
     return BFF.logic && BFF.logic.rankPrograms ? BFF.logic.rankPrograms(list) : list.slice();
@@ -4589,7 +5448,22 @@ details.dir-filters { display: block; background: var(--surface); border: 1px so
     var vt = BFF.logic && BFF.logic.valueText ? BFF.logic.valueText(p) : '';
     return [vl, vt].filter(Boolean).join(' \u00b7 ');
   }
-  function freeLine(p) { return p.freeStuff ? p.freeStuff : NO_FREE; }
+  // What arrives free, or the plain sentence for why nothing does (it differs for a tax credit and a prize draw).
+  function freeLine(p) {
+    if (p.freeStuff) return p.freeStuff;
+    return BFF.logic && BFF.logic.freeNote ? BFF.logic.freeNote(p) : 'What arrives is not stated.';
+  }
+  function gkey(p) { return BFF.logic && BFF.logic.groupKey ? BFF.logic.groupKey(p) : (p.sameAs || p.id); }
+  function isSide(p) { var v = BFF.logic && BFF.logic.verdict ? BFF.logic.verdict(p) : ''; return v === 'conditional' || v === 'longshot'; }
+  function missingCounts() {
+    var L = BFF.logic;
+    return L && L.missingInfoCounts ? L.missingInfoCounts(progs(), profile(), function (id) { return T().getStatus(id); }) : null;
+  }
+  // The shared "My info is missing ..." line for a program that is still to do.
+  function missLine(p) {
+    if (!BFF.missing || T().getStatus(p.id) !== 'todo') return null;
+    return BFF.missing.line(p, profile());
+  }
   function handled(p) { return T().getStatus(p.id) !== 'todo'; }
   function profile() {
     var p = store.get('profile.v1', {});
@@ -4755,10 +5629,47 @@ details.dir-filters { display: block; background: var(--surface); border: 1px so
     return progs().filter(function (p) { return !hiddenHere(p) || !!(selected && selected[p.id]); });
   }
 
+  // At most one program per group of the same thing (the best ranked one that qualifies),
+  // and none in a group where another member is already signed up or received.
+  var seen = null; // ids that were listed the last time the selection was looked at
+  function visibleNow() {
+    var v = {};
+    progs().forEach(function (p) { if (!hiddenHere(p)) v[p.id] = true; });
+    return v;
+  }
+  // Programs that became visible since then (the person added their state, say) get the normal default.
+  // Boxes the person could already see are not touched. Never used after preselect(), which resets `seen`.
+  function applyNewDefaults() {
+    var now = visibleNow();
+    if (!seen) { seen = now; return; }
+    var done = {}, taken = {};
+    progs().forEach(function (p) {
+      var st = T().getStatus(p.id);
+      if (st === 'signed-up' || st === 'received') done[gkey(p)] = true;
+      if (selected[p.id]) taken[gkey(p)] = true;
+    });
+    ranked(progs()).forEach(function (p) {
+      if (!now[p.id] || seen[p.id]) return;
+      var k = gkey(p);
+      if (done[k] || taken[k]) return;
+      if (!handled(p) && defaultOn(p)) { selected[p.id] = true; taken[k] = true; }
+    });
+    seen = now;
+  }
   function initSelection() {
     selected = {};
     preorder = null;
-    progs().forEach(function (p) { if (!handled(p) && !hiddenHere(p) && defaultOn(p)) selected[p.id] = true; });
+    seen = visibleNow();
+    var done = {}, taken = {};
+    progs().forEach(function (p) {
+      var st = T().getStatus(p.id);
+      if (st === 'signed-up' || st === 'received') done[gkey(p)] = true;
+    });
+    ranked(progs()).forEach(function (p) {
+      var k = gkey(p);
+      if (done[k] || taken[k]) return;
+      if (!handled(p) && !hiddenHere(p) && defaultOn(p)) { selected[p.id] = true; taken[k] = true; }
+    });
   }
 
   // ---- views ----
@@ -4767,38 +5678,61 @@ details.dir-filters { display: block; background: var(--surface); border: 1px so
     body.appendChild(h('p', { class: 'fx-lead', text: 'Pick the programs to work through. For each one you get a sign-up page to open and your details ready to copy. Nothing is ever submitted for you.' }));
     body.appendChild(phoneHint());
     var pr = profile();
-    if (!pr.firstName && !pr.email && !pr.address1) {
+    var emptyInfo = !pr.firstName && !pr.email && !pr.address1;
+    if (emptyInfo) {
       var w = h('p', { class: 'fx-warn' }, [document.createTextNode('My info is empty, so there is nothing to copy yet. '), h('a', { href: '#info', text: 'Fill in My info' }), document.createTextNode(' first.')]);
       body.appendChild(w);
     }
+    var counts = missingCounts();
+    var mn = !emptyInfo && BFF.missing && counts ? BFF.missing.notice(counts, { compact: true }) : null;
+    if (mn) body.appendChild(h('div', { class: 'gd-miss-box' }, [mn]));
     var count = h('p', { class: 'fx-count', role: 'status', 'aria-live': 'polite' });
     var start = h('button', { type: 'button', class: 'fx-btn fx-btn--primary' });
-    var boxes = [];
-    var shownList = ranked(setupProgs());
+    var boxes = {};
+    var groups = BFF.logic.collapseGroups(ranked(setupProgs()));
+    var mainGroups = groups.filter(function (g) { return !isSide(g.lead); });
+    var sideGroups = groups.filter(function (g) { return isSide(g.lead); });
+    var sideDet = null;
+    var altDets = [];
+    function ids(g) { return [g.lead].concat(g.others); }
     function refresh() {
       var n = Object.keys(selected).length;
-      count.textContent = n + ' of ' + shownList.length + ' selected';
+      var gn = groups.filter(function (g) { return ids(g).some(function (p) { return selected[p.id]; }); }).length;
+      count.textContent = gn + ' of ' + groups.length + ' selected';
       start.textContent = 'Start (' + n + ' program' + (n === 1 ? '' : 's') + ')';
       start.disabled = n === 0;
     }
-    function setAll(fn) {
-      selected = {};
-      shownList.forEach(function (p, i) { var on = fn(p); boxes[i].checked = on; if (on) selected[p.id] = true; });
+    // Folds only ever open here, so nothing is ticked out of sight.
+    function openTicked() {
+      altDets.forEach(function (d) {
+        if (!d.det.open && d.g.others.some(function (p) { return selected[p.id]; })) d.det.open = true;
+      });
+      if (sideDet && !sideDet.open && sideGroups.some(function (g) { return ids(g).some(function (p) { return selected[p.id]; }); })) sideDet.open = true;
+    }
+    function setBox(p, on) { if (on) selected[p.id] = true; else delete selected[p.id]; if (boxes[p.id]) boxes[p.id].checked = !!on; }
+    // leadFn decides each lead; altFn each alternate (null leaves it as it is).
+    function apply(leadFn, altFn) {
+      groups.forEach(function (g) {
+        setBox(g.lead, leadFn(g.lead));
+        g.others.forEach(function (o) { var v = altFn(o); setBox(o, v === null ? !!selected[o.id] : v); });
+      });
+      openTicked();
       refresh();
     }
     var bar = h('div', { class: 'fx-actions' });
-    [['Select all', function () { return true; }], ['Select none', function () { return false; }],
-     ['Truly free only', function (p) { return !handled(p) && trulyFree(p); }]].forEach(function (b) {
+    [['Select all', function () { apply(function () { return true; }, function () { return null; }); }],
+     ['Select none', function () { apply(function () { return false; }, function () { return false; }); }],
+     ['Truly free only', function () { apply(function (p) { return !handled(p) && trulyFree(p); }, function () { return false; }); }]].forEach(function (b) {
       var btn = h('button', { type: 'button', class: 'fx-btn', text: b[0] });
-      btn.addEventListener('click', function () { setAll(b[1]); });
+      btn.addEventListener('click', b[1]);
       bar.appendChild(btn);
     });
     body.appendChild(bar);
     var at = autoToggle('setup');
     if (at) body.appendChild(at);
     body.appendChild(count);
-    var list = h('ul', { class: 'fx-pick' });
-    shownList.forEach(function (p, i) {
+
+    function pickRow(p, cls) {
       var id = 'gd-pick-' + p.id;
       var cb = h('input', { type: 'checkbox', id: id });
       cb.checked = !!selected[p.id];
@@ -4806,29 +5740,52 @@ details.dir-filters { display: block; background: var(--surface); border: 1px so
         if (cb.checked) selected[p.id] = true; else delete selected[p.id];
         refresh();
       });
-      boxes.push(cb);
+      boxes[p.id] = cb;
       var st = T().getStatus(p.id);
-      var extra = st !== 'todo' ? ' · ' + T().LABELS[st] : '';
-      var cost = BFF.logic && BFF.logic.COST_LABELS ? BFF.logic.COST_LABELS[p.costToClaim] || p.costToClaim : p.costToClaim;
-      list.appendChild(h('li', { class: 'fx-pick-item' }, [cb, h('label', { 'for': id }, [
+      var muted = [p.brand, verdictLabel(p), BFF.logic.valueText ? BFF.logic.valueText(p) : '', st !== 'todo' ? T().LABELS[st] : ''].filter(Boolean).join(' · ');
+      var row = h('div', { class: cls }, [cb, h('label', { 'for': id }, [
         h('strong', { text: p.name }),
-        h('span', { class: 'fx-muted', text: (p.brand || '') + ' · ' + cost + extra }),
-        h('span', { class: 'fx-small', text: worthLine(p) }),
-        h('span', { class: 'fx-small', text: freeLine(p) })
-      ])]));
-    });
+        h('span', { class: 'fx-small fx-pick-free', text: freeLine(p) }),
+        h('span', { class: 'fx-muted fx-pick-meta', text: muted })
+      ])]);
+      var ml = missLine(p);
+      // A sibling of the row, never inside the label (it holds a link).
+      return ml ? [row, h('div', { class: 'gd-miss' }, [ml])] : [row];
+    }
+    function groupItem(g) {
+      var kids = pickRow(g.lead, 'fx-pick-row');
+      if (g.others.length) {
+        var n = g.others.length;
+        var det = h('details', { class: 'fx-alt' }, [
+          h('summary', { text: n === 1 ? '1 more way to get the same thing' : n + ' more ways to get the same thing' }),
+          h('div', { class: 'fx-alt-list' }, g.others.reduce(function (acc, o) { return acc.concat(pickRow(o, 'fx-pick-row fx-pick-alt')); }, []))
+        ]);
+        altDets.push({ g: g, det: det });
+        kids.push(det);
+      }
+      return h('li', { class: 'fx-pick-item fx-grp' }, kids);
+    }
+    var list = h('ul', { class: 'fx-pick' }, mainGroups.map(groupItem));
     body.appendChild(list);
+    if (sideGroups.length) {
+      sideDet = h('details', { class: 'fx-side' }, [
+        h('summary', { text: 'Only if you would buy anyway, and long shots (' + sideGroups.length + ')' }),
+        h('ul', { class: 'fx-pick' }, sideGroups.map(groupItem))
+      ]);
+      body.appendChild(sideDet);
+    }
+    openTicked();
     start.addEventListener('click', function () {
       var chosen = ranked(progs().filter(function (p) { return selected[p.id]; })).map(function (p) { return p.id; });
-      var ids = chosen;
+      var ids2 = chosen;
       if (preorder) {
         var first = preorder.filter(function (id) { return selected[id]; });
         var seen = {};
         first.forEach(function (id) { seen[id] = true; });
-        ids = first.concat(chosen.filter(function (id) { return !seen[id]; }));
+        ids2 = first.concat(chosen.filter(function (id) { return !seen[id]; }));
       }
-      if (!ids.length) return;
-      run = { ids: ids, index: 0, step: 'run' };
+      if (!ids2.length) return;
+      run = { ids: ids2, index: 0, step: 'run' };
       saveRun();
       focusHeading = true;
       render();
@@ -4883,7 +5840,10 @@ details.dir-filters { display: block; background: var(--surface); border: 1px so
   }
 
   function phoneHint() {
-    return h('p', { class: 'fx-small fx-tight' }, [document.createTextNode('Filling on your phone? '), h('a', { href: '#info', text: 'Set up the fill script in My info' }), document.createTextNode('.')]);
+    var a = h('a', { href: '#info', text: 'Set up the fill script in My info' });
+    // My info reads this flag after the route change, opens its phone fold and moves focus there.
+    a.addEventListener('click', function () { BFF.openInfoFill = true; });
+    return h('p', { class: 'fx-small fx-tight' }, [document.createTextNode('Filling on your phone? '), a, document.createTextNode('.')]);
   }
 
   function renderRun() {
@@ -4911,6 +5871,8 @@ details.dir-filters { display: block; background: var(--surface); border: 1px so
     var wl = worthLine(p);
     if (wl) body.appendChild(h('p', { class: 'fx-small fx-tight', text: wl }));
     body.appendChild(h('p', { class: 'fx-small fx-tight', text: freeLine(p) }));
+    var rml = missLine(p);
+    if (rml) body.appendChild(rml);
 
     // (b) open link: a real anchor, so it works wherever links work (no window.open)
     var open = h('a', { class: 'fx-btn fx-btn--primary fx-btn--big', href: p.signupUrl, target: '_blank', rel: 'noopener noreferrer', text: 'Open sign-up page \u2197' });
@@ -5069,7 +6031,7 @@ details.dir-filters { display: block; background: var(--surface); border: 1px so
     if (!body) return;
     if (run && run.step === 'run') renderRun();
     else if (run && run.step === 'finish') renderFinish();
-    else { actions = null; if (!selected) initSelection(); renderSetup(); }
+    else { actions = null; if (!selected) initSelection(); else applyNewDefaults(); renderSetup(); }
     focusHeading = false;
   }
 
@@ -5100,6 +6062,7 @@ details.dir-filters { display: block; background: var(--surface); border: 1px so
       var valid = {};
       (Array.isArray(ids) ? ids : []).forEach(function (id) { if (byId(id)) valid[id] = true; });
       selected = valid;
+      seen = visibleNow();
       preorder = (Array.isArray(ids) ? ids : []).filter(function (id, i, a) { return valid[id] && a.indexOf(id) === i; });
       undoInfo = null;
       if (run) { run = null; saveRun(); }
@@ -5120,6 +6083,8 @@ details.dir-filters { display: block; background: var(--surface); border: 1px so
       if (run && run.autoOpenNext === false) autoOpen = false;
       if (run && run.shortcuts === true) shortcutsOn = true;
       document.addEventListener('keydown', onKey);
+      // A save that lands late: draw again with the selection kept. When hidden, show() draws it.
+      document.addEventListener('bff:profile-changed', function () { if (el && !el.hidden) render(); });
       render();
     },
     show: function () {
@@ -5235,7 +6200,7 @@ details.dir-filters { display: block; background: var(--surface); border: 1px so
     var btnClear = h('button', { type: 'button', class: 'fx-btn fx-btn--link ib-btn', hidden: '', text: 'Clear results from this page' });
     var actions = h('div', { class: 'fx-actions ib-actions', hidden: '' }, [btnCheck, btnLabel, btnList, btnKit, btnAddr, btnClear]);
     var needEmail = h('p', { class: 'fx-warn', hidden: '' }, [
-      document.createTextNode('A draft goes to your own address, so add your email in '), h('a', { href: '#info', text: 'My info' }), document.createTextNode(' first.')
+      document.createTextNode('A draft goes to your own address, so add your email in '), h('a', { href: '#info', text: 'My info', 'data-info-key': 'email' }), document.createTextNode(' first.')
     ]);
     var live = h('p', { class: 'ib-live fx-msg', role: 'status', 'aria-live': 'polite' });
     var err = h('p', { class: 'ib-error fx-warn', role: 'alert', hidden: '' });

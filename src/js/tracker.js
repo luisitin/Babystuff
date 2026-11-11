@@ -253,107 +253,6 @@
   function plural(n, w) { return n + ' ' + (n === 1 ? w : w.replace(/y$/, 'ie') + 's'); }
   var SAVE_FAIL = 'Could not save on this device (storage is full or blocked). Your changes are kept only until you close this page.';
 
-  var view = { rows: {}, filter: 'all', flushers: [] };
-
-  function updateSummary() {
-    if (!view.bar) return;
-    var c = tracker.counts();
-    view.bar.max = Math.max(c.active, 1);
-    view.bar.value = Math.min(c.done, view.bar.max);
-    view.barText.textContent = c.done + ' of ' + c.active + ' done' + (c.skipped ? ' (' + c.skipped + ' skipped)' : '');
-    view.bar.setAttribute('aria-label', c.done + ' of ' + c.active + ' programs done');
-    STATUSES.forEach(function (st) { view.countEls[st].textContent = c[st]; });
-    var vl = tracker.valueLine();
-    view.valueEl.textContent = vl || '';
-    view.valueEl.hidden = !vl;
-    view.empty.hidden = !!(BFF.programs && BFF.programs.length);
-    view.storeWarn.hidden = store.persistent;
-  }
-
-  function applyFilter() {
-    var shown = 0;
-    var active = document.activeElement, moved = null;
-    var list = BFF.programs || [];
-    list.forEach(function (p) {
-      var r = view.rows[p.id];
-      if (!r) return;
-      var ok = view.filter === 'all' || tracker.getStatus(p.id) === view.filter;
-      if (!ok && !r.el.hidden && active && r.el.contains(active)) moved = p;
-      r.el.hidden = !ok;
-      if (ok) shown++;
-    });
-    view.none.hidden = shown > 0 || !list.length;
-    Array.prototype.forEach.call(view.tabs, function (b) {
-      b.setAttribute('aria-pressed', b.getAttribute('data-filter') === view.filter ? 'true' : 'false');
-    });
-    if (moved) {
-      // The row with focus just left this filter: hand focus to the next visible row.
-      var idx = list.indexOf(moved), target = null, i;
-      for (i = idx + 1; i < list.length && !target; i++) if (!view.rows[list[i].id].el.hidden) target = view.rows[list[i].id].select;
-      for (i = idx - 1; i >= 0 && !target; i--) if (!view.rows[list[i].id].el.hidden) target = view.rows[list[i].id].select;
-      if (!target) target = view.tabs[STATUSES.indexOf(view.filter) + 1];
-      if (target) target.focus();
-      view.live.textContent = moved.name + ' moved to ' + LABELS[tracker.getStatus(moved.id)] + '.';
-    }
-  }
-
-  function syncRow(id, force) {
-    var r = view.rows[id];
-    if (!r) return;
-    r.select.value = tracker.getStatus(id);
-    r.el.setAttribute('data-status', r.select.value);
-    if (force || document.activeElement !== r.note) r.note.value = tracker.getNote(id);
-  }
-
-  function buildRow(p) {
-    var id = p.id;
-    var sid = 'trk-s-' + id, nid = 'trk-n-' + id;
-    var select = h('select', { id: sid, class: 'fx-select' });
-    STATUSES.forEach(function (st) { select.appendChild(h('option', { value: st, text: LABELS[st] })); });
-    var note = h('textarea', { id: nid, class: 'fx-textarea', rows: '2', maxlength: '2000', placeholder: 'Notes (confirmation email, date, issues)' });
-    var hint = h('span', { class: 'fx-saved', role: 'status', 'aria-live': 'polite' });
-    var link = h('a', { class: 'fx-link-btn', href: p.signupUrl, target: '_blank', rel: 'noopener noreferrer', text: 'Sign up ↗' });
-    link.setAttribute('aria-label', 'Sign up for ' + p.name + ' (opens in a new tab)');
-    var addr = h('p', { class: 'fx-muted fx-trk-addr', hidden: '' });
-    var gm = h('a', { class: 'fx-link-btn fx-link-btn--ghost', target: '_blank', rel: 'noopener noreferrer', hidden: '', text: 'Search my Gmail ↗' });
-    gm.setAttribute('aria-label', 'Search my Gmail for ' + p.name + ' (opens your own Gmail in a new tab)');
-    var el = h('li', { class: 'fx-trk-row' }, [
-      h('div', { class: 'fx-trk-head' }, [
-        h('div', { class: 'fx-trk-name' }, [h('strong', { text: p.name }), h('span', { class: 'fx-muted', text: p.brand || '' })]),
-        h('div', { class: 'fx-trk-links' }, [link, gm])
-      ]),
-      addr,
-      h('div', { class: 'fx-field' }, [h('label', { 'for': sid, text: 'Status for ' + p.name }), select]),
-      h('div', { class: 'fx-field' }, [h('label', { 'for': nid, text: 'Notes for ' + p.name }), note, hint])
-    ]);
-    var timer = null;
-    function flush() {
-      if (timer === null) return;
-      clearTimeout(timer);
-      timer = null;
-      if (tracker.setNote(id, note.value)) {
-        hint.className = 'fx-saved';
-        hint.textContent = 'Saved';
-        setTimeout(function () { if (hint.textContent === 'Saved') hint.textContent = ''; }, 1500);
-      } else {
-        hint.className = 'fx-hint';
-        hint.textContent = SAVE_FAIL;
-      }
-    }
-    view.flushers.push(flush);
-    note.addEventListener('input', function () {
-      hint.textContent = '';
-      if (timer !== null) clearTimeout(timer);
-      timer = setTimeout(flush, 500);
-    });
-    note.addEventListener('blur', flush);
-    select.addEventListener('change', function () {
-      if (!tracker.setStatus(id, select.value)) view.msg.textContent = SAVE_FAIL;
-    });
-    view.rows[id] = { el: el, select: select, note: note, addr: addr, gm: gm };
-    return el;
-  }
-
   // Every file goes through BFF.host.saveFile, then the message says what happened (see reportSave).
   function hostOk() { return !!(BFF.host && BFF.host.saveFile); }
   function clearShown(msg, key) {
@@ -391,11 +290,117 @@
     }
   }
 
-  // ---- email and calendar helpers ----
+  var TABS = [['todo', 'To do'], ['signed-up', 'Signed up'], ['received', 'Received'], ['skipped', 'Skipped'], ['all', 'All']];
+  var EMPTY = {
+    todo: 'Nothing left to do. Everything on your list is signed up, received or skipped.',
+    'signed-up': 'Nothing signed up yet. Change a program’s status after you sign up.',
+    received: 'Nothing marked received yet.',
+    skipped: 'Nothing skipped.',
+    all: 'Nothing here yet.'
+  };
+  var SECTION_TITLES = { now: 'Do now', later: 'Later', optional: 'Only if you would buy anyway, and long shots' };
+
+  // rows: the live DOM rows of the last full render, by program id.
+  // localChange: the id whose status or note the person is changing with the row's own control.
+  var view = { rows: {}, filter: 'todo', showAll: false, localChange: null, flushers: [], open: {}, openOthers: {}, optOpen: false, scope: null };
+  var CTX = '·';
+
+  // ---- scope: one result feeds the summary, the tab counts and the list ----
+  function prefsNow() {
+    var p = store.get('prefs.v1', {});
+    return p && typeof p === 'object' && !Array.isArray(p) ? p : {};
+  }
   function profileOf() {
     var p = store.get('profile.v1', {});
     return p && typeof p === 'object' && !Array.isArray(p) ? p : {};
   }
+  function computeScope() {
+    var pr = profileOf(), pf = prefsNow();
+    return BFF.logic.trackerScope(BFF.programs || [], {
+      state: pr.state, showOtherStates: !!pf.showOtherStates, profile: pr, showNoFit: !!pf.showNoFit,
+      all: view.showAll, statusOf: function (id) { return tracker.getStatus(id); }
+    });
+  }
+  function weeksNow() { return BFF.logic.weeksUntil(profileOf().dueDate); }
+  function sectionsOf(sc) { return BFF.logic.trackerSections(sc.rows, weeksNow()); }
+  function rowCounts(sc) {
+    var c = { todo: 0, 'signed-up': 0, received: 0, skipped: 0, all: sc.rows.length };
+    sc.rows.forEach(function (r) { c[r.status]++; });
+    c.done = c['signed-up'] + c.received;
+    c.active = sc.rows.length - c.skipped;
+    return c;
+  }
+  function range(t) {
+    var L = BFF.logic, lo = t.low, hi = t.high;
+    if (t.count > 1) { lo = L.roundTotal(lo); hi = L.roundTotal(hi); }
+    return Math.round(lo) === Math.round(hi) ? L.money(lo) : L.money(lo) + ' to ' + L.money(hi);
+  }
+  function claimLine(sc, secs) {
+    var t = BFF.logic.toClaim(sc.rows), parts = [];
+    if (t.free.count) parts.push('about ' + range(t.free) + ' in free things and covered care');
+    if (t.money.count) parts.push('about ' + range(t.money) + ' in money programs (tax credits, deposits, paid leave) if you qualify');
+    if (parts.length) return 'Still to claim: ' + parts.join(', and ') + '.';
+    if (secs.now.length + secs.later.length) return 'Still to claim: no known dollar value for what is left on your list.';
+    return 'Nothing left to claim on your list.';
+  }
+
+  function updateSummary(sc) {
+    if (!view.bar) return;
+    var c = rowCounts(sc), secs = sectionsOf(sc);
+    view.bar.max = Math.max(c.active, 1);
+    view.bar.value = Math.min(c.done, view.bar.max);
+    view.barText.textContent = c.done + ' of ' + c.active + ' done' + (c.skipped ? ' (' + c.skipped + ' skipped)' : '');
+    view.bar.setAttribute('aria-label', c.done + ' of ' + c.active + ' programs done');
+    view.claimEl.textContent = claimLine(sc, secs);
+    view.claimNote.hidden = !(secs.now.length + secs.later.length);
+    var vl = tracker.valueLine();
+    view.valueEl.textContent = vl || '';
+    view.valueEl.hidden = !vl;
+    view.empty.hidden = !!(BFF.programs && BFF.programs.length);
+    view.storeWarn.hidden = store.persistent;
+    TABS.forEach(function (t) { view.tabCounts[t[0]].textContent = '(' + c[t[0]] + ')'; });
+    updateSectionCounts(sc, c, secs);
+  }
+  function updateSectionCounts(sc, c, secs) {
+    var els = view.list ? view.list.querySelectorAll('[data-sec]') : [];
+    Array.prototype.forEach.call(els, function (s) {
+      var key = s.getAttribute('data-sec');
+      var n = key === 'all' ? (view.filter === 'all' ? c.all : c[view.filter]) : secs[key].length;
+      var el = s.querySelector('.fx-trk-count');
+      if (el) el.textContent = '(' + n + ')';
+    });
+  }
+
+  function leftNodes(sc) {
+    var l = sc.left, hasState = !!String(profileOf().state || '').trim(), out = [], first = true;
+    function noun(n) { var t = first ? plural(n, 'program') : String(n); first = false; return t; }
+    if (l.otherState) {
+      if (hasState) out.push([document.createTextNode(noun(l.otherState) + ' for other states')]);
+      else out.push([document.createTextNode(noun(l.otherState) + ' only for some states (add your state in '), h('a', { href: '#info', 'data-info-key': 'state', text: 'My info' }), document.createTextNode(')')]);
+    }
+    if (l.noFit) out.push([document.createTextNode(noun(l.noFit) + ' that your answers in My info rule out')]);
+    if (l.covered) out.push([document.createTextNode(l.covered + ' other ' + (l.covered === 1 ? 'way' : 'ways') + ' to get something you already signed up for')]);
+    return out;
+  }
+  function updateLeft(sc) {
+    var l = sc.left, any = l.otherState + l.noFit + l.covered > 0;
+    view.leftText.textContent = '';
+    if (view.showAll) {
+      view.leftText.textContent = 'Showing all ' + sc.total + ' programs, including ones that are not for you.';
+    } else if (any) {
+      view.leftText.appendChild(document.createTextNode('Left out of your list: '));
+      leftNodes(sc).forEach(function (nodes, i) {
+        if (i) view.leftText.appendChild(document.createTextNode(', '));
+        nodes.forEach(function (n) { view.leftText.appendChild(n); });
+      });
+      view.leftText.appendChild(document.createTextNode('.'));
+    }
+    view.leftBtn.textContent = view.showAll ? 'Back to my list' : 'Show all ' + sc.total + ' programs';
+    view.leftBtn.setAttribute('aria-pressed', view.showAll ? 'true' : 'false');
+    view.left.hidden = !(any || view.showAll);
+  }
+
+  // ---- email and calendar helpers ----
   function plusOn(pr) {
     return !!pr.usePlusTags && BFF.email.supportsPlus(pr.email) !== false && !!BFF.email.plusAddress(pr.email, 'x');
   }
@@ -408,10 +413,12 @@
   function activePrograms() {
     return (BFF.programs || []).filter(function (p) { return tracker.getStatus(p.id) !== 'skipped'; });
   }
-  // Programs the person has signed up for (or received); before that, everything still on their list.
+  // Programs the person has signed up for (or received); before that, their own to-do list in the order shown.
   function checklistPrograms() {
     var started = (BFF.programs || []).filter(function (p) { var st = tracker.getStatus(p.id); return st === 'signed-up' || st === 'received'; });
-    return started.length ? started : activePrograms();
+    if (started.length) return started;
+    var secs = sectionsOf(computeScope());
+    return secs.now.concat(secs.later, secs.optional).map(function (r) { return r.p; });
   }
   function localDate(iso) {
     var t = Date.parse(iso);
@@ -419,31 +426,33 @@
     var d = new Date(t);
     return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate());
   }
-  // Show or hide the per-row address and Gmail search link from the current profile.
+  function emailCtx() {
+    var pr = profileOf(), E = BFF.email, plus = plusOn(pr);
+    return { pr: pr, E: E, plus: plus, gmail: E.isGmail(pr.email), map: plus ? tagMapNow() : {}, acct: gmailAccount() };
+  }
+  // Show or hide one row's address and Gmail search link (only rows whose details panel is built have them).
+  function applyRowEmail(r, x) {
+    if (!r.addr) return;
+    var p = r.p, E = x.E;
+    var tag = x.plus ? x.map[p.id] : '';
+    var inMail = !E.inEmailFeatures || E.inEmailFeatures(p);
+    r.addr.hidden = !(x.plus && inMail);
+    r.addr.textContent = x.plus && inMail ? 'Sign up with: ' + E.plusAddress(x.pr.email, tag) : '';
+    var href = x.gmail ? E.gmailSearchUrl({ email: x.pr.email, tag: tag, domain: E.domainOfUrl(p.signupUrl), account: x.acct, program: p }) : '';
+    r.gm.hidden = !href;
+    if (href) r.gm.setAttribute('href', href); else r.gm.removeAttribute('href');
+  }
   function syncEmailBits() {
-    var pr = profileOf(), E = BFF.email, all = BFF.programs || [];
-    var plus = plusOn(pr), gmail = E.isGmail(pr.email);
-    var map = plus ? tagMapNow() : {};
-    var acct = gmailAccount();
-    all.forEach(function (p) {
-      var r = view.rows[p.id];
-      if (!r) return;
-      var tag = plus ? map[p.id] : '';
-      var inMail = !E.inEmailFeatures || E.inEmailFeatures(p);
-      r.addr.hidden = !(plus && inMail);
-      r.addr.textContent = plus && inMail ? 'Sign up with: ' + E.plusAddress(pr.email, tag) : '';
-      var href = gmail ? E.gmailSearchUrl({ email: pr.email, tag: tag, domain: E.domainOfUrl(p.signupUrl), account: acct, program: p }) : '';
-      r.gm.hidden = !href;
-      if (href) r.gm.setAttribute('href', href); else r.gm.removeAttribute('href');
-    });
+    var x = emailCtx();
+    Object.keys(view.rows).forEach(function (id) { applyRowEmail(view.rows[id], x); });
     if (view.archive) {
-      view.archive.disabled = !plus;
-      if (!plus) view.archive.checked = false;
-      view.plusHint.hidden = plus;
+      view.archive.disabled = !x.plus;
+      if (!x.plus) view.archive.checked = false;
+      view.plusHint.hidden = x.plus;
     }
-    if (view.acctRow) view.acctRow.hidden = !gmail;
-    if (view.mailHint) view.mailHint.hidden = !!E.plusAddress(pr.email, 'x');
-    if (view.gmailNote) view.gmailNote.hidden = !gmail;
+    if (view.acctRow) view.acctRow.hidden = !x.gmail;
+    if (view.mailHint) view.mailHint.hidden = !!x.E.plusAddress(x.pr.email, 'x');
+    if (view.gmailNote) view.gmailNote.hidden = !x.gmail;
     refreshMailto();
   }
 
@@ -470,12 +479,34 @@
     if (!(BFF.host && BFF.host.inArtifact)) return null;
     return h('p', { class: 'fx-small', text: 'From this page ' + what + ' arrive inside a zip file. Unzip it first, then use the file inside.' });
   }
+  // A message that changes inside a fold is scrolled into view, so it is never left off screen.
+  function watchMsg(msg) {
+    if (typeof MutationObserver !== 'function') return;
+    new MutationObserver(function () {
+      if (msg.textContent && msg.scrollIntoView) { try { msg.scrollIntoView({ block: 'nearest' }); } catch (e) {} }
+    }).observe(msg, { childList: true, characterData: true, subtree: true });
+  }
+  function fold(key, title, kids) {
+    var d = h('details', { class: 'fx-about fx-fold', 'data-fold': key }, [h('summary', { text: title }), h('div', { class: 'fx-fold-body' }, kids)]);
+    var o = prefsNow().trkOpen;
+    if (o && typeof o === 'object' && o[key] === true) d.open = true;
+    d.addEventListener('toggle', function () {
+      var pf = prefsNow();
+      var cur = pf.trkOpen && typeof pf.trkOpen === 'object' && !Array.isArray(pf.trkOpen) ? pf.trkOpen : {};
+      if (!!cur[key] === d.open) return;
+      cur[key] = d.open;
+      pf.trkOpen = cur;
+      store.set('prefs.v1', pf);
+    });
+    return d;
+  }
 
   function buildEmailPanel() {
     var E = BFF.email;
     var msg = h('p', { class: 'fx-msg', role: 'status', 'aria-live': 'polite' });
+    watchMsg(msg);
     view.mailHint = h('p', { class: 'fx-warn', hidden: '' }, [
-      document.createTextNode('Add your email in '), h('a', { href: '#info', text: 'My info' }), document.createTextNode(' to email yourself the checklist.')
+      document.createTextNode('Add your email in '), h('a', { href: '#info', text: 'My info', 'data-info-key': 'email' }), document.createTextNode(' to email yourself the checklist.')
     ]);
     // 1. checklist by email: a real mailto link (kept current by refreshMailto) plus a Copy button that always works.
     var inArt = !!(BFF.host && BFF.host.inArtifact);
@@ -509,8 +540,8 @@
     // 2. Gmail filters
     var arch = h('input', { type: 'checkbox', id: 'trk-archive' });
     view.archive = arch;
-    view.plusHint = h('p', { class: 'fx-small', hidden: '' }, [document.createTextNode('For tidy, safe filters, turn on plus addresses in '), h('a', { href: '#info', text: 'My info' }),
-      document.createTextNode('. Without them, filters only add a label for each program\u2019s sender domain (big stores and .gov sites are left out), and Skip the inbox is off.')]);
+    view.plusHint = h('p', { class: 'fx-small', hidden: '' }, [document.createTextNode('For tidy, safe filters, turn on plus addresses in '), h('a', { href: '#info', text: 'My info', 'data-info-key': 'plus' }),
+      document.createTextNode('. Without them, filters only add a label for each program’s sender domain (big stores and .gov sites are left out), and Skip the inbox is off.')]);
     var fBtn = h('button', { type: 'button', class: 'fx-btn', text: 'Download Gmail filters' });
     fBtn.addEventListener('click', function () {
       var pr = profileOf();
@@ -527,7 +558,7 @@
         h('li', { text: 'Select Open file, tick the filters you want, and choose Create filters.' })
       ]),
       zipNote('the filters'),
-      h('p', { class: 'fx-small', text: 'Each filter adds a label like Baby Freebies/Program name. With plus addresses on, it matches the tagged address exactly, so Skip the inbox is safe. Otherwise it matches the program\u2019s sender domain and never archives.' })
+      h('p', { class: 'fx-small', text: 'Each filter adds a label like Baby Freebies/Program name. With plus addresses on, it matches the tagged address exactly, so Skip the inbox is safe. Otherwise it matches the program’s sender domain and never archives.' })
     ]);
     // 3. reminders
     var iBtn = h('button', { type: 'button', class: 'fx-btn', text: 'Download reminders (.ics)' });
@@ -562,9 +593,9 @@
     view.acctRow = h('div', { class: 'fx-field', hidden: '' }, [
       h('label', { 'for': 'trk-acct', text: 'Gmail account number' }), acct,
       h('span', { class: 'fx-small', text: 'Use 0 for the first Google account you are signed in to, 1 for the second, and so on.' })]);
-    return h('section', { class: 'fx-card', 'aria-labelledby': 'trk-mail-h' }, [
-      h('h3', { id: 'trk-mail-h', text: 'Email and calendar' }),
+    return fold('email', 'Email and calendar', [
       h('p', { class: 'fx-muted', text: 'These hand off to your own mail app, Gmail or calendar. Nothing is sent from this app. Government and benefit programs are left out of the filters and searches.' }),
+      msg,
       view.mailHint,
       mailRow,
       h('div', { class: 'fx-check' }, [arch, h('label', { 'for': 'trk-archive', text: 'Skip the inbox (archive)' })]),
@@ -574,60 +605,16 @@
       h('div', { class: 'fx-actions' }, [iBtn]),
       icsNote,
       view.gmailNote,
-      view.acctRow,
-      msg
+      view.acctRow
     ]);
   }
 
-  view.init = function (el) {
-    view.el = el;
-    el.classList.add('fx-view');
-    if (!el.querySelector('h2')) el.appendChild(h('h2', { tabindex: '-1', text: 'Tracker' }));
-
-    view.bar = h('progress', { class: 'fx-progress', value: '0', max: '1' });
-    view.barText = h('p', { class: 'fx-progress-text' });
-    view.countEls = {};
-    var counts = h('ul', { class: 'fx-counts' });
-    STATUSES.forEach(function (st) {
-      var n = h('strong');
-      view.countEls[st] = n;
-      counts.appendChild(h('li', {}, [n, h('span', { text: ' ' + LABELS[st] })]));
-    });
-    view.valueEl = h('p', { class: 'fx-muted', hidden: '' });
-    view.empty = h('p', { class: 'fx-muted', text: 'No programs loaded.', hidden: '' });
-    view.storeWarn = h('p', { class: 'fx-warn', role: 'alert', text: 'This browser is not saving data. ' + SAVE_FAIL, hidden: '' });
-    view.live = h('div', { class: 'fx-sr', role: 'status', 'aria-live': 'polite' });
-    view.msg = h('p', { class: 'fx-hint', role: 'alert' });
-    el.appendChild(h('div', { class: 'fx-card' }, [view.barText, view.bar, counts, view.valueEl, view.empty]));
-    el.appendChild(view.storeWarn);
-    el.appendChild(view.msg);
-    el.appendChild(view.live);
-    el.appendChild(buildEmailPanel());
-    // Mount point for the Gmail connection panel (BFF.inboxView, optional).
-    var inboxNode = h('div', { id: 'trk-inbox' });
-    el.appendChild(inboxNode);
-    try { if (BFF.inboxView && typeof BFF.inboxView.mount === 'function') BFF.inboxView.mount(inboxNode); } catch (e) { if (window.console) console.error('Gmail panel failed to mount:', e); }
-
-    var bar = h('div', { class: 'fx-tabs', role: 'group', 'aria-label': 'Filter by status' });
-    [['all', 'All']].concat(STATUSES.map(function (s) { return [s, LABELS[s]]; })).forEach(function (f) {
-      var b = h('button', { type: 'button', class: 'fx-tab', 'data-filter': f[0], 'aria-pressed': f[0] === 'all' ? 'true' : 'false', text: f[1] });
-      b.addEventListener('click', function () { view.filter = f[0]; applyFilter(); });
-      bar.appendChild(b);
-    });
-    view.tabs = bar.children;
-    el.appendChild(bar);
-
-    var list = h('ul', { class: 'fx-trk-list' });
-    (BFF.programs || []).forEach(function (p) { list.appendChild(buildRow(p)); syncRow(p.id, true); });
-    view.none = h('p', { class: 'fx-muted', text: 'Nothing here yet.', hidden: '' });
-    el.appendChild(list);
-    el.appendChild(view.none);
-
-    // Backup panel
+  function buildBackupPanel() {
     var inc = h('input', { type: 'checkbox', id: 'trk-inc-profile' });
     var warn = h('p', { class: 'fx-warn', text: 'The file will contain your personal details (name, email, address). Keep it somewhere private.', hidden: '' });
     inc.addEventListener('change', function () { warn.hidden = !inc.checked; });
     var msg = h('p', { class: 'fx-msg', role: 'status', 'aria-live': 'polite' });
+    watchMsg(msg);
     var dl = h('button', { type: 'button', class: 'fx-btn fx-btn--primary', text: 'Download backup (JSON)' });
     dl.addEventListener('click', function () {
       var text;
@@ -693,41 +680,382 @@
         onCancel: function () { msg.textContent = 'Reset cancelled.'; }
       });
     });
-    el.appendChild(h('section', { class: 'fx-card', 'aria-labelledby': 'trk-backup-h' }, [
-      h('h3', { id: 'trk-backup-h', text: 'Backup' }),
+    return fold('backup', 'Backup and restore', [
       h('p', { class: 'fx-muted', text: 'Your tracker lives only in this browser. Download a file to keep a copy or move to another device.' }),
+      msg,
       h('div', { class: 'fx-check' }, [inc, h('label', { 'for': 'trk-inc-profile', text: 'Include My info in the backup' })]),
       warn,
       actions1,
       h('div', { class: 'fx-field' }, [h('label', { 'for': 'trk-restore', text: 'Restore from backup' }), file]),
       paste,
-      actions2,
-      msg
-    ]));
+      actions2
+    ]);
+  }
+
+  // ---- rows ----
+  function verdictLabel(p) {
+    var L = BFF.logic, v = L.verdict(p);
+    for (var i = 0; i < L.VERDICTS.length; i++) if (L.VERDICTS[i].id === v) return L.VERDICTS[i].label;
+    return '';
+  }
+  function line3Text(r) {
+    if (r.tag) return r.tag;
+    var st = tracker.getStatus(r.p.id);
+    if (st !== 'signed-up' && st !== 'received') return '';
+    var en = tracker.getEntry(r.p.id), d = en && en.signedUpAt ? localDate(en.signedUpAt) : '';
+    return d ? 'Signed up ' + d : '';
+  }
+  function setLine3(r) {
+    var t = line3Text(r);
+    r.line3.textContent = t;
+    r.line3.hidden = !t;
+  }
+  function setMore(r) {
+    r.more.textContent = '';
+    r.more.appendChild(document.createTextNode('Details'));
+    r.more.appendChild(h('span', { class: 'fx-sr', text: ' for ' + r.p.name }));
+    if (tracker.getNote(r.p.id).trim()) {
+      r.more.appendChild(h('span', { class: 'fx-trk-dot', 'aria-hidden': 'true', text: ' ●' }));
+      r.more.appendChild(h('span', { class: 'fx-sr', text: ' (has a note)' }));
+    }
+  }
+  // "My info is missing ..." under a to-do row; it goes away when the status leaves to-do and returns with it.
+  function setMiss(r) {
+    var want = tracker.getStatus(r.p.id) === 'todo' && !!(BFF.missing && BFF.missing.line);
+    var n = want ? BFF.missing.line(r.p, profileOf()) : null;
+    if (!!n === !!r.missShown) return;
+    r.miss.textContent = '';
+    if (n) r.miss.appendChild(n);
+    r.missShown = !!n;
+  }
+  // The row restyles in place; it only moves at the next full render.
+  function syncRowLocal(r) {
+    var st = tracker.getStatus(r.p.id);
+    r.select.value = st;
+    r.el.setAttribute('data-status', st);
+    r.el.classList.toggle('fx-moved', st !== r.rendered);
+    setLine3(r);
+    setMore(r);
+    setMiss(r);
+  }
+  function setOpen(r, open) {
+    if (open && !r.built) buildPanel(r);
+    r.panel.hidden = !open;
+    r.more.setAttribute('aria-expanded', open ? 'true' : 'false');
+    if (open) view.open[r.p.id] = true; else delete view.open[r.p.id];
+  }
+  function buildPanel(r) {
+    var p = r.p, id = p.id, nid = 'trk-n-' + id;
+    r.built = true;
+    var note = h('textarea', { id: nid, class: 'fx-textarea', rows: '2', maxlength: '2000', placeholder: 'Notes (confirmation email, date, issues)' });
+    note.value = tracker.getNote(id);
+    var hint = h('span', { class: 'fx-saved', role: 'status', 'aria-live': 'polite' });
+    r.addr = h('p', { class: 'fx-muted fx-trk-addr', hidden: '' });
+    r.gm = h('a', { class: 'fx-link-btn fx-link-btn--ghost', target: '_blank', rel: 'noopener noreferrer', hidden: '', text: 'Search my Gmail ↗' });
+    r.gm.setAttribute('aria-label', 'Search my Gmail for ' + p.name + ' (opens your own Gmail in a new tab)');
+    r.note = note;
+    if (p.whatYouGet) r.panel.appendChild(h('p', { class: 'fx-trk-what', text: p.whatYouGet }));
+    r.panel.appendChild(r.addr);
+    r.panel.appendChild(h('div', { class: 'fx-trk-links' }, [r.gm]));
+    r.panel.appendChild(h('div', { class: 'fx-field' }, [h('label', { 'for': nid, text: 'Notes for ' + p.name }), note, hint]));
+    var timer = null;
+    function flush() {
+      if (timer === null) return;
+      clearTimeout(timer);
+      timer = null;
+      var ok;
+      view.localChange = id;
+      try { ok = tracker.setNote(id, note.value); } finally { view.localChange = null; }
+      if (ok) {
+        hint.className = 'fx-saved';
+        hint.textContent = 'Saved';
+        setTimeout(function () { if (hint.textContent === 'Saved') hint.textContent = ''; }, 1500);
+      } else {
+        hint.className = 'fx-hint';
+        hint.textContent = SAVE_FAIL;
+      }
+    }
+    view.flushers.push(flush);
+    note.addEventListener('input', function () {
+      hint.textContent = '';
+      if (timer !== null) clearTimeout(timer);
+      timer = setTimeout(flush, 500);
+    });
+    note.addEventListener('blur', flush);
+    applyRowEmail(r, emailCtx());
+  }
+
+  // o: {tag, others}. Compact: name, a muted line, an optional timing line, one actions row.
+  function buildRow(p, o) {
+    var L = BFF.logic, id = p.id, st = tracker.getStatus(id);
+    var sid = 'trk-s-' + id, pid = 'trk-p-' + id;
+    var r = { p: p, tag: o.tag || '', rendered: st, built: false };
+    var select = h('select', { id: sid, class: 'fx-select fx-trk-select' });
+    STATUSES.forEach(function (s) { select.appendChild(h('option', { value: s, text: LABELS[s] })); });
+    select.value = st;
+    var link = h('a', { class: 'fx-link-btn', href: p.signupUrl, target: '_blank', rel: 'noopener noreferrer', text: 'Sign up ↗' });
+    link.setAttribute('aria-label', 'Sign up for ' + p.name + ' (opens in a new tab)');
+    r.select = select;
+    r.more = h('button', { type: 'button', id: 'trk-d-' + id, class: 'fx-btn fx-trk-more', 'aria-expanded': 'false', 'aria-controls': pid });
+    r.panel = h('div', { id: pid, class: 'fx-trk-panel', hidden: '' });
+    r.line3 = h('p', { class: 'fx-muted fx-trk-line3', hidden: '' });
+    r.miss = h('div', { class: 'fx-trk-miss' });
+    r.missShown = false;
+    var meta = [p.brand, verdictLabel(p), L.valueText(p)].filter(Boolean).join(' ' + CTX + ' ');
+    r.el = h('li', { class: 'fx-trk-row', 'data-id': id, 'data-status': st }, [
+      h('div', { class: 'fx-trk-main' }, [
+        h('strong', { class: 'fx-trk-title', text: p.name }),
+        h('p', { class: 'fx-muted fx-trk-meta', text: meta }),
+        r.line3,
+        r.miss
+      ]),
+      h('div', { class: 'fx-trk-actions' }, [
+        link,
+        h('div', { class: 'fx-trk-status' }, [h('label', { 'for': sid, class: 'fx-sr', text: 'Status for ' + p.name }), select]),
+        r.more
+      ]),
+      r.panel
+    ]);
+    setLine3(r);
+    setMore(r);
+    setMiss(r);
+    r.more.addEventListener('click', function () { setOpen(r, r.more.getAttribute('aria-expanded') !== 'true'); });
+    select.addEventListener('change', function () {
+      var ok;
+      view.localChange = id;
+      try { ok = tracker.setStatus(id, select.value); } finally { view.localChange = null; }
+      if (!ok) view.msg.textContent = SAVE_FAIL;
+      view.live.textContent = '';
+      view.live.textContent = p.name + ' marked ' + LABELS[tracker.getStatus(id)] + '.';
+    });
+    view.rows[id] = r;
+    if (view.open[id]) setOpen(r, true);
+    if (o.others && o.others.length) {
+      var n = o.others.length;
+      var ul = h('ul', { class: 'fx-trk-list fx-trk-alts' });
+      o.others.forEach(function (a) { ul.appendChild(buildRow(a, {})); });
+      var d = h('details', { class: 'fx-about fx-trk-others' }, [
+        h('summary', { text: n === 1 ? '1 more way to get the same thing' : n + ' more ways to get the same thing' }), ul]);
+      d.open = !!view.openOthers[id];
+      d.addEventListener('toggle', function () { if (d.open) view.openOthers[id] = true; else delete view.openOthers[id]; });
+      r.el.appendChild(d);
+    }
+    return r.el;
+  }
+
+  function startGuided(ids, anchor, btn) {
+    var live = ids.filter(function (id) { return tracker.getStatus(id) === 'todo'; });
+    if (!live.length || !BFF.guided || !BFF.guided.preselect) return;
+    function go() { BFF.guided.preselect(live); if (BFF.nav) BFF.nav.go('guided'); else location.hash = '#guided'; }
+    var ri = BFF.guided.runInfo && BFF.guided.runInfo();
+    if (!ri || !BFF.ui) { go(); return; }
+    BFF.ui.confirm({
+      after: anchor, returnTo: btn, confirmLabel: 'Replace run',
+      message: 'Replace your current run? You are at ' + ri.index + ' of ' + ri.total + ' in a guided run. A new run starts from this list. Statuses you already set are kept.',
+      onConfirm: go
+    });
+  }
+
+  function titleEl(key, text, n) {
+    return h('h3', { class: 'fx-trk-sec-title', id: 'trk-h-' + key }, [document.createTextNode(text + ' '), h('span', { class: 'fx-trk-count', text: '(' + n + ')' })]);
+  }
+  function rowList(rows, tagLater) {
+    var ul = h('ul', { class: 'fx-trk-list' });
+    rows.forEach(function (r) {
+      ul.appendChild(buildRow(r.p, { others: r.others, tag: tagLater ? BFF.logic.WHEN_LABELS[r.p.when] || '' : '' }));
+    });
+    return ul;
+  }
+  function nowHelp(secs, weeks) {
+    if (!secs.now.length) return [document.createTextNode(secs.later.length ? 'Nothing to do right now. The rest comes later:' : 'Nothing else to do right now. Only the options below are left.')];
+    if (typeof weeks !== 'number') {
+      return [document.createTextNode('These work now, while pregnant or at any time. Add your due date in '), h('a', { href: '#info', text: 'My info', 'data-info-key': 'dueDate' }),
+        document.createTextNode(' to see when the rest is ready.')];
+    }
+    if (weeks < 0) return [document.createTextNode('Your due date has passed, so everything on your list is ready now.')];
+    if (weeks > 8) return [document.createTextNode('These work now, while pregnant or at any time. Programs for the last weeks and after the birth are under Later.')];
+    var away = weeks === 0 ? 'Your due date is this week' : 'Your due date is ' + weeks + (weeks === 1 ? ' week' : ' weeks') + ' away';
+    return [document.createTextNode(away + ', so the last-weeks programs have joined this list. Programs for after the birth are under Later.')];
+  }
+
+  function renderList(sc) {
+    var active = document.activeElement, focusId = '', caret = null, hadFocus = false;
+    if (active && active !== document.body && view.list.contains(active)) {
+      hadFocus = true;
+      focusId = active.id || '';
+      if (active.tagName === 'TEXTAREA') caret = active.selectionStart;
+    }
+    view.list.textContent = '';
+    view.rows = {};
+    view.flushers = [];
+    view.list.setAttribute('data-tab', view.filter);
+    var c = rowCounts(sc);
+    if (view.filter === 'todo') {
+      if (!c.todo) {
+        view.list.appendChild(h('p', { class: 'fx-muted fx-trk-empty', text: EMPTY.todo }));
+      } else {
+        var weeks = weeksNow(), secs = sectionsOf(sc);
+        // 1. Do now
+        var nowSec = h('section', { class: 'fx-trk-sec', 'data-sec': 'now', 'aria-labelledby': 'trk-h-now' });
+        var head = h('div', { class: 'fx-trk-sec-head' }, [titleEl('now', SECTION_TITLES.now, secs.now.length)]);
+        if (secs.now.length && BFF.guided && BFF.guided.preselect) {
+          var help = h('button', { type: 'button', class: 'fx-btn fx-btn--primary fx-btn--small fx-trk-help', text: 'Do these with help' });
+          help.addEventListener('click', function () {
+            startGuided(secs.now.map(function (r) { return r.p.id; }), head, help);
+          });
+          head.appendChild(help);
+        }
+        nowSec.appendChild(head);
+        nowSec.appendChild(h('p', { class: 'fx-muted fx-trk-help-line' }, nowHelp(secs, weeks)));
+        if (secs.now.length) nowSec.appendChild(rowList(secs.now, false));
+        view.list.appendChild(nowSec);
+        // 2. Later
+        if (secs.later.length) {
+          view.list.appendChild(h('section', { class: 'fx-trk-sec', 'data-sec': 'later', 'aria-labelledby': 'trk-h-later' },
+            [h('div', { class: 'fx-trk-sec-head' }, [titleEl('later', SECTION_TITLES.later, secs.later.length)]), rowList(secs.later, true)]));
+        }
+        // 3. Only if you would buy anyway, and long shots (closed by default)
+        if (secs.optional.length) {
+          var opt = h('details', { class: 'fx-about fx-trk-sec fx-trk-opt', 'data-sec': 'optional' }, [
+            h('summary', {}, [titleEl('optional', SECTION_TITLES.optional, secs.optional.length)]), rowList(secs.optional, false)]);
+          opt.open = view.optOpen;
+          opt.addEventListener('toggle', function () { view.optOpen = opt.open; });
+          view.list.appendChild(opt);
+        }
+      }
+    } else {
+      var rows = sc.rows.filter(function (r) { return view.filter === 'all' || r.status === view.filter; });
+      if (!rows.length) view.list.appendChild(h('p', { class: 'fx-muted fx-trk-empty', text: EMPTY[view.filter] }));
+      else {
+        var label = '';
+        TABS.forEach(function (t) { if (t[0] === view.filter) label = t[1]; });
+        view.list.appendChild(h('section', { class: 'fx-trk-sec', 'data-sec': 'all', 'aria-labelledby': 'trk-h-all' },
+          [h('div', { class: 'fx-trk-sec-head' }, [titleEl('all', label, rows.length)]), rowList(rows, false)]));
+      }
+    }
+    if (hadFocus) {
+      var n = focusId ? document.getElementById(focusId) : null;
+      if (n && view.list.contains(n)) {
+        try { n.focus({ preventScroll: true }); } catch (e) {}
+        if (caret !== null && n.setSelectionRange) { try { n.setSelectionRange(caret, caret); } catch (e2) {} }
+      }
+      if (!n || document.activeElement !== n) { var tb = view.tabBtns[view.filter]; if (tb) tb.focus({ preventScroll: true }); }
+    }
+  }
+
+  // The notice under the summary: how many to-do programs depend on missing My info answers.
+  function refreshMissing() {
+    if (!view.missBox) return;
+    var L = BFF.logic, M = BFF.missing;
+    var counts = L && L.missingInfoCounts ? L.missingInfoCounts(BFF.programs || [], profileOf(), function (id) { return tracker.getStatus(id); }) : null;
+    var sig = counts ? counts.total + ':' + L.MISSING_KEYS.map(function (k) { return counts.keys[k]; }).join(',') : '';
+    if (sig === view.missSig) return;
+    view.missSig = sig;
+    view.missBox.textContent = '';
+    var n = M && M.notice && counts ? M.notice(counts, { compact: true }) : null;
+    if (n) view.missBox.appendChild(n);
+    view.missBox.hidden = !n;
+  }
+
+  function flushAll() { view.flushers.forEach(function (f) { f(); }); }
+
+  // A full render: scope, summary, tab counts, list. Tool folds and the Gmail panel are never touched.
+  function render() {
+    if (!view.list || !BFF.logic) return;
+    flushAll();
+    var sc = computeScope();
+    view.scope = sc;
+    updateSummary(sc);
+    refreshMissing();
+    renderList(sc);
+    updateLeft(sc);
+    syncEmailBits();
+  }
+  // A change made with a row's own control: the row stays put, the numbers follow at once.
+  function softUpdate(id) {
+    var r = view.rows[id];
+    if (r) syncRowLocal(r);
+    var sc = computeScope();
+    updateSummary(sc);
+    refreshMissing();
+    updateLeft(sc);
+    refreshMailto();
+  }
+
+  view.init = function (el) {
+    view.el = el;
+    el.classList.add('fx-view');
+    if (!el.querySelector('h2')) el.appendChild(h('h2', { tabindex: '-1', text: 'Tracker' }));
+
+    view.bar = h('progress', { class: 'fx-progress', value: '0', max: '1' });
+    view.barText = h('p', { class: 'fx-progress-text' });
+    view.claimEl = h('p', { id: 'trk-toclaim', class: 'fx-trk-claim' });
+    view.claimNote = h('p', { class: 'fx-muted', text: 'Our estimate. Programs with no known value, offers that need a purchase and prize draws are not counted.' });
+    view.valueEl = h('p', { class: 'fx-muted', hidden: '' });
+    view.empty = h('p', { class: 'fx-muted', text: 'No programs loaded.', hidden: '' });
+    view.storeWarn = h('p', { class: 'fx-warn', role: 'alert', text: 'This browser is not saving data. ' + SAVE_FAIL, hidden: '' });
+    view.live = h('div', { class: 'fx-sr', role: 'status', 'aria-live': 'polite' });
+    view.msg = h('p', { class: 'fx-hint fx-trk-alert', role: 'alert' });
+    el.appendChild(h('div', { class: 'fx-card fx-trk-summary' }, [view.barText, view.bar, view.claimEl, view.claimNote, view.valueEl, view.empty]));
+    view.missBox = h('div', { class: 'fx-trk-miss-notice', hidden: '' });
+    el.appendChild(view.missBox);
+    el.appendChild(view.storeWarn);
+    el.appendChild(view.msg);
+    el.appendChild(view.live);
+
+    // Tools, folded away. Which folds are open is remembered in prefs.trkOpen.
+    el.appendChild(buildEmailPanel());
+    // Mount point for the Gmail connection panel (BFF.inboxView, optional); inboxview.js finds it by id.
+    var inboxNode = h('div', { id: 'trk-inbox' });
+    el.appendChild(fold('gmail', 'Check Gmail for sign-up emails', [inboxNode]));
+    try { if (BFF.inboxView && typeof BFF.inboxView.mount === 'function') BFF.inboxView.mount(inboxNode); } catch (e) { if (window.console) console.error('Gmail panel failed to mount:', e); }
+    el.appendChild(buildBackupPanel());
+
+    var bar = h('div', { class: 'fx-tabs fx-trk-tabs', role: 'group', 'aria-label': 'Filter by status' });
+    view.tabBtns = {};
+    view.tabCounts = {};
+    TABS.forEach(function (f) {
+      var cnt = h('span', { class: 'fx-tab-count', text: '(0)' });
+      var b = h('button', { type: 'button', class: 'fx-tab', 'data-filter': f[0], 'aria-pressed': f[0] === view.filter ? 'true' : 'false' },
+        [h('span', { class: 'fx-tab-label', text: f[1] }), document.createTextNode(' '), cnt]);
+      b.addEventListener('click', function () {
+        view.filter = f[0];
+        Object.keys(view.tabBtns).forEach(function (k) { view.tabBtns[k].setAttribute('aria-pressed', k === view.filter ? 'true' : 'false'); });
+        render();
+      });
+      view.tabBtns[f[0]] = b;
+      view.tabCounts[f[0]] = cnt;
+      bar.appendChild(b);
+    });
+    el.appendChild(bar);
+
+    view.list = h('div', { id: 'trk-list', class: 'fx-trk-listbox' });
+    el.appendChild(view.list);
+
+    view.leftText = h('p', { class: 'fx-small' });
+    view.leftBtn = h('button', { type: 'button', class: 'fx-btn fx-btn--small', 'aria-pressed': 'false' });
+    view.leftBtn.addEventListener('click', function () { view.showAll = !view.showAll; render(); });
+    view.left = h('div', { class: 'fx-trk-left', hidden: '' }, [view.leftText, view.leftBtn]);
+    el.appendChild(view.left);
 
     document.addEventListener('bff:tracker-changed', function (e) {
       var id = e && e.detail ? e.detail.id : null;
-      if (id && view.rows[id]) syncRow(id);
-      else (BFF.programs || []).forEach(function (p) { syncRow(p.id, true); });
-      updateSummary();
-      applyFilter();
-      refreshMailto();
+      if (id && view.localChange === id) { softUpdate(id); return; }
+      if (view.el.hidden) return;   // show() renders in full when the page comes back
+      render();
     });
-    document.addEventListener('bff:storage-failed', updateSummary);
-    function flushAll() { view.flushers.forEach(function (f) { f(); }); }
+    document.addEventListener('bff:storage-failed', function () { if (view.scope) updateSummary(view.scope); });
     window.addEventListener('pagehide', flushAll);
     document.addEventListener('visibilitychange', function () { if (document.visibilityState === 'hidden') flushAll(); });
-    syncEmailBits();
-    document.addEventListener('bff:profile-changed', syncEmailBits);
-    updateSummary();
-    applyFilter();
+    document.addEventListener('bff:profile-changed', function () {
+      if (view.el.hidden) { syncEmailBits(); return; }
+      render();
+    });
+    render();
   };
   view.show = function () {
-    syncEmailBits();
-    (BFF.programs || []).forEach(function (p) { syncRow(p.id); });
     view.msg.textContent = '';
-    updateSummary();
-    applyFilter();
+    render();
   };
   BFF.views.tracker = { init: view.init, show: view.show };
 })();

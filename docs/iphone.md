@@ -23,7 +23,7 @@ Use this if you want no script at all. It uses your own contact card.
 
 The Shortcut runs the fill script on the page you are looking at, from Safari's Share menu. The app gives you the script to paste. A ready-made shortcut file is not included, because shortcut files must be signed by Apple's app.
 
-1. In My info, under **Fill forms on your phone**, tap **Copy fill script**. If copying does not work, tap **Save fill script as a file**, or select the text that appears.
+1. In My info, open **Fill forms on your phone** and tap **Copy fill script**. If copying does not work, tap **Save fill script as a file**, or select the text that appears.
 2. Open **Settings**, tap **Shortcuts**, then **Advanced**, and turn on **Allow Running Scripts**.
 3. Open the **Shortcuts** app and tap **+** to start a new shortcut.
 4. Search the actions for "Run JavaScript" and add **Run JavaScript on Web Page**.
@@ -37,7 +37,7 @@ If you change My info, copy the script again and paste it over the old one in th
 
 ## Option 3: Use a bookmark (Apple does not document this; test it once)
 
-1. In My info, tap **Copy bookmark code**.
+1. In My info, open **Fill forms on your phone** and tap **Copy bookmark code**.
 2. In Safari, open any page, tap **Share**, then **Add Bookmark**. Name it "Baby fill" and save it.
 3. Open **Bookmarks**, tap **Edit**, then tap "Baby fill".
 4. Delete the address and paste the code you copied. It starts with `javascript:`.
@@ -57,7 +57,7 @@ If nothing happens, the site may block bookmark scripts, or a Safari update may 
 
 Your data is stored only in the browser. Save a backup now and then:
 
-1. In the **Tracker**, tap **Download backup**.
+1. In the **Tracker**, open **Backup and restore** and tap **Download backup (JSON)**.
 2. Keep the file private. It holds your tracker statuses and notes. It includes My info only if you tick **Include My info in the backup** first, and then anyone who has the file can read your details.
 
 Safari can clear a website's saved data after about a week of Safari use without a visit to it. Having a recent backup means you can load your statuses back in.

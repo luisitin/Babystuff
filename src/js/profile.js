@@ -29,6 +29,106 @@
     { key: 'job', label: 'Do you or your partner have a paid job?', options: [['yes', 'Yes'], ['no', 'No']] }
   ];
   var sitSel = {}, sitField = {};
+  var phoneFold = null;
+  var root = null;
+  var needEls = {};      // key -> the "N programs depend on this." line under each of the five fields
+  var ask = null;        // { key, from, wrap, back } while a field is marked as the one asked for
+  var NEED_KEYS = ['state', 'cover', 'insurer', 'lowIncome', 'job'];
+
+  function statusLookup() {
+    return BFF.tracker && BFF.tracker.getStatus ? function (id) { return BFF.tracker.getStatus(id); } : undefined;
+  }
+  var PLUS_ROW = null;   // wrapper around the plus-address checkbox row, so it can take the highlight
+  var ASK_KEYS = NEED_KEYS.concat(['dueDate', 'email', 'plus']);
+  function controlFor(key) {
+    if (key === 'plus') return plusBox;
+    return sitSel[key] || inputs[key];
+  }
+  function wrapFor(key) {
+    if (key === 'plus') return PLUS_ROW;
+    if (sitField[key]) return sitField[key];
+    return inputs[key] && inputs[key].parentNode;
+  }
+  function hasValue(c) { return !!c && (c.type === 'checkbox' ? c.checked : !!c.value); }
+  // Drop the highlight once the asked-for field has an answer.
+  function settleAsk(key) { if (ask && ask.key === key && hasValue(controlFor(key))) ask.wrap.classList.remove('fx-ask'); }
+  // Under each unanswered field: how many programs still to do depend on it. Neutral, not an error.
+  function refreshNeeds() {
+    var L = BFF.logic;
+    if (!L || !L.missingInfoCounts || !needEls.state) return;
+    var pr = read();
+    var counts = L.missingInfoCounts(BFF.programs || [], pr, statusLookup());
+    NEED_KEYS.forEach(function (k) {
+      var n = counts.keys && counts.keys[k] > 0 ? counts.keys[k] : 0;
+      var answered = typeof pr[k] === 'string' && pr[k] !== '';
+      var el = needEls[k];
+      if (!el) return;
+      if (answered || !n) { el.textContent = ''; el.hidden = true; }
+      else { el.textContent = n === 1 ? '1 program depends on this.' : n + ' programs depend on this.'; el.hidden = false; }
+    });
+    // Only the select fields settle here; text, date and checkbox fields settle on their own change/blur.
+    if (ask && NEED_KEYS.indexOf(ask.key) !== -1) settleAsk(ask.key);
+  }
+  function needLine(key, control) {
+    var id = 'info-' + key + '-need';
+    var el = h('p', { id: id, class: 'fx-need', hidden: '' });
+    el.hidden = true;
+    var cur = control.getAttribute('aria-describedby');
+    control.setAttribute('aria-describedby', cur ? cur + ' ' + id : id);
+    needEls[key] = el;
+    return el;
+  }
+  function clearAsk() {
+    if (!ask) return;
+    ask.wrap.classList.remove('fx-ask');
+    if (ask.back && ask.back.parentNode) ask.back.parentNode.removeChild(ask.back);
+    ask = null;
+  }
+  var BACK = { directory: 'Back to Programs', tracker: 'Back to Tracker', guided: 'Back to Do it for me' };
+  function applyAsk(w) {
+    var key = w && w.key;
+    if (ASK_KEYS.indexOf(key) === -1) return;
+    if (key === 'insurer' && sitField.insurer.hidden) key = 'cover';
+    var wrap = wrapFor(key), control = controlFor(key);
+    if (!wrap || !control) return;
+    ask = { key: key, from: w.from, wrap: wrap, back: null };
+    if (!hasValue(control)) wrap.classList.add('fx-ask');
+    if (BACK[w.from]) {
+      ask.back = h('a', { class: 'fx-ask-back', href: '#' + w.from, text: BACK[w.from] });
+      wrap.appendChild(ask.back);
+    }
+    var reduce = false;
+    try { reduce = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches); } catch (e) {}
+    setTimeout(function () {
+      try { wrap.scrollIntoView({ block: 'center', behavior: reduce ? 'auto' : 'smooth' }); } catch (e) { wrap.scrollIntoView(); }
+      control.focus({ preventScroll: true });
+    }, 0);
+  }
+  // A pending save is written when the person leaves My info, so the next page shows the new answer at once.
+  function flushPending() { if (timer) { clearTimeout(timer); saveNow(); } }
+  function visible() { return !!root && !root.hidden && root.offsetParent !== null; }
+  document.addEventListener('click', function (e) {
+    var t = e.target;
+    if (t && t.nodeType === 3) t = t.parentNode;
+    if (!timer || !visible() || !t || !t.closest) return;
+    if (t.closest('a[href^="#"]')) flushPending();
+  }, true);
+  window.addEventListener('hashchange', flushPending);
+  document.addEventListener('bff:profile-changed', refreshNeeds);
+  document.addEventListener('bff:tracker-changed', refreshNeeds);
+
+  // bff.prefs.v1.infoFillOpen: whether the phone fold is open. Read the object, change the key, write it back.
+  function readFillOpen() {
+    var p = store.get('prefs.v1', {});
+    return !!(p && typeof p === 'object' && p.infoFillOpen === true);
+  }
+  function writeFillOpen(open) {
+    var p = store.get('prefs.v1', {});
+    if (!p || typeof p !== 'object') p = {};
+    if (!!p.infoFillOpen === !!open) return;
+    p.infoFillOpen = !!open;
+    store.set('prefs.v1', p);
+  }
 
   var CHECKS = {
     email: { re: /^[^\s@]+@[^\s@]+\.[^\s@]+$/, msg: 'This does not look like an email address. You can still save it.' },
@@ -161,6 +261,7 @@
   BFF.views.info = {
     init: function (el) {
       el.classList.add('fx-view');
+      root = el;
       if (!el.querySelector('h2')) el.appendChild(h('h2', { tabindex: '-1', text: 'My info' }));
       el.appendChild(h('p', { class: 'fx-note', text: 'Stored only in this browser on this device. This app has no server and makes no network requests, so your details never leave your device. Clearing your browser data deletes them.' }));
       el.appendChild(h('p', { class: 'fx-tip', text: 'Tip: Use a dedicated inbox or a plus address like yourname+baby@gmail.com. Sign-up mail is easy to filter, and you can see who shares your address.' }));
@@ -193,14 +294,17 @@
           timer = setTimeout(saveNow, 400);
         });
         if (f.check) input.addEventListener('blur', function () { validate(f); });
+        input.addEventListener('change', function () { settleAsk(f.key); });
+        input.addEventListener('blur', function () { settleAsk(f.key); });
         if (f.key === 'email') { input.addEventListener('change', updatePlus); input.addEventListener('blur', updatePlus); }
-        form.appendChild(h('div', { class: 'fx-field' }, [h('label', { 'for': id, text: f.label }), input, hint]));
+        form.appendChild(h('div', { class: 'fx-field' }, [h('label', { 'for': id, text: f.label }), input, hint, f.key === 'state' ? needLine('state', input) : null]));
+        if (f.key === 'state') input.addEventListener('change', function () { if (input.value && ask && ask.key === 'state') ask.wrap.classList.remove('fx-ask'); });
       });
       el.appendChild(form);
 
       var sit = h('section', { class: 'fx-card fx-form fx-situation', 'aria-labelledby': 'info-sit-h' }, [
         h('h3', { id: 'info-sit-h', text: 'Your situation (optional)' }),
-        h('p', { class: 'fx-muted', text: 'Used only to hide programs that cannot apply to you. Stays on this device.' })
+        h('p', { class: 'fx-muted', text: 'Used only to work out which programs can apply to you. Stays on this device.' })
       ]);
       SITUATION.forEach(function (d) {
         var id = 'info-' + d.key;
@@ -210,6 +314,7 @@
           sel.appendChild(h('option', { value: o[0], text: o[1] }));
         });
         sel.addEventListener('change', function () {
+          if (sel.value && ask && ask.key === d.key) ask.wrap.classList.remove('fx-ask');
           if (d.key === 'cover') syncSituation(read());
           statusEl.className = 'fx-saved fx-saved--block';
           statusEl.textContent = 'Saving…';
@@ -217,7 +322,7 @@
           timer = setTimeout(saveNow, 400);
         });
         sitSel[d.key] = sel;
-        var fld = h('div', { class: 'fx-field', 'data-situation': d.key }, [h('label', { 'for': id, text: d.label }), sel]);
+        var fld = h('div', { class: 'fx-field', 'data-situation': d.key }, [h('label', { 'for': id, text: d.label }), sel, needLine(d.key, sel)]);
         sitField[d.key] = fld;
         sit.appendChild(fld);
       });
@@ -229,6 +334,7 @@
       plusBox.addEventListener('change', function () {
         if (plusBox.checked) tagMapNow(true);
         updatePlus();
+        settleAsk('plus');
         statusEl.className = 'fx-saved fx-saved--block';
         statusEl.textContent = 'Saving…';
         if (timer) clearTimeout(timer);
@@ -236,7 +342,7 @@
       });
       el.appendChild(h('section', { class: 'fx-card', 'aria-labelledby': 'info-plus-h' }, [
         h('h3', { id: 'info-plus-h', text: 'Plus addresses' }),
-        h('div', { class: 'fx-check' }, [plusBox, h('label', { 'for': 'info-plus', text: 'Give each program its own plus address' })]),
+        PLUS_ROW = h('div', { class: 'fx-plus-row' }, [h('div', { class: 'fx-check' }, [plusBox, h('label', { 'for': 'info-plus', text: 'Give each program its own plus address' })])]),
         h('p', { class: 'fx-muted', text: 'Adds a short tag to your email, like yourname+similac@gmail.com. The guided run copies the tagged address, and you can filter or search your inbox by program.' }),
         plusPreview,
         plusNote,
@@ -264,15 +370,41 @@
       el.appendChild(clearRow);
       el.appendChild(statusEl);
       var phoneNode = h('div', { id: 'info-fill' });
-      el.appendChild(phoneNode);
+      // The phone section is long and most people open it once, so it sits in a fold that remembers its state.
+      // phone.js redraws only the inside of #info-fill, so a redraw never closes the fold.
+      phoneFold = h('details', { class: 'fx-card ph-fold', id: 'info-fill-fold' }, [
+        h('summary', { class: 'ph-fold-sum', id: 'info-fill-sum', text: 'Fill forms on your phone (iPhone shortcut or bookmark)' }),
+        phoneNode
+      ]);
+      phoneFold.open = readFillOpen();
+      phoneFold.addEventListener('toggle', function () { writeFillOpen(phoneFold.open); });
+      el.appendChild(phoneFold);
       if (BFF.phoneView && BFF.phoneView.mount) BFF.phoneView.mount(phoneNode);
       fill();
-      function flush() { if (timer) { clearTimeout(timer); saveNow(); } }
+      function flush() { flushPending(); }
       window.addEventListener('pagehide', flush);
       document.addEventListener('visibilitychange', function () { if (document.visibilityState === 'hidden') flush(); });
     },
     show: function () {
       if (!timer) fill();
+      clearAsk();
+      refreshNeeds();
+      var want = BFF.missing && BFF.missing.take ? BFF.missing.take() : null;
+      if (want) applyAsk(want);
+      // Arrived through the guided page's "Set up the fill script" link: open the fold, scroll to it, focus its summary.
+      // Done after the router has moved focus and scrolled to the top.
+      if (BFF.openInfoFill) {
+        BFF.openInfoFill = false;
+        setTimeout(function () {
+          if (!phoneFold) return;
+          phoneFold.open = true;
+          var reduce = false;
+          try { reduce = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches); } catch (e) {}
+          var sum = phoneFold.querySelector('summary');
+          try { phoneFold.scrollIntoView({ block: 'start', behavior: reduce ? 'auto' : 'smooth' }); } catch (e) { phoneFold.scrollIntoView(); }
+          if (sum) sum.focus({ preventScroll: true });
+        }, 0);
+      }
     }
   };
 })();

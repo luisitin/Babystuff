@@ -7,7 +7,7 @@ const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const CSS = ['base.css', 'features.css', 'inbox.css', 'phone.css'].map((f) => 'src/css/' + f);
 const ARTIFACT_CSS = 'src/css/artifact.css';
 const JS = [
-  'logic.js', 'store.js', 'email.js', 'zip.js', 'host.js', 'fieldmatch.js', 'fillscript.js', 'inbox.js',
+  'logic.js', 'store.js', 'missing.js', 'email.js', 'zip.js', 'host.js', 'fieldmatch.js', 'fillscript.js', 'inbox.js',
   'tracker.js', 'profile.js', 'directory.js', 'guided.js', 'inboxview.js', 'phone.js', 'app.js'
 ].map((f) => 'src/js/' + f);
 const inlined = [];

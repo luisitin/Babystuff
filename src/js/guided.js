@@ -32,7 +32,6 @@
     var r = p.requirements || [];
     return trulyFree(p) && p.category !== 'health-benefits' && p.category !== 'assistance' && r.indexOf('eligibility') < 0 && r.indexOf('insurance') < 0;
   }
-  var NO_FREE = 'Nothing arrives free without a purchase or a win.';
   // Best first. Falls back to the data order when the shared logic is missing.
   function ranked(list) {
     return BFF.logic && BFF.logic.rankPrograms ? BFF.logic.rankPrograms(list) : list.slice();
@@ -49,7 +48,22 @@
     var vt = BFF.logic && BFF.logic.valueText ? BFF.logic.valueText(p) : '';
     return [vl, vt].filter(Boolean).join(' \u00b7 ');
   }
-  function freeLine(p) { return p.freeStuff ? p.freeStuff : NO_FREE; }
+  // What arrives free, or the plain sentence for why nothing does (it differs for a tax credit and a prize draw).
+  function freeLine(p) {
+    if (p.freeStuff) return p.freeStuff;
+    return BFF.logic && BFF.logic.freeNote ? BFF.logic.freeNote(p) : 'What arrives is not stated.';
+  }
+  function gkey(p) { return BFF.logic && BFF.logic.groupKey ? BFF.logic.groupKey(p) : (p.sameAs || p.id); }
+  function isSide(p) { var v = BFF.logic && BFF.logic.verdict ? BFF.logic.verdict(p) : ''; return v === 'conditional' || v === 'longshot'; }
+  function missingCounts() {
+    var L = BFF.logic;
+    return L && L.missingInfoCounts ? L.missingInfoCounts(progs(), profile(), function (id) { return T().getStatus(id); }) : null;
+  }
+  // The shared "My info is missing ..." line for a program that is still to do.
+  function missLine(p) {
+    if (!BFF.missing || T().getStatus(p.id) !== 'todo') return null;
+    return BFF.missing.line(p, profile());
+  }
   function handled(p) { return T().getStatus(p.id) !== 'todo'; }
   function profile() {
     var p = store.get('profile.v1', {});
@@ -215,10 +229,47 @@
     return progs().filter(function (p) { return !hiddenHere(p) || !!(selected && selected[p.id]); });
   }
 
+  // At most one program per group of the same thing (the best ranked one that qualifies),
+  // and none in a group where another member is already signed up or received.
+  var seen = null; // ids that were listed the last time the selection was looked at
+  function visibleNow() {
+    var v = {};
+    progs().forEach(function (p) { if (!hiddenHere(p)) v[p.id] = true; });
+    return v;
+  }
+  // Programs that became visible since then (the person added their state, say) get the normal default.
+  // Boxes the person could already see are not touched. Never used after preselect(), which resets `seen`.
+  function applyNewDefaults() {
+    var now = visibleNow();
+    if (!seen) { seen = now; return; }
+    var done = {}, taken = {};
+    progs().forEach(function (p) {
+      var st = T().getStatus(p.id);
+      if (st === 'signed-up' || st === 'received') done[gkey(p)] = true;
+      if (selected[p.id]) taken[gkey(p)] = true;
+    });
+    ranked(progs()).forEach(function (p) {
+      if (!now[p.id] || seen[p.id]) return;
+      var k = gkey(p);
+      if (done[k] || taken[k]) return;
+      if (!handled(p) && defaultOn(p)) { selected[p.id] = true; taken[k] = true; }
+    });
+    seen = now;
+  }
   function initSelection() {
     selected = {};
     preorder = null;
-    progs().forEach(function (p) { if (!handled(p) && !hiddenHere(p) && defaultOn(p)) selected[p.id] = true; });
+    seen = visibleNow();
+    var done = {}, taken = {};
+    progs().forEach(function (p) {
+      var st = T().getStatus(p.id);
+      if (st === 'signed-up' || st === 'received') done[gkey(p)] = true;
+    });
+    ranked(progs()).forEach(function (p) {
+      var k = gkey(p);
+      if (done[k] || taken[k]) return;
+      if (!handled(p) && !hiddenHere(p) && defaultOn(p)) { selected[p.id] = true; taken[k] = true; }
+    });
   }
 
   // ---- views ----
@@ -227,38 +278,61 @@
     body.appendChild(h('p', { class: 'fx-lead', text: 'Pick the programs to work through. For each one you get a sign-up page to open and your details ready to copy. Nothing is ever submitted for you.' }));
     body.appendChild(phoneHint());
     var pr = profile();
-    if (!pr.firstName && !pr.email && !pr.address1) {
+    var emptyInfo = !pr.firstName && !pr.email && !pr.address1;
+    if (emptyInfo) {
       var w = h('p', { class: 'fx-warn' }, [document.createTextNode('My info is empty, so there is nothing to copy yet. '), h('a', { href: '#info', text: 'Fill in My info' }), document.createTextNode(' first.')]);
       body.appendChild(w);
     }
+    var counts = missingCounts();
+    var mn = !emptyInfo && BFF.missing && counts ? BFF.missing.notice(counts, { compact: true }) : null;
+    if (mn) body.appendChild(h('div', { class: 'gd-miss-box' }, [mn]));
     var count = h('p', { class: 'fx-count', role: 'status', 'aria-live': 'polite' });
     var start = h('button', { type: 'button', class: 'fx-btn fx-btn--primary' });
-    var boxes = [];
-    var shownList = ranked(setupProgs());
+    var boxes = {};
+    var groups = BFF.logic.collapseGroups(ranked(setupProgs()));
+    var mainGroups = groups.filter(function (g) { return !isSide(g.lead); });
+    var sideGroups = groups.filter(function (g) { return isSide(g.lead); });
+    var sideDet = null;
+    var altDets = [];
+    function ids(g) { return [g.lead].concat(g.others); }
     function refresh() {
       var n = Object.keys(selected).length;
-      count.textContent = n + ' of ' + shownList.length + ' selected';
+      var gn = groups.filter(function (g) { return ids(g).some(function (p) { return selected[p.id]; }); }).length;
+      count.textContent = gn + ' of ' + groups.length + ' selected';
       start.textContent = 'Start (' + n + ' program' + (n === 1 ? '' : 's') + ')';
       start.disabled = n === 0;
     }
-    function setAll(fn) {
-      selected = {};
-      shownList.forEach(function (p, i) { var on = fn(p); boxes[i].checked = on; if (on) selected[p.id] = true; });
+    // Folds only ever open here, so nothing is ticked out of sight.
+    function openTicked() {
+      altDets.forEach(function (d) {
+        if (!d.det.open && d.g.others.some(function (p) { return selected[p.id]; })) d.det.open = true;
+      });
+      if (sideDet && !sideDet.open && sideGroups.some(function (g) { return ids(g).some(function (p) { return selected[p.id]; }); })) sideDet.open = true;
+    }
+    function setBox(p, on) { if (on) selected[p.id] = true; else delete selected[p.id]; if (boxes[p.id]) boxes[p.id].checked = !!on; }
+    // leadFn decides each lead; altFn each alternate (null leaves it as it is).
+    function apply(leadFn, altFn) {
+      groups.forEach(function (g) {
+        setBox(g.lead, leadFn(g.lead));
+        g.others.forEach(function (o) { var v = altFn(o); setBox(o, v === null ? !!selected[o.id] : v); });
+      });
+      openTicked();
       refresh();
     }
     var bar = h('div', { class: 'fx-actions' });
-    [['Select all', function () { return true; }], ['Select none', function () { return false; }],
-     ['Truly free only', function (p) { return !handled(p) && trulyFree(p); }]].forEach(function (b) {
+    [['Select all', function () { apply(function () { return true; }, function () { return null; }); }],
+     ['Select none', function () { apply(function () { return false; }, function () { return false; }); }],
+     ['Truly free only', function () { apply(function (p) { return !handled(p) && trulyFree(p); }, function () { return false; }); }]].forEach(function (b) {
       var btn = h('button', { type: 'button', class: 'fx-btn', text: b[0] });
-      btn.addEventListener('click', function () { setAll(b[1]); });
+      btn.addEventListener('click', b[1]);
       bar.appendChild(btn);
     });
     body.appendChild(bar);
     var at = autoToggle('setup');
     if (at) body.appendChild(at);
     body.appendChild(count);
-    var list = h('ul', { class: 'fx-pick' });
-    shownList.forEach(function (p, i) {
+
+    function pickRow(p, cls) {
       var id = 'gd-pick-' + p.id;
       var cb = h('input', { type: 'checkbox', id: id });
       cb.checked = !!selected[p.id];
@@ -266,29 +340,52 @@
         if (cb.checked) selected[p.id] = true; else delete selected[p.id];
         refresh();
       });
-      boxes.push(cb);
+      boxes[p.id] = cb;
       var st = T().getStatus(p.id);
-      var extra = st !== 'todo' ? ' · ' + T().LABELS[st] : '';
-      var cost = BFF.logic && BFF.logic.COST_LABELS ? BFF.logic.COST_LABELS[p.costToClaim] || p.costToClaim : p.costToClaim;
-      list.appendChild(h('li', { class: 'fx-pick-item' }, [cb, h('label', { 'for': id }, [
+      var muted = [p.brand, verdictLabel(p), BFF.logic.valueText ? BFF.logic.valueText(p) : '', st !== 'todo' ? T().LABELS[st] : ''].filter(Boolean).join(' · ');
+      var row = h('div', { class: cls }, [cb, h('label', { 'for': id }, [
         h('strong', { text: p.name }),
-        h('span', { class: 'fx-muted', text: (p.brand || '') + ' · ' + cost + extra }),
-        h('span', { class: 'fx-small', text: worthLine(p) }),
-        h('span', { class: 'fx-small', text: freeLine(p) })
-      ])]));
-    });
+        h('span', { class: 'fx-small fx-pick-free', text: freeLine(p) }),
+        h('span', { class: 'fx-muted fx-pick-meta', text: muted })
+      ])]);
+      var ml = missLine(p);
+      // A sibling of the row, never inside the label (it holds a link).
+      return ml ? [row, h('div', { class: 'gd-miss' }, [ml])] : [row];
+    }
+    function groupItem(g) {
+      var kids = pickRow(g.lead, 'fx-pick-row');
+      if (g.others.length) {
+        var n = g.others.length;
+        var det = h('details', { class: 'fx-alt' }, [
+          h('summary', { text: n === 1 ? '1 more way to get the same thing' : n + ' more ways to get the same thing' }),
+          h('div', { class: 'fx-alt-list' }, g.others.reduce(function (acc, o) { return acc.concat(pickRow(o, 'fx-pick-row fx-pick-alt')); }, []))
+        ]);
+        altDets.push({ g: g, det: det });
+        kids.push(det);
+      }
+      return h('li', { class: 'fx-pick-item fx-grp' }, kids);
+    }
+    var list = h('ul', { class: 'fx-pick' }, mainGroups.map(groupItem));
     body.appendChild(list);
+    if (sideGroups.length) {
+      sideDet = h('details', { class: 'fx-side' }, [
+        h('summary', { text: 'Only if you would buy anyway, and long shots (' + sideGroups.length + ')' }),
+        h('ul', { class: 'fx-pick' }, sideGroups.map(groupItem))
+      ]);
+      body.appendChild(sideDet);
+    }
+    openTicked();
     start.addEventListener('click', function () {
       var chosen = ranked(progs().filter(function (p) { return selected[p.id]; })).map(function (p) { return p.id; });
-      var ids = chosen;
+      var ids2 = chosen;
       if (preorder) {
         var first = preorder.filter(function (id) { return selected[id]; });
         var seen = {};
         first.forEach(function (id) { seen[id] = true; });
-        ids = first.concat(chosen.filter(function (id) { return !seen[id]; }));
+        ids2 = first.concat(chosen.filter(function (id) { return !seen[id]; }));
       }
-      if (!ids.length) return;
-      run = { ids: ids, index: 0, step: 'run' };
+      if (!ids2.length) return;
+      run = { ids: ids2, index: 0, step: 'run' };
       saveRun();
       focusHeading = true;
       render();
@@ -343,7 +440,10 @@
   }
 
   function phoneHint() {
-    return h('p', { class: 'fx-small fx-tight' }, [document.createTextNode('Filling on your phone? '), h('a', { href: '#info', text: 'Set up the fill script in My info' }), document.createTextNode('.')]);
+    var a = h('a', { href: '#info', text: 'Set up the fill script in My info' });
+    // My info reads this flag after the route change, opens its phone fold and moves focus there.
+    a.addEventListener('click', function () { BFF.openInfoFill = true; });
+    return h('p', { class: 'fx-small fx-tight' }, [document.createTextNode('Filling on your phone? '), a, document.createTextNode('.')]);
   }
 
   function renderRun() {
@@ -371,6 +471,8 @@
     var wl = worthLine(p);
     if (wl) body.appendChild(h('p', { class: 'fx-small fx-tight', text: wl }));
     body.appendChild(h('p', { class: 'fx-small fx-tight', text: freeLine(p) }));
+    var rml = missLine(p);
+    if (rml) body.appendChild(rml);
 
     // (b) open link: a real anchor, so it works wherever links work (no window.open)
     var open = h('a', { class: 'fx-btn fx-btn--primary fx-btn--big', href: p.signupUrl, target: '_blank', rel: 'noopener noreferrer', text: 'Open sign-up page \u2197' });
@@ -529,7 +631,7 @@
     if (!body) return;
     if (run && run.step === 'run') renderRun();
     else if (run && run.step === 'finish') renderFinish();
-    else { actions = null; if (!selected) initSelection(); renderSetup(); }
+    else { actions = null; if (!selected) initSelection(); else applyNewDefaults(); renderSetup(); }
     focusHeading = false;
   }
 
@@ -560,6 +662,7 @@
       var valid = {};
       (Array.isArray(ids) ? ids : []).forEach(function (id) { if (byId(id)) valid[id] = true; });
       selected = valid;
+      seen = visibleNow();
       preorder = (Array.isArray(ids) ? ids : []).filter(function (id, i, a) { return valid[id] && a.indexOf(id) === i; });
       undoInfo = null;
       if (run) { run = null; saveRun(); }
@@ -580,6 +683,8 @@
       if (run && run.autoOpenNext === false) autoOpen = false;
       if (run && run.shortcuts === true) shortcutsOn = true;
       document.addEventListener('keydown', onKey);
+      // A save that lands late: draw again with the selection kept. When hidden, show() draws it.
+      document.addEventListener('bff:profile-changed', function () { if (el && !el.hidden) render(); });
       render();
     },
     show: function () {

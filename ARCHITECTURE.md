@@ -54,6 +54,7 @@ Written as `(function (root) { … if (typeof module === 'object' && module.expo
 - `sortPrograms(list, key)`: key is `recommended` (the directory default: `guidedDefault` first, then email-only first, then confidence high/medium/low, then CATEGORIES order, then name), `name` (A-Z), `verified` (newest `verifiedOn` first), `category` (CATEGORIES order, then name) or `confidence` (high, medium, low, then name). Returns a new array.
 - `domainOf(url)`: hostname without `www.`
 - `escapeHtml(s)`
+- Phase I adds `trackerScope`, `readyNow`, `trackerSections` and `toClaim` (see "Phase I" at the end).
 
 ### `BFF.store` (`src/js/store.js`)
 - `get(key, fallback)`, `set(key, value)`, `remove(key)`: JSON in localStorage under the prefix `bff.`, wrapped in try/catch with an in-memory fallback. `BFF.store.persistent` is a boolean.
@@ -63,6 +64,7 @@ Written as `(function (root) { … if (typeof module === 'object' && module.expo
 - Statuses: `todo` (default), `signed-up`, `received`, `skipped`, with labels To do, Signed up, Received, Skipped.
 - `getStatus(id)`, `setStatus(id, status)`, `getNote(id)`, `setNote(id, text)`, `all()`, `counts()`, `exportJSON({includeProfile})`, `importJSON(text)` (validates, then merges).
 - Each setter dispatches `bff:tracker-changed`.
+- `getEntry(id)`, `restoreEntry(id, entry)`, `counts()`, `valueLine()`, `reset()`, `exportJSON`, `analyzeImport`, `importJSON` are unchanged. The view (`BFF.views.tracker = {init, show}`) is described in "Phase I".
 - Directory cards show a status `<select>` wired to `getStatus` and `setStatus` (builder 1 builds the control; builder 2 provides the API).
 
 ### Views and routing (`#hash`)
@@ -310,7 +312,7 @@ New category: `money` ("Money and savings"), for cash programs such as account d
 - New select "What you get": "Anything", then the eight `OFFER_LABELS`.
 - Chips: "Truly free" (new meaning), "Open to everyone" (`openToAll`), "Email only", "Needs a registry". When "Truly free" is on, one line under the chips says: "Truly free: real products or samples at no cost. No purchase, no fee, not a prize draw."
 - When My info has a state and some programs are for other states only, those are hidden and a line says "N programs for other states are hidden." with a "Show them" button (stored in prefs).
-- Each card gains: its rank ("#3", from `rankMap` over all programs), the verdict badge, the offer kinds, a "Free with no purchase" line (`freeStuff`, or "Nothing arrives free without a purchase or a win."), the value line with `valueBasis`, the certainty label, the effort label, and "Best time" with `whenNote`.
+- Each card gains: its rank ("#3", from `rankMap` over all programs), the verdict badge, the offer kinds, a "Free with no purchase" line (`freeStuff`, or the sentence from `logic.freeNote(p)` that says why nothing arrives free, for example "Nothing arrives free without a purchase." or "Nothing arrives unless you are picked."), the value line with `valueBasis`, the certainty label, the effort label, and "Best time" with `whenNote`.
 - A summary above the list: how many truly free programs there are and their combined value (labelled as an estimate), and, when My info has a due date, the weeks left and how many programs are best done now, in the last weeks, and after the birth. Without a due date it says to add one in My info. The due date is read from `profile.v1` and never leaves the page.
 
 ### Guided run, tracker and helper
@@ -413,3 +415,61 @@ Why: the Programs page was about 61,000 px tall, the top pick was a tax credit, 
 - Lists: `.dir-fit` (hidden-by-answers box with its Show/Hide button), `.dir-state`, `.result-count`, `.start-run`, `.dir-group`, `.same-group`.
 - My info: `.fx-situation`, selects `#info-cover`, `#info-insurer`, `#info-lowIncome`, `#info-job` (field wrappers carry `data-situation`).
 - Prefs: `filters.kind`, `filters.fitsMine`, `showNoFit` in `bff.prefs.v1`.
+
+## Phase I: a Tracker you can work down (contract)
+
+Why: the Tracker listed every program in file order, including ones for other states and ones the answers in My info rule out, and the list started 1,600 px down a 54,000 px page. Now it is the person's own to-do list: only what applies, best first, what can be done now on top, small rows, tools folded away. Nothing in the product rules changes.
+
+### `BFF.logic` helpers (pure)
+- `trackerScope(list, {state, showOtherStates, profile, showNoFit, statusOf, all})` returns `{rows, left: {otherState, noFit, covered}, total}`. Programs are taken in `rankPrograms` order. A program with a status other than `todo` is always its own row, `{p, status, others: []}`. A to-do program is left out and counted when: its `states` do not include the person's state (or no state is set) and `showOtherStates` is off; the answers in My info rule it out and `showNoFit` is off (only when `hasSituation`); or another program of the same group (`groupKey`) is Signed up or Received. Skipped never covers a group. `all: true` switches off those three rules only. Left-in to-do programs of one group fold: the first is the lead row, the others go in its `others`, in rank order. `total` is the number of programs.
+- `readyNow(p, weeks)`: `weeks` is what `weeksUntil` returns. With null or more than 8: true for `pregnancy` and `anytime`. From 0 to 8: also `late-pregnancy`. Below 0: always true.
+- `trackerSections(rows, weeks)` returns `{now, later, optional}` from to-do rows only. `optional` holds rows whose `verdict` is `conditional` or `longshot`, whatever their timing. Of the rest, `now` holds `readyNow` rows and `later` the others, `late-pregnancy` before the rest, each in rank order.
+- `toClaim(rows)` returns `{free, money}`, each a `totalValue` result, from to-do rows that are not optional (lead programs only). `money` is kind `money`; `free` is kind `stuff` or `care`.
+
+### Scope
+One `trackerScope` result feeds the summary, the tab counts and the list. The Tracker reads `showOtherStates` and `showNoFit` from `bff.prefs.v1` (the Programs page owns them), the profile (`state`, the situation answers, `dueDate`) and a session-only switch (`view.showAll`, not stored). It is recomputed on every render.
+
+### Page layout (top to bottom)
+1. Summary card: "X of N done (S skipped)" (X = Signed up or Received rows, N = rows that are not Skipped) with a progress bar; `p#trk-toclaim` ("Still to claim: about $A to $B in free things and covered care, and about $C to $D in money programs (tax credits, deposits, paid leave) if you qualify.", parts at zero left out, or "Nothing left to claim on your list."); the muted "Our estimate..." line; the existing claimed-value line.
+2. Three `details.fx-fold[data-fold="email|gmail|backup"]`, closed by default: "Email and calendar", "Check Gmail for sign-up emails" (holds `div#trk-inbox`, mounted by `inboxview.js`), "Backup and restore". Open state is stored in `prefs.trkOpen` as `{email, gmail, backup}` booleans. A message that changes inside a fold is scrolled into view. All control ids are unchanged: `trk-archive`, `trk-acct`, `trk-inc-profile`, `trk-restore`, `trk-paste`, `trk-inbox`.
+3. Tabs `div.fx-tabs[role=group]`, `button.fx-tab[data-filter="todo|signed-up|received|skipped|all"][aria-pressed]`, text "Label (n)" (`.fx-tab-label`, `.fx-tab-count`). Default `todo`. Counts are rows from the scope.
+4. `div#trk-list`, with `data-tab`.
+5. `div.fx-trk-left` (hidden when nothing is left out): "Left out of your list: A programs for other states, B that your answers in My info rule out, C other ways to get something you already signed up for." (with no state: "A programs only for some states (add your state in My info)"), and a button "Show all N programs" / "Back to my list".
+
+### List
+- To do tab: `section.fx-trk-sec[data-sec="now"]` ("Do now (N)", helper line, button `.fx-trk-help` "Do these with help" that calls `BFF.guided.preselect(ids)` then `BFF.nav.go('guided')`, after the "Replace run" confirm when `BFF.guided.runInfo()` reports a run); `section[data-sec="later"]` ("Later (N)", each row has a timing tag from `WHEN_LABELS` in `.fx-trk-line3`); `details.fx-trk-sec[data-sec="optional"]` ("Only if you would buy anyway, and long shots (N)", closed). Each has `.fx-trk-sec-title` (an `h3`) with a `.fx-trk-count` "(N)". Empty: `p.fx-trk-empty` "Nothing left to do. Everything on your list is signed up, received or skipped." When Do now is empty and Later is not: "Nothing to do right now. The rest comes later:".
+- Other tabs: one flat `section[data-sec="all"]` in rank order, or `p.fx-trk-empty` ("Nothing signed up yet. Change a program's status after you sign up." / "Nothing marked received yet." / "Nothing skipped." / "Nothing here yet.").
+- Row: `li.fx-trk-row[data-id][data-status]` with `.fx-trk-title` (name), `.fx-trk-meta` (brand, verdict, `valueText`), `.fx-trk-line3` (timing tag, or "Signed up YYYY-MM-DD" from `signedUpAt`), `.fx-trk-actions` (the "Sign up" link, `select#trk-s-<id>` with the hidden label "Status for <name>", and `button#trk-d-<id>.fx-trk-more` "Details" with `aria-expanded` and `aria-controls="trk-p-<id>"`, plus a marker and hidden "(has a note)" when a note exists). `div#trk-p-<id>.fx-trk-panel` is built on first open: `whatYouGet`, "Sign up with: <address>", "Search my Gmail", and `textarea#trk-n-<id>` (saves 500 ms after typing, on blur and on pagehide). Same-thing alternates sit in `details.fx-trk-others` ("N more ways to get the same thing") as nested `li.fx-trk-row`.
+
+### Rows stay put
+A change made with a row's own control (status select or note) sets `view.localChange = id` around the `BFF.tracker` call. The `bff:tracker-changed` listener then only restyles the row (`.fx-moved`, dashed border, select shows the new status), announces "<name> marked <label>." in the live region and updates the summary, tab counts, section counts and left-out line. The row moves at the next full render: tab switch, `show()`, the show-all switch, a profile change, or any change from elsewhere (Gmail panel, restore, reset, Programs page, guided run; when the Tracker is hidden the render waits for `show`). A full render keeps focus on the same control when it still exists, otherwise moves it to the pressed tab, and never touches the folds or the Gmail panel.
+
+### Checklist
+`checklistPrograms()`: programs Signed up or Received first; otherwise the person's own to-do list in the order shown (Do now, Later, optional). The email code's length limits still apply.
+
+## Phase I part 3: what My info is missing (contract)
+
+Why: many programs are state, plan or income specific, and a badge "If you qualify" does not say which My info answer would settle it. Now a program says what is missing and links to that field. The state and the four "Your situation" answers are read only to hide and badge programs and to say what is missing; they never go into the fill script, bookmark, phone view, autofill helper, guided copy or email.
+
+### `BFF.logic`
+- `MISSING_KEYS = ['state','cover','insurer','lowIncome','job']` (the order of the fields in My info). `MISSING_LABELS` (sentences: your state, your health cover, your health plan, your income answer, your paid job answer) and `MISSING_SHORT` (chips: Your state, Health cover, Health plan, Income, Paid job).
+- `missingInfo(p, profile)` -> keys in `MISSING_KEYS` order, no duplicates. Rules in order: state-limited, the profile has a state and it is not one of them -> `[]`; `fit(p, profile) === 'no'` -> `[]`; state-limited and no state -> `state`. Then per audience tag: `medicaid`, `insured`, `marketplace`, `military` with no valid cover -> `cover`; `wic`, `low-income` with no `lowIncome` answer and cover not `medicaid` -> `lowIncome`; `worker`, `employer` with no `job` answer -> `job`; `member` with no `insurer` and cover not `none` -> `insurer`; `local` adds nothing. A null or garbage profile, or a program with no `audience` or `states`, is fine.
+- `missingInfoCounts(list, profile, statusOf)` -> `{total, keys: {state, cover, insurer, lowIncome, job}}`. With `statusOf(id)`, programs whose status is set and not `todo` are skipped.
+- `missingInfoText(keys)` -> `''`, `your state`, `your state and your health plan`, `your state, your health cover and your income answer`.
+- `onlyInText(p)` -> `''` (nationwide) or `Only in DE`, `Only in IL and TX`, `Only in DE, FL and OH` (stored order).
+
+### `BFF.missing` (`src/js/missing.js`, loaded right after `store.js`; needs only `BFF.logic`)
+- `line(p, profile, opts)` -> element or `null`. `opts.tag` (default `p`), `opts.states` (default true: lead with the `onlyInText` sentence when `state` is missing). It reads as one sentence in normal inline flow: `<p class="miss-line" data-missing="state cover"><span class="miss-mark" aria-hidden="true">!</span> <span class="miss-text">Only in IL and TX. My info is missing your state and your health cover.</span> <a class="miss-add" href="#info" data-info-key="state">Add them<span class="fx-sr"> in My info</span></a></p>`. One key: "Add it". `data-info-key` is the first missing key. The link is a 44 px target through vertical padding cancelled by a negative margin, so it adds no line height.
+- `notice(counts, opts)` -> element or `null` when `counts.total` is 0. Every form has `data-missing-total` and `data-missing-keys` (keys with a count above 0, in key order).
+  - Full form (two or more keys): `div.miss-box` with `p.miss-lead` ("My info is missing details that <strong>N programs</strong> depend on.") and `ul.miss-chips` (a grid, two columns on a phone) with one `li > a.miss-chip[href="#info"][data-info-key]` per key, in key order, each `span.miss-label` plus `span.miss-n` (the count plus an `fx-sr` " program(s)").
+  - One key: `div.miss-box.miss-box--one` with one sentence and no chips: "My info is missing your health plan. <strong>5 programs</strong> depend on it. <a class="miss-add" ...>Add it</a>" (singular: "<strong>1 program</strong> depends on it.").
+  - `opts.compact: true`: always the `miss-box--one` form. With several keys: "My info is missing details that <strong>N programs</strong> depend on. <a class="miss-add" data-info-key="<first key with a count>">Add them</a>".
+- Counting rule on every page: all programs still to do (`missingInfoCounts(programs, profile, statusOf)`).
+- Hand-off: one capture-phase click listener on `document` records `{key, from}` when the click is inside `a[data-info-key]` (`from` is the view in `location.hash`, `directory` if empty or unknown). It never prevents or stops the click, so the router still navigates. `take()` returns the pending `{key, from}` or `null` and clears it; My info calls it in `show()` to scroll to and focus the field. `want(key, from)` sets it by hand. My info accepts the five missing keys (with the "N programs depend on this." hint) and three more: `dueDate`, `email` and `plus` (the plus-address checkbox row, `div.fx-plus-row`). Each jumps to its field, focuses it, highlights it with `fx-ask` when empty (or unticked) and adds the back link; no count hint. An already answered field is scrolled to and focused and gets the back link, but no highlight (this includes `insurer` falling back to `cover` while the plan field is hidden). The highlight goes away when the field has an answer: on change for selects, date and checkbox, on change or blur for the email field, never while the person is typing. Used by: Programs "Add your due date in My info" (`dueDate`), Tracker "Add your due date" help (`dueDate`), Tracker mail hint and Inbox draft hint (`email`), Tracker plus-address hint (`plus`).
+- CSS (`features.css`): `.miss-line`, `.miss-mark`, `.miss-text`, `.miss-add`, `.miss-box`, `.miss-lead`, `.miss-chips`, `.miss-chip`, `.miss-n`. Links and chips are at least 44 px tall.
+
+### Tracker use
+`div.fx-trk-miss-notice` sits right after the summary card and holds the compact one-sentence `notice(counts, { compact: true })` (hidden when null); it is refreshed in `render()` and in the soft update, without touching focus. Each to-do row shows `miss-line` under `.fx-trk-meta` (`div.fx-trk-miss`); it goes away when the status leaves to-do and returns with it. The "add your state in My info" link in the left-out line has `data-info-key="state"`.
+
+### Do it for me use
+The compact notice sits under the intro (`div.gd-miss-box`), but it is skipped, along with the empty box, while the "My info is empty" warning is shown. The per-row lines stay either way.
