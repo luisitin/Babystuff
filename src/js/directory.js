@@ -174,7 +174,7 @@
     els.hiddenBox = h('details', { class: 'dir-hidden', hidden: true }, [
       els.hiddenSummary,
       els.hiddenList,
-      h('p', { class: 'dir-hidden-foot', text: 'What you show here is hidden again the next time you open the app.' })
+      h('p', { class: 'dir-hidden-foot', text: 'These numbers count every tab and ignore the search and filters. What you show here is hidden again the next time you open the app.' })
     ]);
     els.hiddenBox.addEventListener('toggle', function () { hiddenOpen = els.hiddenBox.open; });
     els.live = h('div', { class: 'visually-hidden', role: 'status', 'aria-live': 'polite', 'aria-atomic': 'true' });
@@ -336,7 +336,7 @@
     kids.push(h('div', { class: 'card-foot' }, [link, toggle]));
     var art;
     if (BFF.tracker && BFF.ticks) {
-      var tk = BFF.ticks.build(p, { prefix: 'tick', status: st, onChange: function (res) { onTick(art, p, res); } });
+      var tk = BFF.ticks.build(p, { prefix: 'tick', status: st, received: true, onChange: function (res) { onTick(art, p, res); } });
       tickOf[p.id] = tk;
       kids.push(h('div', { class: 'card-ticks' }, [tk.el, h('p', { class: 'tick-note' })]));
     }
@@ -368,13 +368,6 @@
     }
     if (p.catches && String(p.catches).trim()) {
       d.push(h('div', { class: 'catches', role: 'note' }, [h('strong', { text: 'Catches' }), h('span', { text: p.catches })]));
-    }
-    if (BFF.tracker) {
-      var sid = 'st-' + p.id;
-      var sel = h('select', { id: sid, 'data-program-id': p.id, 'aria-label': 'My status for ' + p.name }, STATUSES.map(function (s) { return h('option', { value: s[0], text: s[1] }); }));
-      sel.value = st;
-      sel.addEventListener('change', function () { BFF.tracker.setStatus(p.id, sel.value); });
-      d.push(h('div', { class: 'status-row' }, [h('label', { for: sid, text: 'My status' }), sel]));
     }
     if (p.whatYouGet) d.push(h('p', { class: 'what-you-get', text: p.whatYouGet }));
     if (p.costDetail) d.push(h('p', { class: 'cost-detail', text: p.costDetail }));
@@ -450,7 +443,7 @@
       if (on) kids.push(document.createTextNode(' (shown for now)'));
       var btn = h('button', { type: 'button', class: 'btn btn-small' }, [
         document.createTextNode(on ? 'Hide' : 'Show'),
-        h('span', { class: 'visually-hidden', text: ' ' + reasonText(r, n, true) })
+        h('span', { class: 'visually-hidden', text: ' ' + reasonText(r, n, hasState) })
       ]);
       btn.addEventListener('click', function () {
         if (shownReasons[r] === true) delete shownReasons[r]; else shownReasons[r] = true;
@@ -560,7 +553,7 @@
     var defs = [['pregnancy', 'do now'], ['late-pregnancy', 'in the last weeks'], ['after-birth', 'after the birth']];
     if (wk < 0) defs = [defs[2]];
     var counts = {};
-    collapseShown(pool).forEach(function (g) { counts[g.lead.when] = (counts[g.lead.when] || 0) + 1; });
+    collapseShown(pool.filter(todoNow)).forEach(function (g) { counts[g.lead.when] = (counts[g.lead.when] || 0) + 1; });
     var row = h('ul', { class: 'when-buttons' });
     defs.forEach(function (d) {
       var n = counts[d[0]] || 0;
@@ -635,10 +628,16 @@
     renderMissBox();
     els.count.textContent = 'Showing ' + shown.length + ' of ' + pool.length + ' programs';
     els.empty.hidden = shown.length !== 0;
-    els.emptyHidden.hidden = !(shown.length === 0 && split.hiddenNow > 0);
-    els.emptyHidden.textContent = split.hiddenNow > 0
-      ? (split.hiddenNow === 1 ? '1 program is' : split.hiddenNow + ' programs are') + ' hidden from this list. Open "Hidden from this list" above to show ' + (split.hiddenNow === 1 ? 'it.' : 'them.')
-      : '';
+    // Only hidden programs that also pass the search, tab and filters are worth pointing at.
+    var matchHidden = shown.length === 0 && split.hiddenNow > 0
+      ? L.filterPrograms(all.filter(function (p) { return split.reasons[p.id] && shownReasons[split.reasons[p.id]] !== true; }), opts)
+      : [];
+    var mCounts = {};
+    matchHidden.forEach(function (p) { var r = split.reasons[p.id]; mCounts[r] = (mCounts[r] || 0) + 1; });
+    els.emptyHidden.hidden = matchHidden.length === 0;
+    els.emptyHidden.textContent = matchHidden.length === 0 ? ''
+      : (matchHidden.length === 1 ? '1 hidden program matches' : matchHidden.length + ' hidden programs match') +
+        ' (' + L.hideCountsText(mCounts, !!profState()) + '). Open "Hidden from this list" above to show ' + (matchHidden.length === 1 ? 'it.' : 'them.');
     renderedIds = shown.map(function (p) { return p.id; });
     refreshStart();
   }
@@ -706,23 +705,41 @@
     delete openCards[id];
   }
 
+  // Why a program that is back on to do is still hidden (the Tracker's style, for this page).
+  function hiddenSentence(p, reason) {
+    if (reason === 'covered') return 'You already signed up for another way to get this, so it will be hidden from this list.';
+    if (reason === 'noFit') return 'Your answers in My info rule it out, so it will be hidden from this list.';
+    if (reason === 'otherState') {
+      return profState() ? 'It is for another state, so it will be hidden from this list.'
+        : 'It is only for some states, so it will be hidden from this list until you add your state in My info.';
+    }
+    return '';
+  }
+
   // A tick box was used on a card. The save and the boxes are already settled (BFF.ticks).
   function onTick(art, p, res) {
     var note = art.querySelector('.tick-note');
-    var reason = hiddenNowReason(p, hideCtx());
+    var ctx = hideCtx();
+    var reason = hiddenNowReason(p, ctx);
     var strip = (reason === 'done' || reason === 'notForMe');
+    var st = res.status;
+    var fail = res.ok ? '' : ' ' + SAVE_FAIL;
     BFF.ticks.keepPlace(res.input, function () {
       if (strip) {
         closeDetails(art, p.id);
         art.classList.add('is-ticked');
-        if (note) note.textContent = (reason === 'done' ? 'Marked done.' : 'Marked not for me.') + ' It will be hidden from this list. Untick to undo.' + (res.ok ? '' : ' ' + SAVE_FAIL);
+        var what = st === 'received' ? 'Marked received.' : st === 'skipped' ? 'Marked not for me.'
+          : (res.prev === 'received' ? 'No longer marked received.' : 'Marked done.');
+        if (note) note.textContent = what + ' It will be hidden from this list.' + (res.checked ? ' Untick to undo.' : ' Tick it again to undo.') + fail;
       } else {
         art.classList.remove('is-ticked');
-        if (note) note.textContent = res.ok ? '' : SAVE_FAIL;
+        var why = st === 'todo' && reason ? 'No longer marked. ' + hiddenSentence(p, reason) : '';
+        if (note) note.textContent = (why + fail).trim();
       }
     });
-    var st = res.status;
-    say(p.name + (st === 'signed-up' || st === 'received' ? ' marked done.' : st === 'skipped' ? ' marked not for me.' : ' is back on your list.') + (res.ok ? '' : ' ' + SAVE_FAIL));
+    var back = L.hideReason(p, ctx) === '';
+    say(p.name + (st === 'received' ? ' marked received.' : st === 'signed-up' ? (res.prev === 'received' ? ' is no longer marked received.' : ' marked done.')
+      : st === 'skipped' ? ' marked not for me.' : back ? ' is back on your list.' : ' is no longer marked.') + fail);
   }
 
   function onTrackerChanged() {
@@ -746,11 +763,6 @@
     renderMissBox();
     Object.keys(tickOf).forEach(function (id) { tickOf[id].sync(statusOf(id)); });
     refreshStart();
-    var sels = els.list.querySelectorAll('select[data-program-id]');
-    for (var i = 0; i < sels.length; i++) {
-      var s = BFF.tracker.getStatus(sels[i].getAttribute('data-program-id')) || 'todo';
-      if (sels[i].value !== s) sels[i].value = s;
-    }
   }
 
   BFF.views.directory = {

@@ -29,6 +29,34 @@
     catch (e) { window.scrollBy(0, d); }
   }
 
+  // What the last tick on each program did in this visit, so the opposite tick takes it back truly
+  // (also from another page). Nothing is stored; a bulk change (import, clear) forgets it all.
+  var lastTick = {};
+  if (typeof document !== 'undefined' && document && typeof document.addEventListener === 'function') {
+    document.addEventListener('bff:tracker-changed', function (e) {
+      if (e && e.detail && e.detail.id === null) lastTick = {};
+    });
+  }
+  // The tick without any DOM: saves the status and remembers it. around(save) is optional.
+  // A save that did not reach storage still holds for this visit: ok is false and the change stays.
+  function apply(id, box, checked, around) {
+    var T = BFF.tracker, L = BFF.logic;
+    var prev = T.getStatus(id) || 'todo';
+    var entry = T.getEntry ? T.getEntry(id) : null;
+    var ch = L.tickChange(prev, box, checked, lastTick[id] || null);
+    var ok = true, now = prev;
+    if (ch.status !== prev) {
+      var save = function () { ok = T.setStatus(id, ch.status, ch.signedUpAt ? { signedUpAt: ch.signedUpAt } : undefined) !== false; };
+      if (typeof around === 'function') around(save); else save();
+      now = T.getStatus(id) || 'todo';
+      if (now !== prev) {
+        var was = prev === 'signed-up' || prev === 'received';
+        lastTick[id] = { box: box, checked: !!checked, from: prev, to: now, signedUpAt: was && entry && typeof entry.signedUpAt === 'string' ? entry.signedUpAt : '' };
+      }
+    }
+    return { ok: ok, status: now, prev: prev, undo: ch.undo };
+  }
+
   // opts: prefix, status, received (add the Received box, shown only while done), around(run) (the save runs inside it), onChange({ ok, status, prev, box, checked, input }).
   function build(p, opts) {
     opts = opts || {};
@@ -60,20 +88,10 @@
 
     function changed(key, input) {
       keepPlace(input, function () {
-        var T = BFF.tracker;
         var checked = input.checked;
-        var prev = T.getStatus(p.id) || 'todo';
-        var next = L.statusAfterTick(prev, key, checked);
-        var ok = true;
-        if (next !== prev) {
-          // A save that did not reach storage still holds for this visit (the app-wide rule):
-          // the change stays and onChange gets ok: false, so the caller can say it will not last.
-          var save = function () { ok = T.setStatus(p.id, next) !== false; };
-          if (typeof opts.around === 'function') opts.around(save); else save();
-        }
-        var now = T.getStatus(p.id) || 'todo';
-        sync(now);
-        if (typeof opts.onChange === 'function') opts.onChange({ ok: ok, status: now, prev: prev, box: key, checked: checked, input: input });
+        var res = apply(p.id, key, checked, opts.around);
+        sync(res.status);
+        if (typeof opts.onChange === 'function') opts.onChange({ ok: res.ok, status: res.status, prev: res.prev, box: key, checked: checked, undo: res.undo, input: input });
       });
     }
 
@@ -84,5 +102,5 @@
     return { el: wrap, sync: sync };
   }
 
-  BFF.ticks = { build: build, keepPlace: keepPlace };
+  BFF.ticks = { build: build, apply: apply, keepPlace: keepPlace };
 })();

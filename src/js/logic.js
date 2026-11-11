@@ -375,6 +375,19 @@
     }
     return st;
   }
+  // What a tick does, with the memory of the last tick on this program in this visit.
+  // last = { box, checked, from, to, signedUpAt } or null. When nothing else changed the status since
+  // (last.to === status) and the same box is flipped back, the result is last.from, so an undo is true.
+  // signedUpAt is the sign-up date to keep, or ''.
+  function tickChange(status, box, checked, last) {
+    var st = status === 'signed-up' || status === 'received' || status === 'skipped' ? status : 'todo';
+    var fresh = !!last && last.to === st;
+    var undo = fresh && last.box === box && !!checked === !last.checked;
+    var next = undo ? last.from : statusAfterTick(st, box, checked);
+    var done = function (x) { return x === 'signed-up' || x === 'received'; };
+    var keep = fresh && done(last.from) && done(next) && typeof last.signedUpAt === 'string' ? last.signedUpAt : '';
+    return { status: next, undo: undo, signedUpAt: keep };
+  }
   // { groupKey: true } for every group with a member that is signed up or received.
   function coveredGroups(list, statusOf) {
     var out = {};
@@ -423,10 +436,15 @@
   // The Do it for me selection after a look at what is hidden. seen: ids that were listed the last time,
   // now: ids listed now. A selected id that was listed and is hidden now goes (it was ticked off on another
   // page, or the state or answers changed). Ids selected while already hidden (handed over) stay.
-  function pruneSelection(selected, seen, now) {
+  // statusOf (optional): an id that is signed up, received or marked not for me is dropped whether or not it was listed.
+  function pruneSelection(selected, seen, now, statusOf) {
     var out = {};
     Object.keys(selected || {}).forEach(function (id) {
       if (!selected[id]) return;
+      if (typeof statusOf === 'function') {
+        var st = statusOf(id);
+        if (st === 'signed-up' || st === 'received' || st === 'skipped') return;
+      }
       if (seen && seen[id] === true && !(now && now[id] === true)) return;
       out[id] = true;
     });
@@ -459,16 +477,16 @@
     var ranked = rankPrograms(list);
     var out = { rows: [], left: { otherState: 0, noFit: 0, covered: 0 }, total: ranked.length };
     var leads = {};
-    var sit = hasSituation(opts.profile);
     var covered = coveredGroups(ranked, statusOf);
+    // The same rule as everywhere else (hideReason), with the status forced to to do: it is only asked of to-do programs.
+    var ctx = { state: opts.state, profile: opts.profile, statusOf: function () { return 'todo'; }, covered: covered };
     ranked.forEach(function (p) {
       var st = statusOf(p.id) || 'todo';
       if (st !== 'todo') { out.rows.push({ p: p, status: st, others: [] }); return; }
       var k = groupKey(p);
       if (!opts.all) {
-        if (hiddenByState(p, opts.state)) { out.left.otherState++; return; }
-        if (sit && hiddenByAnswers(p, opts.profile, 'todo')) { out.left.noFit++; return; }
-        if (Object.prototype.hasOwnProperty.call(covered, k)) { out.left.covered++; return; }
+        var why = hideReason(p, ctx);
+        if (why) { out.left[why]++; return; }
       }
       if (Object.prototype.hasOwnProperty.call(leads, k)) leads[k].others.push(p);
       else { leads[k] = { p: p, status: 'todo', others: [] }; out.rows.push(leads[k]); }
@@ -700,6 +718,7 @@
     onlyInText: onlyInText,
     tickState: tickState,
     statusAfterTick: statusAfterTick,
+    tickChange: tickChange,
     coveredGroups: coveredGroups,
     HIDE_REASONS: HIDE_REASONS,
     hideReason: hideReason,

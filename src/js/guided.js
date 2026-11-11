@@ -225,6 +225,8 @@
   // At most one program per group of the same thing (the best ranked one that qualifies),
   // and none in a group where another member is already signed up or received.
   var seen = null; // ids that were listed the last time the selection was looked at
+  var statusSnap = {}; // statuses at the last look: only a status that changed since then drops a selected program
+  function snapStatuses() { statusSnap = {}; progs().forEach(function (p) { statusSnap[p.id] = T().getStatus(p.id); }); }
   function visibleNow() {
     var v = {}, ctx = hideCtx();
     progs().forEach(function (p) { if (!hiddenHere(p, ctx)) v[p.id] = true; });
@@ -234,9 +236,12 @@
   // Boxes the person could already see are not touched. Never used after preselect(), which resets `seen`.
   function applyNewDefaults() {
     var now = visibleNow();
-    if (!seen) { seen = now; return; }
+    if (!seen) { seen = now; snapStatuses(); return; }
     // Ticked off on another page, or no longer applies: it leaves the selection.
-    selected = BFF.logic.pruneSelection(selected, seen, now);
+    selected = BFF.logic.pruneSelection(selected, seen, now, function (id) {
+      var st = T().getStatus(id);
+      return st !== statusSnap[id] ? st : 'todo';   // handed over on purpose (preselect): kept until it changes
+    });
     var done = {}, taken = {};
     progs().forEach(function (p) {
       var st = T().getStatus(p.id);
@@ -250,11 +255,13 @@
       if (!handled(p) && defaultOn(p)) { selected[p.id] = true; taken[k] = true; }
     });
     seen = now;
+    snapStatuses();
   }
   function initSelection() {
     selected = {};
     preorder = null;
     seen = visibleNow();
+    snapStatuses();
     var done = {}, taken = {}, ctx = hideCtx();
     progs().forEach(function (p) {
       var st = T().getStatus(p.id);
@@ -688,6 +695,7 @@
       (Array.isArray(ids) ? ids : []).forEach(function (id) { if (byId(id)) valid[id] = true; });
       selected = valid;
       seen = visibleNow();
+      snapStatuses();
       preorder = (Array.isArray(ids) ? ids : []).filter(function (id, i, a) { return valid[id] && a.indexOf(id) === i; });
       undoInfo = null;
       if (run) { run = null; saveRun(); }

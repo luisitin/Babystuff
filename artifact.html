@@ -174,7 +174,7 @@ main:focus { outline: none; }
 .filters { display: grid; gap: var(--space-2); }
 .field { display: grid; gap: 2px; min-width: 0; }
 .field label, .field-label { font-size: .8125rem; font-weight: 600; color: var(--muted); }
-.field input[type="search"], .field select, .status-row select {
+.field input[type="search"], .field select {
   width: 100%; min-height: 44px; padding: 0 var(--space-3); font: inherit; color: var(--text);
   background: var(--surface); border: 1px solid var(--border-strong); border-radius: var(--radius-sm);
 }
@@ -244,9 +244,6 @@ main:focus { outline: none; }
 .source-list a { display: inline-flex; align-items: center; min-height: 44px; }
 .card-foot { margin-top: auto; display: grid; gap: var(--space-3); }
 .verified { font-size: .8125rem; color: var(--muted); }
-.status-row { display: flex; align-items: center; gap: var(--space-3); }
-.status-row label { font-size: .875rem; font-weight: 600; flex: none; }
-.status-row select { flex: 1 1 auto; min-width: 0; min-height: 44px; padding: 0 var(--space-3); font: inherit; color: var(--text); background: var(--bg); border: 1px solid var(--border-strong); border-radius: var(--radius-sm); }
 .empty {
   background: var(--surface); border: 1px dashed var(--border-strong); border-radius: var(--radius);
   padding: var(--space-5) var(--space-4); text-align: center; display: grid; gap: var(--space-3); justify-items: center;
@@ -1256,6 +1253,19 @@ body::before {
     }
     return st;
   }
+  // What a tick does, with the memory of the last tick on this program in this visit.
+  // last = { box, checked, from, to, signedUpAt } or null. When nothing else changed the status since
+  // (last.to === status) and the same box is flipped back, the result is last.from, so an undo is true.
+  // signedUpAt is the sign-up date to keep, or ''.
+  function tickChange(status, box, checked, last) {
+    var st = status === 'signed-up' || status === 'received' || status === 'skipped' ? status : 'todo';
+    var fresh = !!last && last.to === st;
+    var undo = fresh && last.box === box && !!checked === !last.checked;
+    var next = undo ? last.from : statusAfterTick(st, box, checked);
+    var done = function (x) { return x === 'signed-up' || x === 'received'; };
+    var keep = fresh && done(last.from) && done(next) && typeof last.signedUpAt === 'string' ? last.signedUpAt : '';
+    return { status: next, undo: undo, signedUpAt: keep };
+  }
   // { groupKey: true } for every group with a member that is signed up or received.
   function coveredGroups(list, statusOf) {
     var out = {};
@@ -1304,10 +1314,15 @@ body::before {
   // The Do it for me selection after a look at what is hidden. seen: ids that were listed the last time,
   // now: ids listed now. A selected id that was listed and is hidden now goes (it was ticked off on another
   // page, or the state or answers changed). Ids selected while already hidden (handed over) stay.
-  function pruneSelection(selected, seen, now) {
+  // statusOf (optional): an id that is signed up, received or marked not for me is dropped whether or not it was listed.
+  function pruneSelection(selected, seen, now, statusOf) {
     var out = {};
     Object.keys(selected || {}).forEach(function (id) {
       if (!selected[id]) return;
+      if (typeof statusOf === 'function') {
+        var st = statusOf(id);
+        if (st === 'signed-up' || st === 'received' || st === 'skipped') return;
+      }
       if (seen && seen[id] === true && !(now && now[id] === true)) return;
       out[id] = true;
     });
@@ -1340,16 +1355,16 @@ body::before {
     var ranked = rankPrograms(list);
     var out = { rows: [], left: { otherState: 0, noFit: 0, covered: 0 }, total: ranked.length };
     var leads = {};
-    var sit = hasSituation(opts.profile);
     var covered = coveredGroups(ranked, statusOf);
+    // The same rule as everywhere else (hideReason), with the status forced to to do: it is only asked of to-do programs.
+    var ctx = { state: opts.state, profile: opts.profile, statusOf: function () { return 'todo'; }, covered: covered };
     ranked.forEach(function (p) {
       var st = statusOf(p.id) || 'todo';
       if (st !== 'todo') { out.rows.push({ p: p, status: st, others: [] }); return; }
       var k = groupKey(p);
       if (!opts.all) {
-        if (hiddenByState(p, opts.state)) { out.left.otherState++; return; }
-        if (sit && hiddenByAnswers(p, opts.profile, 'todo')) { out.left.noFit++; return; }
-        if (Object.prototype.hasOwnProperty.call(covered, k)) { out.left.covered++; return; }
+        var why = hideReason(p, ctx);
+        if (why) { out.left[why]++; return; }
       }
       if (Object.prototype.hasOwnProperty.call(leads, k)) leads[k].others.push(p);
       else { leads[k] = { p: p, status: 'todo', others: [] }; out.rows.push(leads[k]); }
@@ -1581,6 +1596,7 @@ body::before {
     onlyInText: onlyInText,
     tickState: tickState,
     statusAfterTick: statusAfterTick,
+    tickChange: tickChange,
     coveredGroups: coveredGroups,
     HIDE_REASONS: HIDE_REASONS,
     hideReason: hideReason,
@@ -1911,6 +1927,34 @@ body::before {
     catch (e) { window.scrollBy(0, d); }
   }
 
+  // What the last tick on each program did in this visit, so the opposite tick takes it back truly
+  // (also from another page). Nothing is stored; a bulk change (import, clear) forgets it all.
+  var lastTick = {};
+  if (typeof document !== 'undefined' && document && typeof document.addEventListener === 'function') {
+    document.addEventListener('bff:tracker-changed', function (e) {
+      if (e && e.detail && e.detail.id === null) lastTick = {};
+    });
+  }
+  // The tick without any DOM: saves the status and remembers it. around(save) is optional.
+  // A save that did not reach storage still holds for this visit: ok is false and the change stays.
+  function apply(id, box, checked, around) {
+    var T = BFF.tracker, L = BFF.logic;
+    var prev = T.getStatus(id) || 'todo';
+    var entry = T.getEntry ? T.getEntry(id) : null;
+    var ch = L.tickChange(prev, box, checked, lastTick[id] || null);
+    var ok = true, now = prev;
+    if (ch.status !== prev) {
+      var save = function () { ok = T.setStatus(id, ch.status, ch.signedUpAt ? { signedUpAt: ch.signedUpAt } : undefined) !== false; };
+      if (typeof around === 'function') around(save); else save();
+      now = T.getStatus(id) || 'todo';
+      if (now !== prev) {
+        var was = prev === 'signed-up' || prev === 'received';
+        lastTick[id] = { box: box, checked: !!checked, from: prev, to: now, signedUpAt: was && entry && typeof entry.signedUpAt === 'string' ? entry.signedUpAt : '' };
+      }
+    }
+    return { ok: ok, status: now, prev: prev, undo: ch.undo };
+  }
+
   // opts: prefix, status, received (add the Received box, shown only while done), around(run) (the save runs inside it), onChange({ ok, status, prev, box, checked, input }).
   function build(p, opts) {
     opts = opts || {};
@@ -1942,20 +1986,10 @@ body::before {
 
     function changed(key, input) {
       keepPlace(input, function () {
-        var T = BFF.tracker;
         var checked = input.checked;
-        var prev = T.getStatus(p.id) || 'todo';
-        var next = L.statusAfterTick(prev, key, checked);
-        var ok = true;
-        if (next !== prev) {
-          // A save that did not reach storage still holds for this visit (the app-wide rule):
-          // the change stays and onChange gets ok: false, so the caller can say it will not last.
-          var save = function () { ok = T.setStatus(p.id, next) !== false; };
-          if (typeof opts.around === 'function') opts.around(save); else save();
-        }
-        var now = T.getStatus(p.id) || 'todo';
-        sync(now);
-        if (typeof opts.onChange === 'function') opts.onChange({ ok: ok, status: now, prev: prev, box: key, checked: checked, input: input });
+        var res = apply(p.id, key, checked, opts.around);
+        sync(res.status);
+        if (typeof opts.onChange === 'function') opts.onChange({ ok: res.ok, status: res.status, prev: res.prev, box: key, checked: checked, undo: res.undo, input: input });
       });
     }
 
@@ -1966,7 +2000,7 @@ body::before {
     return { el: wrap, sync: sync };
   }
 
-  BFF.ticks = { build: build, keepPlace: keepPlace };
+  BFF.ticks = { build: build, apply: apply, keepPlace: keepPlace };
 })();
 // Pure helpers for plus addresses, Gmail filters, a mailto checklist and calendar reminders.
 // Nothing here touches the network or the DOM. Loadable from Node tests as well as the browser.
@@ -3591,7 +3625,8 @@ body::before {
       var st = entryOf(state(), id).status;
       return STATUSES.indexOf(st) >= 0 ? st : 'todo';
     },
-    setStatus: function (id, status) {
+    // opts.signedUpAt: a sign-up date to keep (the ticks pass it to take a change back); used only for signed-up or received.
+    setStatus: function (id, status, opts) {
       if (STATUSES.indexOf(status) < 0) return false;
       var s = state();
       var e = entryOf(s, id);
@@ -3599,7 +3634,10 @@ body::before {
       var prev = STATUSES.indexOf(e.status) >= 0 ? e.status : 'todo';
       s[id] = { status: status, note: e.note || '', updatedAt: now };
       // signedUpAt marks when the program became Signed up; it is what reminders count from.
-      if (status === 'signed-up' && prev !== 'signed-up') s[id].signedUpAt = now;
+      var given = opts && typeof opts.signedUpAt === 'string' && opts.signedUpAt.length > 0 && opts.signedUpAt.length <= 40 && !isNaN(Date.parse(opts.signedUpAt)) ? opts.signedUpAt : '';
+      var done = status === 'signed-up' || status === 'received';
+      if (done && given) s[id].signedUpAt = given;
+      else if (status === 'signed-up' && prev !== 'signed-up' && !(prev === 'received' && e.signedUpAt)) s[id].signedUpAt = now;
       else if (e.signedUpAt) s[id].signedUpAt = e.signedUpAt;
       var ok = store.set(KEY, s);
       emit(id);
@@ -4250,8 +4288,10 @@ body::before {
     if (!res.ok) view.msg.textContent = SAVE_FAIL;
     var st = res.status, name = r.p.name;
     view.live.textContent = '';
+    var leftOut = st === 'todo' ? leftOutSentence(r.p) : '';
     view.live.textContent = name + (st === 'signed-up' ? (res.prev === 'received' ? ' is no longer marked received.' : ' marked done.')
-      : st === 'received' ? ' marked received.' : st === 'skipped' ? ' marked not for me.' : ' is back on your list.');
+      : st === 'received' ? ' marked received.' : st === 'skipped' ? ' marked not for me.'
+      : leftOut ? ' is no longer marked. ' + leftOut : ' is back on your list.');
   }
 
   // The row restyles in place; it only moves at the next full render.
@@ -5166,7 +5206,7 @@ body::before {
     els.hiddenBox = h('details', { class: 'dir-hidden', hidden: true }, [
       els.hiddenSummary,
       els.hiddenList,
-      h('p', { class: 'dir-hidden-foot', text: 'What you show here is hidden again the next time you open the app.' })
+      h('p', { class: 'dir-hidden-foot', text: 'These numbers count every tab and ignore the search and filters. What you show here is hidden again the next time you open the app.' })
     ]);
     els.hiddenBox.addEventListener('toggle', function () { hiddenOpen = els.hiddenBox.open; });
     els.live = h('div', { class: 'visually-hidden', role: 'status', 'aria-live': 'polite', 'aria-atomic': 'true' });
@@ -5328,7 +5368,7 @@ body::before {
     kids.push(h('div', { class: 'card-foot' }, [link, toggle]));
     var art;
     if (BFF.tracker && BFF.ticks) {
-      var tk = BFF.ticks.build(p, { prefix: 'tick', status: st, onChange: function (res) { onTick(art, p, res); } });
+      var tk = BFF.ticks.build(p, { prefix: 'tick', status: st, received: true, onChange: function (res) { onTick(art, p, res); } });
       tickOf[p.id] = tk;
       kids.push(h('div', { class: 'card-ticks' }, [tk.el, h('p', { class: 'tick-note' })]));
     }
@@ -5360,13 +5400,6 @@ body::before {
     }
     if (p.catches && String(p.catches).trim()) {
       d.push(h('div', { class: 'catches', role: 'note' }, [h('strong', { text: 'Catches' }), h('span', { text: p.catches })]));
-    }
-    if (BFF.tracker) {
-      var sid = 'st-' + p.id;
-      var sel = h('select', { id: sid, 'data-program-id': p.id, 'aria-label': 'My status for ' + p.name }, STATUSES.map(function (s) { return h('option', { value: s[0], text: s[1] }); }));
-      sel.value = st;
-      sel.addEventListener('change', function () { BFF.tracker.setStatus(p.id, sel.value); });
-      d.push(h('div', { class: 'status-row' }, [h('label', { for: sid, text: 'My status' }), sel]));
     }
     if (p.whatYouGet) d.push(h('p', { class: 'what-you-get', text: p.whatYouGet }));
     if (p.costDetail) d.push(h('p', { class: 'cost-detail', text: p.costDetail }));
@@ -5442,7 +5475,7 @@ body::before {
       if (on) kids.push(document.createTextNode(' (shown for now)'));
       var btn = h('button', { type: 'button', class: 'btn btn-small' }, [
         document.createTextNode(on ? 'Hide' : 'Show'),
-        h('span', { class: 'visually-hidden', text: ' ' + reasonText(r, n, true) })
+        h('span', { class: 'visually-hidden', text: ' ' + reasonText(r, n, hasState) })
       ]);
       btn.addEventListener('click', function () {
         if (shownReasons[r] === true) delete shownReasons[r]; else shownReasons[r] = true;
@@ -5552,7 +5585,7 @@ body::before {
     var defs = [['pregnancy', 'do now'], ['late-pregnancy', 'in the last weeks'], ['after-birth', 'after the birth']];
     if (wk < 0) defs = [defs[2]];
     var counts = {};
-    collapseShown(pool).forEach(function (g) { counts[g.lead.when] = (counts[g.lead.when] || 0) + 1; });
+    collapseShown(pool.filter(todoNow)).forEach(function (g) { counts[g.lead.when] = (counts[g.lead.when] || 0) + 1; });
     var row = h('ul', { class: 'when-buttons' });
     defs.forEach(function (d) {
       var n = counts[d[0]] || 0;
@@ -5627,10 +5660,16 @@ body::before {
     renderMissBox();
     els.count.textContent = 'Showing ' + shown.length + ' of ' + pool.length + ' programs';
     els.empty.hidden = shown.length !== 0;
-    els.emptyHidden.hidden = !(shown.length === 0 && split.hiddenNow > 0);
-    els.emptyHidden.textContent = split.hiddenNow > 0
-      ? (split.hiddenNow === 1 ? '1 program is' : split.hiddenNow + ' programs are') + ' hidden from this list. Open "Hidden from this list" above to show ' + (split.hiddenNow === 1 ? 'it.' : 'them.')
-      : '';
+    // Only hidden programs that also pass the search, tab and filters are worth pointing at.
+    var matchHidden = shown.length === 0 && split.hiddenNow > 0
+      ? L.filterPrograms(all.filter(function (p) { return split.reasons[p.id] && shownReasons[split.reasons[p.id]] !== true; }), opts)
+      : [];
+    var mCounts = {};
+    matchHidden.forEach(function (p) { var r = split.reasons[p.id]; mCounts[r] = (mCounts[r] || 0) + 1; });
+    els.emptyHidden.hidden = matchHidden.length === 0;
+    els.emptyHidden.textContent = matchHidden.length === 0 ? ''
+      : (matchHidden.length === 1 ? '1 hidden program matches' : matchHidden.length + ' hidden programs match') +
+        ' (' + L.hideCountsText(mCounts, !!profState()) + '). Open "Hidden from this list" above to show ' + (matchHidden.length === 1 ? 'it.' : 'them.');
     renderedIds = shown.map(function (p) { return p.id; });
     refreshStart();
   }
@@ -5698,23 +5737,41 @@ body::before {
     delete openCards[id];
   }
 
+  // Why a program that is back on to do is still hidden (the Tracker's style, for this page).
+  function hiddenSentence(p, reason) {
+    if (reason === 'covered') return 'You already signed up for another way to get this, so it will be hidden from this list.';
+    if (reason === 'noFit') return 'Your answers in My info rule it out, so it will be hidden from this list.';
+    if (reason === 'otherState') {
+      return profState() ? 'It is for another state, so it will be hidden from this list.'
+        : 'It is only for some states, so it will be hidden from this list until you add your state in My info.';
+    }
+    return '';
+  }
+
   // A tick box was used on a card. The save and the boxes are already settled (BFF.ticks).
   function onTick(art, p, res) {
     var note = art.querySelector('.tick-note');
-    var reason = hiddenNowReason(p, hideCtx());
+    var ctx = hideCtx();
+    var reason = hiddenNowReason(p, ctx);
     var strip = (reason === 'done' || reason === 'notForMe');
+    var st = res.status;
+    var fail = res.ok ? '' : ' ' + SAVE_FAIL;
     BFF.ticks.keepPlace(res.input, function () {
       if (strip) {
         closeDetails(art, p.id);
         art.classList.add('is-ticked');
-        if (note) note.textContent = (reason === 'done' ? 'Marked done.' : 'Marked not for me.') + ' It will be hidden from this list. Untick to undo.' + (res.ok ? '' : ' ' + SAVE_FAIL);
+        var what = st === 'received' ? 'Marked received.' : st === 'skipped' ? 'Marked not for me.'
+          : (res.prev === 'received' ? 'No longer marked received.' : 'Marked done.');
+        if (note) note.textContent = what + ' It will be hidden from this list.' + (res.checked ? ' Untick to undo.' : ' Tick it again to undo.') + fail;
       } else {
         art.classList.remove('is-ticked');
-        if (note) note.textContent = res.ok ? '' : SAVE_FAIL;
+        var why = st === 'todo' && reason ? 'No longer marked. ' + hiddenSentence(p, reason) : '';
+        if (note) note.textContent = (why + fail).trim();
       }
     });
-    var st = res.status;
-    say(p.name + (st === 'signed-up' || st === 'received' ? ' marked done.' : st === 'skipped' ? ' marked not for me.' : ' is back on your list.') + (res.ok ? '' : ' ' + SAVE_FAIL));
+    var back = L.hideReason(p, ctx) === '';
+    say(p.name + (st === 'received' ? ' marked received.' : st === 'signed-up' ? (res.prev === 'received' ? ' is no longer marked received.' : ' marked done.')
+      : st === 'skipped' ? ' marked not for me.' : back ? ' is back on your list.' : ' is no longer marked.') + fail);
   }
 
   function onTrackerChanged() {
@@ -5738,11 +5795,6 @@ body::before {
     renderMissBox();
     Object.keys(tickOf).forEach(function (id) { tickOf[id].sync(statusOf(id)); });
     refreshStart();
-    var sels = els.list.querySelectorAll('select[data-program-id]');
-    for (var i = 0; i < sels.length; i++) {
-      var s = BFF.tracker.getStatus(sels[i].getAttribute('data-program-id')) || 'todo';
-      if (sels[i].value !== s) sels[i].value = s;
-    }
   }
 
   BFF.views.directory = {
@@ -5985,6 +6037,8 @@ body::before {
   // At most one program per group of the same thing (the best ranked one that qualifies),
   // and none in a group where another member is already signed up or received.
   var seen = null; // ids that were listed the last time the selection was looked at
+  var statusSnap = {}; // statuses at the last look: only a status that changed since then drops a selected program
+  function snapStatuses() { statusSnap = {}; progs().forEach(function (p) { statusSnap[p.id] = T().getStatus(p.id); }); }
   function visibleNow() {
     var v = {}, ctx = hideCtx();
     progs().forEach(function (p) { if (!hiddenHere(p, ctx)) v[p.id] = true; });
@@ -5994,9 +6048,12 @@ body::before {
   // Boxes the person could already see are not touched. Never used after preselect(), which resets `seen`.
   function applyNewDefaults() {
     var now = visibleNow();
-    if (!seen) { seen = now; return; }
+    if (!seen) { seen = now; snapStatuses(); return; }
     // Ticked off on another page, or no longer applies: it leaves the selection.
-    selected = BFF.logic.pruneSelection(selected, seen, now);
+    selected = BFF.logic.pruneSelection(selected, seen, now, function (id) {
+      var st = T().getStatus(id);
+      return st !== statusSnap[id] ? st : 'todo';   // handed over on purpose (preselect): kept until it changes
+    });
     var done = {}, taken = {};
     progs().forEach(function (p) {
       var st = T().getStatus(p.id);
@@ -6010,11 +6067,13 @@ body::before {
       if (!handled(p) && defaultOn(p)) { selected[p.id] = true; taken[k] = true; }
     });
     seen = now;
+    snapStatuses();
   }
   function initSelection() {
     selected = {};
     preorder = null;
     seen = visibleNow();
+    snapStatuses();
     var done = {}, taken = {}, ctx = hideCtx();
     progs().forEach(function (p) {
       var st = T().getStatus(p.id);
@@ -6448,6 +6507,7 @@ body::before {
       (Array.isArray(ids) ? ids : []).forEach(function (id) { if (byId(id)) valid[id] = true; });
       selected = valid;
       seen = visibleNow();
+      snapStatuses();
       preorder = (Array.isArray(ids) ? ids : []).filter(function (id, i, a) { return valid[id] && a.indexOf(id) === i; });
       undoInfo = null;
       if (run) { run = null; saveRun(); }
@@ -7434,6 +7494,13 @@ body::before {
       n.textContent = "This browser isn't saving data, so your info and tracker will be gone after a reload.";
       n.hidden = false;
     }
+    // A save that fails later (storage full or blocked) says so on every page, whatever page is open.
+    document.addEventListener('bff:storage-failed', function () {
+      var m = document.getElementById('storage-notice');
+      if (!m) return;
+      m.textContent = 'This browser has stopped saving data (storage is full or blocked). Your newest changes are kept only until you close this page.';
+      m.hidden = false;
+    });
 
     lastChecked();
 

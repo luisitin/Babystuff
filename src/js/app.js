@@ -114,6 +114,13 @@
       n.textContent = "This browser isn't saving data, so your info and tracker will be gone after a reload.";
       n.hidden = false;
     }
+    // A save that fails later (storage full or blocked) says so on every page, whatever page is open.
+    document.addEventListener('bff:storage-failed', function () {
+      var m = document.getElementById('storage-notice');
+      if (!m) return;
+      m.textContent = 'This browser has stopped saving data (storage is full or blocked). Your newest changes are kept only until you close this page.';
+      m.hidden = false;
+    });
 
     lastChecked();
 

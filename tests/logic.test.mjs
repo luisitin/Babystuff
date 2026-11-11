@@ -994,12 +994,6 @@ test('hideReasonText: the one wording for the Programs hidden box and Do it for 
   assert.equal(L.hideReasonText('nope', 2, true), '');
 });
 
-test('ticks.js keeps a change whose save failed: no undo of the entry', () => {
-  const src = readFileSync(new URL('../src/js/ticks.js', import.meta.url), 'utf8');
-  assert.ok(!/restoreEntry|getEntry/.test(src));
-  assert.match(src, /opts\.around/);
-});
-
 test('hideCountsText: reasons in HIDE_REASONS order, zero counts and end stops left out', () => {
   assert.equal(L.hideCountsText({}, true), '');
   assert.equal(L.hideCountsText({ otherState: 3, done: 2 }, true), '3 for other states, 2 you marked done');
@@ -1029,4 +1023,72 @@ test('Do it for me and the Tracker use the shared hide rule and the new wording'
   assert.match(t, /skipped: 'Not for me'/);
   assert.ok(!/trk-s-/.test(t));
   assert.match(t, /prefix: 'trk'/);
+});
+
+test('tickChange: undo is true, the date is kept, anything else follows statusAfterTick', () => {
+  const X = '2026-03-01T10:00:00.000Z';
+  const last = (box, checked, from, to, d) => ({ box, checked, from, to, signedUpAt: d === undefined ? '' : d });
+  // Received (X) -> Not for me -> untick = Received with X
+  let r = L.tickChange('skipped', 'notForMe', false, last('notForMe', true, 'received', 'skipped', X));
+  assert.deepEqual(r, { status: 'received', undo: true, signedUpAt: X });
+  // Received -> untick Done -> tick Done = Received with X
+  r = L.tickChange('todo', 'done', true, last('done', false, 'received', 'todo', X));
+  assert.deepEqual(r, { status: 'received', undo: true, signedUpAt: X });
+  // Done (X) -> Not for me -> tick Done = Done with X (not an undo: another box)
+  r = L.tickChange('skipped', 'done', true, last('notForMe', true, 'signed-up', 'skipped', X));
+  assert.deepEqual(r, { status: 'signed-up', undo: false, signedUpAt: X });
+  // Received -> untick Received = Signed up
+  r = L.tickChange('received', 'received', false, null);
+  assert.deepEqual(r, { status: 'signed-up', undo: false, signedUpAt: '' });
+  // untick Received, then tick it again = Received, undo
+  r = L.tickChange('signed-up', 'received', true, last('received', false, 'received', 'signed-up', X));
+  assert.deepEqual(r, { status: 'received', undo: true, signedUpAt: X });
+  // To do -> Done: nothing to keep
+  r = L.tickChange('todo', 'done', true, null);
+  assert.deepEqual(r, { status: 'signed-up', undo: false, signedUpAt: '' });
+  // something else changed the status since: the memory is stale
+  r = L.tickChange('signed-up', 'notForMe', false, last('notForMe', true, 'received', 'skipped', X));
+  assert.equal(r.undo, false);
+  assert.equal(r.status, 'signed-up');
+  assert.equal(r.signedUpAt, '');
+  // same direction again is not an undo
+  r = L.tickChange('skipped', 'notForMe', true, last('notForMe', true, 'todo', 'skipped'));
+  assert.equal(r.undo, false);
+  // junk input
+  assert.equal(L.tickChange('weird', 'done', true, undefined).status, 'signed-up');
+});
+
+test('trackerScope leaves out exactly what hideReason says, with the same counts', () => {
+  const list = [TP('open'), TP('tx-only', { states: ['TX'] }), TP('mcd', { audience: ['medicaid'] }),
+    TP('lead'), TP('alt', { sameAs: 'lead' }), TP('skip1'), TP('maybe', { audience: ['wic'] })];
+  const st = { lead: 'signed-up', skip1: 'skipped' };
+  const statusOf = (id) => st[id] || 'todo';
+  for (const state of ['CA', 'TX', '']) {
+    for (const profile of [{}, { cover: 'private' }]) {
+      const sc = L.trackerScope(list, { state, profile, statusOf });
+      const covered = L.coveredGroups(list, statusOf);
+      const want = { otherState: 0, noFit: 0, covered: 0 };
+      const leftIds = [];
+      list.forEach((p) => {
+        if (statusOf(p.id) !== 'todo') return;
+        const r = L.hideReason(p, { state, profile, statusOf: () => 'todo', covered });
+        if (r) { want[r]++; leftIds.push(p.id); }
+      });
+      assert.deepEqual(sc.left, want, state + ' ' + JSON.stringify(profile));
+      const rowIds = [].concat(...sc.rows.map((r) => [r.p.id].concat(r.others.map((o) => o.id))));
+      leftIds.forEach((id) => assert.ok(!rowIds.includes(id), id + ' should be left out'));
+      assert.equal(rowIds.length + leftIds.length, list.length);
+    }
+  }
+});
+
+test('pruneSelection with statusOf drops done, received and not-for-me ids, listed before or not', () => {
+  const st = { a: 'signed-up', b: 'skipped', c: 'received', d: 'todo', e: 'skipped' };
+  const statusOf = (id) => st[id] || 'todo';
+  const selected = { a: true, b: true, c: true, d: true, e: true, f: true };
+  const seen = { a: true, d: true };       // b, c, e were hidden at the last look
+  const now = { a: true, d: true, f: true };
+  assert.deepEqual(L.pruneSelection(selected, seen, now, statusOf), { d: true, f: true });
+  // without statusOf the handed-over ones stay
+  assert.deepEqual(L.pruneSelection(selected, seen, now), { a: true, b: true, c: true, d: true, e: true, f: true });
 });

@@ -171,7 +171,7 @@ main:focus { outline: none; }
 .filters { display: grid; gap: var(--space-2); }
 .field { display: grid; gap: 2px; min-width: 0; }
 .field label, .field-label { font-size: .8125rem; font-weight: 600; color: var(--muted); }
-.field input[type="search"], .field select, .status-row select {
+.field input[type="search"], .field select {
   width: 100%; min-height: 44px; padding: 0 var(--space-3); font: inherit; color: var(--text);
   background: var(--surface); border: 1px solid var(--border-strong); border-radius: var(--radius-sm);
 }
@@ -241,9 +241,6 @@ main:focus { outline: none; }
 .source-list a { display: inline-flex; align-items: center; min-height: 44px; }
 .card-foot { margin-top: auto; display: grid; gap: var(--space-3); }
 .verified { font-size: .8125rem; color: var(--muted); }
-.status-row { display: flex; align-items: center; gap: var(--space-3); }
-.status-row label { font-size: .875rem; font-weight: 600; flex: none; }
-.status-row select { flex: 1 1 auto; min-width: 0; min-height: 44px; padding: 0 var(--space-3); font: inherit; color: var(--text); background: var(--bg); border: 1px solid var(--border-strong); border-radius: var(--radius-sm); }
 .empty {
   background: var(--surface); border: 1px dashed var(--border-strong); border-radius: var(--radius);
   padding: var(--space-5) var(--space-4); text-align: center; display: grid; gap: var(--space-3); justify-items: center;

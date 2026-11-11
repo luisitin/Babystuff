@@ -114,7 +114,8 @@
       var st = entryOf(state(), id).status;
       return STATUSES.indexOf(st) >= 0 ? st : 'todo';
     },
-    setStatus: function (id, status) {
+    // opts.signedUpAt: a sign-up date to keep (the ticks pass it to take a change back); used only for signed-up or received.
+    setStatus: function (id, status, opts) {
       if (STATUSES.indexOf(status) < 0) return false;
       var s = state();
       var e = entryOf(s, id);
@@ -122,7 +123,10 @@
       var prev = STATUSES.indexOf(e.status) >= 0 ? e.status : 'todo';
       s[id] = { status: status, note: e.note || '', updatedAt: now };
       // signedUpAt marks when the program became Signed up; it is what reminders count from.
-      if (status === 'signed-up' && prev !== 'signed-up') s[id].signedUpAt = now;
+      var given = opts && typeof opts.signedUpAt === 'string' && opts.signedUpAt.length > 0 && opts.signedUpAt.length <= 40 && !isNaN(Date.parse(opts.signedUpAt)) ? opts.signedUpAt : '';
+      var done = status === 'signed-up' || status === 'received';
+      if (done && given) s[id].signedUpAt = given;
+      else if (status === 'signed-up' && prev !== 'signed-up' && !(prev === 'received' && e.signedUpAt)) s[id].signedUpAt = now;
       else if (e.signedUpAt) s[id].signedUpAt = e.signedUpAt;
       var ok = store.set(KEY, s);
       emit(id);
@@ -773,8 +777,10 @@
     if (!res.ok) view.msg.textContent = SAVE_FAIL;
     var st = res.status, name = r.p.name;
     view.live.textContent = '';
+    var leftOut = st === 'todo' ? leftOutSentence(r.p) : '';
     view.live.textContent = name + (st === 'signed-up' ? (res.prev === 'received' ? ' is no longer marked received.' : ' marked done.')
-      : st === 'received' ? ' marked received.' : st === 'skipped' ? ' marked not for me.' : ' is back on your list.');
+      : st === 'received' ? ' marked received.' : st === 'skipped' ? ' marked not for me.'
+      : leftOut ? ' is no longer marked. ' + leftOut : ' is back on your list.');
   }
 
   // The row restyles in place; it only moves at the next full render.
