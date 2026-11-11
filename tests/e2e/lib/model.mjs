@@ -27,10 +27,10 @@ export function shownFor(state, showOther, opts, sort) {
 export const distinct = (list) => new Set(list.map(L.groupKey)).size;
 
 // Summary numbers the Directory shows over a pool.
-export function summaryFor(pool) {
+export function summaryFor(pool, profile) {
   const free = pool.filter((p) => L.isTrulyFree(p) && L.isOpenToAll(p));
   const tv = L.totalValue(free);
-  const more = distinct(pool.filter((p) => { const v = L.verdict(p); return L.needsQualifying(p) && (v === 'top' || v === 'good' || v === 'small'); }));
+  const more = distinct(pool.filter((p) => { const v = L.verdict(p); return L.needsQualifying(p) && (v === 'top' || v === 'good' || v === 'small') && L.fit(p, L.hasSituation(profile) ? profile : {}) !== 'no'; }));
   return {
     free, freeGroups: distinct(free), tv, more,
     lo: L.roundTotal(tv.low), hi: L.roundTotal(tv.high),
@@ -53,3 +53,45 @@ export const byDomain = (() => {
   ALL.forEach((p) => { (m[domainOf(p)] = m[domainOf(p)] || []).push(p); });
   return m;
 })();
+
+// ---- Phase I: the Tracker's own to-do list and the missing-info lines ----
+export const MISSING_KEYS = L.MISSING_KEYS;
+export const statusFn = (map) => (id) => (map && map[id]) || 'todo';
+// What the Tracker works out from the profile, the saved prefs, the statuses and the "show all" switch.
+export function trackerFor({ profile = {}, prefs = {}, statuses = {}, all = false } = {}) {
+  const sc = L.trackerScope(ALL, { state: profile.state, showOtherStates: !!prefs.showOtherStates, profile, showNoFit: !!prefs.showNoFit, all, statusOf: statusFn(statuses) });
+  const weeks = L.weeksUntil(profile.dueDate);
+  const secs = L.trackerSections(sc.rows, weeks);
+  const c = { todo: 0, 'signed-up': 0, received: 0, skipped: 0, all: sc.rows.length };
+  sc.rows.forEach((r) => { c[r.status]++; });
+  c.done = c['signed-up'] + c.received;
+  c.active = sc.rows.length - c.skipped;
+  return { sc, weeks, secs, counts: c, ids: (rows) => rows.map((r) => r.p.id) };
+}
+// "X of N done (S skipped)" and the "Still to claim" sentence, worded from the module's own numbers.
+export function doneText(c) { return c.done + ' of ' + c.active + ' done' + (c.skipped ? ' (' + c.skipped + ' skipped)' : ''); }
+export function rangeText(t) {
+  let lo = t.low, hi = t.high;
+  if (t.count > 1) { lo = L.roundTotal(lo); hi = L.roundTotal(hi); }
+  return Math.round(lo) === Math.round(hi) ? L.money(lo) : L.money(lo) + ' to ' + L.money(hi);
+}
+export function claimText(sc, secs) {
+  const t = L.toClaim(sc.rows), parts = [];
+  if (t.free.count) parts.push('about ' + rangeText(t.free) + ' in free things and covered care');
+  if (t.money.count) parts.push('about ' + rangeText(t.money) + ' in money programs (tax credits, deposits, paid leave) if you qualify');
+  if (parts.length) return 'Still to claim: ' + parts.join(', and ') + '.';
+  if (secs.now.length + secs.later.length) return 'Still to claim: no known dollar value for what is left on your list.';
+  return 'Nothing left to claim on your list.';
+}
+// The sentence of a missing-info line for a program (null when nothing is missing).
+export function missLineFor(p, profile) {
+  const keys = L.missingInfo(p, profile);
+  if (!keys.length) return null;
+  let lead = '';
+  if (keys.includes('state')) { lead = L.onlyInText(p); if (lead) lead += '. '; }
+  return { keys, data: keys.join(' '), text: lead + 'My info is missing ' + L.missingInfoText(keys) + '.', link: keys.length > 1 ? 'Add them' : 'Add it', first: keys[0] };
+}
+export const countsFor = (profile, statuses) => L.missingInfoCounts(ALL, profile, statusFn(statuses));
+export const keysWithCount = (counts) => MISSING_KEYS.filter((k) => counts.keys[k] > 0);
+// Programs that carry a missing-info line for a profile (still to do), best first.
+export const withLine = (profile, statuses) => L.rankPrograms(ALL).filter((p) => statusFn(statuses)(p.id) === 'todo' && L.missingInfo(p, profile).length > 0);

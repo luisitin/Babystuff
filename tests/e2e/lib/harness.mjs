@@ -191,3 +191,110 @@ export function contrast(a, b) { const l1 = lum(a), l2 = lum(b); return (Math.ma
 
 export const norm = (u) => { try { const x = new URL(u); x.hash = ''; return x.href; } catch (e) { return u; } };
 export const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+
+// ---- Phase I helpers: Tracker folds, tabs and row panels, saved data, scroll ----
+// An init script that stores an object under bff.<name>.v1 on the first load only (a reload keeps what the app saved since).
+export function seedStore(name, obj) {
+  return 'try{if(!localStorage.getItem("bff.' + name + '.v1"))localStorage.setItem("bff.' + name + '.v1",' + JSON.stringify(JSON.stringify(obj)) + ')}catch(e){}';
+}
+// The tracker entries for a { programId: status } map.
+export function trackerSeed(map) {
+  const o = {};
+  Object.keys(map).forEach((id) => { o[id] = { status: map[id], note: '', updatedAt: new Date().toISOString() }; });
+  return o;
+}
+// Open one of the three Tracker tool folds (email, gmail, backup) the way a person does: tap its summary.
+export async function openFold(page, key) {
+  const d = page.locator('#view-tracker details.fx-fold[data-fold="' + key + '"]');
+  if (!(await d.evaluate((e) => e.open))) await d.locator('summary').first().click();
+}
+export async function foldOpen(page, key) {
+  return page.locator('#view-tracker details.fx-fold[data-fold="' + key + '"]').evaluate((e) => e.open);
+}
+// Tap a Tracker tab (todo, signed-up, received, skipped, all) and wait until it is the pressed one.
+export async function trkTab(page, filter) {
+  const b = page.locator('#view-tracker button.fx-tab[data-filter="' + filter + '"]');
+  await b.click();
+  await page.waitForFunction((f) => document.querySelector('#view-tracker button.fx-tab[data-filter="' + f + '"]').getAttribute('aria-pressed') === 'true' && document.querySelector('#trk-list').getAttribute('data-tab') === f, filter);
+}
+// Open a Tracker row's Details panel. Closed folds around the row (the optional section, "more ways") are opened first.
+export async function openRowDetails(page, id) {
+  await page.evaluate((i) => {
+    const li = document.querySelector('#trk-list li.fx-trk-row[data-id="' + i + '"]');
+    for (let n = li && li.parentElement; n && n.id !== 'trk-list'; n = n.parentElement) if (n.tagName === 'DETAILS') n.open = true;
+  }, id);
+  const b = page.locator('#trk-d-' + id);
+  if ((await b.getAttribute('aria-expanded')) !== 'true') await b.click();
+  await page.waitForSelector('#trk-p-' + id + ':not([hidden])');
+}
+// Wait until the page has stopped scrolling (two equal readings 150 ms apart, up to 3 s). The My info hand-off scrolls smoothly.
+export async function settleScroll(page, max = 3000) {
+  let last = await page.evaluate(() => window.scrollY);
+  const t0 = Date.now();
+  while (Date.now() - t0 < max) {
+    await sleep(150);
+    const now = await page.evaluate(() => window.scrollY);
+    if (now === last) return true;
+    last = now;
+  }
+  return false;
+}
+// Open all three Tracker tool folds (email and calendar, Gmail, backup) so their controls can be used.
+export async function openTools(page) {
+  for (const k of ['email', 'gmail', 'backup']) await openFold(page, k);
+}
+// Make sure a Tracker row can be reached: unfold the "more ways" fold and the optional section around it.
+export async function revealRow(page, id) {
+  await page.evaluate((i) => {
+    const li = document.querySelector('#trk-list li.fx-trk-row[data-id="' + i + '"]');
+    for (let n = li && li.parentElement; n && n.id !== 'trk-list'; n = n.parentElement) if (n.tagName === 'DETAILS') n.open = true;
+  }, id);
+}
+// Put the Tracker on the All tab and switch on "Show all N programs", so every program has a row.
+export async function showAllRows(page) {
+  await trkTab(page, 'all');
+  const b = page.locator('#view-tracker .fx-trk-left button');
+  if ((await b.isVisible()) && (await b.getAttribute('aria-pressed')) === 'false') await b.click();
+}
+export const BACKUP_MSG = '#view-tracker details.fx-fold[data-fold="backup"] .fx-msg';
+// My info keeps "Fill forms on your phone" in a closed fold (remembered in prefs.infoFillOpen). Open it by tapping its summary.
+export async function openPhoneFold(page) {
+  const d = page.locator('#info-fill-fold');
+  if (!(await d.evaluate((e) => e.open))) await d.locator('summary').first().click();
+}
+// Open the tool folds of a view where there are any (Tracker folds, the phone fold on My info).
+export async function openViewTools(page, view) {
+  if (view === 'tracker') await openTools(page);
+  if (view === 'info') await openPhoneFold(page);
+}
+// Unfold the "more ways" fold or the optional section around a Do it for me pick box, so it can be ticked.
+export async function revealPick(page, id) {
+  await page.evaluate((i) => {
+    const cb = document.getElementById('gd-pick-' + i);
+    for (let n = cb && cb.parentElement; n && n.id !== 'view-guided'; n = n.parentElement) if (n.tagName === 'DETAILS') n.open = true;
+  }, id);
+}
+// Open every Tracker row's Details panel (unfolding the "more ways" folds and the optional section around them).
+export async function openAllPanels(page) {
+  await page.evaluate(() => {
+    document.querySelectorAll('#trk-list details').forEach((d) => { d.open = true; });
+    document.querySelectorAll('#trk-list button.fx-trk-more').forEach((b) => { if (b.getAttribute('aria-expanded') !== 'true') b.click(); });
+  });
+}
+// Reload after a write the person made. Chromium hands localStorage writes to its browser process asynchronously. When the machine
+// is busy (several runs at once) a reload straight after a write can read the old, empty value, and a second reload then shows the
+// value that was there all along. So: reload, and if a bff.* value read before the reload is missing or different afterwards, reload
+// again (up to four times). An app that really loses its data still loses it on every reload and the check after this fails.
+export async function reloadAfterWrite(page) {
+  const read = () => page.evaluate(() => { const o = {}; for (let i = 0; i < localStorage.length; i++) { const k = localStorage.key(i); if (k.indexOf('bff.') === 0) o[k] = localStorage.getItem(k); } return o; });
+  const before = await read();
+  await sleep(300);
+  for (let i = 0; i < 4; i++) {
+    await page.reload();
+    await page.waitForLoadState('load');
+    await sleep(150);
+    const after = await read();
+    if (Object.keys(before).every((k) => after[k] === before[k])) return;
+    await sleep(2000); // the old value was not visible yet; give the browser process time before the next reload
+  }
+}

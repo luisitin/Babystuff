@@ -1,7 +1,7 @@
 // Groups 8 to 10: fill script on fixture forms, persistence and privacy, accessibility smoke.
 import fs from 'node:fs';
 import path from 'node:path';
-import { ROOT, OUT, ROUTES, PROGRAMS, PROFILE, open, clean, runGroup, contrast, lsDump } from './harness.mjs';
+import { ROOT, OUT, ROUTES, PROGRAMS, PROFILE, open, clean, runGroup, contrast, lsDump, trkTab, openRowDetails, openPhoneFold, reloadAfterWrite } from './harness.mjs';
 import { FORM_HTML } from './fixtures.mjs';
 import { prepare } from './groups-a.mjs';
 import { L, E, ALL, byId, byDomain, domainOf } from './model.mjs';
@@ -33,6 +33,7 @@ const readForm = (page) => page.evaluate(() => Object.fromEntries([...document.q
 async function makeScripts(browser, plus) {
   const h = await open(browser, { perms: ['clipboard-read', 'clipboard-write'], profile: Object.assign({}, PROFILE, { usePlusTags: plus }), hash: 'info' });
   await h.go('info');
+  await openPhoneFold(h.page);
   await h.page.getByRole('button', { name: 'Copy fill script' }).click(); await h.page.waitForTimeout(250);
   const script = await h.page.evaluate(() => navigator.clipboard.readText());
   await h.page.getByRole('button', { name: 'Copy bookmark code' }).click(); await h.page.waitForTimeout(250);
@@ -160,6 +161,8 @@ export async function persistence(env) {
       await h.go('guided');
       const b = page.getByRole('button', { name: /^Start \(/ }); if (await b.count()) await b.first().click();
       await h.go('tracker');
+      await trkTab(page, 'signed-up'); // the first program was marked Signed up by prepare()
+      await openRowDetails(page, PROGRAMS[0].id);
       await page.locator('#trk-n-' + PROGRAMS[0].id).fill('kept note'); await page.waitForTimeout(700);
       const ls = await lsDump(page);
       const keys = Object.keys(ls);
@@ -167,13 +170,14 @@ export async function persistence(env) {
       g.check(mode + ': no cookies', (await h.ctx.cookies()).length === 0 && (await page.evaluate(() => document.cookie)) === '');
       const other = await page.evaluate(async () => ({ ss: sessionStorage.length, idb: indexedDB.databases ? (await indexedDB.databases()).length : 0 }));
       g.check(mode + ': no sessionStorage or IndexedDB use', other.ss === 0 && other.idb === 0, JSON.stringify(other));
-      await page.reload(); await page.waitForTimeout(250);
+      await reloadAfterWrite(page); await page.waitForTimeout(250);
       await h.go('info');
       const f = await page.evaluate(() => ({ fn: document.getElementById('info-firstName').value, em: document.getElementById('info-email').value, plus: document.getElementById('info-plus').checked }));
       g.check(mode + ': reload keeps My info', f.fn === 'Sam' && f.em === PROFILE.email && f.plus === true, JSON.stringify(f));
       // Truly free is still on after the reload, so the directory lists only truly free programs. Look for the
       // statuses where a person would: in the Tracker (every program), and in the directory for a program it still lists.
       await h.go('tracker');
+      await trkTab(page, 'signed-up');
       g.check(mode + ': reload keeps tracker statuses (first program is Signed up in the Tracker)', (await page.locator('#trk-s-' + PROGRAMS[0].id).inputValue()) === 'signed-up');
       await h.go('directory');
       const seen = await page.evaluate(() => Object.fromEntries([...document.querySelectorAll('#view-directory select[data-program-id]')].map((s) => [s.dataset.programId, s.value])));
@@ -182,6 +186,8 @@ export async function persistence(env) {
       g.check(mode + ': a program that is not truly free is not listed while Truly free is on', !Object.keys(seen).includes(PROGRAMS[0].id) || L.isTrulyFree(PROGRAMS[0]));
       g.check(mode + ': reload keeps prefs (theme and filter)', (await page.evaluate(() => document.documentElement.getAttribute('data-theme'))) === 'dark' && (await page.getByLabel('Truly free').isChecked()));
       await h.go('tracker');
+      await trkTab(page, 'signed-up');
+      await openRowDetails(page, PROGRAMS[0].id);
       g.check(mode + ': reload keeps notes', (await page.locator('#trk-n-' + PROGRAMS[0].id).inputValue()) === 'kept note');
       clean(g, h, mode + ' session');
       await h.ctx.close();

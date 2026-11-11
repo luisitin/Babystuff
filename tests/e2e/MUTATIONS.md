@@ -58,3 +58,31 @@ Notes:
 - Mutations 7 and 18 stop group 11 early (the later steps need the state line or the rank), so the failed count is small compared with the checks left unrun. They still fail the run.
 - Mutations 1, 2, 5 and 6 ran while other mutation runs shared the machine, so their failed counts may include a little timing noise. Mutation 3 showed extra failures that did not repeat when it was rerun alone, and the table gives the quiet numbers for it. The caught or not caught answer is the same in every case.
 - Only the listed groups were run per mutation, not the full suite. Eighteen picked mutations are a spot-check, not a coverage measure.
+
+## Phase I
+
+Date: 2026-11-11. Sixteen mutations were applied one at a time to a throwaway copy of `index.html` and `artifact.html` (the same text replaced in both, with a script that stops unless the text is found exactly once in each), and group 14 was pointed at the copy with `BFF_E2E_BUILD_DIR=<folder>`; only the part of group 14 that could notice was run (`BFF_E2E_SUB=I4,I5 ...`). Nothing touched the repo. Result: 15 of 15 real mutations caught; mutation 13 changed nothing the page can show and was replaced by 16.
+
+| # | File | What was broken | Parts run | Failed checks | First checks that caught it |
+|---|------|-----------------|-----------|---------------|-----------------------------|
+| 1 | logic.js | `missingInfoCounts` ignores `statusOf` (programs already signed up still count) | I4, I5 | 30 of 412 | "data-missing-total and data-missing-keys equal L.missingInfoCounts" and "the sentence" on Programs and Tracker, in the runs where three statuses are set (92 vs 89) |
+| 2 | tracker.js | the Tracker notice loses `compact` (the full form with chips shows) | I4 | 30 of 364 | "Tracker notice: one-sentence form (miss-box--one), no chips"; "the sentence" |
+| 3 | guided.js | Do it for me shows the notice while "My info is empty" is showing | I4 | 6 of 364 | "My info is empty, so exactly one warning shows and no notice box" (1 warning, 1 box) |
+| 4 | missing.js | `take()` returns the hand-off without clearing it | I6 | 24 of 434 | "coming back through the nav shows no highlight and no back link" |
+| 5 | profile.js | the highlight is removed on every keystroke in the email field | I6 | 4 of 434 | "typing in the email field keeps the highlight"; "a full address typed but not yet left keeps the highlight" |
+| 6 | missing.js | a line's `data-info-key` is always `state` | I4, I6 | 65 of 663 | "every card, row and line equals L.missingInfo (data-missing, sentence, link, first key)" on all three pages |
+| 7 | logic.js | `trackerScope` keeps programs for other states | I1 | 16 of 27 (the group then stopped) | "summary reads X of N done" (137 vs 77); progress bar; the rows and the left-out sentence |
+| 8 | tracker.js | a row's own status select no longer sets `localChange`, so the row moves at once | I2 | 2 of 13 (the group then stopped) | "the row stays where it was" |
+| 9 | guided.js | the default tick ignores a group already signed up for | I3 | 4 of 136 | "same-thing group (patched data) ... nothing in the group is ticked" (second signed up, first received) |
+| 10 | tracker.js | a fold's open state is not written to `prefs.trkOpen` | I2 | 10 of 224 | "prefs.trkOpen records the open folds" |
+| 11 | profile.js | the back link always points at `#directory` | I6 | 2 of 107 (the group then stopped) | "one back link, Back to Tracker, href #tracker" |
+| 12 | profile.js | the hand-off highlights a field that already has an answer | I6 | 9 of 434 | "field already answered ... no highlight (it is answered)" |
+| 13 | profile.js | a hint is not hidden when the field is answered | I5 | 0 of 48, not caught | equivalent mutation: an answered field has a count of 0 in `missingInfoCounts`, so the hint is hidden by the count anyway; replaced by 16 |
+| 14 | directory.js | the Programs notice is always the compact one-sentence form | I4 | 30 of 364 | "full form has no miss-box--one class and no inline link"; "the sentence" |
+| 15 | logic.js | `trackerSections` puts programs that are not ready into Do now | I1 | 145 of 1043 | "now rows equal trackerSections ids and order" (46 vs 27); the sections list |
+| 16 | profile.js | the "N programs depend on this." hint shows the total instead of the field's count | I5 | 10 of 48 | "each unanswered field shows N programs depend on this. with the module count" (92 vs the state count) |
+
+Notes:
+- Mutations 7, 8 and 11 stop their part early (the later steps need the row or the page that the mutation broke), so the failed count is small next to the checks left unrun. They still fail the run.
+- Mutation 9 changes nothing on today's unpatched data (the only group with more than one member has no program that is ticked by default), which is why group 14 runs that rule on data patched in the page (see README, "Phase I"). On the patched data it is caught.
+- Sixteen picked mutations are a spot-check, not a coverage measure.

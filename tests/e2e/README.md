@@ -1,20 +1,37 @@
 # End-to-end browser test
 
-Run from the repo root: `node tests/e2e/run.mjs` (optional `--shots <dir>` saves 1x screenshots, `--only 4,7` runs those group numbers). A full run takes about 6.5 minutes.
+Run from the repo root: `node tests/e2e/run.mjs` (optional `--shots <dir>` saves 1x screenshots, `--only 4,7` runs those group numbers). A full run takes about 14 minutes (group 4 alone is about 6, group 14 about 4; `--only` runs just some groups).
 
 - It builds the repo (`node scripts/build.mjs`), then drives Chromium through Playwright against `index.html` (standalone) and `artifact.html` (wrapped in the artifact skeleton, with a mocked `window.claude`: downloads, Gmail connector, `use()` returning null, and no runtime at all).
-- Groups: 1 boot and layout, 2 routes, 3 link audit (all programs, including the ones hidden by state and the ones inside "same thing" groups), 4 click-through of every link and button, 5 downloads and copy, 6 backup round trip, 7 Gmail card, 8 fill script on fixture forms (plus-address rules), 9 persistence and privacy, 10 accessibility smoke, 11 Phase G directory, 12 Phase G guided run, tracker and email features.
+- Groups: 1 boot and layout, 2 routes, 3 link audit (all programs, including the ones hidden by state and the ones inside "same thing" groups), 4 click-through of every link and button, 5 downloads and copy, 6 backup round trip, 7 Gmail card, 8 fill script on fixture forms (plus-address rules), 9 persistence and privacy, 10 accessibility smoke, 11 Phase G directory, 12 Phase G guided run, tracker and email features, 13 Phase H (prints its own lines 13, 14 and 15), 14 Phase I (prints I1 to I7).
 - Group 11 covers: best-value order and group headings, ranks, the Truly free, Open to everyone and What you get filters, every card line, the summary numbers, "Show these", the state rule with "Show them" and "Hide them", "same thing" groups, the due-date plan buttons, saved preferences from older versions, and no sideways scroll at 375px.
 - Group 12 covers: the guided run order and default selection, the state rule in the guided list, "Start over" confirmation, tagged addresses in a run, the tracker value line, per-row plus addresses and Gmail links, and the Gmail filters file.
 - Expected numbers are never typed in. `lib/model.mjs` loads the real `logic.js`, `email.js` and `fieldmatch.js` in Node and works them out from `data/programs.json`, so the page is compared with the module and the data.
 - Dates for the due-date checks are relative to today, so they do not go stale.
 - All network is blocked and recorded; the app must make no request of its own. Everything it sees is synthetic: the Gmail mock, the profile and the fixture forms (`lib/fixtures.mjs`). No real site or mailbox is touched.
-- Exit code 1 if any check fails; the last line is `N checks, M failed`. The last full run: 983 checks, 0 failed. Findings are in `FINDINGS.md`; mutation spot-checks are in `MUTATIONS.md`.
+- Exit code 1 if any check fails; the last line is `N checks, M failed`. The last full run: 3740 checks, 0 failed (about 14 minutes). Findings are in `FINDINGS.md`; mutation spot-checks are in `MUTATIONS.md`.
 - To test a changed copy of the build without touching the repo, put `index.html` and `artifact.html` in a folder and run `BFF_E2E_BUILD_DIR=<folder> node tests/e2e/run.mjs --only 11,12`. The run then skips the build and uses those files (this is how `MUTATIONS.md` was made).
 - Not part of `node --test` or CI: it needs a browser (Playwright is preinstalled locally, not on CI runners). Without Playwright it prints `e2e skipped: Playwright not available` and exits 0.
+- `BFF_E2E_SUB=I2,I6 node tests/e2e/run.mjs --only 14` runs only those parts of group 14.
 - Files are named without `.test.` on purpose so `node --test` never picks them up.
-- Layout: `run.mjs` (runner), `lib/harness.mjs` (reporter, page opener), `lib/model.mjs` (expected answers), `lib/groups-a.mjs` to `groups-d.mjs` (the checks), `lib/mock.mjs` (Gmail and artifact mock), `lib/fixtures.mjs` (synthetic form).
+- Layout: `run.mjs` (runner), `lib/harness.mjs` (reporter, page opener), `lib/model.mjs` (expected answers), `lib/groups-a.mjs` to `groups-f.mjs` (the checks; `groups-e` is Phase H, `groups-f` is Phase I), `lib/mock.mjs` (Gmail and artifact mock), `lib/fixtures.mjs` (synthetic form).
 
 ## Phase H (group 13)
 
 Groups 1 to 12 open the Programs page through `open()`, which taps the All tab and unfolds "Sort and filter" (pass `all: false` for the real default view) and, where a card's status select is needed, opens the card with `openCard()`. Group 13 covers the tabs, collapsed cards, the filters disclosure, the four "Your situation" answers (save, reload, backup and restore, Clear my info), what they hide, the "Show them" choice, tracked programs never hidden, "Fits my answers", the answers never reaching the fill script, bookmark, phone view or guided copy, and no sideways scroll at 360 and 390. It prints three lines (13, 14, 15). Expected numbers come from `lib/model.mjs`.
+
+## Phase I (group 14)
+
+The Tracker is the person's own to-do list now (scoped to their state and answers, ranked, tabbed, rows that stay put, tool folds that start closed), the Do it for me list has one row per group, and every page says what My info is missing. Old groups that used the Tracker or My info now go through small helpers in `lib/harness.mjs`: `openTools` / `openFold` (the three Tracker folds), `openPhoneFold` (My info), `trkTab`, `showAllRows` (All tab plus "Show all N programs"), `revealRow`, `openRowDetails`, `openAllPanels`, `revealPick` (Do it for me), `settleScroll` (the My info hand-off scrolls smoothly; wait until two readings 150 ms apart agree) and `reloadAfterWrite` (see FINDINGS, "odd").
+
+Group 14 prints seven lines, run in both outputs at 390 wide (and 320 for layout), with the profiles empty, state only, a full sample, and the full sample plus an insurer:
+- I1 Tracker: the rows, their order and the sections equal `L.trackerScope` and `L.trackerSections` for the page's own weeks value (due in 150 days, 4 weeks, passed); the "(N)" in each title, "X of N done", `#trk-toclaim` (`L.toClaim`), tab counts, the left-out sentence, "Show all N programs" and "Back to my list", and the other tabs.
+- I2 Tracker behaviour: a status change through the row's own select leaves the row in place with `.fx-moved` while the numbers update, and it moves after a tab switch; "Do these with help" selects exactly the Do now programs; folds start closed and keep their open state through a reload (`prefs.trkOpen`); Details opens, and a note is saved and comes back.
+- I3 Do it for me: one row per group, other ways in a fold, the optional section closed with its count, at most one default tick per group, none in a group already signed up for. Today's data has only one group with more than one member and none of its members is ticked by default, so that rule is also run on a page whose data is patched in memory (the inlined data is read through a wrapped `JSON.parse`) to make two default programs one group.
+- I4 Missing info: the line on every card, Tracker row and Do it for me row equals `L.missingInfo` (data-missing, sentence, link text, first key, "in My info" in the name); the notice on all three pages equals `L.missingInfoCounts` (full form with chips on Programs, one sentence everywhere else, none at total 0, none on Do it for me while My info is empty); marking a program Signed up lowers the total by one on every page.
+- I5 My info hints: "N programs depend on this." for each unanswered field, gone when answered, the others following.
+- I6 Hand-off: from Programs, the Tracker and Do it for me, for the five answer keys and for `dueDate`, `email` and `plus`: focus, `fx-ask`, the back link, the highlight leaving when answered (email only after leaving the field), the answer saved, the back link returning to the page's heading, used once, nothing stored by the hand-off; already answered fields; the `insurer` fallback to `cover`.
+- I7 Accessibility and layout: 44 px links and chips, 4.5:1 contrast in light and dark, no element past the right edge at 390 and 320 with each notice form showing.
+
+Mutation spot-checks for this round are in `MUTATIONS.md` ("Phase I").
+

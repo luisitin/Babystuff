@@ -2,7 +2,7 @@
 // Every expected number comes from the real modules through model.mjs.
 import fs from 'node:fs';
 import path from 'node:path';
-import { TMP, PROFILE, open, clean, runGroup, openCard } from './harness.mjs';
+import { TMP, PROFILE, open, clean, runGroup, openCard, openPhoneFold, openTools, trkTab, showAllRows, revealRow, openRowDetails, BACKUP_MSG, reloadAfterWrite } from './harness.mjs';
 import { L, ALL, byId, poolFor } from './model.mjs';
 
 const MODES = ['standalone', 'artifact'];
@@ -64,7 +64,7 @@ export async function phaseH(env) {
       // ---- the choice survives a reload ----
       await page.locator(D + '.kind-tab[data-kind="money"]').click(); await settle(page);
       g.check(tag + 'choice is saved in prefs as filters.kind', (await prefs(page)).filters && (await prefs(page)).filters.kind === 'money');
-      await page.reload(); await page.waitForSelector(D + '.card'); await settle(page);
+      await reloadAfterWrite(page); await page.waitForSelector(D + '.card'); await settle(page);
       g.check(tag + 'Money is still chosen after a reload and lists the model programs', (await tabs(page)).money.pressed === 'true' && sameSet(await idsNow(page), ids(L.filterPrograms(pool, { kind: 'money' }))));
       // ---- cards start collapsed ----
       await page.locator(D + '.kind-tab[data-kind="stuff"]').click(); await settle(page);
@@ -123,8 +123,9 @@ export async function phaseH(env) {
       const afterState = poolFor('', false);
 
       // ---- before any answer ----
-      const sum0 = norm(await page.locator(D + '.sum-situation').innerText());
-      g.check(tag + 'no answers: summary invites four quick questions and nothing is hidden', /^Answer four quick questions in My info to hide programs that cannot apply to you\.$/.test(sum0) && (await page.locator(D + '.dir-fit').isHidden()));
+      // The "Answer four quick questions" line is gone from the summary; the missing-info notice invites the answers now.
+      const miss0 = await page.evaluate(() => { const b = document.querySelector('#view-directory .dir-miss .miss-box'); return b ? { keys: b.dataset.missingKeys, shown: b.offsetParent !== null } : null; });
+      g.check(tag + 'no answers: the summary has no questions line, the missing-info notice asks for the four answers, and nothing is hidden', (await page.locator(D + '.sum-situation').count()) === 0 && !!miss0 && miss0.shown && ['cover', 'lowIncome', 'job'].every((k) => miss0.keys.split(' ').includes(k)) && (await page.locator(D + '.dir-fit').isHidden()), JSON.stringify(miss0));
       await page.locator(D + 'details.dir-filters > summary').click();
       const fm = page.locator(D + 'label[data-chip="fitsMine"] input');
       g.check(tag + '"Fits my answers" is disabled until something is answered, with a hint', await fm.isDisabled() && await page.locator(D + '.chip-hint').isVisible());
@@ -140,7 +141,7 @@ export async function phaseH(env) {
       const sp = await storedProfile(page);
       g.check(tag + 'answers are saved in profile.v1', ['cover', 'insurer', 'lowIncome', 'job'].every((k) => sp[k] === ANSWERS[k]), JSON.stringify(sp));
       g.check(tag + 'answers live only in bff.profile.v1 (not in prefs, tracker or guided)', await page.evaluate((v) => ['bff.prefs.v1', 'bff.tracker.v1', 'bff.guided.v1'].every((k) => !(localStorage.getItem(k) || '').includes(v)), ANSWERS.insurer || 'zz-none-zz'));
-      await page.reload(); await settle(page);
+      await reloadAfterWrite(page); await settle(page);
       await h.go('info');
       g.check(tag + 'answers survive a reload', (await page.locator('#info-cover').inputValue()) === ANSWERS.cover && (await page.locator('#info-insurer').inputValue()) === ANSWERS.insurer && (await page.locator('#info-lowIncome').inputValue()) === ANSWERS.lowIncome && (await page.locator('#info-job').inputValue()) === ANSWERS.job);
 
@@ -161,8 +162,9 @@ export async function phaseH(env) {
       const fits = ids(keep.filter((p) => L.fit(p, prof) === 'yes' && p.audience && p.audience.length));
       const fitCards = await page.evaluate(() => [...document.querySelectorAll('#view-directory article.card')].filter((c) => c.querySelector('.tag-fit')).map((c) => c.dataset.programId));
       g.check(tag + '"Fits your answers" badge is on exactly the programs with fit yes and an audience', sameSet(fitCards, fits) && fits.length > 0, fitCards.length + ' vs ' + fits.length);
-      const sumSit = norm(await page.locator(D + '.sum-situation').innerText());
-      g.check(tag + 'summary says how many fit and how many are hidden', sumSit === keep.filter((p) => L.fit(p, prof) === 'yes').length + (keep.filter((p) => L.fit(p, prof) === 'yes').length === 1 ? ' program fits' : ' programs fit') + ' your answers; ' + nHide + ' hidden.', sumSit);
+      // The fit sentence moved out of the summary: the box under it says how many programs the answers hide.
+      const fitBox2 = norm(await page.locator(D + '.dir-fit').innerText());
+      g.check(tag + 'the summary has no fit sentence; the answers box says how many are hidden', (await page.locator(D + '.sum-situation').count()) === 0 && fitBox2.startsWith((nHide === 1 ? '1 program hidden' : nHide + ' programs hidden') + ' because of your answers in My info.'), fitBox2);
       g.check(tag + 'hidden programs have no "Does not match" badge while hidden', (await page.locator(D + '.tag-nomatch').count()) === 0);
 
       // Fits my answers
@@ -203,7 +205,7 @@ export async function phaseH(env) {
       g.check(tag + '"Does not match your answers" is on exactly the hidden programs', sameSet(noMatch, ids(hiddenList)) && noMatch.length === nHide, noMatch.length + ' vs ' + nHide);
       g.check(tag + 'focus stays on the Show/Hide button', await page.evaluate(() => document.activeElement === document.querySelector('#view-directory .dir-fit button')));
       g.check(tag + 'the choice is remembered in prefs.showNoFit', (await prefs(page)).showNoFit === true);
-      await page.reload(); await page.waitForSelector(D + '.card'); await settle(page);
+      await reloadAfterWrite(page); await page.waitForSelector(D + '.card'); await settle(page);
       await h.showAll();
       g.check(tag + 'after a reload the programs are still shown with the badge', sameSet(await idsNow(page), ids(afterState)) && (await page.locator(D + '.tag-nomatch').count()) === nHide);
       await fitBox.getByRole('button', { name: 'Hide them' }).click(); await settle(page);
@@ -211,6 +213,7 @@ export async function phaseH(env) {
 
       // ---- backup and restore carry the answers; Clear my info removes them ----
       await h.go('tracker');
+      await openTools(page);
       await page.getByLabel('Include My info in the backup').check();
       let text;
       if (mode === 'standalone') {
@@ -225,12 +228,13 @@ export async function phaseH(env) {
       const cleared = await storedProfile(page);
       g.check(tag + 'Clear my info removes the answers from storage and the form', ['cover', 'insurer', 'lowIncome', 'job'].every((k) => !cleared[k]) && (await page.locator('#info-cover').inputValue()) === '' && (await page.locator('#info-lowIncome').inputValue()) === '' && (await page.locator('#info-job').inputValue()) === '', JSON.stringify(cleared));
       await h.go('directory'); await h.showAll();
-      g.check(tag + 'with the answers gone nothing is hidden and the invitation is back', sameSet(await idsNow(page), ids(afterState)) && (await page.locator(D + '.dir-fit').isHidden()) && /^Answer four quick questions/.test(norm(await page.locator(D + '.sum-situation').innerText())));
+      g.check(tag + 'with the answers gone nothing is hidden and the invitation is back', sameSet(await idsNow(page), ids(afterState)) && (await page.locator(D + '.dir-fit').isHidden()) && (await page.locator(D + '.sum-situation').count()) === 0 && (await page.locator('#view-directory .dir-miss .miss-box').count()) === 1);
       await h.go('tracker');
+      await openTools(page);
       if (mode === 'standalone') { const f = path.join(TMP, 'h-backup.json'); fs.writeFileSync(f, text); await page.setInputFiles('#trk-restore', f); }
       else { await page.locator('summary', { hasText: 'Restore from pasted text instead' }).click(); await page.locator('#trk-paste').fill(text); await page.getByRole('button', { name: 'Restore from pasted text' }).click(); }
       await page.locator('.fx-confirm').getByRole('button', { name: 'Restore' }).click();
-      await page.waitForFunction(() => /Restored/.test(document.querySelector('section[aria-labelledby="trk-backup-h"] .fx-msg').textContent), null, { timeout: 4000 }).catch(() => {});
+      await page.waitForFunction(() => /Restored/.test(document.querySelector('details.fx-fold[data-fold="backup"] .fx-msg').textContent), null, { timeout: 4000 }).catch(() => {});
       const back = await storedProfile(page);
       g.check(tag + 'restoring the backup brings the four answers back', ['cover', 'insurer', 'lowIncome', 'job'].every((k) => back[k] === ANSWERS[k]), JSON.stringify(back));
       await h.go('directory'); await h.showAll();
@@ -238,6 +242,7 @@ export async function phaseH(env) {
       // a restore never overwrites an answer that is already set
       await h.go('info'); await page.locator('#info-job').selectOption('yes'); await page.waitForTimeout(700);
       await h.go('tracker');
+      await openTools(page);
       if (mode === 'standalone') await page.setInputFiles('#trk-restore', path.join(TMP, 'h-backup.json'));
       else { await page.locator('#trk-paste').fill(text); await page.getByRole('button', { name: 'Restore from pasted text' }).click(); }
       await page.locator('.fx-confirm').getByRole('button', { name: 'Restore' }).click(); await page.waitForTimeout(400);
@@ -246,6 +251,7 @@ export async function phaseH(env) {
       const evil = JSON.parse(text); evil.profile = Object.assign({}, evil.profile, { cover: 'bogus', job: 'maybe', insurer: '<b>x</b>' });
       await h.go('info'); await page.getByRole('button', { name: 'Clear my info' }).click(); await page.locator('.fx-confirm').getByRole('button', { name: 'Clear my info' }).click(); await page.waitForTimeout(300);
       await h.go('tracker');
+      await openTools(page);
       if (mode === 'standalone') { const f = path.join(TMP, 'h-evil.json'); fs.writeFileSync(f, JSON.stringify(evil)); await page.setInputFiles('#trk-restore', f); }
       else { await page.locator('#trk-paste').fill(JSON.stringify(evil)); await page.getByRole('button', { name: 'Restore from pasted text' }).click(); }
       await page.locator('.fx-confirm').getByRole('button', { name: 'Restore' }).click(); await page.waitForTimeout(400);
@@ -259,6 +265,7 @@ export async function phaseH(env) {
       const pg = hp.page;
       await hp.go('info');
       g.check(tag + 'a profile loaded from storage shows the answers in My info', (await pg.locator('#info-lowIncome').inputValue()) === ANSWERS.lowIncome && (await pg.locator('#info-cover').inputValue()) === ANSWERS.cover);
+      await openPhoneFold(pg);
       await pg.getByRole('button', { name: 'Copy fill script' }).click(); await pg.waitForTimeout(250);
       const script = await pg.evaluate(() => navigator.clipboard.readText());
       await pg.getByRole('button', { name: 'Copy bookmark code' }).click(); await pg.waitForTimeout(250);

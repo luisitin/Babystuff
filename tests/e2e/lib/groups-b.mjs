@@ -2,7 +2,8 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { isDeepStrictEqual } from 'node:util';
-import { TMP, PROGRAMS, PROFILE, open, clean, runGroup, parseZip, lsDump } from './harness.mjs';
+import { TMP, PROGRAMS, PROFILE, open, clean, runGroup, parseZip, lsDump, openTools, openRowDetails, revealRow, showAllRows, openFold, openViewTools, BACKUP_MSG } from './harness.mjs';
+import { E, trackerFor } from './model.mjs';
 import { prepare } from './groups-a.mjs';
 import { ALLOWED_TOOLS } from './mock.mjs';
 
@@ -15,7 +16,7 @@ async function download(page, click) {
 }
 const lastSave = (page) => page.evaluate(() => window.__saves[window.__saves.length - 1]);
 const msgOf = (button, sel) => button.locator('xpath=ancestor::*[contains(@class,"' + sel.card + '")][1]').locator(sel.msg).first();
-const TRK = { card: 'fx-card', msg: '.fx-msg' };
+const TRK = { card: 'fx-fold', msg: '.fx-msg' };
 const PHONE = { card: 'ph-group', msg: '.ph-status' };
 const startsSaved = (t) => /^(Saved|Downloaded)/.test(t.trim());
 
@@ -47,7 +48,7 @@ export async function downloads(env) {
       const h = await open(browser, { mode, claude });
       await prepare(h);
       for (const f of FILES) {
-        await h.go(f.view);
+        await h.go(f.view); await openViewTools(h.page, f.view);
         const b = h.page.getByRole('button', { name: f.button });
         const d = await download(h.page, () => b.click()).catch((e) => ({ err: String(e.message).split('\n')[0] }));
         const label = mode + (claude === 'none' ? '(c)' : '') + ' ' + f.key;
@@ -66,7 +67,7 @@ export async function downloads(env) {
     const h = await open(browser, { mode: 'artifact', claude: 'full' });
     await prepare(h);
     for (const f of FILES) {
-      await h.go(f.view);
+      await h.go(f.view); await openViewTools(h.page, f.view);
       const b = h.page.getByRole('button', { name: f.button });
       await b.click();
       await h.page.waitForFunction((n) => window.__saves.length >= n, (await h.page.evaluate(() => window.__saves.length)));
@@ -95,7 +96,7 @@ export async function downloads(env) {
     for (const mode of ['declined', 'rate_limited', 'error']) {
       await h.page.evaluate((m) => { window.__dlMode = m; }, mode);
       for (const f of [FILES[0], FILES[1], FILES[3]]) {
-        await h.go(f.view);
+        await h.go(f.view); await openViewTools(h.page, f.view);
         const b = h.page.getByRole('button', { name: f.button });
         await b.click();
         await h.page.waitForTimeout(350);
@@ -118,7 +119,7 @@ export async function downloads(env) {
     const hb = await open(browser, { mode: 'artifact', claude: 'null' });
     await prepare(hb);
     for (const f of FILES) {
-      await hb.go(f.view);
+      await hb.go(f.view); await openViewTools(hb.page, f.view);
       const b = hb.page.getByRole('button', { name: f.button });
       await b.click(); await hb.page.waitForTimeout(250);
       const card = b.locator('xpath=ancestor::*[contains(@class,"' + f.scope.card + '")][1]');
@@ -140,7 +141,7 @@ export async function downloads(env) {
       const h = await open(browser, { mode, perms: ['clipboard-read', 'clipboard-write'] });
       await prepare(h);
       for (const c of COPIES) {
-        await h.go(c.view);
+        await h.go(c.view); await openViewTools(h.page, c.view);
         const b = h.page.getByRole('button', { name: c.button });
         await b.click(); await h.page.waitForTimeout(250);
         const clip = await h.page.evaluate(() => navigator.clipboard.readText());
@@ -153,7 +154,7 @@ export async function downloads(env) {
       const f = await open(browser, { mode, init: ['try{Object.defineProperty(navigator.clipboard,"writeText",{value:function(){return Promise.reject(new DOMException("blocked","NotAllowedError"))},configurable:true});document.execCommand=function(){return false}}catch(e){}'] });
       await prepare(f);
       for (const c of COPIES) {
-        await f.go(c.view);
+        await f.go(c.view); await openViewTools(f.page, c.view);
         const b = f.page.getByRole('button', { name: c.button });
         await b.click(); await f.page.waitForTimeout(300);
         const msg = (await msgOf(b, c.scope).innerText()).trim();
@@ -179,6 +180,7 @@ const j = (s) => { try { return JSON.parse(s); } catch (e) { return s; } };
 
 async function wipe(h) {
   await h.go('tracker');
+  await openTools(h.page);
   await h.page.getByRole('button', { name: 'Reset tracker' }).click();
   await h.page.locator('.fx-confirm').getByRole('button', { name: 'Reset tracker' }).click();
   await h.go('info');
@@ -195,7 +197,11 @@ export async function backup(env) {
       const page = h.page;
       await prepare(h);
       await h.go('tracker');
+      await openTools(page);
+      await showAllRows(page);
+      await openRowDetails(page, PROGRAMS[1].id);
       await page.locator('#trk-n-' + PROGRAMS[1].id).fill('synthetic note for the round trip');
+      await revealRow(page, PROGRAMS[3].id);
       await page.locator('#trk-s-' + PROGRAMS[3].id).selectOption('signed-up');
       await page.waitForTimeout(800);
       await page.getByLabel('Include My info in the backup').check();
@@ -211,10 +217,11 @@ export async function backup(env) {
       g.check(mode + ': wipe removed My info', mid.p === null || Object.keys(j(mid.p) || {}).length === 0, mid.p);
       g.check(mode + ': wipe emptied the tracker', mid.t === null || Object.keys((j(mid.t) || {}).entries || j(mid.t) || {}).length === 0, String(mid.t).slice(0, 80));
       await h.go('tracker');
+      await openTools(page);
       if (mode === 'standalone') await page.setInputFiles('#trk-restore', file);
       else { await page.locator('summary', { hasText: 'Restore from pasted text instead' }).click(); await page.locator('#trk-paste').fill(text); await page.getByRole('button', { name: 'Restore from pasted text' }).click(); }
       await page.locator('.fx-confirm').getByRole('button', { name: 'Restore' }).click();
-      await page.waitForFunction(() => /Restored/.test(document.querySelector('section[aria-labelledby="trk-backup-h"] .fx-msg').textContent), null, { timeout: 4000 }).catch(() => {});
+      await page.waitForFunction(() => /Restored/.test(document.querySelector('details.fx-fold[data-fold="backup"] .fx-msg').textContent), null, { timeout: 4000 }).catch(() => {});
       const after = await tracked(page);
       g.check(mode + ': tracker equal after restore', isDeepStrictEqual(j(after.t), j(before.t)), JSON.stringify(j(before.t)).slice(0, 120) + ' vs ' + JSON.stringify(j(after.t)).slice(0, 120));
       g.check(mode + ': My info equal after restore', isDeepStrictEqual(j(after.p), j(before.p)), JSON.stringify(j(before.p)).slice(0, 160) + ' vs ' + JSON.stringify(j(after.p)).slice(0, 160));
@@ -235,10 +242,11 @@ export async function backup(env) {
       };
       for (const k of Object.keys(bad)) {
         await h.go('tracker');
+        await openTools(page);
         const ls0 = await lsDump(page);
         if (mode === 'standalone') await page.setInputFiles('#trk-restore', { name: 'bad.json', mimeType: 'application/json', buffer: Buffer.from(bad[k]) });
         else {
-          const det = page.locator('details', { hasText: 'Restore from pasted text instead' });
+          const det = page.locator('details:not(.fx-fold)', { hasText: 'Restore from pasted text instead' });
           if (!(await det.evaluate((d) => d.open))) await det.locator('summary').click();
           await page.locator('#trk-paste').fill(bad[k]);
           await page.getByRole('button', { name: 'Restore from pasted text' }).click();
@@ -247,7 +255,7 @@ export async function backup(env) {
         let confirmShown = await page.locator('.fx-confirm').count();
         if (confirmShown) await page.locator('.fx-confirm').getByRole('button', { name: 'Restore' }).click().catch(() => {});
         await page.waitForTimeout(200);
-        const msg = await page.locator('section[aria-labelledby="trk-backup-h"] .fx-msg').innerText();
+        const msg = await page.locator(BACKUP_MSG).innerText();
         g.check(mode + ' bad backup (' + k + '): refused with a message', /fail|not a|not valid|cannot|unsupported|malformed|unknown|too large|invalid/i.test(msg) && !/^Restored/.test(msg.trim()), msg);
         g.check(mode + ' bad backup (' + k + '): data untouched', isDeepStrictEqual(await lsDump(page), ls0));
         if (await page.locator('.fx-confirm').count()) await page.locator('.fx-confirm').getByRole('button', { name: 'Cancel' }).click();
@@ -263,7 +271,8 @@ export const gmailCalls = [];
 const GM_PROFILE = Object.assign({}, PROFILE, { usePlusTags: true });
 async function gmailOpen(browser, gm, extra = {}) {
   const h = await open(browser, Object.assign({ mode: 'artifact', claude: 'full', profile: GM_PROFILE, hash: 'tracker', gm }, extra));
-  await h.page.waitForSelector('[data-ib-card]');
+  await h.page.waitForSelector('[data-ib-card]', { state: 'attached' });
+  await openFold(h.page, 'gmail'); // the Gmail card sits in a closed fold on the Tracker
   await h.page.waitForTimeout(300);
   return h;
 }
@@ -400,12 +409,16 @@ export async function gmail(env) {
     for (const [mode, claude] of [['standalone', 'full'], ['artifact', 'null'], ['artifact', 'none']]) {
       const label = mode + (mode === 'artifact' ? '/' + claude : '');
       const h = await open(browser, { mode, claude, profile: GM_PROFILE, hash: 'tracker' });
-      await h.page.waitForSelector('[data-ib-card]');
+      await h.page.waitForSelector('[data-ib-card]', { state: 'attached' });
+      await openFold(h.page, 'gmail');
       await h.page.waitForTimeout(500);
       const t = await card(h.page).innerText();
       g.check(label + ': says the connection needs Claude', /Claude/.test(t) && /not connected/i.test(t), t.slice(0, 100));
       g.check(label + ': no dead buttons', (await card(h.page).locator('button.ib-btn:visible').count()) === 0);
-      g.check(label + ': Search my Gmail links are offered', (await h.page.locator('a:visible', { hasText: 'Search my Gmail' }).count()) > 0);
+      // the links live in a row's Details panel now: open the first row of the to-do list that has one
+      const withGm = trackerFor({ profile: GM_PROFILE }).secs.now.find((r) => E.inEmailFeatures(r.p));
+      await openRowDetails(h.page, withGm.p.id);
+      g.check(label + ': Search my Gmail links are offered (in a row\'s Details panel)', (await h.page.locator('a:visible', { hasText: 'Search my Gmail' }).count()) > 0);
       clean(g, h, label);
       await h.ctx.close();
     }
