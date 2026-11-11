@@ -15,7 +15,7 @@
     ['category', 'Category'],
     ['confidence', 'Confidence']
   ];
-  var STATUSES = [['todo', 'To do'], ['signed-up', 'Signed up'], ['received', 'Received'], ['skipped', 'Skipped']];
+  var STATUSES = [['todo', 'To do'], ['signed-up', 'Signed up'], ['received', 'Received'], ['skipped', 'Not for me']];
 
   var VERDICT_NOTES = {
     top: 'Free, and worth the most. Claim these first.',
@@ -34,8 +34,12 @@
   var TRULY_FREE_LINE = 'Truly free: real products or samples at no cost. No purchase, no fee, not a prize draw.';
 
   var state = Object.assign({}, DEFAULTS);
-  var showOther = false;
-  var showNoFit = false;
+  // What the person chose to show for now: reason -> true. Never saved; empty on every page load.
+  var shownReasons = {};
+  var hiddenOpen = false;
+  var tickOf = {};
+  var renderedIds = [];
+  var SAVE_FAIL = 'It could not be saved on this device (storage is full or blocked), so it lasts only until you close this page.';
   var openCards = {};
   var profile = {};
   var els = {};
@@ -73,16 +77,13 @@
       state.kind = KIND_IDS.indexOf(f.kind) !== -1 ? f.kind : DEFAULTS.kind;
       state.sort = f.sort === 'recommended' ? 'best' : SORTS.some(function (s) { return s[0] === f.sort; }) ? f.sort : 'best';
     }
-    showOther = !!(prefs && prefs.showOtherStates);
-    showNoFit = !!(prefs && prefs.showNoFit);
   }
   function savePrefs() {
     if (!BFF.store) return;
     var prefs = BFF.store.get('prefs.v1', {});
     if (!prefs || typeof prefs !== 'object') prefs = {};
     prefs.filters = Object.assign({}, state);
-    prefs.showOtherStates = showOther;
-    prefs.showNoFit = showNoFit;
+    delete prefs.showOtherStates; delete prefs.showNoFit;
     BFF.store.set('prefs.v1', prefs);
   }
 
@@ -168,8 +169,15 @@
       els.fitsHint
     ]);
     els.tfNote = h('p', { class: 'dir-note', hidden: true, text: TRULY_FREE_LINE });
-    els.stateBox = h('div', { class: 'dir-state', hidden: true });
-    els.fitBox = h('div', { class: 'dir-state dir-fit', hidden: true });
+    els.hiddenSummary = h('summary');
+    els.hiddenList = h('ul', { class: 'dir-hidden-list' });
+    els.hiddenBox = h('details', { class: 'dir-hidden', hidden: true }, [
+      els.hiddenSummary,
+      els.hiddenList,
+      h('p', { class: 'dir-hidden-foot', text: 'These numbers count every tab and ignore the search and filters. What you show here is hidden again the next time you open the app.' })
+    ]);
+    els.hiddenBox.addEventListener('toggle', function () { hiddenOpen = els.hiddenBox.open; });
+    els.live = h('div', { class: 'visually-hidden', role: 'status', 'aria-live': 'polite', 'aria-atomic': 'true' });
     els.summary = h('section', { class: 'dir-summary', 'aria-label': 'Summary' });
     els.missBox = h('div', { class: 'dir-miss', hidden: true });
 
@@ -179,12 +187,15 @@
     els.empty = h('div', { class: 'empty', hidden: true }, [
       h('p', { text: 'No programs match those filters.' })
     ]);
+    els.emptyHidden = h('p', { class: 'empty-hidden', hidden: true });
+    els.empty.appendChild(els.emptyHidden);
     var emptyClear = h('button', { type: 'button', class: 'btn btn-primary', text: 'Clear filters' });
     emptyClear.addEventListener('click', clearFilters);
     els.empty.appendChild(emptyClear);
 
     els.start = h('button', { type: 'button', class: 'btn btn-primary start-run' });
     els.start.addEventListener('click', function () {
+      refreshStart();
       if (!shownIds.length || !BFF.guided) return;
       var ids = shownIds.slice();
       function go() { BFF.guided.preselect(ids); if (BFF.nav) BFF.nav.go('guided'); else location.hash = '#guided'; }
@@ -203,12 +214,12 @@
     root.appendChild(els.tabs);
     root.appendChild(els.filterBox);
     root.appendChild(els.tfNote);
-    root.appendChild(els.stateBox);
-    root.appendChild(els.fitBox);
+    root.appendChild(els.hiddenBox);
     root.appendChild(resultRow);
     root.appendChild(h('div', { class: 'start-row' }, [els.start]));
     root.appendChild(els.list);
     root.appendChild(els.empty);
+    root.appendChild(els.live);
   }
 
   function syncControls() {
@@ -323,6 +334,12 @@
       h('span', { class: 'card-toggle-icon', 'aria-hidden': 'true', text: open ? String.fromCharCode(0x25B4) : String.fromCharCode(0x25BE) })
     ]);
     kids.push(h('div', { class: 'card-foot' }, [link, toggle]));
+    var art;
+    if (BFF.tracker && BFF.ticks) {
+      var tk = BFF.ticks.build(p, { prefix: 'tick', status: st, received: true, onChange: function (res) { onTick(art, p, res); } });
+      tickOf[p.id] = tk;
+      kids.push(h('div', { class: 'card-ticks' }, [tk.el, h('p', { class: 'tick-note' })]));
+    }
 
     // Everything else, shown when the card is opened.
     var d = [];
@@ -352,13 +369,6 @@
     if (p.catches && String(p.catches).trim()) {
       d.push(h('div', { class: 'catches', role: 'note' }, [h('strong', { text: 'Catches' }), h('span', { text: p.catches })]));
     }
-    if (BFF.tracker) {
-      var sid = 'st-' + p.id;
-      var sel = h('select', { id: sid, 'data-program-id': p.id, 'aria-label': 'My status for ' + p.name }, STATUSES.map(function (s) { return h('option', { value: s[0], text: s[1] }); }));
-      sel.value = st;
-      sel.addEventListener('change', function () { BFF.tracker.setStatus(p.id, sel.value); });
-      d.push(h('div', { class: 'status-row' }, [h('label', { for: sid, text: 'My status' }), sel]));
-    }
     if (p.whatYouGet) d.push(h('p', { class: 'what-you-get', text: p.whatYouGet }));
     if (p.costDetail) d.push(h('p', { class: 'cost-detail', text: p.costDetail }));
     var reqs = Array.isArray(p.requirements) ? p.requirements : [];
@@ -387,7 +397,7 @@
     var more = h('div', { class: 'card-more', id: cid, hidden: !open }, d);
     kids.push(more);
 
-    var art = h('article', { class: 'card' + (open ? ' is-open' : ''), 'data-program-id': p.id }, kids);
+    art = h('article', { class: 'card' + (open ? ' is-open' : ''), 'data-program-id': p.id }, kids);
     toggle.addEventListener('click', function () {
       var now = toggle.getAttribute('aria-expanded') !== 'true';
       toggle.setAttribute('aria-expanded', now ? 'true' : 'false');
@@ -399,58 +409,54 @@
     return art;
   }
 
-  function stateInfo() {
-    var st = profState();
-    var hidden = L.otherStateCount(programs(), st);
-    return { st: st, hidden: hidden, hide: hidden > 0 && !showOther };
+  function hideCtx() {
+    return { state: profState(), profile: profile, statusOf: statusOf, covered: L.coveredGroups(programs(), statusOf) };
+  }
+  // The reason a program would be hidden at the next render, '' when it would be listed.
+  function hiddenNowReason(p, ctx) {
+    var r = L.hideReason(p, ctx);
+    return r && shownReasons[r] !== true ? r : '';
   }
 
-  // Programs the answers in My info rule out (never ones already in progress), among those left by the state rule.
-  function fitInfo(afterState) {
-    var sit = L.hasSituation(profile);
-    var hidden = sit ? L.hiddenByAnswersCount(afterState, profile, statusOf) : 0;
-    return { sit: sit, hidden: hidden, hide: sit && hidden > 0 && !showNoFit };
-  }
-  function renderFitBox(info) {
-    els.fitBox.textContent = '';
-    els.fitBox.hidden = info.hidden === 0;
-    if (info.hidden === 0) return;
-    var n = info.hidden;
-    els.fitBox.appendChild(h('p', { text: info.hide
-      ? (n === 1 ? '1 program hidden' : n + ' programs hidden') + ' because of your answers in My info.'
-      : (n === 1 ? '1 program that does not match' : n + ' programs that do not match') + ' your answers in My info ' + (n === 1 ? 'is' : 'are') + ' shown.' }));
-    var b = h('button', { type: 'button', class: 'btn btn-small', text: info.hide ? 'Show them' : 'Hide them' });
-    b.addEventListener('click', function () { showNoFit = !showNoFit; savePrefs(); render(); var nb = els.fitBox.querySelector('button'); if (nb) nb.focus(); });
-    els.fitBox.appendChild(b);
-  }
+  function reasonText(r, n, hasState) { return L.hideReasonText(r, n, hasState); }
 
-  function renderStateBox(info) {
-    els.stateBox.textContent = '';
-    els.stateBox.hidden = false;
-    if (info.hidden === 0) { els.stateBox.hidden = true; return; }
-    var n = info.hidden, t;
-    if (!info.st) {
-      if (info.hide) t = (n === 1 ? '1 program is' : n + ' programs are') + ' only for some states. ';
-      else t = (n === 1 ? '1 program only for some states is' : n + ' programs only for some states are') + ' shown. ';
-      var kids = [document.createTextNode(t)];
-      if (info.hide) {
-        kids.push(document.createTextNode('Add your state in '));
+  function renderHiddenBox(split) {
+    var box = els.hiddenBox;
+    box.hidden = split.total === 0;
+    els.hiddenList.textContent = '';
+    if (split.total === 0) return;
+    var hasState = !!profState();
+    var now = split.hiddenNow;
+    els.hiddenSummary.textContent = now === 0
+      ? 'Nothing is hidden right now (' + split.total + ' normally ' + (split.total === 1 ? 'is' : 'are') + ')'
+      : 'Hidden from this list: ' + plural(now, 'program', 'programs');
+    L.HIDE_REASONS.forEach(function (r) {
+      var n = split.counts[r];
+      if (!n) return;
+      var on = shownReasons[r] === true;
+      var text = reasonText(r, n, hasState);
+      var mark = on ? ' (shown for now)' : '';
+      var stop = text.charAt(text.length - 1) === '.';   // the mark goes before a full stop
+      var kids = [document.createTextNode(on && stop ? text.slice(0, -1) + mark + '.' : text)];
+      if (r === 'otherState' && !hasState) {
+        kids.push(document.createTextNode(' Add your state in '));
         kids.push(h('a', { href: '#info', 'data-info-key': 'state', text: 'My info' }));
         kids.push(document.createTextNode(' to see the ones for you.'));
-      } else {
-        kids.push(document.createTextNode('Add your state in '));
-        kids.push(h('a', { href: '#info', 'data-info-key': 'state', text: 'My info' }));
-        kids.push(document.createTextNode(' to narrow them.'));
       }
-      els.stateBox.appendChild(h('p', null, kids));
-    } else if (info.hide) {
-      els.stateBox.appendChild(h('p', { text: n === 1 ? '1 program for another state is hidden.' : n + ' programs for other states are hidden.' }));
-    } else {
-      els.stateBox.appendChild(h('p', { text: n === 1 ? '1 program for another state is shown.' : n + ' programs for other states are shown.' }));
-    }
-    var b = h('button', { type: 'button', class: 'btn btn-small', text: info.hide ? 'Show them' : 'Hide them' });
-    b.addEventListener('click', function () { showOther = !showOther; savePrefs(); render(); var nb = els.stateBox.querySelector('button'); if (nb) nb.focus(); });
-    els.stateBox.appendChild(b);
+      if (on && !stop) kids.push(document.createTextNode(mark));
+      var btn = h('button', { type: 'button', class: 'btn btn-small' }, [
+        document.createTextNode(on ? 'Hide' : 'Show'),
+        h('span', { class: 'visually-hidden', text: ' ' + reasonText(r, n, hasState) })
+      ]);
+      btn.addEventListener('click', function () {
+        if (shownReasons[r] === true) delete shownReasons[r]; else shownReasons[r] = true;
+        render();
+        var again = els.hiddenBox.querySelector('li[data-reason="' + r + '"] button');
+        if (again) again.focus();
+      });
+      els.hiddenList.appendChild(h('li', { 'data-reason': r }, [h('span', { class: 'dir-hidden-text' }, kids), btn]));
+    });
+    box.open = hiddenOpen;
   }
 
   function goGroup(when) {
@@ -480,9 +486,8 @@
   }
   // Filter options for the list: the chosen filters plus the state and answers rules.
   function listOpts(extra) {
-    var info = stateInfo();
     var opts = Object.assign({}, state, {
-      state: info.st, hideOtherStates: info.hide,
+      state: profState(), hideOtherStates: false,
       profile: profile, hideNoFit: false,
       fitsMine: state.fitsMine && L.hasSituation(profile)
     }, extra || {});
@@ -492,7 +497,9 @@
   function renderSummary(pool, fInfo) {
     var box = els.summary;
     box.textContent = '';
-    var free = pool.filter(function (p) { return L.isTrulyFree(p) && L.isOpenToAll(p); });
+    function todoNow(p) { return statusOf(p.id) === 'todo'; }
+    var free = pool.filter(function (p) { return todoNow(p) && L.isTrulyFree(p) && L.isOpenToAll(p); });
+    var marked = programs().some(function (p) { var s = statusOf(p.id); return s !== 'todo' && L.isTrulyFree(p) && L.isOpenToAll(p); });
     var freeGroups = distinctGroups(free);
     var tv = L.totalValue(free);
     var lo = L.roundTotal(tv.low), hi = L.roundTotal(tv.high);
@@ -501,13 +508,13 @@
     var skipNote = noValue ? '; ' + noValue + (noValue === 1 ? ' has' : ' have') + ' no known value and ' + (noValue === 1 ? 'is' : 'are') + ' not counted' : '';
     if (tv.count) worth = ', worth about ' + (lo === hi ? L.money(lo) : L.money(lo) + ' to ' + L.money(hi)) + ' together (our estimate, from ordinary shelf prices' + skipNote + ').';
     var mainKids = [
-      h('strong', { text: freeGroups + ' truly free ' + (freeGroups === 1 ? 'program' : 'programs') + ' open to everyone' }),
+      h('strong', { text: freeGroups + ' truly free ' + (freeGroups === 1 ? 'program' : 'programs') + ' open to everyone' + (marked ? ' left to do' : '') }),
       document.createTextNode(worth)
     ];
     var top = h('div', { class: 'sum-top' }, [h('p', { class: 'sum-main' }, mainKids)]);
     var more = distinctGroups(pool.filter(function (p) {
       var v = L.verdict(p);
-      return L.needsQualifying(p) && (v === 'top' || v === 'good' || v === 'small') && L.fit(p, L.hasSituation(profile) ? profile : {}) !== 'no';
+      return todoNow(p) && L.needsQualifying(p) && (v === 'top' || v === 'good' || v === 'small') && L.fit(p, L.hasSituation(profile) ? profile : {}) !== 'no';
     }));
     if (freeGroups > 0 && !(state.trulyFree && state.openToAll && state.kind !== 'money' && state.kind !== 'care')) {
       var show = h('button', { type: 'button', class: 'btn btn-small show-these', text: 'Show these' });
@@ -549,7 +556,7 @@
     var defs = [['pregnancy', 'do now'], ['late-pregnancy', 'in the last weeks'], ['after-birth', 'after the birth']];
     if (wk < 0) defs = [defs[2]];
     var counts = {};
-    collapseShown(pool).forEach(function (g) { counts[g.lead.when] = (counts[g.lead.when] || 0) + 1; });
+    collapseShown(pool.filter(todoNow)).forEach(function (g) { counts[g.lead.when] = (counts[g.lead.when] || 0) + 1; });
     var row = h('ul', { class: 'when-buttons' });
     defs.forEach(function (d) {
       var n = counts[d[0]] || 0;
@@ -589,10 +596,11 @@
 
   function render() {
     var all = programs();
-    var info = stateInfo();
-    var afterState = L.filterPrograms(all, { state: info.st, hideOtherStates: info.hide });
-    var fInfo = fitInfo(afterState);
-    var pool = fInfo.hide ? L.filterPrograms(afterState, { profile: profile, hideNoFit: true, statusOf: statusOf }) : afterState;
+    var sit = L.hasSituation(profile);
+    var split = L.splitHidden(all, { state: profState(), profile: profile, statusOf: statusOf }, shownReasons);
+    var pool = split.pool;
+    var fInfo = { sit: sit };
+    tickOf = {};
     // Ranks are numbered within the tab, over the programs that are left after the state and answers rules.
     var rankOf = L.rankMap(state.kind === 'all' ? pool : L.filterPrograms(pool, { kind: state.kind }));
     var ctx = { sit: fInfo.sit };
@@ -618,15 +626,35 @@
     els.tfNote.hidden = !state.trulyFree;
     renderTabs(pool);
     renderFilterBox(fInfo);
-    renderFitBox(fInfo);
-    renderStateBox(info);
+    renderHiddenBox(split);
     renderSummary(pool, fInfo);
     renderMissBox();
     els.count.textContent = 'Showing ' + shown.length + ' of ' + pool.length + ' programs';
     els.empty.hidden = shown.length !== 0;
-    shownIds = shown.map(function (p) { return p.id; });
-    els.start.textContent = 'Start a guided run with these ' + shown.length;
-    els.start.disabled = shown.length === 0;
+    // Only hidden programs that also pass the search, tab and filters are worth pointing at.
+    var matchHidden = shown.length === 0 && split.hiddenNow > 0
+      ? L.filterPrograms(all.filter(function (p) { return split.reasons[p.id] && shownReasons[split.reasons[p.id]] !== true; }), opts)
+      : [];
+    var mCounts = {};
+    matchHidden.forEach(function (p) { var r = split.reasons[p.id]; mCounts[r] = (mCounts[r] || 0) + 1; });
+    els.emptyHidden.hidden = matchHidden.length === 0;
+    els.emptyHidden.textContent = matchHidden.length === 0 ? ''
+      : (matchHidden.length === 1 ? '1 hidden program matches' : matchHidden.length + ' hidden programs match') +
+        ' (' + L.hideCountsText(mCounts, !!profState()) + '). Open "Hidden from this list" above to show ' + (matchHidden.length === 1 ? 'it.' : 'them.');
+    renderedIds = shown.map(function (p) { return p.id; });
+    refreshStart();
+  }
+
+  // The guided run only gets programs that would still be listed: ticking something done
+  // also takes its other ways out of the run, so the button stays true between full renders.
+  function refreshStart() {
+    var ctx = hideCtx();
+    shownIds = renderedIds.filter(function (id) {
+      var p = byProgramId(id);
+      return p && !hiddenNowReason(p, ctx);
+    });
+    els.start.textContent = 'Start a guided run with these ' + shownIds.length;
+    els.start.disabled = shownIds.length === 0;
   }
 
   // Tab labels and counts: what each tab would show with the other filters as they are now.
@@ -661,6 +689,62 @@
     els.fitsMine.checked = state.fitsMine && fInfo.sit;
   }
 
+  function say(text) {
+    if (!els.live) return;
+    els.live.textContent = '';
+    els.live.textContent = text;
+  }
+
+  // Close Details on a card (used when it collapses to a strip).
+  function closeDetails(art, id) {
+    var more = art.querySelector('.card-more'), tg = art.querySelector('.card-toggle');
+    if (more) more.hidden = true;
+    if (tg) {
+      tg.setAttribute('aria-expanded', 'false');
+      var ic = tg.querySelector('.card-toggle-icon');
+      if (ic) ic.textContent = String.fromCharCode(0x25BE);
+    }
+    art.classList.remove('is-open');
+    delete openCards[id];
+  }
+
+  // Why a program that is back on to do is still hidden (the Tracker's style, for this page).
+  function hiddenSentence(p, reason) {
+    if (reason === 'covered') return 'You already signed up for another way to get this, so it will be hidden from this list.';
+    if (reason === 'noFit') return 'Your answers in My info rule it out, so it will be hidden from this list.';
+    if (reason === 'otherState') {
+      return profState() ? 'It is for another state, so it will be hidden from this list.'
+        : 'It is only for some states, so it will be hidden from this list until you add your state in My info.';
+    }
+    return '';
+  }
+
+  // A tick box was used on a card. The save and the boxes are already settled (BFF.ticks).
+  function onTick(art, p, res) {
+    var note = art.querySelector('.tick-note');
+    var ctx = hideCtx();
+    var reason = hiddenNowReason(p, ctx);
+    var strip = (reason === 'done' || reason === 'notForMe');
+    var st = res.status;
+    var fail = res.ok ? '' : ' ' + SAVE_FAIL;
+    BFF.ticks.keepPlace(res.input, function () {
+      if (strip) {
+        closeDetails(art, p.id);
+        art.classList.add('is-ticked');
+        var what = st === 'received' ? 'Marked received.' : st === 'skipped' ? 'Marked not for me.'
+          : (res.prev === 'received' ? 'No longer marked received.' : 'Marked done.');
+        if (note) note.textContent = what + ' It will be hidden from this list.' + (res.checked ? ' Untick to undo.' : ' Tick it again to undo.') + fail;
+      } else {
+        art.classList.remove('is-ticked');
+        var why = st === 'todo' && reason ? 'No longer marked. ' + hiddenSentence(p, reason) : '';
+        if (note) note.textContent = (why + fail).trim();
+      }
+    });
+    var back = L.hideReason(p, ctx) === '';
+    say(p.name + (st === 'received' ? ' marked received.' : st === 'signed-up' ? (res.prev === 'received' ? ' is no longer marked received.' : ' marked done.')
+      : st === 'skipped' ? ' marked not for me.' : back ? ' is back on your list.' : ' is no longer marked.') + fail);
+  }
+
   function onTrackerChanged() {
     if (!BFF.tracker || !els.list) return;
     var badges = els.list.querySelectorAll('.card[data-program-id]');
@@ -680,11 +764,8 @@
       if (want) { var foot = badges[m].querySelector('.card-foot'); badges[m].insertBefore(want, foot); }
     }
     renderMissBox();
-    var sels = els.list.querySelectorAll('select[data-program-id]');
-    for (var i = 0; i < sels.length; i++) {
-      var s = BFF.tracker.getStatus(sels[i].getAttribute('data-program-id')) || 'todo';
-      if (sels[i].value !== s) sels[i].value = s;
-    }
+    Object.keys(tickOf).forEach(function (id) { tickOf[id].sync(statusOf(id)); });
+    refreshStart();
   }
 
   BFF.views.directory = {

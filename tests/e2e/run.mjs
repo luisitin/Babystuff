@@ -40,10 +40,12 @@ const B = await import('./lib/groups-b.mjs');
 const C = await import('./lib/groups-c.mjs');
 const D = await import('./lib/groups-d.mjs');
 const E = await import('./lib/groups-e.mjs');
+const F = await import('./lib/groups-f.mjs');
+const G = await import('./lib/groups-g.mjs');
 const t0 = Date.now();
 const oi = process.argv.indexOf('--only');
 const only = oi > 0 ? process.argv[oi + 1].split(',') : null; // e.g. --only 4,7 runs those group numbers
-const steps = [['1', A.boot], ['2', A.routes], ['3', A.links], ['4', A.clickThrough], ['5', B.downloads], ['6', B.backup], ['7', B.gmail], ['8', C.fill], ['9', C.persistence], ['10', C.a11y], ['11', D.directoryG], ['12', D.guidedTrackerG], ['13', E.phaseH]];
+const steps = [['1', A.boot], ['2', A.routes], ['3', A.links], ['4', A.clickThrough], ['5', B.downloads], ['6', B.backup], ['7', B.gmail], ['8', C.fill], ['9', C.persistence], ['10', C.a11y], ['11', D.directoryG], ['12', D.guidedTrackerG], ['13', E.phaseH], ['14', F.phaseI], ['15', G.phaseJ]];
 try {
   for (const [id, fn] of steps) if (!only || only.includes(id)) await fn(env);
 } finally {

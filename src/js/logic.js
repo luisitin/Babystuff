@@ -353,30 +353,140 @@
     return st.length ? 'Only in ' + joinAnd(st.map(String)) : '';
   }
 
+  // ---- Phase J: ticks and the one "hidden from this list" rule ----
+  // Done and Received are two ticks over the stored status; Not for me is the status skipped.
+  function tickState(status) {
+    return { done: status === 'signed-up' || status === 'received', received: status === 'received', notForMe: status === 'skipped' };
+  }
+  function statusAfterTick(status, box, checked) {
+    var st = status === 'signed-up' || status === 'received' || status === 'skipped' ? status : 'todo';
+    var on = !!checked;
+    if (box === 'done') {
+      if (on) return st === 'received' ? 'received' : 'signed-up';
+      return st === 'signed-up' || st === 'received' ? 'todo' : st;
+    }
+    if (box === 'received') {
+      if (on) return 'received';
+      return st === 'received' ? 'signed-up' : st;
+    }
+    if (box === 'notForMe') {
+      if (on) return 'skipped';
+      return st === 'skipped' ? 'todo' : st;
+    }
+    return st;
+  }
+  // What a tick does, with the memory of the last tick on this program in this visit.
+  // last = { box, checked, from, to, signedUpAt } or null. When nothing else changed the status since
+  // (last.to === status) and the same box is flipped back, the result is last.from, so an undo is true.
+  // signedUpAt is the sign-up date to keep, or ''.
+  function tickChange(status, box, checked, last) {
+    var st = status === 'signed-up' || status === 'received' || status === 'skipped' ? status : 'todo';
+    var fresh = !!last && last.to === st;
+    var undo = fresh && last.box === box && !!checked === !last.checked;
+    var next = undo ? last.from : statusAfterTick(st, box, checked);
+    var done = function (x) { return x === 'signed-up' || x === 'received'; };
+    var keep = fresh && done(last.from) && done(next) && typeof last.signedUpAt === 'string' ? last.signedUpAt : '';
+    return { status: next, undo: undo, signedUpAt: keep };
+  }
+  // { groupKey: true } for every group with a member that is signed up or received.
+  function coveredGroups(list, statusOf) {
+    var out = {};
+    var f = typeof statusOf === 'function' ? statusOf : function () { return 'todo'; };
+    (list || []).forEach(function (p) {
+      if (!p) return;
+      var st = f(p.id);
+      if (st === 'signed-up' || st === 'received') out[groupKey(p)] = true;
+    });
+    return out;
+  }
+  var HIDE_REASONS = ['otherState', 'noFit', 'done', 'notForMe', 'covered'];
+  // ctx = { state, profile, statusOf, covered }. '' when the program is not hidden. First match wins.
+  function hideReason(p, ctx) {
+    ctx = ctx || {};
+    var st = typeof ctx.statusOf === 'function' ? ctx.statusOf(p.id) : 'todo';
+    if (st === 'signed-up' || st === 'received') return 'done';
+    if (st === 'skipped') return 'notForMe';
+    if (hiddenByState(p, ctx.state)) return 'otherState';
+    if (hasSituation(ctx.profile) && fit(p, ctx.profile) === 'no') return 'noFit';
+    if (ctx.covered && Object.prototype.hasOwnProperty.call(ctx.covered, groupKey(p))) return 'covered';
+    return '';
+  }
+  var REASON_NOUN = {
+    otherState: ['for another state', 'for other states'],
+    noFit: ['that your answers in My info rule out', 'that your answers in My info rule out'],
+    done: ['you marked done', 'you marked done'],
+    notForMe: ['you marked not for me', 'you marked not for me'],
+    covered: ['other way to get something you already signed up for', 'other ways to get something you already signed up for']
+  };
+  // "3 for other states", "1 only for some states" (no state set). Shared by the Programs hidden box and Do it for me.
+  function hideReasonText(reason, n, hasState) {
+    if (!REASON_NOUN[reason]) return '';
+    if (reason === 'otherState' && !hasState) return n + ' only for some states.';
+    return n + ' ' + REASON_NOUN[reason][n === 1 ? 0 : 1];
+  }
+  // "3 for other states, 2 you marked done": the counts in HIDE_REASONS order, zero counts left out, no end stop.
+  function hideCountsText(counts, hasState) {
+    var parts = [];
+    HIDE_REASONS.forEach(function (r) {
+      var n = counts && counts[r] ? counts[r] : 0;
+      if (n > 0) parts.push(hideReasonText(r, n, hasState).replace(/\.$/, ''));
+    });
+    return parts.join(', ');
+  }
+  // The Do it for me selection after a look at what is hidden. seen: ids that were listed the last time,
+  // now: ids listed now. A selected id that was listed and is hidden now goes (it was ticked off on another
+  // page, or the state or answers changed). Ids selected while already hidden (handed over) stay.
+  // statusOf (optional): an id that is signed up, received or marked not for me is dropped whether or not it was listed.
+  function pruneSelection(selected, seen, now, statusOf) {
+    var out = {};
+    Object.keys(selected || {}).forEach(function (id) {
+      if (!selected[id]) return;
+      if (typeof statusOf === 'function') {
+        var st = statusOf(id);
+        if (st === 'signed-up' || st === 'received' || st === 'skipped') return;
+      }
+      if (seen && seen[id] === true && !(now && now[id] === true)) return;
+      out[id] = true;
+    });
+    return out;
+  }
+  // shown: { reason: true } for the reasons the person chose to show for now.
+  function splitHidden(list, ctx, shown) {
+    ctx = ctx || {};
+    shown = shown || {};
+    var c = ctx.covered ? ctx : Object.assign({}, ctx, { covered: coveredGroups(list, ctx.statusOf) });
+    var out = { pool: [], reasons: {}, counts: {}, total: 0, hiddenNow: 0 };
+    HIDE_REASONS.forEach(function (r) { out.counts[r] = 0; });
+    (list || []).forEach(function (p) {
+      if (!p) return;
+      var r = hideReason(p, c);
+      if (r) { out.reasons[p.id] = r; out.counts[r]++; out.total++; }
+      if (r && shown[r] !== true) { out.hiddenNow++; return; }
+      out.pool.push(p);
+    });
+    return out;
+  }
+
   // ---- the Tracker's own list ----
   // One pass over the programs in rank order. Anything the person has acted on is its own row.
   // To-do programs for other states, ruled out by the answers, or covered by a same-thing sign-up
-  // are left out (and counted) unless opts.all is set. To-do alternates fold under their lead.
+  // are left out (and counted) unless opts.all is set. Nothing the person chose to show is saved. To-do alternates fold under their lead.
   function trackerScope(list, opts) {
     opts = opts || {};
     var statusOf = typeof opts.statusOf === 'function' ? opts.statusOf : function () { return 'todo'; };
     var ranked = rankPrograms(list);
     var out = { rows: [], left: { otherState: 0, noFit: 0, covered: 0 }, total: ranked.length };
-    var covered = {};
     var leads = {};
-    var sit = hasSituation(opts.profile);
-    ranked.forEach(function (p) {
-      var st = statusOf(p.id);
-      if (st === 'signed-up' || st === 'received') covered[groupKey(p)] = true;
-    });
+    var covered = coveredGroups(ranked, statusOf);
+    // The same rule as everywhere else (hideReason), with the status forced to to do: it is only asked of to-do programs.
+    var ctx = { state: opts.state, profile: opts.profile, statusOf: function () { return 'todo'; }, covered: covered };
     ranked.forEach(function (p) {
       var st = statusOf(p.id) || 'todo';
       if (st !== 'todo') { out.rows.push({ p: p, status: st, others: [] }); return; }
       var k = groupKey(p);
       if (!opts.all) {
-        if (hiddenByState(p, opts.state) && !opts.showOtherStates) { out.left.otherState++; return; }
-        if (sit && hiddenByAnswers(p, opts.profile, 'todo') && !opts.showNoFit) { out.left.noFit++; return; }
-        if (Object.prototype.hasOwnProperty.call(covered, k)) { out.left.covered++; return; }
+        var why = hideReason(p, ctx);
+        if (why) { out.left[why]++; return; }
       }
       if (Object.prototype.hasOwnProperty.call(leads, k)) leads[k].others.push(p);
       else { leads[k] = { p: p, status: 'todo', others: [] }; out.rows.push(leads[k]); }
@@ -606,6 +716,16 @@
     missingInfoCounts: missingInfoCounts,
     missingInfoText: missingInfoText,
     onlyInText: onlyInText,
+    tickState: tickState,
+    statusAfterTick: statusAfterTick,
+    tickChange: tickChange,
+    coveredGroups: coveredGroups,
+    HIDE_REASONS: HIDE_REASONS,
+    hideReason: hideReason,
+    hideReasonText: hideReasonText,
+    hideCountsText: hideCountsText,
+    pruneSelection: pruneSelection,
+    splitHidden: splitHidden,
     trackerScope: trackerScope,
     readyNow: readyNow,
     trackerSections: trackerSections,

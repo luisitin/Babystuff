@@ -240,3 +240,42 @@ test('tracker.js loads without DOM or BFF.logic and still exposes the view entry
   assert.equal(BFF.logic, undefined);
   assert.equal(BFF.tracker.valueLine(), null);
 });
+
+test('setStatus: the sign-up date rules', () => {
+  const { BFF } = load(progs);
+  const t = BFF.tracker;
+  const at = (id) => (t.getEntry(id) || {}).signedUpAt;
+  t.setStatus('a', 'signed-up');
+  const x = at('a');
+  assert.ok(x);
+  // received, then untick Received: the date stays
+  t.setStatus('a', 'received');
+  assert.equal(at('a'), x);
+  t.setStatus('a', 'signed-up');
+  assert.equal(at('a'), x);
+  // going back to received and to do keeps the stored date; a plain re-sign-up from todo starts a new one
+  t.setStatus('a', 'received');
+  t.setStatus('a', 'todo');
+  assert.equal(at('a'), x);
+  // a given date is kept for signed-up or received
+  const old = '2026-01-01T00:00:00.000Z';
+  t.setStatus('b', 'skipped');
+  t.setStatus('b', 'signed-up', { signedUpAt: old });
+  assert.equal(at('b'), old);
+  t.setStatus('b', 'received', { signedUpAt: '2026-02-02T00:00:00.000Z' });
+  assert.equal(at('b'), '2026-02-02T00:00:00.000Z');
+  // an invalid one is ignored: not a date, too long, not a string
+  t.setStatus('c', 'signed-up', { signedUpAt: 'nope' });
+  assert.ok(!isNaN(Date.parse(at('c'))) && at('c') !== 'nope');
+  const c1 = at('c');
+  t.setStatus('c', 'todo');
+  t.setStatus('c', 'signed-up', { signedUpAt: '2026-01-01T00:00:00.000Z' + 'x'.repeat(40) });
+  assert.ok(at('c') !== undefined && at('c').length <= 40);
+  t.setStatus('c', 'todo');
+  t.setStatus('c', 'signed-up', { signedUpAt: 5 });
+  assert.equal(typeof at('c'), 'string');
+  // a given date is not used for other statuses
+  t.setStatus('c', 'skipped', { signedUpAt: old });
+  assert.notEqual(at('c'), old);
+  assert.ok(c1);
+});

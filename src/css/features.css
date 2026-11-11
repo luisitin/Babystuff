@@ -70,8 +70,11 @@
 .fx-view .fx-trk-meta, .fx-view .fx-trk-line3 { margin: 2px 0 0; }
 .fx-trk-actions { display: flex; flex-wrap: wrap; align-items: center; gap: var(--fx-s2); margin-top: var(--fx-s1); }
 .fx-trk-actions .fx-link-btn, .fx-trk-actions .fx-btn { flex: none; padding: var(--fx-s1) var(--fx-s3); }
-.fx-trk-status { flex: 1 1 7rem; min-width: 0; }
-.fx-trk-status .fx-select { padding-left: var(--fx-s2); padding-right: var(--fx-s1); }
+/* Phase J: Done / Received / Not for me ticks under the actions of a row (tick rules live in base.css) */
+.fx-trk-ticks { margin-top: var(--fx-s1); border-top: 1px solid var(--fx-border); padding-top: 2px; min-width: 0; }
+.fx-trk-ticks .ticks { gap: 0 var(--fx-s3); }
+.fx-trk-tick-note { margin: 0 0 var(--fx-s1); line-height: 1.35; overflow-wrap: anywhere; }
+.fx-trk-tabs .fx-tab-label { overflow-wrap: normal; }
 .fx-trk-dot { color: var(--fx-primary); }
 .fx-trk-panel { margin-top: var(--fx-s2); padding-top: var(--fx-s2); border-top: 1px solid var(--fx-border); }
 .fx-trk-panel .fx-field { margin: var(--fx-s2) 0 0; }
@@ -118,8 +121,11 @@
 .fx-confirm-msg { margin: 0 0 var(--fx-s2); font-weight: 600; }
 .fx-confirm-msg:focus { outline: none; }
 .fx-problem { margin-bottom: var(--fx-s2); }
-.fx-actionbar-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--fx-s2); }
-.fx-actionbar-row .fx-btn { padding-left: var(--fx-s1); padding-right: var(--fx-s1); min-width: 0; }
+.fx-actionbar-row { display: grid; grid-template-columns: minmax(0, .85fr) minmax(0, 1.1fr) minmax(0, 1.1fr) minmax(0, .85fr); gap: var(--fx-s2); }
+.fx-actionbar-row .fx-btn { padding-left: var(--fx-s1); padding-right: var(--fx-s1); min-width: 0; line-height: 1.15; }
+/* Phase J: the line about what Do it for me leaves out; its links are 44px targets that add no line height */
+.gd-left { margin: var(--fx-s3) 0; line-height: 1.45; }
+.gd-left a { display: inline-block; padding: 12px 4px; margin: -12px 0; }
 
 /* Sticky bars only on phones, where the nav is fixed at the bottom */
 @media (max-width: 719px) {

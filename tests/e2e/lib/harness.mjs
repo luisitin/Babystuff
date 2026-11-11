@@ -18,6 +18,11 @@ export async function loadPlaywright() {
 
 // ---- reporter: one line per group, a summary at the end ----
 export const stats = { checks: 0, failed: 0, groups: 0 };
+// Thrown when a page's whole localStorage is empty after a reload or a navigation although it held values a moment before, and no
+// script in the page removed or cleared anything (see guardedReload). runGroup runs the group once more when this happens.
+export class BrowserStoreLoss extends Error {
+  constructor(message) { super(message); this.name = 'BrowserStoreLoss'; }
+}
 export function group(name) {
   const fails = [];
   let n = 0;
@@ -30,6 +35,8 @@ export function group(name) {
       return !!cond;
     },
     note(text) { console.log('     note: ' + text); },
+    // Forget everything this group counted so far (used when the group is run again from the start).
+    abandon() { stats.checks -= n; stats.failed -= fails.length; stats.groups--; n = 0; fails.length = 0; },
     end() {
       console.log((fails.length ? 'FAIL ' : 'ok   ') + name + ' (' + n + ' checks' + (fails.length ? ', ' + fails.length + ' failed' : '') + ')');
       fails.forEach((f) => console.log('       x ' + f));
@@ -37,10 +44,24 @@ export function group(name) {
   };
   return g;
 }
+// Run a group. If the browser empties a page's localStorage (BrowserStoreLoss) the group is run once more from the start and the
+// first attempt's checks are not counted. A second BrowserStoreLoss is a failed check, so a loss that repeats is never hidden.
 export async function runGroup(name, fn) {
-  const g = group(name);
-  try { await fn(g); } catch (e) { g.check('group ran to the end', false, e && e.stack ? e.stack.split('\n').slice(0, 3).join(' | ') : e); }
-  g.end();
+  for (let attempt = 1; attempt <= 2; attempt++) {
+    const g = group(name);
+    try { await fn(g); } catch (e) {
+      if (e instanceof BrowserStoreLoss) {
+        if (attempt === 1) {
+          g.note('"' + name + '": ' + e.message + ' No script in the page removed or cleared it. Running this group once more from the start; the first attempt is not counted.');
+          g.abandon();
+          continue;
+        }
+        g.check('the browser kept localStorage (it was emptied again on the second try)', false, e.message);
+      } else g.check('group ran to the end', false, e && e.stack ? e.stack.split('\n').slice(0, 3).join(' | ') : e);
+    }
+    g.end();
+    return;
+  }
 }
 
 // ---- opening the app ----
@@ -53,10 +74,18 @@ export function artifactFragment() { return fs.readFileSync(path.join(OUT, 'arti
 export const artifactPath = path.join(TMP, 'artifact-wrapped.html');
 export function writeArtifactPage() { fs.writeFileSync(artifactPath, SKELETON_HEAD + artifactFragment() + '</body></html>'); }
 export const artifactUrl = pathToFileURL(artifactPath).href;
+export const seedPagePath = path.join(TMP, 'seed.html');
+const seedPageUrl = pathToFileURL(seedPagePath).href;
 
+// Records every Storage setItem, removeItem and clear call made by a script in the page (call and key only, never a value) in
+// window.__bffRec. It does not read or write storage itself. guardedReload uses it to tell the page removing data from the browser
+// emptying the store. Only the document that is open can be asked: what a document does while it is being unloaded (a pagehide handler)
+// cannot be recorded. Measured in Chromium 2026-11-11: a call from a page script to a Playwright binding and a write to window.name made
+// from pagehide or unload are both lost (the same handler's localStorage writes did land; a beforeunload binding call did arrive).
+const RECORDER = '(function(){var r=window.__bffRec=[];["setItem","removeItem","clear"].forEach(function(n){var f=Storage.prototype[n];Storage.prototype[n]=function(k){if(r.length<5000)r.push(n==="clear"?"clear":n+" "+k);return f.apply(this,arguments)}})})();';
 const VIEWER_STUBS = 'window.open=function(){return null};window.alert=function(){};window.confirm=function(){return false};window.prompt=function(){return null};window.print=function(){};';
 
-/* open(browser, {mode: 'standalone'|'artifact', claude: 'full'|'null'|'none', viewport, scheme, perms, fixtures, profile, init, hash, gm, dl})
+/* open(browser, {mode: 'standalone'|'artifact', claude: 'full'|'null'|'none', viewport, scheme, perms, fixtures, profile, init, hash, gm, dl, seedMayGo})
    Returns {ctx, page, net, errors, url}. Every request except file: and data: goes to `net` and is aborted,
    unless it is a fixture served by us. Console errors and page errors go to `errors`. */
 export async function open(browser, o = {}) {
@@ -82,13 +111,10 @@ export async function open(browser, o = {}) {
     return route.abort();
   });
   const h = { ctx, net, errors: [], mode, claude: o.claude || 'full' };
-  const init = [];
+  const init = [RECORDER];
   if (mode === 'artifact') {
     init.push(VIEWER_STUBS);
     if (h.claude !== 'none') init.push(mockInit({ nullAll: h.claude === 'null', gm: o.gm, dl: o.dl }));
-  }
-  if (o.profile) {
-    init.push('try{if(!localStorage.getItem("bff.profile.v1"))localStorage.setItem("bff.profile.v1",' + JSON.stringify(JSON.stringify(o.profile)) + ')}catch(e){}');
   }
   (o.init || []).forEach((s) => init.push(s));
   for (const s of init) await ctx.addInitScript(s);
@@ -101,11 +127,30 @@ export async function open(browser, o = {}) {
   watch(page);
   ctx.on('page', watch);
   if (mode === 'artifact') writeArtifactPage();
+  // Saved values to start with (o.profile, o.seed). They are written from a blank page on the same file: origin before the app page
+  // opens, never from an init script: an init script that touches localStorage made the browser empty the whole store on about one
+  // load in five (see FINDINGS.md, Phase I).
+  const seed = Object.assign({}, o.seed || {});
+  if (o.profile && !Object.prototype.hasOwnProperty.call(seed, 'bff.profile.v1')) seed['bff.profile.v1'] = JSON.stringify(o.profile);
+  h.seed = seed;
+  if (Object.keys(seed).length) {
+    fs.writeFileSync(seedPagePath, '<!doctype html><meta charset=utf8><title>seed</title>');
+    await page.goto(seedPageUrl);
+    await page.evaluate((m) => { for (const k of Object.keys(m)) localStorage.setItem(k, m[k]); }, seed);
+  }
   h.url = (mode === 'artifact' ? artifactUrl : standaloneUrl) + '#' + (o.hash || 'directory');
   if (o.goto !== false) {
     await page.goto(h.url);
     await page.waitForSelector('#view-directory, .view:not([hidden])', { state: 'attached' });
     await page.waitForTimeout(o.settle === undefined ? 250 : o.settle);
+    // The seeded values must still be there: if the app has not removed them and they are gone, the browser emptied the store.
+    if (Object.keys(seed).length) {
+      // o.seedMayGo: keys the app may legitimately remove on load (default none, so every seeded key is checked).
+      const may = o.seedMayGo || [];
+      const checked = Object.keys(seed).filter((k) => !may.includes(k));
+      const gone = await page.evaluate((m) => m.filter((k) => localStorage.getItem(k) === null), checked);
+      if (gone.length) await storeLossVerdict(page, checked, [], 'the saved values written before the page opened were missing after it opened (' + checked.length + ' keys checked, ' + gone.length + ' missing).');
+    }
   }
   // Phase H: the Programs page opens on the Free stuff tab with the filters folded. Older checks look at every program, so by
   // default we do what a person would: tap All and unfold "Sort and filter". Pass {all: false} to test the real default view.
@@ -191,3 +236,176 @@ export function contrast(a, b) { const l1 = lum(a), l2 = lum(b); return (Math.ma
 
 export const norm = (u) => { try { const x = new URL(u); x.hash = ''; return x.href; } catch (e) { return u; } };
 export const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+
+// ---- Phase I helpers: Tracker folds, tabs and row panels, saved data, scroll ----
+// A { key: json } map for open({ seed }): stores an object under bff.<name>.v1 before the app page first opens.
+export function seedStore(name, obj) {
+  return { ['bff.' + name + '.v1']: JSON.stringify(obj) };
+}
+// The tracker entries for a { programId: status } map.
+export function trackerSeed(map) {
+  const o = {};
+  Object.keys(map).forEach((id) => { o[id] = { status: map[id], note: '', updatedAt: new Date().toISOString() }; });
+  return o;
+}
+// Open one of the three Tracker tool folds (email, gmail, backup) the way a person does: tap its summary.
+export async function openFold(page, key) {
+  const d = page.locator('#view-tracker details.fx-fold[data-fold="' + key + '"]');
+  if (!(await d.evaluate((e) => e.open))) await d.locator('summary').first().click();
+}
+export async function foldOpen(page, key) {
+  return page.locator('#view-tracker details.fx-fold[data-fold="' + key + '"]').evaluate((e) => e.open);
+}
+// Tap a Tracker tab (todo, signed-up, received, skipped, all) and wait until it is the pressed one.
+export async function trkTab(page, filter) {
+  const b = page.locator('#view-tracker button.fx-tab[data-filter="' + filter + '"]');
+  await b.click();
+  await page.waitForFunction((f) => document.querySelector('#view-tracker button.fx-tab[data-filter="' + f + '"]').getAttribute('aria-pressed') === 'true' && document.querySelector('#trk-list').getAttribute('data-tab') === f, filter);
+}
+// Open a Tracker row's Details panel. Closed folds around the row (the optional section, "more ways") are opened first.
+export async function openRowDetails(page, id) {
+  await page.evaluate((i) => {
+    const li = document.querySelector('#trk-list li.fx-trk-row[data-id="' + i + '"]');
+    for (let n = li && li.parentElement; n && n.id !== 'trk-list'; n = n.parentElement) if (n.tagName === 'DETAILS') n.open = true;
+  }, id);
+  const b = page.locator('#trk-d-' + id);
+  if ((await b.getAttribute('aria-expanded')) !== 'true') await b.click();
+  await page.waitForSelector('#trk-p-' + id + ':not([hidden])');
+}
+// Wait until the page has stopped scrolling (two equal readings 150 ms apart, up to 3 s). The My info hand-off scrolls smoothly.
+export async function settleScroll(page, max = 3000) {
+  let last = await page.evaluate(() => window.scrollY);
+  const t0 = Date.now();
+  while (Date.now() - t0 < max) {
+    await sleep(150);
+    const now = await page.evaluate(() => window.scrollY);
+    if (now === last) return true;
+    last = now;
+  }
+  return false;
+}
+// Open all three Tracker tool folds (email and calendar, Gmail, backup) so their controls can be used.
+export async function openTools(page) {
+  for (const k of ['email', 'gmail', 'backup']) await openFold(page, k);
+}
+// Make sure a Tracker row can be reached: unfold the "more ways" fold and the optional section around it.
+export async function revealRow(page, id) {
+  await page.evaluate((i) => {
+    const li = document.querySelector('#trk-list li.fx-trk-row[data-id="' + i + '"]');
+    for (let n = li && li.parentElement; n && n.id !== 'trk-list'; n = n.parentElement) if (n.tagName === 'DETAILS') n.open = true;
+  }, id);
+}
+// Put the Tracker on the All tab and switch on "Show all N programs", so every program has a row.
+export async function showAllRows(page) {
+  await trkTab(page, 'all');
+  const b = page.locator('#view-tracker .fx-trk-left button');
+  if ((await b.isVisible()) && (await b.getAttribute('aria-pressed')) === 'false') await b.click();
+}
+export const BACKUP_MSG = '#view-tracker details.fx-fold[data-fold="backup"] .fx-msg';
+// My info keeps "Fill forms on your phone" in a closed fold (remembered in prefs.infoFillOpen). Open it by tapping its summary.
+export async function openPhoneFold(page) {
+  const d = page.locator('#info-fill-fold');
+  if (!(await d.evaluate((e) => e.open))) await d.locator('summary').first().click();
+}
+// Open the tool folds of a view where there are any (Tracker folds, the phone fold on My info).
+export async function openViewTools(page, view) {
+  if (view === 'tracker') await openTools(page);
+  if (view === 'info') await openPhoneFold(page);
+}
+// Unfold the "more ways" fold or the optional section around a Do it for me pick box, so it can be ticked.
+export async function revealPick(page, id) {
+  await page.evaluate((i) => {
+    const cb = document.getElementById('gd-pick-' + i);
+    for (let n = cb && cb.parentElement; n && n.id !== 'view-guided'; n = n.parentElement) if (n.tagName === 'DETAILS') n.open = true;
+  }, id);
+}
+// Open every Tracker row's Details panel (unfolding the "more ways" folds and the optional section around them).
+export async function openAllPanels(page) {
+  await page.evaluate(() => {
+    document.querySelectorAll('#trk-list details').forEach((d) => { d.open = true; });
+    document.querySelectorAll('#trk-list button.fx-trk-more').forEach((b) => { if (b.getAttribute('aria-expanded') !== 'true') b.click(); });
+  });
+}
+// Decide what to do when a page's localStorage is empty although `keys` held values a moment ago. `oldCalls` are Storage calls the
+// old document made that the caller knows of (guardedReload has none, see its comment) and the new document's record is read here. If any script in the page
+// removed or cleared one of those keys, that is the app's doing and the group fails at once with a plain Error. Otherwise it is
+// reported as BrowserStoreLoss, and runGroup repeats the group once.
+export async function storeLossVerdict(page, keys, oldCalls, what) {
+  const calls = oldCalls.concat(await page.evaluate(() => window.__bffRec || []));
+  const removed = calls.filter((c) => c === 'clear' || (/^removeItem /.test(c) && keys.includes(c.slice(11))) );
+  if (removed.length) throw new Error('the page itself removed saved data: ' + removed.slice(0, 4).join(', ') + ' (' + what + ')');
+  throw new BrowserStoreLoss(what);
+}
+// Reload and check that what was in localStorage a moment ago is still there. If the store is completely empty afterwards, no script
+// in either document removed it (storeLossVerdict), the browser emptied it. Any other difference (some keys changed or
+// missing while others remain) is returned, not thrown: the check after the call reports it.
+export async function guardedReload(page) {
+  const read = () => page.evaluate(() => { const o = {}; for (let i = 0; i < localStorage.length; i++) { const k = localStorage.key(i); if (k !== 'bff.__probe') o[k] = localStorage.getItem(k); } return o; });
+  const before = await read();
+  await page.reload();
+  await page.waitForLoadState('load');
+  await sleep(150);
+  const after = await read();
+  const keys = Object.keys(before);
+  if (keys.length && Object.keys(after).length === 0) {
+    // Only the new document's record can be read here (storeLossVerdict). A removal made by the old document while it unloaded is not
+    // in any record, so it looks like a browser loss: the group runs once more, and a second loss fails it.
+    await storeLossVerdict(page, keys, [], 'localStorage held ' + keys.length + ' key' + (keys.length === 1 ? '' : 's') + ' (' + keys.join(', ') + ') before a reload and was empty after it.');
+  }
+}
+// Reload after a write the person made: a short pause so the page's own saving is done, then guardedReload.
+export async function reloadAfterWrite(page) {
+  await sleep(300);
+  await guardedReload(page);
+}
+
+// ---- Phase J helpers: the "Hidden from this list" box, tick boxes ----
+export const HB = '#view-directory details.dir-hidden';
+// Everything the Programs hidden box shows: presence, summary, one entry per reason line, the footer, the empty-state line.
+export async function hiddenBoxState(page) {
+  return page.evaluate((sel) => {
+    const d = document.querySelector(sel);
+    const t = (e) => (e ? e.textContent.replace(/\s+/g, ' ').trim() : null);
+    if (!d) return { present: false };
+    const lines = [...d.querySelectorAll('ul.dir-hidden-list > li')].map((li) => {
+      const b = li.querySelector('button');
+      const hv = b && b.querySelector('.visually-hidden');
+      return { reason: li.dataset.reason, text: t(li.querySelector('.dir-hidden-text')), btn: t(b), btnVisible: b ? [...b.childNodes].filter((n) => n.nodeType === 3).map((n) => n.textContent).join('').trim() : null, btnHidden: hv ? hv.textContent : null, link: li.querySelector('a[href="#info"][data-info-key="state"]') ? t(li.querySelector('a')) : null, btnClass: b ? b.className : '' };
+    });
+    const eh = document.querySelector('#view-directory p.empty-hidden');
+    return { present: true, hidden: d.hidden, open: d.open, summary: t(d.querySelector('summary')), lines, foot: t(d.querySelector('p.dir-hidden-foot')), emptyHidden: eh && !eh.hidden ? t(eh) : null };
+  }, HB);
+}
+// Unfold the box the way a person does (tap its summary) unless it is open.
+export async function openHiddenBox(page) {
+  const d = page.locator(HB);
+  if (!(await d.evaluate((e) => e.open))) await d.locator('summary').first().click();
+}
+// Tap Show (or Hide) on the line of one reason; returns after the list is drawn again.
+export async function toggleReason(page, reason) {
+  await openHiddenBox(page);
+  await page.locator(HB + ' li[data-reason="' + reason + '"] button').click();
+  await page.waitForTimeout(250);
+}
+// Show every reason that has a line (the audit groups need every program as a card).
+export async function showAllHidden(page) {
+  await openHiddenBox(page);
+  for (const r of ['otherState', 'noFit', 'done', 'notForMe', 'covered']) {
+    const b = page.locator(HB + ' li[data-reason="' + r + '"] button');
+    if ((await b.count()) && (await b.innerText()).trim().startsWith('Show')) { await b.click(); await page.waitForTimeout(200); }
+  }
+}
+// The ids of the cards on the Programs page, in order.
+export async function cardIds(page) {
+  return page.evaluate(() => [...document.querySelectorAll('#view-directory article.card')].map((c) => c.dataset.programId));
+}
+// The tick boxes of a Programs card: { done, received, notForMe } as checked flags, the Received label's visibility and the note.
+export async function cardTicks(page, id) {
+  return page.evaluate((i) => {
+    const c = document.querySelector('#view-directory article.card[data-program-id="' + i + '"]');
+    if (!c) return null;
+    const b = (k) => c.querySelector('input[data-tick="' + k + '"]');
+    const n = c.querySelector('p.tick-note');
+    return { done: !!b('done') && b('done').checked, received: !!b('received') && b('received').checked, notForMe: !!b('notForMe') && b('notForMe').checked, rcvVisible: !!b('received') && !b('received').closest('label').hidden && b('received').offsetParent !== null, note: n ? n.textContent.replace(/\s+/g, ' ').trim() : null, ticked: c.classList.contains('is-ticked') };
+  }, id);
+}

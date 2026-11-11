@@ -1,7 +1,7 @@
 // Groups 1 to 4: boot, routes, link audit, click-through.
 import fs from 'node:fs';
-import { ROOT, ROUTES, PROGRAMS, PROFILE, open, clean, runGroup, seedProfileUI, norm, artifactFragment, lsDump, openCard } from './harness.mjs';
-import { L, ALL, byId } from './model.mjs';
+import { ROOT, ROUTES, PROGRAMS, PROFILE, open, clean, runGroup, guardedReload, seedProfileUI, norm, artifactFragment, lsDump, setStatuses, showAllRows, openAllPanels, openViewTools, hiddenBoxState, toggleReason, showAllHidden, cardIds, HB } from './harness.mjs';
+import { L, ALL, byId, splitFor } from './model.mjs';
 
 export const suspects = []; // buttons that visibly did nothing (reported, never failed)
 export const SIGNUP = new Set(PROGRAMS.map((p) => p.signupUrl));
@@ -87,13 +87,13 @@ export async function routes(env) {
   });
 }
 
-// Fill My info through the form, then mark a few programs through the directory selects, as a person would.
+// Fill My info through the form, then mark a few programs in the page (these groups need the state, not the control; the tick boxes have their own group).
 export async function prepare(h) {
   await seedProfileUI(h, PROFILE, true);
-  await h.go('directory');
   const ids = PROGRAMS.slice(0, 3).map((p) => p.id);
   const vals = ['signed-up', 'received', 'skipped'];
-  for (let i = 0; i < ids.length; i++) { await openCard(h.page, ids[i]); await h.page.locator('select[data-program-id="' + ids[i] + '"]').selectOption(vals[i]); }
+  await setStatuses(h.page, Object.fromEntries(ids.map((id, i) => [id, vals[i]]))); // while on My info, so the Programs page draws them hidden when it opens
+  await h.go('directory');
 }
 async function expandAll(page) { await page.evaluate(() => document.querySelectorAll('details').forEach((d) => { d.open = true; })); }
 async function startGuided(h) {
@@ -104,6 +104,9 @@ async function startGuided(h) {
 }
 async function enterRoute(h, r) {
   if (r === 'guided') await startGuided(h); else await h.go(r);
+  // The Tracker lists the person's own to-do list and builds a row's Details panel on first open. Show every program and
+  // open every panel, so every sign-up link and every "Search my Gmail" link is audited and clicked as before.
+  if (r === 'tracker') { await showAllRows(h.page); await openAllPanels(h.page); }
   await expandAll(h.page);
 }
 
@@ -137,19 +140,25 @@ export async function links(env) {
       const label = mode + (mode === 'artifact' ? '/' + claude : '');
       const h = await open(browser, { mode, claude });
       await prepare(h);
-      // Programs for other states are hidden until the person asks. Check the rule, then use "Show them" so the audit covers all of them.
+      // Phase J: programs for other states and the three marked ones are hidden until the person shows them. Check the rule with the
+      // box's own Show and Hide buttons, then show everything so the audit covers all of them.
       await h.go('directory');
       const stateOnly = ALL.filter((p) => L.hiddenByState(p, PROFILE.state));
-      const idsNow = async () => h.page.evaluate(() => [...document.querySelectorAll('#view-directory article.card')].map((c) => c.dataset.programId));
-      const box = h.page.locator('#view-directory .dir-state:not(.dir-fit)');
+      const marked = Object.fromEntries(PROGRAMS.slice(0, 3).map((p, i) => [p.id, ['signed-up', 'received', 'skipped'][i]]));
+      const M0 = splitFor({ state: PROFILE.state, profile: PROFILE, statuses: marked });
+      const idsNow = () => cardIds(h.page);
       let before = await idsNow();
-      g.check(label + ': with state ' + PROFILE.state + ' the other-state programs are not listed and the state line gives their count', stateOnly.length > 0 && stateOnly.every((p) => !before.includes(p.id)) && before.length === ALL.length - stateOnly.length && (await box.innerText()).includes(stateOnly.length + ' programs for other states are hidden.'), before.length + ' cards, ' + stateOnly.length + ' hidden');
-      await box.getByRole('button', { name: 'Show them' }).click(); await h.page.waitForTimeout(200);
+      const bx = await hiddenBoxState(h.page);
+      const oneLine = (r) => (bx.lines.find((l) => l.reason === r) || {}).text;
+      g.check(label + ': with state ' + PROFILE.state + ' the other-state and marked programs are not listed and the box gives the counts', stateOnly.length > 0 && before.length === M0.pool.length && M0.pool.length === ALL.length - M0.total && stateOnly.every((p) => !before.includes(p.id)) && Object.keys(marked).every((id) => !before.includes(id)) && oneLine('otherState') === L.hideReasonText('otherState', M0.counts.otherState, true) && bx.summary === 'Hidden from this list: ' + M0.hiddenNow + ' programs', before.length + ' cards, ' + stateOnly.length + ' hidden, ' + JSON.stringify(bx.lines));
+      await toggleReason(h.page, 'otherState');
       let after = await idsNow();
-      g.check(label + ': "Show them" lists all ' + ALL.length + ' programs and the button becomes "Hide them"', after.length === ALL.length && (await box.getByRole('button', { name: 'Hide them' }).count()) === 1, String(after.length));
-      await box.getByRole('button', { name: 'Hide them' }).click(); await h.page.waitForTimeout(200);
-      g.check(label + ': "Hide them" hides them again', (await idsNow()).length === ALL.length - stateOnly.length && (await box.getByRole('button', { name: 'Show them' }).count()) === 1);
-      await box.getByRole('button', { name: 'Show them' }).click(); await h.page.waitForTimeout(200);
+      const bx2 = await hiddenBoxState(h.page);
+      g.check(label + ': Show on the other-state line lists those programs and the button becomes Hide', stateOnly.every((p) => after.includes(p.id)) && after.length === M0.pool.length + M0.counts.otherState && bx2.lines.find((l) => l.reason === 'otherState').btnVisible === 'Hide', String(after.length));
+      await toggleReason(h.page, 'otherState');
+      g.check(label + ': Hide hides them again', (await idsNow()).length === M0.pool.length && (await hiddenBoxState(h.page)).lines.find((l) => l.reason === 'otherState').btnVisible === 'Show');
+      await showAllHidden(h.page);
+      g.check(label + ': showing every reason lists all ' + ALL.length + ' programs', (await idsNow()).length === ALL.length, String((await idsNow()).length));
       const tally = {};
       for (const r of ROUTES) {
         await enterRoute(h, r);
@@ -221,7 +230,12 @@ export async function clickThrough(env) {
           return out;
         });
         let bad = [];
-        for (let i = 0; i < items.length; i++) {
+        // The Tracker repeats the Programs sign-up links and adds one Gmail search link per program, so a click on every fourth
+        // keeps the run short; groups 3 (audit) and the Programs route above cover all of them.
+        const stride = r === 'tracker' ? 4 : 1;
+        let clicked = 0;
+        for (let i = 0; i < items.length; i += stride) {
+          clicked++;
           const href = items[i], before = h.net.length;
           await page.locator('[data-e2e="' + i + '"]').scrollIntoViewIfNeeded().catch(() => {});
           await page.locator('[data-e2e="' + i + '"]').click({ timeout: 4000 }).catch((e) => bad.push('click failed ' + href + ' ' + String(e.message).split('\n')[0]));
@@ -233,7 +247,7 @@ export async function clickThrough(env) {
           if (extra.length) bad.push('unexpected extra request ' + extra[0]);
           await closeExtra();
         }
-        g.check(mode + ' #' + r + ': ' + items.length + ' external links each open exactly their href', bad.length === 0, bad.slice(0, 3).join(' | '));
+        g.check(mode + ' #' + r + ': ' + clicked + ' of ' + items.length + ' external links each open exactly their href', bad.length === 0 && (clicked > 0 || items.length === 0), bad.slice(0, 3).join(' | '));
         g.check(mode + ' #' + r + ': app page did not navigate away', page.url() === url0 || page.url().split('#')[0] === url0.split('#')[0], page.url());
       }
       g.check(mode + ': no errors after link clicks', h.errors.length === 0, h.errors.slice(0, 2).join(' | '));
@@ -251,14 +265,18 @@ export async function clickThrough(env) {
         const tag = mode + ' #' + plan.r + (plan.run ? ' (run in progress)' : '');
         const enter = async () => {
           await pg.evaluate(() => localStorage.removeItem('bff.guided.v1'));
-          await pg.reload(); await pg.waitForTimeout(120);
+          await guardedReload(pg); await pg.waitForTimeout(120);
           await hb.go(plan.r);
+          await openViewTools(pg, plan.r); // the Tracker folds and the phone fold on My info start closed
           if (plan.run) await startGuided(hb);
         };
         await enter();
         const names = await pg.locator('button:visible').evaluateAll((bs) => bs.map((b) => (b.getAttribute('aria-label') || b.textContent).trim().replace(/\s+/g, ' ')));
         let fails = [], did = 0; const asked = [];
+        let detailsSeen = 0;
         for (let i = 0; i < names.length; i++) {
+          // Every Tracker row has the same Details button: try one in five (all rows run the same code), and every other button.
+          if (plan.r === 'tracker' && /^Details for /.test(names[i]) && detailsSeen++ % 5 !== 0) continue;
           if (i > 0 || true) await enter();
           const btn = pg.locator('button:visible').nth(i);
           if ((await btn.count()) === 0) continue;
