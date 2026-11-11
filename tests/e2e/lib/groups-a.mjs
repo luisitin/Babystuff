@@ -1,6 +1,6 @@
 // Groups 1 to 4: boot, routes, link audit, click-through.
 import fs from 'node:fs';
-import { ROOT, ROUTES, PROGRAMS, PROFILE, open, clean, runGroup, seedProfileUI, norm, artifactFragment, lsDump, openCard, showAllRows, openAllPanels, openViewTools } from './harness.mjs';
+import { ROOT, ROUTES, PROGRAMS, PROFILE, open, clean, runGroup, guardedReload, seedProfileUI, norm, artifactFragment, lsDump, openCard, showAllRows, openAllPanels, openViewTools } from './harness.mjs';
 import { L, ALL, byId } from './model.mjs';
 
 export const suspects = []; // buttons that visibly did nothing (reported, never failed)
@@ -259,7 +259,7 @@ export async function clickThrough(env) {
         const tag = mode + ' #' + plan.r + (plan.run ? ' (run in progress)' : '');
         const enter = async () => {
           await pg.evaluate(() => localStorage.removeItem('bff.guided.v1'));
-          await pg.reload(); await pg.waitForTimeout(120);
+          await guardedReload(pg); await pg.waitForTimeout(120);
           await hb.go(plan.r);
           await openViewTools(pg, plan.r); // the Tracker folds and the phone fold on My info start closed
           if (plan.run) await startGuided(hb);

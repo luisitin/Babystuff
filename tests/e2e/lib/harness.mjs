@@ -18,6 +18,11 @@ export async function loadPlaywright() {
 
 // ---- reporter: one line per group, a summary at the end ----
 export const stats = { checks: 0, failed: 0, groups: 0 };
+// Thrown when a page's whole localStorage is empty after a reload or a navigation although it held values a moment before, and no
+// script in the page removed or cleared anything (see guardedReload). runGroup runs the group once more when this happens.
+export class BrowserStoreLoss extends Error {
+  constructor(message) { super(message); this.name = 'BrowserStoreLoss'; }
+}
 export function group(name) {
   const fails = [];
   let n = 0;
@@ -30,6 +35,8 @@ export function group(name) {
       return !!cond;
     },
     note(text) { console.log('     note: ' + text); },
+    // Forget everything this group counted so far (used when the group is run again from the start).
+    abandon() { stats.checks -= n; stats.failed -= fails.length; stats.groups--; n = 0; fails.length = 0; },
     end() {
       console.log((fails.length ? 'FAIL ' : 'ok   ') + name + ' (' + n + ' checks' + (fails.length ? ', ' + fails.length + ' failed' : '') + ')');
       fails.forEach((f) => console.log('       x ' + f));
@@ -37,10 +44,24 @@ export function group(name) {
   };
   return g;
 }
+// Run a group. If the browser empties a page's localStorage (BrowserStoreLoss) the group is run once more from the start and the
+// first attempt's checks are not counted. A second BrowserStoreLoss is a failed check, so a loss that repeats is never hidden.
 export async function runGroup(name, fn) {
-  const g = group(name);
-  try { await fn(g); } catch (e) { g.check('group ran to the end', false, e && e.stack ? e.stack.split('\n').slice(0, 3).join(' | ') : e); }
-  g.end();
+  for (let attempt = 1; attempt <= 2; attempt++) {
+    const g = group(name);
+    try { await fn(g); } catch (e) {
+      if (e instanceof BrowserStoreLoss) {
+        if (attempt === 1) {
+          g.note('"' + name + '": ' + e.message + ' No script in the page removed or cleared it. Running this group once more from the start; the first attempt is not counted.');
+          g.abandon();
+          continue;
+        }
+        g.check('the browser kept localStorage (it was emptied again on the second try)', false, e.message);
+      } else g.check('group ran to the end', false, e && e.stack ? e.stack.split('\n').slice(0, 3).join(' | ') : e);
+    }
+    g.end();
+    return;
+  }
 }
 
 // ---- opening the app ----
@@ -53,7 +74,13 @@ export function artifactFragment() { return fs.readFileSync(path.join(OUT, 'arti
 export const artifactPath = path.join(TMP, 'artifact-wrapped.html');
 export function writeArtifactPage() { fs.writeFileSync(artifactPath, SKELETON_HEAD + artifactFragment() + '</body></html>'); }
 export const artifactUrl = pathToFileURL(artifactPath).href;
+export const seedPagePath = path.join(TMP, 'seed.html');
+const seedPageUrl = pathToFileURL(seedPagePath).href;
 
+// Records every Storage setItem, removeItem and clear call made by a script in the page (call and key only, never a value) in
+// window.__bffRec. It does not read or write storage itself. guardedReload uses it to tell the page removing data from the browser
+// emptying the store.
+const RECORDER = '(function(){var r=window.__bffRec=[];["setItem","removeItem","clear"].forEach(function(n){var f=Storage.prototype[n];Storage.prototype[n]=function(k){if(r.length<5000)r.push(n==="clear"?"clear":n+" "+k);return f.apply(this,arguments)}})})();';
 const VIEWER_STUBS = 'window.open=function(){return null};window.alert=function(){};window.confirm=function(){return false};window.prompt=function(){return null};window.print=function(){};';
 
 /* open(browser, {mode: 'standalone'|'artifact', claude: 'full'|'null'|'none', viewport, scheme, perms, fixtures, profile, init, hash, gm, dl})
@@ -82,13 +109,10 @@ export async function open(browser, o = {}) {
     return route.abort();
   });
   const h = { ctx, net, errors: [], mode, claude: o.claude || 'full' };
-  const init = [];
+  const init = [RECORDER];
   if (mode === 'artifact') {
     init.push(VIEWER_STUBS);
     if (h.claude !== 'none') init.push(mockInit({ nullAll: h.claude === 'null', gm: o.gm, dl: o.dl }));
-  }
-  if (o.profile) {
-    init.push('try{if(!localStorage.getItem("bff.profile.v1"))localStorage.setItem("bff.profile.v1",' + JSON.stringify(JSON.stringify(o.profile)) + ')}catch(e){}');
   }
   (o.init || []).forEach((s) => init.push(s));
   for (const s of init) await ctx.addInitScript(s);
@@ -101,11 +125,27 @@ export async function open(browser, o = {}) {
   watch(page);
   ctx.on('page', watch);
   if (mode === 'artifact') writeArtifactPage();
+  // Saved values to start with (o.profile, o.seed). They are written from a blank page on the same file: origin before the app page
+  // opens, never from an init script: an init script that touches localStorage made the browser empty the whole store on about one
+  // load in five (see FINDINGS.md, Phase I).
+  const seed = Object.assign({}, o.seed || {});
+  if (o.profile && !Object.prototype.hasOwnProperty.call(seed, 'bff.profile.v1')) seed['bff.profile.v1'] = JSON.stringify(o.profile);
+  h.seed = seed;
+  if (Object.keys(seed).length) {
+    fs.writeFileSync(seedPagePath, '<!doctype html><meta charset=utf8><title>seed</title>');
+    await page.goto(seedPageUrl);
+    await page.evaluate((m) => { for (const k of Object.keys(m)) localStorage.setItem(k, m[k]); }, seed);
+  }
   h.url = (mode === 'artifact' ? artifactUrl : standaloneUrl) + '#' + (o.hash || 'directory');
   if (o.goto !== false) {
     await page.goto(h.url);
     await page.waitForSelector('#view-directory, .view:not([hidden])', { state: 'attached' });
     await page.waitForTimeout(o.settle === undefined ? 250 : o.settle);
+    // The seeded values must still be there: if the app has not removed them and they are gone, the browser emptied the store.
+    if (Object.keys(seed).length) {
+      const gone = await page.evaluate((m) => Object.keys(m).filter((k) => localStorage.getItem(k) === null), seed);
+      if (gone.length) await storeLossVerdict(page, Object.keys(seed), [], 'the saved values written before the page opened were missing after it opened (' + Object.keys(seed).length + ' keys written, ' + gone.length + ' missing).');
+    }
   }
   // Phase H: the Programs page opens on the Free stuff tab with the filters folded. Older checks look at every program, so by
   // default we do what a person would: tap All and unfold "Sort and filter". Pass {all: false} to test the real default view.
@@ -193,9 +233,9 @@ export const norm = (u) => { try { const x = new URL(u); x.hash = ''; return x.h
 export const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
 // ---- Phase I helpers: Tracker folds, tabs and row panels, saved data, scroll ----
-// An init script that stores an object under bff.<name>.v1 on the first load only (a reload keeps what the app saved since).
+// A { key: json } map for open({ seed }): stores an object under bff.<name>.v1 before the app page first opens.
 export function seedStore(name, obj) {
-  return 'try{if(!localStorage.getItem("bff.' + name + '.v1"))localStorage.setItem("bff.' + name + '.v1",' + JSON.stringify(JSON.stringify(obj)) + ')}catch(e){}';
+  return { ['bff.' + name + '.v1']: JSON.stringify(obj) };
 }
 // The tracker entries for a { programId: status } map.
 export function trackerSeed(map) {
@@ -281,20 +321,36 @@ export async function openAllPanels(page) {
     document.querySelectorAll('#trk-list button.fx-trk-more').forEach((b) => { if (b.getAttribute('aria-expanded') !== 'true') b.click(); });
   });
 }
-// Reload after a write the person made. Chromium hands localStorage writes to its browser process asynchronously. When the machine
-// is busy (several runs at once) a reload straight after a write can read the old, empty value, and a second reload then shows the
-// value that was there all along. So: reload, and if a bff.* value read before the reload is missing or different afterwards, reload
-// again (up to four times). An app that really loses its data still loses it on every reload and the check after this fails.
-export async function reloadAfterWrite(page) {
-  const read = () => page.evaluate(() => { const o = {}; for (let i = 0; i < localStorage.length; i++) { const k = localStorage.key(i); if (k.indexOf('bff.') === 0) o[k] = localStorage.getItem(k); } return o; });
+// Decide what to do when a page's localStorage is empty although `keys` held values a moment ago. `calls` are the Storage calls the
+// old document made after the values were read (guardedReload) and the new document's record is read here. If any script in the page
+// removed or cleared one of those keys, that is the app's doing and the group fails at once with a plain Error. Otherwise it is
+// reported as BrowserStoreLoss, and runGroup repeats the group once.
+export async function storeLossVerdict(page, keys, oldCalls, what) {
+  const calls = oldCalls.concat(await page.evaluate(() => window.__bffRec || []));
+  const removed = calls.filter((c) => c === 'clear' || (/^removeItem /.test(c) && keys.includes(c.slice(11))) );
+  if (removed.length) throw new Error('the page itself removed saved data: ' + removed.slice(0, 4).join(', ') + ' (' + what + ')');
+  throw new BrowserStoreLoss(what);
+}
+// Reload and check that what was in localStorage a moment ago is still there. If the store is completely empty afterwards, no script
+// in either document removed it (storeLossVerdict), the browser emptied it. Any other difference (some keys changed or
+// missing while others remain) is returned, not thrown: the check after the call reports it.
+export async function guardedReload(page) {
+  const read = () => page.evaluate(() => { const o = {}; for (let i = 0; i < localStorage.length; i++) { const k = localStorage.key(i); if (k !== 'bff.__probe') o[k] = localStorage.getItem(k); } return o; });
   const before = await read();
-  await sleep(300);
-  for (let i = 0; i < 4; i++) {
-    await page.reload();
-    await page.waitForLoadState('load');
-    await sleep(150);
-    const after = await read();
-    if (Object.keys(before).every((k) => after[k] === before[k])) return;
-    await sleep(2000); // the old value was not visible yet; give the browser process time before the next reload
+  const mark = await page.evaluate(() => (window.__bffRec || []).length);
+  const oldCalls = async () => page.evaluate((m) => (window.__bffRec || []).slice(m), mark).catch(() => []);
+  const tail = await oldCalls();
+  await page.reload();
+  await page.waitForLoadState('load');
+  await sleep(150);
+  const after = await read();
+  const keys = Object.keys(before);
+  if (keys.length && Object.keys(after).length === 0) {
+    await storeLossVerdict(page, keys, tail, 'localStorage held ' + keys.length + ' key' + (keys.length === 1 ? '' : 's') + ' (' + keys.join(', ') + ') before a reload and was empty after it.');
   }
+}
+// Reload after a write the person made: a short pause so the page's own saving is done, then guardedReload.
+export async function reloadAfterWrite(page) {
+  await sleep(300);
+  await guardedReload(page);
 }

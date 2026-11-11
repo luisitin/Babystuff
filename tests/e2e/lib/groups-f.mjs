@@ -17,10 +17,10 @@ const PROFILES = [['empty', {}], ['state only', { state: 'TX' }], ['full sample'
 const MODES = ['standalone', 'artifact'];
 
 async function openP(browser, mode, o = {}) {
-  const init = [];
-  if (o.prefs) init.push(seedStore('prefs', o.prefs));
-  if (o.statuses) init.push(seedStore('tracker', trackerSeed(o.statuses)));
-  return open(browser, { mode, viewport: o.vp, scheme: o.scheme, profile: o.profile || {}, init, hash: o.hash || 'tracker', all: false });
+  const seed = {};
+  if (o.prefs) Object.assign(seed, seedStore('prefs', o.prefs));
+  if (o.statuses) Object.assign(seed, seedStore('tracker', trackerSeed(o.statuses)));
+  return open(browser, { mode, viewport: o.vp, scheme: o.scheme, profile: o.profile || {}, seed, hash: o.hash || 'tracker', all: false });
 }
 const eq = (a, b) => JSON.stringify(a) === JSON.stringify(b);
 const plural = (n, w) => n + ' ' + w + (n === 1 ? '' : 's');
@@ -230,64 +230,58 @@ async function trackerBehaviour(env, g) {
       await h.ctx.close();
     }
     // ---- folds: closed by default, open state survives a reload ----
-    // Under a very heavy machine load Chromium sometimes shows an empty localStorage to the page that follows a reload, even though the
-    // value was written (reloadAfterWrite already retries). If the saved prefs are still missing, try the whole block once more in a
-    // fresh browser context and say so; an app that really loses the folds fails the second time too.
-    for (let attempt = 0; attempt < 2; attempt++) {
-      const h = await openP(browser, mode, { profile });
-      const page = h.page;
-      for (const k of ['email', 'gmail', 'backup']) g.check(label + ': fold "' + k + '" is closed by default', (await page.locator('#view-tracker details.fx-fold[data-fold="' + k + '"]').count()) === 1 && !(await foldOpen(page, k)));
-      g.check(label + ': a closed fold keeps its controls out of sight', !(await page.locator('#trk-archive').isVisible()) && !(await page.locator('#trk-restore').isVisible()) && !(await page.locator('#trk-inbox').isVisible()));
-      await openFold(page, 'email');
-      await openFold(page, 'backup');
-      g.check(label + ': opening shows the controls', (await page.locator('#trk-archive').isVisible()) && (await page.getByRole('button', { name: 'Download backup (JSON)' }).isVisible()));
-      await page.waitForTimeout(150);
-      const saved = await page.evaluate(() => JSON.parse(localStorage.getItem('bff.prefs.v1') || '{}').trkOpen);
-      g.check(label + ': prefs.trkOpen records the open folds', saved && saved.email === true && saved.backup === true && !saved.gmail, JSON.stringify(saved));
-      await reloadAfterWrite(page);
-      await page.waitForSelector('#view-tracker details.fx-fold');
-      await page.waitForTimeout(250);
-      const afterReload = await page.evaluate(() => [localStorage.getItem('bff.prefs.v1'), [...document.querySelectorAll('details.fx-fold')].map((d) => d.dataset.fold + ':' + d.open).join()]);
-      if (attempt === 0 && afterReload[0] === null) { g.note(label + ': the browser showed no saved prefs after a reload (machine under load); repeating the fold checks once'); await h.ctx.close(); continue; }
-      g.check(label + ': after a reload the same folds are open, the others closed', (await foldOpen(page, 'email')) && (await foldOpen(page, 'backup')) && !(await foldOpen(page, 'gmail')), JSON.stringify(afterReload));
-      await page.locator('#view-tracker details.fx-fold[data-fold="email"] > summary').click();
-      await page.waitForTimeout(150);
-      const saved2 = await page.evaluate(() => JSON.parse(localStorage.getItem('bff.prefs.v1') || '{}').trkOpen);
-      g.check(label + ': closing a fold is remembered too', saved2 && saved2.email === false && saved2.backup === true, JSON.stringify(saved2));
-      // a full render (tab switch, status change elsewhere) never touches the folds
-      await trkTab(page, 'all');
-      await page.evaluate((i) => BFF.tracker.setStatus(i, 'skipped'), ALL[5].id);
-      await page.waitForTimeout(100);
-      g.check(label + ': tab switches and renders leave the folds as they were', !(await foldOpen(page, 'email')) && (await foldOpen(page, 'backup')));
-      clean(g, h, label + ' folds');
-      await h.ctx.close();
-      break;
+    // The saved prefs must survive a reload. If the browser empties the whole store, guardedReload says so and runGroup repeats the group.
+    {
+    const h = await openP(browser, mode, { profile });
+    const page = h.page;
+    for (const k of ['email', 'gmail', 'backup']) g.check(label + ': fold "' + k + '" is closed by default', (await page.locator('#view-tracker details.fx-fold[data-fold="' + k + '"]').count()) === 1 && !(await foldOpen(page, k)));
+    g.check(label + ': a closed fold keeps its controls out of sight', !(await page.locator('#trk-archive').isVisible()) && !(await page.locator('#trk-restore').isVisible()) && !(await page.locator('#trk-inbox').isVisible()));
+    await openFold(page, 'email');
+    await openFold(page, 'backup');
+    g.check(label + ': opening shows the controls', (await page.locator('#trk-archive').isVisible()) && (await page.getByRole('button', { name: 'Download backup (JSON)' }).isVisible()));
+    await page.waitForTimeout(150);
+    const saved = await page.evaluate(() => JSON.parse(localStorage.getItem('bff.prefs.v1') || '{}').trkOpen);
+    g.check(label + ': prefs.trkOpen records the open folds', saved && saved.email === true && saved.backup === true && !saved.gmail, JSON.stringify(saved));
+    await reloadAfterWrite(page);
+    await page.waitForSelector('#view-tracker details.fx-fold');
+    await page.waitForTimeout(250);
+    const afterReload = await page.evaluate(() => [localStorage.getItem('bff.prefs.v1'), [...document.querySelectorAll('details.fx-fold')].map((d) => d.dataset.fold + ':' + d.open).join()]);
+    g.check(label + ': after a reload the same folds are open, the others closed', (await foldOpen(page, 'email')) && (await foldOpen(page, 'backup')) && !(await foldOpen(page, 'gmail')), JSON.stringify(afterReload));
+    await page.locator('#view-tracker details.fx-fold[data-fold="email"] > summary').click();
+    await page.waitForTimeout(150);
+    const saved2 = await page.evaluate(() => JSON.parse(localStorage.getItem('bff.prefs.v1') || '{}').trkOpen);
+    g.check(label + ': closing a fold is remembered too', saved2 && saved2.email === false && saved2.backup === true, JSON.stringify(saved2));
+    // a full render (tab switch, status change elsewhere) never touches the folds
+    await trkTab(page, 'all');
+    await page.evaluate((i) => BFF.tracker.setStatus(i, 'skipped'), ALL[5].id);
+    await page.waitForTimeout(100);
+    g.check(label + ': tab switches and renders leave the folds as they were', !(await foldOpen(page, 'email')) && (await foldOpen(page, 'backup')));
+    clean(g, h, label + ' folds');
+    await h.ctx.close();
     }
-    // ---- the Details panel and a saved note (same reload caveat as the folds above) ----
-    for (let attempt = 0; attempt < 2; attempt++) {
-      const h = await openP(browser, mode, { profile });
-      const page = h.page;
-      const ex = trackerFor({ profile });
-      const id = idsOf(ex.secs.now)[0];
-      const p = byId[id];
-      const btn = page.locator('#trk-d-' + id);
-      g.check(label + ': Details starts closed and points at its panel', (await btn.getAttribute('aria-expanded')) === 'false' && (await btn.getAttribute('aria-controls')) === 'trk-p-' + id && !(await page.locator('#trk-p-' + id).isVisible()));
-      g.check(label + ': no note box exists until the panel is first opened', (await page.locator('#trk-n-' + id).count()) === 0);
-      await openRowDetails(page, id);
-      g.check(label + ': the panel opens with what you get, the note box and Search my Gmail logic', (await btn.getAttribute('aria-expanded')) === 'true' && norm(await page.locator('#trk-p-' + id + ' .fx-trk-what').textContent()) === norm(p.whatYouGet) && (await page.locator('#trk-n-' + id).isVisible()));
-      await page.locator('#trk-n-' + id).fill('Jane, sent the form on the 3rd');
-      await page.waitForFunction((i) => BFF.tracker.getNote(i) === 'Jane, sent the form on the 3rd', id, { timeout: 2500 });
-      g.check(label + ': the note is saved in bff.tracker.v1', (await page.evaluate((i) => (JSON.parse(localStorage.getItem('bff.tracker.v1') || '{}')[i] || {}).note, id)) === 'Jane, sent the form on the 3rd');
-      g.check(label + ': Details now says the row has a note', /\(has a note\)/.test(await btn.textContent()));
-      await reloadAfterWrite(page);
-      await page.waitForSelector('#trk-list li.fx-trk-row');
-      await page.waitForTimeout(200);
-      if (attempt === 0 && (await page.evaluate(() => localStorage.getItem('bff.tracker.v1'))) === null) { g.note(label + ': the browser showed no saved tracker after a reload (machine under load); repeating the note checks once'); await h.ctx.close(); continue; }
-      await openRowDetails(page, id);
-      g.check(label + ': the note is back after a reload', (await page.locator('#trk-n-' + id).inputValue()) === 'Jane, sent the form on the 3rd');
-      clean(g, h, label + ' details');
-      await h.ctx.close();
-      break;
+    // ---- the Details panel and a saved note ----
+    {
+    const h = await openP(browser, mode, { profile });
+    const page = h.page;
+    const ex = trackerFor({ profile });
+    const id = idsOf(ex.secs.now)[0];
+    const p = byId[id];
+    const btn = page.locator('#trk-d-' + id);
+    g.check(label + ': Details starts closed and points at its panel', (await btn.getAttribute('aria-expanded')) === 'false' && (await btn.getAttribute('aria-controls')) === 'trk-p-' + id && !(await page.locator('#trk-p-' + id).isVisible()));
+    g.check(label + ': no note box exists until the panel is first opened', (await page.locator('#trk-n-' + id).count()) === 0);
+    await openRowDetails(page, id);
+    g.check(label + ': the panel opens with what you get, the note box and Search my Gmail logic', (await btn.getAttribute('aria-expanded')) === 'true' && norm(await page.locator('#trk-p-' + id + ' .fx-trk-what').textContent()) === norm(p.whatYouGet) && (await page.locator('#trk-n-' + id).isVisible()));
+    await page.locator('#trk-n-' + id).fill('Jane, sent the form on the 3rd');
+    await page.waitForFunction((i) => BFF.tracker.getNote(i) === 'Jane, sent the form on the 3rd', id, { timeout: 2500 });
+    g.check(label + ': the note is saved in bff.tracker.v1', (await page.evaluate((i) => (JSON.parse(localStorage.getItem('bff.tracker.v1') || '{}')[i] || {}).note, id)) === 'Jane, sent the form on the 3rd');
+    g.check(label + ': Details now says the row has a note', /\(has a note\)/.test(await btn.textContent()));
+    await reloadAfterWrite(page);
+    await page.waitForSelector('#trk-list li.fx-trk-row');
+    await page.waitForTimeout(200);
+    await openRowDetails(page, id);
+    g.check(label + ': the note is back after a reload', (await page.locator('#trk-n-' + id).inputValue()) === 'Jane, sent the form on the 3rd');
+    clean(g, h, label + ' details');
+    await h.ctx.close();
     }
   }
 }
@@ -360,8 +354,7 @@ async function guidedGroupRule(env, g) {
   for (const mode of MODES) {
     for (const [name, statuses] of [['neither is signed up', {}], ['the second is signed up', { [B.id]: 'signed-up' }], ['the first is received', { [A.id]: 'received' }]]) {
       const label = mode + ' same-thing group (patched data), ' + name;
-      const init = [patch, seedStore('tracker', trackerSeed(statuses))];
-      const h = await open(browser, { mode, profile: FULL, init, hash: 'guided', all: false });
+      const h = await open(browser, { mode, profile: FULL, init: [patch], seed: seedStore('tracker', trackerSeed(statuses)), hash: 'guided', all: false });
       const d = await readGuided(h.page);
       const inGroup = d.rows.filter((r) => r.id === A.id || r.id === B.id);
       const done = Object.keys(statuses).length > 0;

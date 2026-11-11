@@ -100,7 +100,7 @@ export async function phaseH(env) {
 
       // a saved non-default filter opens the disclosure on load; Clear filters returns to Free stuff
       for (const f of [{ trulyFree: true }, { category: 'formula' }, { offer: 'product' }, { emailOnly: true }]) {
-        const h2 = await open(browser, { mode, all: false, init: ['try{localStorage.setItem("bff.prefs.v1",' + JSON.stringify(JSON.stringify({ filters: Object.assign({ kind: 'all' }, f) })) + ')}catch(e){}'] });
+        const h2 = await open(browser, { mode, all: false, seed: { 'bff.prefs.v1': JSON.stringify({ filters: Object.assign({ kind: 'all' }, f) }) } });
         const key = Object.keys(f)[0];
         g.check(tag + 'saved filter ' + key + ' opens the disclosure on load', await h2.page.locator(D + 'details.dir-filters').evaluate((d) => d.open) && /\(1 on\)/.test(await h2.page.locator(D + 'details.dir-filters > summary').innerText()));
         if (key === 'trulyFree') {

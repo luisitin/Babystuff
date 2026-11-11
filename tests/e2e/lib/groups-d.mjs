@@ -294,7 +294,7 @@ export async function directoryG(env) {
         ['offer __proto__ and unknown sort', { filters: { offer: '__proto__', category: 'toString', sort: 'nope', query: 7 } }],
         ['prefs is not an object', 'oops']
       ]) {
-        const h = await open(browser, { mode, init: ['try{localStorage.setItem("bff.prefs.v1",' + JSON.stringify(JSON.stringify(prefs)) + ')}catch(e){}'] });
+        const h = await open(browser, { mode, seed: { 'bff.prefs.v1': JSON.stringify(prefs) } });
         const page = h.page;
         const n = (await shownIds(page)).length;
         const M = shownFor('', false, {}, 'best');
