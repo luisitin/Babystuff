@@ -9,7 +9,7 @@ Run from the repo root: `node tests/e2e/run.mjs` (optional `--shots <dir>` saves
 - Expected numbers are never typed in. `lib/model.mjs` loads the real `logic.js`, `email.js` and `fieldmatch.js` in Node and works them out from `data/programs.json`, so the page is compared with the module and the data.
 - Dates for the due-date checks are relative to today, so they do not go stale.
 - All network is blocked and recorded; the app must make no request of its own. Everything it sees is synthetic: the Gmail mock, the profile and the fixture forms (`lib/fixtures.mjs`). No real site or mailbox is touched.
-- Exit code 1 if any check fails; the last line is `N checks, M failed`. The last full run (Phase J build): 4823 checks, 0 failed (900 s, no group repeated). Findings are in `FINDINGS.md`; mutation spot-checks are in `MUTATIONS.md`.
+- Exit code 1 if any check fails; the last line is `N checks, M failed`. The last full run (Phase J build, after the "(shown for now)" wording fix): 4823 checks, 0 failed (896 s, no group repeated). Findings are in `FINDINGS.md`; mutation spot-checks are in `MUTATIONS.md`.
 - To test a changed copy of the build without touching the repo, put `index.html` and `artifact.html` in a folder and run `BFF_E2E_BUILD_DIR=<folder> node tests/e2e/run.mjs --only 11,12`. The run then skips the build and uses those files (this is how `MUTATIONS.md` was made).
 - Not part of `node --test` or CI: it needs a browser (Playwright is preinstalled locally, not on CI runners). Without Playwright it prints `e2e skipped: Playwright not available` and exits 0.
 - `BFF_E2E_SUB=I2,I6 node tests/e2e/run.mjs --only 14` runs only those parts of group 14.
